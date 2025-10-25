@@ -22,33 +22,33 @@ const YachtController = {
   },
 
   create: (req, res) => {
-    const { name, type, length, owner, homePort } = req.body;
+    const { name, type, length, owner, homePort } = req.body || {};
     
-    if (!name || !type || !length) {
+    if (!name || typeof name !== 'string' || !type || typeof type !== 'string' || !length) {
       return res.status(400).json({ error: 'Name, type, and length are required' });
     }
 
-    const yacht = new Yacht(nextId++, name, type, length, owner, homePort);
+    const yacht = new Yacht(nextId++, name, type, parseInt(length, 10), owner, homePort);
     yachts.push(yacht);
     res.status(201).json(yacht);
   },
 
   update: (req, res) => {
-    const id = parseInt(req.params.id);
+    const id = parseInt(req.params.id, 10);
     const index = yachts.findIndex(y => y.id === id);
     
     if (index === -1) {
       return res.status(404).json({ error: 'Yacht not found' });
     }
 
-    const { name, type, length, owner, homePort } = req.body;
+    const { name, type, length, owner, homePort } = req.body || {};
     const yacht = yachts[index];
     
-    if (name) yacht.name = name;
-    if (type) yacht.type = type;
-    if (length) yacht.length = length;
-    if (owner) yacht.owner = owner;
-    if (homePort) yacht.homePort = homePort;
+    if (name && typeof name === 'string') yacht.name = name;
+    if (type && typeof type === 'string') yacht.type = type;
+    if (length) yacht.length = parseInt(length, 10);
+    if (owner && typeof owner === 'string') yacht.owner = owner;
+    if (homePort && typeof homePort === 'string') yacht.homePort = homePort;
 
     res.json(yacht);
   },
