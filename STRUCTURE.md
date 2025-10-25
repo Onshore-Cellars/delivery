@@ -193,10 +193,13 @@ __tests__/
 │   ├── auth.test.ts
 │   ├── listings.test.ts
 │   └── bookings.test.ts
-├── components/
-│   └── ...
-└── utils/
-    └── auth.test.ts
+├── pages/
+│   ├── login.test.tsx
+│   ├── register.test.tsx
+│   └── marketplace.test.tsx
+└── lib/
+    ├── auth.test.ts
+    └── stripe.test.ts
 ```
 
 ### Testing Tools to Add
@@ -244,7 +247,7 @@ See `.env.example` for all required environment variables.
 
 Critical variables:
 - `DATABASE_URL`: PostgreSQL connection
-- `NEXTAUTH_SECRET`: JWT signing key
+- `NEXTAUTH_SECRET`: Secret key for JWT token signing (can be any secure random string)
 - `STRIPE_SECRET_KEY`: Payment processing
 
 ## Deployment Checklist
