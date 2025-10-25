@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yacht Delivery Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            background: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .tab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .tab.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #5568d3;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .card h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            margin: 5px 0;
+            color: #666;
+        }
+
+        .card .label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .status.scheduled {
+            background: #ffeaa7;
+            color: #fdcb6e;
+        }
+
+        .status.in-progress {
+            background: #74b9ff;
+            color: #0984e3;
+        }
+
+        .status.completed {
+            background: #55efc4;
+            color: #00b894;
+        }
+
+        .status.cancelled {
+            background: #fab1a0;
+            color: #d63031;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-small {
+            width: auto;
+            padding: 8px 15px;
+            font-size: 12px;
+        }
+
+        .btn-danger {
+            background: #d63031;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-success {
+            background: #00b894;
+        }
+
+        .btn-success:hover {
+            background: #00a383;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 36px;
+            margin-bottom: 5px;
+        }
+
+        .stat-card p {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⛵ Yacht Delivery Platform</h1>
+            <p class="subtitle">Professional yacht delivery management system</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('dashboard')">Dashboard</button>
+            <button class="tab" onclick="showTab('deliveries')">Deliveries</button>
+            <button class="tab" onclick="showTab('yachts')">Yachts</button>
+            <button class="tab" onclick="showTab('captains')">Captains</button>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content active">
+            <div class="stats">
+                <div class="stat-card">
+                    <h3 id="totalDeliveries">0</h3>
+                    <p>Total Deliveries</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="totalYachts">0</h3>
+                    <p>Yachts</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="totalCaptains">0</h3>
+                    <p>Captains</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Recent Deliveries</h2>
+                <div id="recentDeliveries" class="grid"></div>
+            </div>
+        </div>
+
+        <!-- Deliveries Tab -->
+        <div id="deliveries" class="tab-content">
+            <div class="section">
+                <h2>Create New Delivery</h2>
+                <form id="deliveryForm">
+                    <div class="form-group">
+                        <label>Yacht</label>
+                        <select id="deliveryYacht" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Captain</label>
+                        <select id="deliveryCaptain" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Origin</label>
+                        <input type="text" id="deliveryOrigin" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Destination</label>
+                        <input type="text" id="deliveryDestination" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Departure Date</label>
+                        <input type="date" id="deliveryDeparture" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Estimated Arrival</label>
+                        <input type="date" id="deliveryArrival" required>
+                    </div>
+                    <button type="submit">Create Delivery</button>
+                </form>
+            </div>
+
+            <div class="section">
+                <h2>All Deliveries</h2>
+                <div id="allDeliveries" class="grid"></div>
+            </div>
+        </div>
+
+        <!-- Yachts Tab -->
+        <div id="yachts" class="tab-content">
+            <div class="section">
+                <h2>Add New Yacht</h2>
+                <form id="yachtForm">
+                    <div class="form-group">
+                        <label>Yacht Name</label>
+                        <input type="text" id="yachtName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select id="yachtType" required>
+                            <option value="sailboat">Sailboat</option>
+                            <option value="motor yacht">Motor Yacht</option>
+                            <option value="catamaran">Catamaran</option>
+                            <option value="trimaran">Trimaran</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Length (feet)</label>
+                        <input type="number" id="yachtLength" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Owner</label>
+                        <input type="text" id="yachtOwner" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Home Port</label>
+                        <input type="text" id="yachtPort" required>
+                    </div>
+                    <button type="submit">Add Yacht</button>
+                </form>
+            </div>
+
+            <div class="section">
+                <h2>Fleet</h2>
+                <div id="allYachts" class="grid"></div>
+            </div>
+        </div>
+
+        <!-- Captains Tab -->
+        <div id="captains" class="tab-content">
+            <div class="section">
+                <h2>Add New Captain</h2>
+                <form id="captainForm">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" id="captainName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>License Number</label>
+                        <input type="text" id="captainLicense" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Years of Experience</label>
+                        <input type="number" id="captainExperience" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Specializations (comma-separated)</label>
+                        <input type="text" id="captainSpecializations" placeholder="sailboat, motor yacht">
+                    </div>
+                    <button type="submit">Add Captain</button>
+                </form>
+            </div>
+
+            <div class="section">
+                <h2>All Captains</h2>
+                <div id="allCaptains" class="grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+
+        // Tab switching
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            // Refresh data when switching tabs
+            if (tabName === 'dashboard') loadDashboard();
+            if (tabName === 'deliveries') loadDeliveries();
+            if (tabName === 'yachts') loadYachts();
+            if (tabName === 'captains') loadCaptains();
+        }
+
+        // Load dashboard data
+        async function loadDashboard() {
+            try {
+                const [deliveries, yachts, captains] = await Promise.all([
+                    fetch(`${API_BASE}/deliveries`).then(r => r.json()),
+                    fetch(`${API_BASE}/yachts`).then(r => r.json()),
+                    fetch(`${API_BASE}/captains`).then(r => r.json())
+                ]);
+
+                document.getElementById('totalDeliveries').textContent = deliveries.length;
+                document.getElementById('totalYachts').textContent = yachts.length;
+                document.getElementById('totalCaptains').textContent = captains.length;
+
+                const recentDiv = document.getElementById('recentDeliveries');
+                recentDiv.innerHTML = deliveries.slice(0, 6).map(d => {
+                    const yacht = yachts.find(y => y.id === d.yachtId);
+                    const captain = captains.find(c => c.id === d.captainId);
+                    return `
+                        <div class="card">
+                            <h3>${yacht ? yacht.name : 'Unknown Yacht'}</h3>
+                            <p><span class="label">Captain:</span> ${captain ? captain.name : 'Unknown'}</p>
+                            <p><span class="label">Route:</span> ${d.origin} → ${d.destination}</p>
+                            <p><span class="label">Departure:</span> ${new Date(d.departureDate).toLocaleDateString()}</p>
+                            <span class="status ${d.status}">${d.status}</span>
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+
+        // Load deliveries
+        async function loadDeliveries() {
+            try {
+                const [deliveries, yachts, captains] = await Promise.all([
+                    fetch(`${API_BASE}/deliveries`).then(r => r.json()),
+                    fetch(`${API_BASE}/yachts`).then(r => r.json()),
+                    fetch(`${API_BASE}/captains`).then(r => r.json())
+                ]);
+
+                // Populate yacht dropdown
+                const yachtSelect = document.getElementById('deliveryYacht');
+                yachtSelect.innerHTML = yachts.map(y => 
+                    `<option value="${y.id}">${y.name} (${y.type})</option>`
+                ).join('');
+
+                // Populate captain dropdown
+                const captainSelect = document.getElementById('deliveryCaptain');
+                captainSelect.innerHTML = captains.map(c => 
+                    `<option value="${c.id}">${c.name}</option>`
+                ).join('');
+
+                // Display all deliveries
+                const deliveriesDiv = document.getElementById('allDeliveries');
+                deliveriesDiv.innerHTML = deliveries.map(d => {
+                    const yacht = yachts.find(y => y.id === d.yachtId);
+                    const captain = captains.find(c => c.id === d.captainId);
+                    return `
+                        <div class="card">
+                            <h3>${yacht ? yacht.name : 'Unknown Yacht'}</h3>
+                            <p><span class="label">Captain:</span> ${captain ? captain.name : 'Unknown'}</p>
+                            <p><span class="label">Route:</span> ${d.origin} → ${d.destination}</p>
+                            <p><span class="label">Departure:</span> ${new Date(d.departureDate).toLocaleDateString()}</p>
+                            <p><span class="label">Arrival:</span> ${new Date(d.estimatedArrival).toLocaleDateString()}</p>
+                            <span class="status ${d.status}">${d.status}</span>
+                            <div class="actions">
+                                <button class="btn-small btn-success" onclick="updateDeliveryStatus(${d.id}, 'in-progress')">Start</button>
+                                <button class="btn-small btn-success" onclick="updateDeliveryStatus(${d.id}, 'completed')">Complete</button>
+                                <button class="btn-small btn-danger" onclick="deleteDelivery(${d.id})">Delete</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('Error loading deliveries:', error);
+            }
+        }
+
+        // Load yachts
+        async function loadYachts() {
+            try {
+                const yachts = await fetch(`${API_BASE}/yachts`).then(r => r.json());
+                
+                const yachtsDiv = document.getElementById('allYachts');
+                yachtsDiv.innerHTML = yachts.map(y => `
+                    <div class="card">
+                        <h3>${y.name}</h3>
+                        <p><span class="label">Type:</span> ${y.type}</p>
+                        <p><span class="label">Length:</span> ${y.length} ft</p>
+                        <p><span class="label">Owner:</span> ${y.owner}</p>
+                        <p><span class="label">Home Port:</span> ${y.homePort}</p>
+                        <div class="actions">
+                            <button class="btn-small btn-danger" onclick="deleteYacht(${y.id})">Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading yachts:', error);
+            }
+        }
+
+        // Load captains
+        async function loadCaptains() {
+            try {
+                const captains = await fetch(`${API_BASE}/captains`).then(r => r.json());
+                
+                const captainsDiv = document.getElementById('allCaptains');
+                captainsDiv.innerHTML = captains.map(c => `
+                    <div class="card">
+                        <h3>${c.name}</h3>
+                        <p><span class="label">License:</span> ${c.license}</p>
+                        <p><span class="label">Experience:</span> ${c.experience} years</p>
+                        <p><span class="label">Specializations:</span> ${c.specializations.join(', ')}</p>
+                        <div class="actions">
+                            <button class="btn-small btn-danger" onclick="deleteCaptain(${c.id})">Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading captains:', error);
+            }
+        }
+
+        // Form handlers
+        document.getElementById('yachtForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                const response = await fetch(`${API_BASE}/yachts`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: document.getElementById('yachtName').value,
+                        type: document.getElementById('yachtType').value,
+                        length: parseInt(document.getElementById('yachtLength').value),
+                        owner: document.getElementById('yachtOwner').value,
+                        homePort: document.getElementById('yachtPort').value
+                    })
+                });
+                if (response.ok) {
+                    e.target.reset();
+                    loadYachts();
+                    alert('Yacht added successfully!');
+                }
+            } catch (error) {
+                console.error('Error adding yacht:', error);
+                alert('Failed to add yacht');
+            }
+        });
+
+        document.getElementById('captainForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                const specs = document.getElementById('captainSpecializations').value;
+                const response = await fetch(`${API_BASE}/captains`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: document.getElementById('captainName').value,
+                        license: document.getElementById('captainLicense').value,
+                        experience: parseInt(document.getElementById('captainExperience').value),
+                        specializations: specs ? specs.split(',').map(s => s.trim()) : []
+                    })
+                });
+                if (response.ok) {
+                    e.target.reset();
+                    loadCaptains();
+                    alert('Captain added successfully!');
+                }
+            } catch (error) {
+                console.error('Error adding captain:', error);
+                alert('Failed to add captain');
+            }
+        });
+
+        document.getElementById('deliveryForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                const response = await fetch(`${API_BASE}/deliveries`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        yachtId: parseInt(document.getElementById('deliveryYacht').value),
+                        captainId: parseInt(document.getElementById('deliveryCaptain').value),
+                        origin: document.getElementById('deliveryOrigin').value,
+                        destination: document.getElementById('deliveryDestination').value,
+                        departureDate: document.getElementById('deliveryDeparture').value,
+                        estimatedArrival: document.getElementById('deliveryArrival').value,
+                        status: 'scheduled'
+                    })
+                });
+                if (response.ok) {
+                    e.target.reset();
+                    loadDeliveries();
+                    alert('Delivery created successfully!');
+                }
+            } catch (error) {
+                console.error('Error creating delivery:', error);
+                alert('Failed to create delivery');
+            }
+        });
+
+        // Delete functions
+        async function deleteYacht(id) {
+            if (confirm('Are you sure you want to delete this yacht?')) {
+                try {
+                    await fetch(`${API_BASE}/yachts/${id}`, { method: 'DELETE' });
+                    loadYachts();
+                } catch (error) {
+                    console.error('Error deleting yacht:', error);
+                }
+            }
+        }
+
+        async function deleteCaptain(id) {
+            if (confirm('Are you sure you want to delete this captain?')) {
+                try {
+                    await fetch(`${API_BASE}/captains/${id}`, { method: 'DELETE' });
+                    loadCaptains();
+                } catch (error) {
+                    console.error('Error deleting captain:', error);
+                }
+            }
+        }
+
+        async function deleteDelivery(id) {
+            if (confirm('Are you sure you want to delete this delivery?')) {
+                try {
+                    await fetch(`${API_BASE}/deliveries/${id}`, { method: 'DELETE' });
+                    loadDeliveries();
+                    loadDashboard();
+                } catch (error) {
+                    console.error('Error deleting delivery:', error);
+                }
+            }
+        }
+
+        async function updateDeliveryStatus(id, status) {
+            try {
+                await fetch(`${API_BASE}/deliveries/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status })
+                });
+                loadDeliveries();
+                loadDashboard();
+            } catch (error) {
+                console.error('Error updating delivery:', error);
+            }
+        }
+
+        // Initial load
+        loadDashboard();
+    </script>
+</body>
+</html>
