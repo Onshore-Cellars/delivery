@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import CreateBookingModal from '@/components/CreateBookingModal'
 
 interface Listing {
   id: string
@@ -26,6 +27,8 @@ export default function MarketplacePage() {
   const router = useRouter()
   const [listings, setListings] = useState<Listing[]>([])
   const [loading, setLoading] = useState(true)
+  const [selectedListing, setSelectedListing] = useState<Listing | null>(null)
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false)
   const [filters, setFilters] = useState({
     origin: '',
     destination: '',
@@ -78,6 +81,33 @@ export default function MarketplacePage() {
       month: 'short',
       day: 'numeric',
     })
+  }
+
+  const handleBookNow = (listing: Listing) => {
+    // Check if user is logged in
+    const token = localStorage.getItem('token')
+    if (!token) {
+      router.push('/login')
+      return
+    }
+
+    const user = localStorage.getItem('user')
+    if (user) {
+      const userData = JSON.parse(user)
+      // Only shippers and yacht clients can book
+      if (userData.role !== 'SHIPPER' && userData.role !== 'YACHT_CLIENT') {
+        alert('Only shippers and yacht clients can make bookings')
+        return
+      }
+    }
+
+    setSelectedListing(listing)
+    setIsBookingModalOpen(true)
+  }
+
+  const handleBookingSuccess = () => {
+    // Refresh listings to update available capacity
+    fetchListings()
   }
 
   return (
@@ -242,7 +272,7 @@ export default function MarketplacePage() {
                       </div>
                     )}
                     <button
-                      onClick={() => router.push(`/dashboard?bookListing=${listing.id}`)}
+                      onClick={() => handleBookNow(listing)}
                       className="mt-4 px-6 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                     >
                       Book Now
@@ -252,6 +282,18 @@ export default function MarketplacePage() {
               </div>
             ))}
           </div>
+        )}
+
+        {selectedListing && (
+          <CreateBookingModal
+            isOpen={isBookingModalOpen}
+            onClose={() => {
+              setIsBookingModalOpen(false)
+              setSelectedListing(null)
+            }}
+            onSuccess={handleBookingSuccess}
+            listing={selectedListing}
+          />
         )}
       </div>
     </div>
