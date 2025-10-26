@@ -145,34 +145,44 @@ export default function DashboardPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>Loading...</p>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-900 mb-4"></div>
+          <p className="text-slate-600">Loading...</p>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100">
+      <nav className="bg-white shadow-sm border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <h1 className="text-xl font-bold text-gray-900">Yachting Logistics</h1>
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-gradient-to-br from-blue-900 to-blue-700 rounded flex items-center justify-center">
+                  <span className="text-white font-bold text-lg">⚓</span>
+                </div>
+                <h1 className="text-xl font-bold bg-gradient-to-r from-blue-900 to-blue-700 bg-clip-text text-transparent">
+                  Onshore Logistics
+                </h1>
+              </div>
             </div>
             <div className="flex items-center space-x-4">
-              <Link href="/marketplace" className="text-gray-700 hover:text-gray-900">
+              <Link href="/marketplace" className="text-slate-700 hover:text-blue-900 font-medium transition-colors">
                 Marketplace
               </Link>
               {user.role === 'ADMIN' && (
-                <Link href="/admin" className="text-gray-700 hover:text-gray-900">
+                <Link href="/admin" className="text-slate-700 hover:text-blue-900 font-medium transition-colors">
                   Admin
                 </Link>
               )}
-              <span className="text-gray-500">|</span>
-              <span className="text-gray-700">{user.name}</span>
+              <span className="text-slate-300">|</span>
+              <span className="text-slate-700 font-medium">{user.name}</span>
               <button
                 onClick={handleLogout}
-                className="text-sm text-blue-600 hover:text-blue-800"
+                className="text-sm text-blue-900 hover:text-blue-700 font-medium transition-colors"
               >
                 Logout
               </button>
@@ -183,24 +193,24 @@ export default function DashboardPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h2 className="text-3xl font-bold text-gray-900">Welcome, {user.name}!</h2>
-          <p className="text-gray-600 mt-2">
-            Account Type: <span className="font-semibold">{user.role.replace('_', ' ')}</span>
+          <h2 className="text-3xl font-bold text-slate-900">Welcome, {user.name}!</h2>
+          <p className="text-slate-600 mt-2">
+            Account Type: <span className="font-semibold text-blue-900">{user.role.replace('_', ' ')}</span>
             {user.company && (
-              <> | Company: <span className="font-semibold">{user.company}</span></>
+              <> | Company: <span className="font-semibold text-blue-900">{user.company}</span></>
             )}
           </p>
         </div>
 
-        <div className="border-b border-gray-200 mb-6">
+        <div className="border-b border-slate-200 mb-6">
           <nav className="-mb-px flex space-x-8">
             <button
               onClick={() => setActiveTab('overview')}
               className={`${
                 activeTab === 'overview'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+                  ? 'border-blue-900 text-blue-900'
+                  : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
             >
               Overview
             </button>
@@ -209,9 +219,9 @@ export default function DashboardPage() {
                 onClick={() => setActiveTab('listings')}
                 className={`${
                   activeTab === 'listings'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+                    ? 'border-blue-900 text-blue-900'
+                    : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
               >
                 My Listings
               </button>
@@ -221,9 +231,9 @@ export default function DashboardPage() {
                 onClick={() => setActiveTab('bookings')}
                 className={`${
                   activeTab === 'bookings'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+                    ? 'border-blue-900 text-blue-900'
+                    : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
               >
                 My Bookings
               </button>
@@ -233,19 +243,19 @@ export default function DashboardPage() {
 
         {activeTab === 'overview' && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Quick Actions</h3>
+            <div className="bg-white p-6 rounded-xl shadow-lg border border-slate-200">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">Quick Actions</h3>
               <div className="space-y-3">
                 <Link
                   href="/marketplace"
-                  className="block w-full px-4 py-2 text-center border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50"
+                  className="block w-full px-4 py-3 text-center border-2 border-blue-900 text-blue-900 rounded-lg hover:bg-blue-50 font-medium transition-all"
                 >
                   Browse Marketplace
                 </Link>
                 {user.role === 'CARRIER' && (
                   <button 
                     onClick={() => setIsCreateListingOpen(true)}
-                    className="block w-full px-4 py-2 text-center bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                    className="block w-full px-4 py-3 text-center bg-gradient-to-r from-blue-900 to-blue-700 text-white rounded-lg hover:from-blue-800 hover:to-blue-600 font-medium transition-all shadow-md hover:shadow-lg"
                   >
                     Create New Listing
                   </button>
@@ -253,43 +263,61 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Account Info</h3>
-              <dl className="space-y-2">
+            <div className="bg-white p-6 rounded-xl shadow-lg border border-slate-200">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">Account Info</h3>
+              <dl className="space-y-3">
                 <div>
-                  <dt className="text-sm text-gray-500">Email</dt>
-                  <dd className="text-sm font-medium text-gray-900">{user.email}</dd>
+                  <dt className="text-sm text-slate-500 font-medium">Email</dt>
+                  <dd className="text-sm font-medium text-slate-900">{user.email}</dd>
                 </div>
                 <div>
-                  <dt className="text-sm text-gray-500">Role</dt>
-                  <dd className="text-sm font-medium text-gray-900">
+                  <dt className="text-sm text-slate-500 font-medium">Role</dt>
+                  <dd className="text-sm font-medium text-blue-900">
                     {user.role.replace('_', ' ')}
                   </dd>
                 </div>
                 {user.company && (
                   <div>
-                    <dt className="text-sm text-gray-500">Company</dt>
-                    <dd className="text-sm font-medium text-gray-900">{user.company}</dd>
+                    <dt className="text-sm text-slate-500 font-medium">Company</dt>
+                    <dd className="text-sm font-medium text-slate-900">{user.company}</dd>
                   </div>
                 )}
               </dl>
             </div>
 
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Getting Started</h3>
-              <ul className="space-y-2 text-sm text-gray-600">
+            <div className="bg-white p-6 rounded-xl shadow-lg border border-slate-200">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">Getting Started</h3>
+              <ul className="space-y-2 text-sm text-slate-600">
                 {user.role === 'CARRIER' && (
                   <>
-                    <li>✓ Account created successfully</li>
-                    <li>→ Create your first van listing</li>
-                    <li>→ Manage bookings</li>
+                    <li className="flex items-center">
+                      <span className="text-green-600 mr-2">✓</span>
+                      Account created successfully
+                    </li>
+                    <li className="flex items-center">
+                      <span className="text-blue-900 mr-2">→</span>
+                      Create your first van listing
+                    </li>
+                    <li className="flex items-center">
+                      <span className="text-blue-900 mr-2">→</span>
+                      Manage bookings
+                    </li>
                   </>
                 )}
                 {(user.role === 'SHIPPER' || user.role === 'YACHT_CLIENT') && (
                   <>
-                    <li>✓ Account created successfully</li>
-                    <li>→ Browse available routes</li>
-                    <li>→ Book space for your deliveries</li>
+                    <li className="flex items-center">
+                      <span className="text-green-600 mr-2">✓</span>
+                      Account created successfully
+                    </li>
+                    <li className="flex items-center">
+                      <span className="text-blue-900 mr-2">→</span>
+                      Browse available routes
+                    </li>
+                    <li className="flex items-center">
+                      <span className="text-blue-900 mr-2">→</span>
+                      Book space for your deliveries
+                    </li>
                   </>
                 )}
               </ul>

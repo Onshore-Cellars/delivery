@@ -124,13 +124,13 @@ export default function CreateBookingModal({ isOpen, onClose, onSuccess, listing
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-900">Book Van Space</h2>
-          <p className="text-sm text-gray-600 mt-1">
+      <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200">
+        <div className="p-6 border-b border-slate-200 bg-gradient-to-r from-green-700 to-green-600">
+          <h2 className="text-2xl font-bold text-white">Book Van Space</h2>
+          <p className="text-sm text-green-100 mt-1">
             {listing.originAddress} → {listing.destinationAddress}
           </p>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-green-200 mt-1">
             Carrier: {listing.carrier.name}
             {listing.carrier.company && ` (${listing.carrier.company})`}
           </p>
@@ -138,12 +138,12 @@ export default function CreateBookingModal({ isOpen, onClose, onSuccess, listing
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {error && (
-            <div className="rounded-md bg-red-50 p-4">
+            <div className="rounded-lg bg-red-50 p-4 border border-red-200">
               <div className="text-sm text-red-800">{error}</div>
             </div>
           )}
 
-          <div className="bg-blue-50 p-4 rounded-md">
+          <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
             <h3 className="text-sm font-medium text-blue-900 mb-2">Available Capacity</h3>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
@@ -242,7 +242,7 @@ export default function CreateBookingModal({ isOpen, onClose, onSuccess, listing
           </div>
 
           {estimatedPrice > 0 && (
-            <div className="bg-green-50 p-4 rounded-md">
+            <div className="bg-green-50 p-4 rounded-lg border border-green-200">
               <h3 className="text-sm font-medium text-green-900 mb-1">Estimated Price</h3>
               <p className="text-2xl font-bold text-green-900">€{estimatedPrice.toFixed(2)}</p>
               {!listing.fixedPrice && (
@@ -263,18 +263,18 @@ export default function CreateBookingModal({ isOpen, onClose, onSuccess, listing
             </div>
           )}
 
-          <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+          <div className="flex justify-end space-x-3 pt-4 border-t border-slate-200">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="px-4 py-2 border border-slate-300 rounded-lg shadow-sm text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-900"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
+              className="px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 transition-all"
             >
               {loading ? 'Booking...' : 'Confirm Booking'}
             </button>
