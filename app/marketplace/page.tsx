@@ -29,10 +29,12 @@ export default function MarketplacePage() {
   const [bookingError, setBookingError] = useState('')
   const [bookingSuccess, setBookingSuccess] = useState('')
   const [bookingLoading, setBookingLoading] = useState(false)
+  const [fetchError, setFetchError] = useState('')
 
   const fetchListings = useCallback(async () => {
     try {
       setLoading(true)
+      setFetchError('')
       const params = new URLSearchParams()
       if (filters.origin) params.append('origin', filters.origin)
       if (filters.destination) params.append('destination', filters.destination)
@@ -42,8 +44,10 @@ export default function MarketplacePage() {
       const response = await fetch(`/api/listings?${params.toString()}`)
       const data = await response.json()
       if (response.ok) setListings(data.listings)
+      else setFetchError(data.error || 'Failed to load listings')
     } catch (err) {
       console.error('Error fetching listings:', err)
+      setFetchError('Failed to load listings. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -171,6 +175,12 @@ export default function MarketplacePage() {
             </div>
           </form>
         </div>
+
+        {fetchError && (
+          <div className="mb-6 rounded-md bg-red-50 p-4">
+            <p className="text-sm text-red-800">{fetchError}</p>
+          </div>
+        )}
 
         {loading ? (
           <div className="text-center py-12"><p className="text-gray-500">Loading listings...</p></div>

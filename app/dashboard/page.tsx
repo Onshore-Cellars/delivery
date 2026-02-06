@@ -35,12 +35,19 @@ export default function DashboardPage() {
   })
   const [formError, setFormError] = useState('')
   const [formLoading, setFormLoading] = useState(false)
+  const [fetchError, setFetchError] = useState('')
 
   useEffect(() => {
     const token = localStorage.getItem('token')
     const userData = localStorage.getItem('user')
     if (!token || !userData) { router.push('/login'); return }
-    setUser(JSON.parse(userData))
+    try {
+      setUser(JSON.parse(userData))
+    } catch {
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+      router.push('/login')
+    }
   }, [router])
 
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
@@ -53,7 +60,11 @@ export default function DashboardPage() {
       })
       const data = await res.json()
       if (res.ok) setListings(data.listings)
-    } catch (err) { console.error('Error:', err) }
+      else setFetchError(data.error || 'Failed to load listings')
+    } catch (err) {
+      console.error('Error:', err)
+      setFetchError('Failed to load data. Please refresh the page.')
+    }
   }, [token, user])
 
   const fetchBookings = useCallback(async () => {
@@ -62,7 +73,11 @@ export default function DashboardPage() {
       const res = await fetch('/api/bookings', { headers: { Authorization: `Bearer ${token}` } })
       const data = await res.json()
       if (res.ok) setBookings(data.bookings)
-    } catch (err) { console.error('Error:', err) }
+      else setFetchError(data.error || 'Failed to load bookings')
+    } catch (err) {
+      console.error('Error:', err)
+      setFetchError('Failed to load data. Please refresh the page.')
+    }
   }, [token])
 
   useEffect(() => {
@@ -92,25 +107,41 @@ export default function DashboardPage() {
 
   const toggleListing = async (id: string, isActive: boolean) => {
     try {
-      await fetch('/api/listings', {
+      const res = await fetch('/api/listings', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ id, isActive: !isActive }),
       })
+      if (!res.ok) {
+        const data = await res.json()
+        setFetchError(data.error || 'Failed to update listing')
+        return
+      }
       fetchListings()
-    } catch (err) { console.error('Error:', err) }
+    } catch (err) {
+      console.error('Error:', err)
+      setFetchError('Failed to update listing. Please try again.')
+    }
   }
 
   const updateBookingStatus = async (id: string, status: string) => {
     try {
-      await fetch('/api/bookings', {
+      const res = await fetch('/api/bookings', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ id, status }),
       })
+      if (!res.ok) {
+        const data = await res.json()
+        setFetchError(data.error || 'Failed to update booking')
+        return
+      }
       fetchBookings()
       if (user?.role === 'CARRIER') fetchListings()
-    } catch (err) { console.error('Error:', err) }
+    } catch (err) {
+      console.error('Error:', err)
+      setFetchError('Failed to update booking. Please try again.')
+    }
   }
 
   const handleLogout = () => {
@@ -151,6 +182,12 @@ export default function DashboardPage() {
       </nav>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {fetchError && (
+          <div className="mb-6 rounded-md bg-red-50 p-4 flex justify-between items-center">
+            <p className="text-sm text-red-800">{fetchError}</p>
+            <button onClick={() => setFetchError('')} className="text-red-500 hover:text-red-700 text-sm">Dismiss</button>
+          </div>
+        )}
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-gray-900">Welcome, {user.name}!</h2>
           <p className="text-gray-600 mt-1">

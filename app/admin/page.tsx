@@ -34,7 +34,15 @@ export default function AdminPage() {
     const token = localStorage.getItem('token')
     const userData = localStorage.getItem('user')
     if (!token || !userData) { router.push('/login'); return }
-    const user = JSON.parse(userData)
+    let user
+    try {
+      user = JSON.parse(userData)
+    } catch {
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+      router.push('/login')
+      return
+    }
     if (user.role !== 'ADMIN') { router.push('/dashboard'); return }
     fetchData(token)
   }, [router])

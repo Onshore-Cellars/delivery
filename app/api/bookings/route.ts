@@ -73,6 +73,10 @@ export async function POST(request: NextRequest) {
     const weight = parseFloat(weightBooked)
     const volume = parseFloat(volumeBooked)
 
+    if (isNaN(weight) || isNaN(volume) || weight <= 0 || volume <= 0) {
+      return NextResponse.json({ error: 'Weight and volume must be positive numbers' }, { status: 400 })
+    }
+
     if (listing.availableWeight < weight) {
       return NextResponse.json({ error: 'Insufficient weight capacity' }, { status: 400 })
     }

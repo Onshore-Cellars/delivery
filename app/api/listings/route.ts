@@ -39,11 +39,13 @@ export async function GET(request: NextRequest) {
     }
 
     if (minWeight) {
-      where.availableWeight = { gte: parseFloat(minWeight) }
+      const w = parseFloat(minWeight)
+      if (!isNaN(w)) where.availableWeight = { gte: w }
     }
 
     if (minVolume) {
-      where.availableVolume = { gte: parseFloat(minVolume) }
+      const v = parseFloat(minVolume)
+      if (!isNaN(v)) where.availableVolume = { gte: v }
     }
 
     const listings = await prisma.vanListing.findMany({
