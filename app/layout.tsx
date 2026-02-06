@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Yachting Logistics - Optimize Van Space in the Yachting Industry",
-  description: "Connect suppliers with spare van space to those who need it. Efficient, cost-effective delivery solutions for yacht destinations.",
+  title: "VanShare - Share Van Space, Save on Delivery",
+  description: "The marketplace for sharing van delivery space. Carriers list spare capacity, customers book affordable deliveries.",
 };
 
 export default function RootLayout({

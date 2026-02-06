@@ -1,118 +1,82 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
-enum UserRole {
-  CARRIER
-  SHIPPER
-  YACHT_CLIENT
-  ADMIN
-}
-
-enum BookingStatus {
-  PENDING
-  CONFIRMED
-  IN_TRANSIT
-  DELIVERED
-  CANCELLED
-}
-
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  name          String?
-  password      String
-  role          UserRole
-  phone         String?
-  company       String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  
-  // Relations
-  listings      VanListing[]  @relation("carrier")
-  bookings      Booking[]     @relation("shipper")
-  
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String
+  role      String   @default("CUSTOMER")
+  phone     String?
+  company   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  listings VanListing[] @relation("carrier")
+  bookings Booking[]    @relation("shipper")
+
   @@index([email])
 }
 
 model VanListing {
-  id                String    @id @default(cuid())
-  carrierId         String
-  carrier           User      @relation("carrier", fields: [carrierId], references: [id], onDelete: Cascade)
-  
-  // Van details
-  vehicleType       String
-  licensePlate      String?
-  
-  // Route information
-  originAddress     String
+  id        String @id @default(cuid())
+  carrierId String
+  carrier   User   @relation("carrier", fields: [carrierId], references: [id], onDelete: Cascade)
+
+  vehicleType        String
+  licensePlate       String?
+  originAddress      String
   destinationAddress String
-  departureDate     DateTime
-  arrivalDate       DateTime?
-  
-  // Capacity
-  totalWeight       Float     // in kg
-  totalVolume       Float     // in cubic meters
-  availableWeight   Float     // remaining weight capacity
-  availableVolume   Float     // remaining volume capacity
-  
-  // Pricing
-  pricePerKg        Float?
+  departureDate      DateTime
+  arrivalDate        DateTime?
+
+  totalWeight     Float
+  totalVolume     Float
+  availableWeight Float
+  availableVolume Float
+
+  pricePerKg         Float?
   pricePerCubicMeter Float?
-  fixedPrice        Float?
-  
-  // Status
-  isActive          Boolean   @default(true)
-  
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  
-  // Relations
-  bookings          Booking[]
-  
+  fixedPrice         Float?
+
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bookings Booking[]
+
   @@index([carrierId])
   @@index([departureDate])
   @@index([isActive])
 }
 
 model Booking {
-  id                String        @id @default(cuid())
-  listingId         String
-  listing           VanListing    @relation(fields: [listingId], references: [id], onDelete: Cascade)
-  shipperId         String
-  shipper           User          @relation("shipper", fields: [shipperId], references: [id], onDelete: Cascade)
-  
-  // Booking details
-  weightBooked      Float         // in kg
-  volumeBooked      Float         // in cubic meters
-  itemDescription   String
-  pickupAddress     String?
-  deliveryAddress   String?
-  
-  // Pricing
-  totalPrice        Float
-  
-  // Payment
-  stripePaymentId   String?
-  paymentStatus     String        @default("pending")
-  
-  // Status
-  status            BookingStatus @default(PENDING)
-  
-  createdAt         DateTime      @default(now())
-  updatedAt         DateTime      @updatedAt
-  
+  id        String     @id @default(cuid())
+  listingId String
+  listing   VanListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  shipperId String
+  shipper   User       @relation("shipper", fields: [shipperId], references: [id], onDelete: Cascade)
+
+  weightBooked    Float
+  volumeBooked    Float
+  itemDescription String
+  pickupAddress   String?
+  deliveryAddress String?
+
+  totalPrice      Float
+  stripePaymentId String?
+  paymentStatus   String @default("pending")
+  status          String @default("PENDING")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([listingId])
   @@index([shipperId])
   @@index([status])
