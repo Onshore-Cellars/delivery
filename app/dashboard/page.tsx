@@ -3,6 +3,9 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Navbar from '@/components/Navbar'
+import Footer from '@/components/Footer'
+import StatusBadge from '@/components/StatusBadge'
 
 interface User { id: string; email: string; name: string; role: string; company?: string }
 
@@ -144,44 +147,15 @@ export default function DashboardPage() {
     }
   }
 
-  const handleLogout = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
-    router.push('/login')
-  }
-
   const formatDate = (d: string) => new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-
-  const statusColor: Record<string, string> = {
-    PENDING: 'bg-yellow-100 text-yellow-800',
-    CONFIRMED: 'bg-blue-100 text-blue-800',
-    IN_TRANSIT: 'bg-purple-100 text-purple-800',
-    DELIVERED: 'bg-green-100 text-green-800',
-    CANCELLED: 'bg-red-100 text-red-800',
-  }
 
   if (!user) return <div className="min-h-screen flex items-center justify-center"><p>Loading...</p></div>
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <Link href="/" className="text-xl font-bold text-blue-600">VanShare</Link>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link href="/marketplace" className="text-gray-700 hover:text-gray-900">Marketplace</Link>
-              {user.role === 'ADMIN' && <Link href="/admin" className="text-gray-700 hover:text-gray-900">Admin</Link>}
-              <span className="text-gray-500">|</span>
-              <span className="text-gray-700">{user.name}</span>
-              <button onClick={handleLogout} className="text-sm text-blue-600 hover:text-blue-800">Logout</button>
-            </div>
-          </div>
-        </div>
-      </nav>
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <Navbar />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
         {fetchError && (
           <div className="mb-6 rounded-md bg-red-50 p-4 flex justify-between items-center">
             <p className="text-sm text-red-800">{fetchError}</p>
@@ -340,7 +314,7 @@ export default function DashboardPage() {
                 {listings.map(listing => (
                   <div key={listing.id} className="bg-white p-4 rounded-lg shadow">
                     <div className="flex justify-between items-start">
-                      <div>
+                      <Link href={`/listings/${listing.id}`} className="flex-1 hover:opacity-80">
                         <div className="flex items-center space-x-2">
                           <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${listing.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
                             {listing.isActive ? 'Active' : 'Inactive'}
@@ -350,7 +324,7 @@ export default function DashboardPage() {
                         <p className="font-semibold mt-1">{listing.originAddress} &rarr; {listing.destinationAddress}</p>
                         <p className="text-sm text-gray-500">{formatDate(listing.departureDate)} | {listing.availableWeight}/{listing.totalWeight} kg | {listing.availableVolume}/{listing.totalVolume} m&sup3;</p>
                         <p className="text-sm text-gray-500">{listing._count?.bookings || 0} booking(s)</p>
-                      </div>
+                      </Link>
                       <button onClick={() => toggleListing(listing.id, listing.isActive)}
                         className={`px-3 py-1 rounded text-xs font-medium ${listing.isActive ? 'bg-red-100 text-red-700 hover:bg-red-200' : 'bg-green-100 text-green-700 hover:bg-green-200'}`}>
                         {listing.isActive ? 'Deactivate' : 'Activate'}
@@ -383,11 +357,9 @@ export default function DashboardPage() {
                 {bookings.map(booking => (
                   <div key={booking.id} className="bg-white p-4 rounded-lg shadow">
                     <div className="flex justify-between items-start">
-                      <div className="flex-1">
+                      <Link href={`/bookings/${booking.id}`} className="flex-1 hover:opacity-80">
                         <div className="flex items-center space-x-2 mb-1">
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${statusColor[booking.status] || 'bg-gray-100 text-gray-800'}`}>
-                            {booking.status}
-                          </span>
+                          <StatusBadge status={booking.status} />
                           <span className="text-sm font-semibold">EUR {booking.totalPrice.toFixed(2)}</span>
                         </div>
                         <p className="font-medium">{booking.listing.originAddress} &rarr; {booking.listing.destinationAddress}</p>
@@ -396,7 +368,7 @@ export default function DashboardPage() {
                         {user.role === 'CARRIER' && <p className="text-sm text-gray-500">Customer: {booking.shipper.name} ({booking.shipper.email})</p>}
                         {user.role !== 'CARRIER' && <p className="text-sm text-gray-500">Carrier: {booking.listing.carrier.name}</p>}
                         <p className="text-xs text-gray-400 mt-1">Booked: {formatDate(booking.createdAt)}</p>
-                      </div>
+                      </Link>
                       <div className="flex flex-col space-y-1 ml-4">
                         {user.role === 'CARRIER' && booking.status === 'PENDING' && (
                           <>
@@ -427,6 +399,7 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   )
 }

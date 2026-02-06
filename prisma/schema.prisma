@@ -20,6 +20,8 @@ model User {
 
   listings VanListing[] @relation("carrier")
   bookings Booking[]    @relation("shipper")
+  reviewsGiven    Review[] @relation("reviewsGiven")
+  reviewsReceived Review[] @relation("reviewsReceived")
 
   @@index([email])
 }
@@ -77,7 +79,27 @@ model Booking {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  review Review?
+
   @@index([listingId])
   @@index([shipperId])
   @@index([status])
+}
+
+model Review {
+  id         String @id @default(cuid())
+  bookingId  String @unique
+  booking    Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  reviewerId String
+  reviewer   User   @relation("reviewsGiven", fields: [reviewerId], references: [id], onDelete: Cascade)
+  targetId   String
+  target     User   @relation("reviewsReceived", fields: [targetId], references: [id], onDelete: Cascade)
+
+  rating  Int
+  comment String?
+
+  createdAt DateTime @default(now())
+
+  @@index([targetId])
+  @@index([reviewerId])
 }

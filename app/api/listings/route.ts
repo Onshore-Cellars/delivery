@@ -48,7 +48,17 @@ export async function GET(request: NextRequest) {
       if (!isNaN(v)) where.availableVolume = { gte: v }
     }
 
-    const listings = await prisma.vanListing.findMany({
+    const page = parseInt(searchParams.get('page') || '1')
+    const limit = parseInt(searchParams.get('limit') || '0')
+    const sortBy = searchParams.get('sortBy') || 'departureDate'
+    const sortOrder = searchParams.get('sortOrder') === 'desc' ? 'desc' as const : 'asc' as const
+
+    const validSortFields = ['departureDate', 'pricePerKg', 'fixedPrice', 'availableWeight', 'createdAt']
+    const orderField = validSortFields.includes(sortBy) ? sortBy : 'departureDate'
+
+    const total = await prisma.vanListing.count({ where })
+
+    const queryOptions: Parameters<typeof prisma.vanListing.findMany>[0] = {
       where,
       include: {
         carrier: {
@@ -56,10 +66,20 @@ export async function GET(request: NextRequest) {
         },
         _count: { select: { bookings: true } },
       },
-      orderBy: { departureDate: 'asc' },
-    })
+      orderBy: { [orderField]: sortOrder },
+    }
 
-    return NextResponse.json({ listings })
+    if (limit > 0) {
+      queryOptions.take = limit
+      queryOptions.skip = (page - 1) * limit
+    }
+
+    const listings = await prisma.vanListing.findMany(queryOptions)
+
+    return NextResponse.json({
+      listings,
+      pagination: limit > 0 ? { page, limit, total, totalPages: Math.ceil(total / limit) } : null,
+    })
   } catch (error) {
     console.error('Error fetching listings:', error)
     return NextResponse.json({ error: 'An error occurred while fetching listings' }, { status: 500 })
@@ -131,7 +151,7 @@ export async function PATCH(request: NextRequest) {
     if (!decoded) return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
 
     const body = await request.json()
-    const { id, isActive } = body
+    const { id, isActive, vehicleType, originAddress, destinationAddress, departureDate, pricePerKg, fixedPrice } = body
 
     if (!id) return NextResponse.json({ error: 'Listing id is required' }, { status: 400 })
 
@@ -142,9 +162,19 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'Not authorized' }, { status: 403 })
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const data: any = {}
+    if (isActive !== undefined) data.isActive = isActive
+    if (vehicleType) data.vehicleType = vehicleType
+    if (originAddress) data.originAddress = originAddress
+    if (destinationAddress) data.destinationAddress = destinationAddress
+    if (departureDate) data.departureDate = new Date(departureDate)
+    if (pricePerKg !== undefined) data.pricePerKg = pricePerKg ? parseFloat(pricePerKg) : null
+    if (fixedPrice !== undefined) data.fixedPrice = fixedPrice ? parseFloat(fixedPrice) : null
+
     const updated = await prisma.vanListing.update({
       where: { id },
-      data: { isActive: isActive !== undefined ? isActive : listing.isActive },
+      data: Object.keys(data).length > 0 ? data : { isActive: listing.isActive },
     })
 
     return NextResponse.json({ listing: updated })

@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
+import Navbar from '@/components/Navbar'
+import Footer from '@/components/Footer'
 
 interface Listing {
   id: string
@@ -30,6 +32,9 @@ export default function MarketplacePage() {
   const [bookingSuccess, setBookingSuccess] = useState('')
   const [bookingLoading, setBookingLoading] = useState(false)
   const [fetchError, setFetchError] = useState('')
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [sortBy, setSortBy] = useState('departureDate')
 
   const fetchListings = useCallback(async () => {
     try {
@@ -41,9 +46,15 @@ export default function MarketplacePage() {
       if (filters.dateFrom) params.append('dateFrom', filters.dateFrom)
       if (filters.minWeight) params.append('minWeight', filters.minWeight)
 
+      params.append('limit', '12')
+      params.append('page', page.toString())
+      params.append('sortBy', sortBy)
       const response = await fetch(`/api/listings?${params.toString()}`)
       const data = await response.json()
-      if (response.ok) setListings(data.listings)
+      if (response.ok) {
+        setListings(data.listings)
+        if (data.pagination) setTotalPages(data.pagination.totalPages)
+      }
       else setFetchError(data.error || 'Failed to load listings')
     } catch (err) {
       console.error('Error fetching listings:', err)
@@ -51,7 +62,7 @@ export default function MarketplacePage() {
     } finally {
       setLoading(false)
     }
-  }, [filters])
+  }, [filters, page, sortBy])
 
   useEffect(() => {
     fetchListings()
@@ -59,6 +70,7 @@ export default function MarketplacePage() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
+    setPage(1)
     fetchListings()
   }
 
@@ -114,22 +126,10 @@ export default function MarketplacePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <Link href="/" className="text-xl font-bold text-blue-600">VanShare</Link>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link href="/dashboard" className="text-gray-700 hover:text-gray-900">Dashboard</Link>
-              <Link href="/login" className="text-gray-700 hover:text-gray-900">Login</Link>
-            </div>
-          </div>
-        </div>
-      </nav>
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <Navbar />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">Available Van Space</h2>
           <form onSubmit={handleSearch} className="bg-white p-6 rounded-lg shadow">
@@ -182,6 +182,17 @@ export default function MarketplacePage() {
           </div>
         )}
 
+        <div className="flex justify-between items-center mb-4">
+          <p className="text-sm text-gray-500">{listings.length} listing(s) found</p>
+          <select value={sortBy} onChange={e => { setSortBy(e.target.value); setPage(1) }}
+            className="px-3 py-1.5 border border-gray-300 rounded-md text-sm bg-white">
+            <option value="departureDate">Sort by Date</option>
+            <option value="pricePerKg">Sort by Price/kg</option>
+            <option value="availableWeight">Sort by Capacity</option>
+            <option value="createdAt">Sort by Newest</option>
+          </select>
+        </div>
+
         {loading ? (
           <div className="text-center py-12"><p className="text-gray-500">Loading listings...</p></div>
         ) : listings.length === 0 ? (
@@ -226,17 +237,36 @@ export default function MarketplacePage() {
                       </div>
                     </div>
                   </div>
-                  <div className="ml-6">
+                  <div className="ml-6 flex flex-col space-y-2">
                     <button
                       onClick={() => { setBookingModal(listing); setBookingError(''); setBookingSuccess('') }}
                       className="px-6 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
                     >
                       Book Now
                     </button>
+                    <Link href={`/listings/${listing.id}`}
+                      className="px-6 py-2 text-center border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                      View Details
+                    </Link>
                   </div>
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="mt-8 flex justify-center items-center space-x-4">
+            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1}
+              className="px-4 py-2 border border-gray-300 rounded-md text-sm bg-white hover:bg-gray-50 disabled:opacity-50">
+              Previous
+            </button>
+            <span className="text-sm text-gray-600">Page {page} of {totalPages}</span>
+            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page >= totalPages}
+              className="px-4 py-2 border border-gray-300 rounded-md text-sm bg-white hover:bg-gray-50 disabled:opacity-50">
+              Next
+            </button>
           </div>
         )}
       </div>
@@ -319,6 +349,8 @@ export default function MarketplacePage() {
           </div>
         </div>
       )}
+
+      <Footer />
     </div>
   )
 }

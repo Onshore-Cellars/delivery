@@ -1,33 +1,13 @@
 import Link from "next/link";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      <nav className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <Link href="/" className="text-xl font-bold text-blue-600">VanShare</Link>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link href="/marketplace" className="text-gray-700 hover:text-gray-900">
-                Marketplace
-              </Link>
-              <Link href="/login" className="text-gray-700 hover:text-gray-900">
-                Login
-              </Link>
-              <Link
-                href="/register"
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-              >
-                Sign Up
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col">
+      <Navbar />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center">
           <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
             <span className="block">Share Van Space</span>
@@ -122,13 +102,7 @@ export default function Home() {
         </div>
       </main>
 
-      <footer className="bg-white border-t border-gray-200 mt-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <p className="text-center text-gray-500 text-sm">
-            VanShare - Share Van Space, Save on Delivery
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

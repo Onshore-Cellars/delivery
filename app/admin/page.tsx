@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Navbar from '@/components/Navbar'
+import Footer from '@/components/Footer'
+import StatusBadge from '@/components/StatusBadge'
 
 interface Stats {
   users: { total: number; carriers: number; customers: number }
@@ -68,33 +71,13 @@ export default function AdminPage() {
 
   const formatDate = (d: string) => new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 
-  const handleLogout = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
-    router.push('/login')
-  }
-
   if (loading) return <div className="min-h-screen flex items-center justify-center"><p>Loading...</p></div>
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <Link href="/" className="text-xl font-bold text-blue-600">VanShare</Link>
-              <span className="ml-3 text-sm text-gray-500">Admin</span>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link href="/dashboard" className="text-gray-700 hover:text-gray-900">Dashboard</Link>
-              <Link href="/marketplace" className="text-gray-700 hover:text-gray-900">Marketplace</Link>
-              <button onClick={handleLogout} className="text-sm text-blue-600 hover:text-blue-800">Logout</button>
-            </div>
-          </div>
-        </div>
-      </nav>
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <Navbar />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
         <h2 className="text-3xl font-bold text-gray-900 mb-8">Admin Dashboard</h2>
 
         {stats && (
@@ -167,7 +150,7 @@ export default function AdminPage() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm">{b.shipper.name}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">{b.listing.carrier.name}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">EUR {b.totalPrice.toFixed(2)}</td>
-                      <td className="px-6 py-4 whitespace-nowrap"><span className="px-2 py-1 text-xs rounded-full bg-gray-100">{b.status}</span></td>
+                      <td className="px-6 py-4 whitespace-nowrap"><StatusBadge status={b.status} /></td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(b.createdAt)}</td>
                     </tr>
                   ))}
@@ -211,6 +194,7 @@ export default function AdminPage() {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   )
 }
