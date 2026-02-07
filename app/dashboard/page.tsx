@@ -165,7 +165,7 @@ export default function DashboardPage() {
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-gray-900">Welcome, {user.name}!</h2>
           <p className="text-gray-600 mt-1">
-            {user.role === 'CARRIER' ? 'Carrier' : user.role === 'ADMIN' ? 'Administrator' : 'Customer'}
+            {user.role === 'CARRIER' ? 'Supplier / Carrier' : user.role === 'ADMIN' ? 'Administrator' : 'Yacht Crew'}
             {user.company && ` | ${user.company}`}
           </p>
         </div>
@@ -262,13 +262,13 @@ export default function DashboardPage() {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700">Origin</label>
-                      <input type="text" required placeholder="e.g., London" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                      <input type="text" required placeholder="e.g., Nice Warehouse" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                         value={listingForm.originAddress} onChange={e => setListingForm({ ...listingForm, originAddress: e.target.value })}
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700">Destination</label>
-                      <input type="text" required placeholder="e.g., Manchester" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                      <input type="text" required placeholder="e.g., Port de Antibes Marina" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                         value={listingForm.destinationAddress} onChange={e => setListingForm({ ...listingForm, destinationAddress: e.target.value })}
                       />
                     </div>

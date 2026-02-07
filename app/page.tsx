@@ -10,11 +10,11 @@ export default function Home() {
       <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center">
           <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
-            <span className="block">Share Van Space</span>
-            <span className="block text-blue-600">Save on Delivery</span>
+            <span className="block">Yacht Supply Delivery</span>
+            <span className="block text-blue-600">Made Simple</span>
           </h1>
           <p className="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
-            The marketplace connecting van carriers with spare capacity to customers who need affordable deliveries. List your space or book a delivery in minutes.
+            Book space in supplier vans heading to marinas and yachts. Chandleries and suppliers list spare van capacity, yacht crews book deliveries in minutes.
           </p>
           <div className="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
             <div className="rounded-md shadow">
@@ -40,23 +40,23 @@ export default function Home() {
           <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
             <div className="bg-white p-6 rounded-lg shadow">
               <div className="text-blue-600 text-3xl mb-4">&#x1F69A;</div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">For Carriers</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">For Yacht Suppliers</h3>
               <p className="text-gray-600">
-                Got spare space in your van? List your routes and earn extra income on trips you are already making.
+                Running vans to marinas anyway? List your spare capacity and earn extra on every trip to the docks.
               </p>
             </div>
             <div className="bg-white p-6 rounded-lg shadow">
-              <div className="text-blue-600 text-3xl mb-4">&#x1F4E6;</div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">For Customers</h3>
+              <div className="text-blue-600 text-3xl mb-4">&#x26F5;</div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">For Yacht Crews</h3>
               <p className="text-gray-600">
-                Need something delivered? Browse available routes and book van space at a fraction of the usual cost.
+                Need provisions, parts or supplies dockside? Browse upcoming van runs and book space at a fraction of courier costs.
               </p>
             </div>
             <div className="bg-white p-6 rounded-lg shadow">
-              <div className="text-blue-600 text-3xl mb-4">&#x2705;</div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Simple &amp; Transparent</h3>
+              <div className="text-blue-600 text-3xl mb-4">&#x2693;</div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Marina to Marina</h3>
               <p className="text-gray-600">
-                Clear pricing, real-time capacity tracking, and booking management all in one place.
+                Real routes to real marinas. See available weight and volume, book instantly, and track your delivery dockside.
               </p>
             </div>
           </div>
@@ -68,30 +68,30 @@ export default function Home() {
             <div className="text-center">
               <div className="bg-blue-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 font-bold text-lg">1</div>
               <h4 className="font-semibold text-gray-900">Sign Up</h4>
-              <p className="text-sm text-gray-500 mt-1">Create a free account as a Carrier or Customer</p>
+              <p className="text-sm text-gray-500 mt-1">Register as a Supplier (carrier) or Yacht Crew (customer)</p>
             </div>
             <div className="text-center">
               <div className="bg-blue-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 font-bold text-lg">2</div>
               <h4 className="font-semibold text-gray-900">List or Browse</h4>
-              <p className="text-sm text-gray-500 mt-1">Carriers list van space, customers browse routes</p>
+              <p className="text-sm text-gray-500 mt-1">Suppliers list van runs to marinas, crews browse upcoming trips</p>
             </div>
             <div className="text-center">
               <div className="bg-blue-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 font-bold text-lg">3</div>
-              <h4 className="font-semibold text-gray-900">Book</h4>
-              <p className="text-sm text-gray-500 mt-1">Reserve space with weight and volume you need</p>
+              <h4 className="font-semibold text-gray-900">Book Space</h4>
+              <p className="text-sm text-gray-500 mt-1">Reserve the weight and volume you need, see price instantly</p>
             </div>
             <div className="text-center">
               <div className="bg-blue-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 font-bold text-lg">4</div>
-              <h4 className="font-semibold text-gray-900">Deliver</h4>
-              <p className="text-sm text-gray-500 mt-1">Track your delivery from pickup to dropoff</p>
+              <h4 className="font-semibold text-gray-900">Delivered Dockside</h4>
+              <p className="text-sm text-gray-500 mt-1">Track your delivery from warehouse to marina berth</p>
             </div>
           </div>
         </div>
 
         <div className="mt-24 bg-blue-600 rounded-lg p-12 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">Ready to start sharing van space?</h2>
+          <h2 className="text-3xl font-bold text-white mb-4">Get supplies to the dock, the smart way</h2>
           <p className="text-blue-100 mb-8 text-lg">
-            Join the marketplace and start saving on delivery costs today.
+            Join yacht suppliers and crews already saving on marina deliveries.
           </p>
           <Link
             href="/register"

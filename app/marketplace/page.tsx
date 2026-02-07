@@ -131,14 +131,14 @@ export default function MarketplacePage() {
 
       <div className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
         <div className="mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Available Van Space</h2>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">Available Van Runs to Marinas</h2>
           <form onSubmit={handleSearch} className="bg-white p-6 rounded-lg shadow">
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
               <div>
                 <label htmlFor="origin" className="block text-sm font-medium text-gray-700">From</label>
                 <input type="text" name="origin" id="origin"
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  placeholder="e.g., London"
+                  placeholder="e.g., Southampton"
                   value={filters.origin} onChange={e => setFilters({ ...filters, origin: e.target.value })}
                 />
               </div>
@@ -146,7 +146,7 @@ export default function MarketplacePage() {
                 <label htmlFor="destination" className="block text-sm font-medium text-gray-700">To</label>
                 <input type="text" name="destination" id="destination"
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  placeholder="e.g., Manchester"
+                  placeholder="e.g., Antibes Marina"
                   value={filters.destination} onChange={e => setFilters({ ...filters, destination: e.target.value })}
                 />
               </div>
@@ -276,7 +276,7 @@ export default function MarketplacePage() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Book Van Space</h3>
+              <h3 className="text-lg font-semibold text-gray-900">Book Delivery Space</h3>
               <button onClick={() => setBookingModal(null)} className="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
             </div>
 
@@ -320,7 +320,7 @@ export default function MarketplacePage() {
                   <label className="block text-sm font-medium text-gray-700">Item Description</label>
                   <input type="text" required
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                    placeholder="e.g., 3 boxes of electronics"
+                    placeholder="e.g., Engine parts, galley supplies"
                     value={bookingForm.itemDescription}
                     onChange={e => setBookingForm({ ...bookingForm, itemDescription: e.target.value })}
                   />

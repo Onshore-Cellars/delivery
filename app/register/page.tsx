@@ -46,7 +46,7 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <Link href="/" className="block text-center text-2xl font-bold text-blue-600">VanShare</Link>
+          <Link href="/" className="block text-center text-2xl font-bold text-blue-600">DockDrop</Link>
           <h2 className="mt-4 text-center text-3xl font-extrabold text-gray-900">
             Create your account
           </h2>
@@ -91,8 +91,8 @@ export default function RegisterPage() {
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 value={formData.role} onChange={handleChange}
               >
-                <option value="CUSTOMER">Customer (I need deliveries)</option>
-                <option value="CARRIER">Carrier (I have van space to offer)</option>
+                <option value="CUSTOMER">Yacht Crew / Buyer (I need supplies delivered)</option>
+                <option value="CARRIER">Supplier / Carrier (I run vans to marinas)</option>
               </select>
             </div>
             <div>

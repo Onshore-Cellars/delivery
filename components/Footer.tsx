@@ -6,8 +6,8 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
-            <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">VanShare</h3>
-            <p className="mt-2 text-sm text-gray-500">Share Van Space, Save on Delivery</p>
+            <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">DockDrop</h3>
+            <p className="mt-2 text-sm text-gray-500">Yacht Supply Delivery Marketplace</p>
           </div>
           <div>
             <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">Links</h3>
@@ -26,7 +26,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="mt-8 pt-6 border-t border-gray-200">
-          <p className="text-center text-xs text-gray-400">VanShare &copy; {new Date().getFullYear()}. All rights reserved.</p>
+          <p className="text-center text-xs text-gray-400">DockDrop &copy; {new Date().getFullYear()}. All rights reserved.</p>
         </div>
       </div>
     </footer>

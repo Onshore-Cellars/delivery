@@ -244,7 +244,7 @@ export default function ListingDetailPage() {
             <div className="mt-6 pt-4 border-t border-gray-200">
               <button onClick={() => setShowBooking(!showBooking)}
                 className="px-6 py-3 bg-green-600 text-white font-medium rounded-md hover:bg-green-700">
-                {showBooking ? 'Cancel' : 'Book This Van'}
+                {showBooking ? 'Cancel' : 'Book Space'}
               </button>
             </div>
           )}
@@ -301,7 +301,7 @@ export default function ListingDetailPage() {
         {/* Booking form */}
         {showBooking && (
           <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <h3 className="text-lg font-semibold mb-4">Book Van Space</h3>
+            <h3 className="text-lg font-semibold mb-4">Book Delivery Space</h3>
             {bookingSuccess ? (
               <div className="rounded-md bg-green-50 p-4">
                 <p className="text-sm text-green-800 font-medium">{bookingSuccess}</p>
@@ -329,7 +329,7 @@ export default function ListingDetailPage() {
                     <label className="block text-sm font-medium text-gray-700">Description</label>
                     <input type="text" required
                       className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md sm:text-sm"
-                      placeholder="e.g., 3 boxes"
+                      placeholder="e.g., Engine parts, 3 boxes"
                       value={bookingForm.itemDescription} onChange={e => setBookingForm({ ...bookingForm, itemDescription: e.target.value })} />
                   </div>
                 </div>
@@ -344,7 +344,7 @@ export default function ListingDetailPage() {
 
         {/* Carrier info */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Carrier</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Supplier</h3>
           <div className="flex items-start justify-between">
             <div>
               <p className="font-medium text-gray-900">{listing.carrier.name}</p>

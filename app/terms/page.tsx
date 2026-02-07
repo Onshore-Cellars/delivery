@@ -9,10 +9,10 @@ export default function TermsPage() {
 
         <div className="bg-white rounded-lg shadow p-8 prose prose-gray max-w-none">
           <h2 className="text-xl font-semibold mb-4">1. Acceptance of Terms</h2>
-          <p className="text-gray-600 mb-6">By accessing and using VanShare, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the platform.</p>
+          <p className="text-gray-600 mb-6">By accessing and using DockDrop, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the platform.</p>
 
           <h2 className="text-xl font-semibold mb-4">2. Platform Description</h2>
-          <p className="text-gray-600 mb-6">VanShare is a marketplace that connects van carriers with spare delivery capacity to customers who need affordable delivery services. We facilitate connections but are not a party to delivery agreements between carriers and customers.</p>
+          <p className="text-gray-600 mb-6">DockDrop is a marketplace that connects van carriers with spare delivery capacity to customers who need affordable delivery services. We facilitate connections but are not a party to delivery agreements between carriers and customers.</p>
 
           <h2 className="text-xl font-semibold mb-4">3. User Accounts</h2>
           <p className="text-gray-600 mb-6">You must provide accurate information when creating an account. You are responsible for maintaining the security of your account credentials. Users can register as either Carriers (offering van space) or Customers (booking deliveries).</p>
@@ -27,7 +27,7 @@ export default function TermsPage() {
           <p className="text-gray-600 mb-6">Bookings in PENDING status can be cancelled by either party. Once a booking is CONFIRMED, cancellation policies may apply. Capacity is automatically restored when a booking is cancelled.</p>
 
           <h2 className="text-xl font-semibold mb-4">7. Limitation of Liability</h2>
-          <p className="text-gray-600 mb-6">VanShare acts as a marketplace facilitator. We are not liable for damages, delays, or losses arising from deliveries arranged through the platform.</p>
+          <p className="text-gray-600 mb-6">DockDrop acts as a marketplace facilitator. We are not liable for damages, delays, or losses arising from deliveries arranged through the platform.</p>
 
           <p className="text-gray-400 text-sm mt-8">Last updated: February 2026</p>
         </div>

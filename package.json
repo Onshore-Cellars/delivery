@@ -4,13 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "DATABASE_URL=\"file:./placeholder.db\" prisma generate && next build",
+    "build": "prisma generate && next build",
     "postinstall": "prisma generate || true",
     "start": "next start",
     "lint": "eslint",
     "db:push": "prisma db push",
     "db:seed": "npx tsx prisma/seed.ts",
-    "db:reset": "rm -f prisma/dev.db && prisma db push && npx tsx prisma/seed.ts",
+    "db:reset": "prisma db push --force-reset && npx tsx prisma/seed.ts",
     "setup": "npm install && prisma db push && npx tsx prisma/seed.ts"
   },
   "dependencies": {

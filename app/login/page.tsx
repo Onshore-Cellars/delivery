@@ -46,7 +46,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <Link href="/" className="block text-center text-2xl font-bold text-blue-600">VanShare</Link>
+          <Link href="/" className="block text-center text-2xl font-bold text-blue-600">DockDrop</Link>
           <h2 className="mt-4 text-center text-3xl font-extrabold text-gray-900">
             Sign in to your account
           </h2>
@@ -94,7 +94,7 @@ export default function LoginPage() {
           </div>
 
           <div className="text-center text-sm text-gray-500">
-            <p>Demo accounts: carrier@demo.com / customer@demo.com / admin@demo.com</p>
+            <p>Demo: carrier@demo.com / customer@demo.com / admin@demo.com</p>
             <p>Password: password123</p>
           </div>
         </form>

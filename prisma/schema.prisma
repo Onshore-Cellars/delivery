@@ -4,8 +4,23 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum UserRole {
+  CUSTOMER
+  CARRIER
+  ADMIN
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  IN_TRANSIT
+  DELIVERED
+  CANCELLED
 }
 
 model User {
@@ -13,16 +28,16 @@ model User {
   email     String   @unique
   name      String?
   password  String
-  role      String   @default("CUSTOMER")
+  role      UserRole @default(CUSTOMER)
   phone     String?
   company   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  listings VanListing[] @relation("carrier")
-  bookings Booking[]    @relation("shipper")
-  reviewsGiven    Review[] @relation("reviewsGiven")
-  reviewsReceived Review[] @relation("reviewsReceived")
+  listings        VanListing[] @relation("carrier")
+  bookings        Booking[]    @relation("shipper")
+  reviewsGiven    Review[]     @relation("reviewsGiven")
+  reviewsReceived Review[]     @relation("reviewsReceived")
 
   @@index([email])
 }
@@ -74,8 +89,8 @@ model Booking {
 
   totalPrice      Float
   stripePaymentId String?
-  paymentStatus   String @default("pending")
-  status          String @default("PENDING")
+  paymentStatus   String        @default("pending")
+  status          BookingStatus @default(PENDING)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -88,13 +103,13 @@ model Booking {
 }
 
 model Review {
-  id         String @id @default(cuid())
-  bookingId  String @unique
+  id         String  @id @default(cuid())
+  bookingId  String  @unique
   booking    Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
   reviewerId String
-  reviewer   User   @relation("reviewsGiven", fields: [reviewerId], references: [id], onDelete: Cascade)
+  reviewer   User    @relation("reviewsGiven", fields: [reviewerId], references: [id], onDelete: Cascade)
   targetId   String
-  target     User   @relation("reviewsReceived", fields: [targetId], references: [id], onDelete: Cascade)
+  target     User    @relation("reviewsReceived", fields: [targetId], references: [id], onDelete: Cascade)
 
   rating  Int
   comment String?
