@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { verifyToken, getTokenFromHeader } from '@/lib/auth'
+import { notifyStatusUpdate } from '@/lib/notifications'
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -88,6 +89,18 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
           data: { status: 'COMPLETED' },
         })
       }
+    }
+
+    // Send notification
+    try {
+      await notifyStatusUpdate({
+        bookingId: id,
+        status,
+        description: description || statusDescriptions[status],
+        location,
+      })
+    } catch (notifErr) {
+      console.error('Notification error:', notifErr)
     }
 
     return NextResponse.json({ booking: updatedBooking })

@@ -42,7 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   const refreshUser = useCallback(async () => {
-    const storedToken = localStorage.getItem('hh_token')
+    const storedToken = localStorage.getItem('yh_token')
     if (!storedToken) {
       setLoading(false)
       return
@@ -57,12 +57,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(data.user)
         setToken(storedToken)
       } else {
-        localStorage.removeItem('hh_token')
+        localStorage.removeItem('yh_token')
         setUser(null)
         setToken(null)
       }
     } catch {
-      localStorage.removeItem('hh_token')
+      localStorage.removeItem('yh_token')
     } finally {
       setLoading(false)
     }
@@ -81,7 +81,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const data = await res.json()
     if (!res.ok) throw new Error(data.error || 'Login failed')
 
-    localStorage.setItem('hh_token', data.token)
+    localStorage.setItem('yh_token', data.token)
     setToken(data.token)
     setUser(data.user)
     router.push('/dashboard')
@@ -96,14 +96,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const data = await res.json()
     if (!res.ok) throw new Error(data.error || 'Registration failed')
 
-    localStorage.setItem('hh_token', data.token)
+    localStorage.setItem('yh_token', data.token)
     setToken(data.token)
     setUser(data.user)
     router.push('/dashboard')
   }
 
   const logout = () => {
-    localStorage.removeItem('hh_token')
+    localStorage.removeItem('yh_token')
     setUser(null)
     setToken(null)
     router.push('/')

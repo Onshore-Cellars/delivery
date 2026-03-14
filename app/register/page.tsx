@@ -81,12 +81,12 @@ function RegisterForm() {
       <div className="hidden lg:flex lg:flex-1 hero-gradient pattern-overlay items-center justify-center p-12">
         <div className="max-w-md text-center">
           <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center mx-auto mb-8">
-            <span className="text-gold-400 font-bold text-2xl">HH</span>
+            <span className="text-gold-400 font-bold text-2xl">YH</span>
           </div>
           <h2 className="text-3xl font-bold text-white mb-4">Join the Marketplace</h2>
           <p className="text-slate-300 leading-relaxed">
             Whether you&apos;re a carrier with spare capacity or a yacht owner needing reliable delivery,
-            Hull & Haulage connects you with the right partners.
+            YachtHop connects you with the right partners across the Mediterranean.
           </p>
         </div>
       </div>
@@ -97,9 +97,9 @@ function RegisterForm() {
           <div className="mb-8">
             <Link href="/" className="flex items-center gap-2 mb-8">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-navy-800 to-navy-900 flex items-center justify-center">
-                <span className="text-gold-400 font-bold text-sm">HH</span>
+                <span className="text-gold-400 font-bold text-sm">YH</span>
               </div>
-              <span className="text-lg font-bold text-navy-900 tracking-tight">Hull & Haulage</span>
+              <span className="text-lg font-bold text-navy-900 tracking-tight">YachtHop</span>
             </Link>
             <h1 className="text-3xl font-extrabold text-navy-900 tracking-tight">Create your account</h1>
             <p className="mt-2 text-slate-500">Get started in under a minute.</p>

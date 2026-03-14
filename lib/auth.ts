@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 
 const SALT_ROUNDS = 12
-const JWT_SECRET = process.env.NEXTAUTH_SECRET || 'hull-haulage-secret-change-me'
+const JWT_SECRET = process.env.NEXTAUTH_SECRET || 'yachthop-secret-change-me'
 
 export interface DecodedToken {
   userId: string
@@ -39,7 +39,7 @@ export function getTokenFromHeader(authHeader: string | null): string | null {
 
 export function generateTrackingCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
-  let code = 'HH-'
+  let code = 'YH-'
   for (let i = 0; i < 8; i++) {
     code += chars.charAt(Math.floor(Math.random() * chars.length))
   }

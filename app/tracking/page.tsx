@@ -80,7 +80,7 @@ export default function TrackingPage() {
             <input
               type="text"
               className="flex-1 px-4 py-3 rounded-lg border border-slate-200 text-sm text-navy-900 font-mono tracking-wider focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none uppercase"
-              placeholder="HH-XXXXXXXX"
+              placeholder="YH-XXXXXXXX"
               value={code}
               onChange={(e) => setCode(e.target.value.toUpperCase())}
             />

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { verifyToken, getTokenFromHeader, generateTrackingCode } from '@/lib/auth'
+import { notifyBookingCreated } from '@/lib/notifications'
 
 export async function GET(request: NextRequest) {
   try {
@@ -140,6 +141,42 @@ export async function POST(request: NextRequest) {
         where: { id: listingId },
         data: { status: 'FULL' },
       })
+    }
+
+    // Send notifications
+    try {
+      const fullBooking = await prisma.booking.findUnique({
+        where: { id: booking.id },
+        include: {
+          shipper: { select: { id: true, name: true, email: true, emailNotifications: true } },
+          listing: {
+            include: {
+              carrier: { select: { id: true, name: true, email: true, emailNotifications: true } },
+            },
+          },
+        },
+      })
+      if (fullBooking) {
+        await notifyBookingCreated({
+          id: fullBooking.id,
+          trackingCode: fullBooking.trackingCode || trackingCode,
+          cargoDescription: fullBooking.cargoDescription,
+          totalPrice: fullBooking.totalPrice,
+          currency: fullBooking.currency,
+          shipperId: fullBooking.shipperId,
+          listing: {
+            title: fullBooking.listing.title,
+            originPort: fullBooking.listing.originPort,
+            destinationPort: fullBooking.listing.destinationPort,
+            departureDate: fullBooking.listing.departureDate,
+            carrierId: fullBooking.listing.carrierId,
+            carrier: fullBooking.listing.carrier,
+          },
+          shipper: fullBooking.shipper,
+        })
+      }
+    } catch (notifErr) {
+      console.error('Notification error:', notifErr)
     }
 
     return NextResponse.json({ booking }, { status: 201 })

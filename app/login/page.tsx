@@ -32,9 +32,9 @@ export default function LoginPage() {
           <div className="mb-8">
             <Link href="/" className="flex items-center gap-2 mb-8">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-navy-800 to-navy-900 flex items-center justify-center">
-                <span className="text-gold-400 font-bold text-sm">HH</span>
+                <span className="text-gold-400 font-bold text-sm">YH</span>
               </div>
-              <span className="text-lg font-bold text-navy-900 tracking-tight">Hull & Haulage</span>
+              <span className="text-lg font-bold text-navy-900 tracking-tight">YachtHop</span>
             </Link>
             <h1 className="text-3xl font-extrabold text-navy-900 tracking-tight">Welcome back</h1>
             <p className="mt-2 text-slate-500">
@@ -111,12 +111,12 @@ export default function LoginPage() {
       <div className="hidden lg:flex lg:flex-1 hero-gradient pattern-overlay items-center justify-center p-12">
         <div className="max-w-md text-center">
           <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center mx-auto mb-8">
-            <span className="text-gold-400 font-bold text-2xl">HH</span>
+            <span className="text-gold-400 font-bold text-2xl">YH</span>
           </div>
           <h2 className="text-3xl font-bold text-white mb-4">Premium Yacht Logistics</h2>
           <p className="text-slate-300 leading-relaxed">
             The trusted marketplace for carriers and yacht owners across the Mediterranean.
-            Streamline your deliveries with Hull & Haulage.
+            Streamline your yacht deliveries with YachtHop.
           </p>
         </div>
       </div>

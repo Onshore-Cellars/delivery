@@ -7,6 +7,8 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ─── ENUMS ────────────────────────────────────────────────────────────────────
+
 enum UserRole {
   CARRIER
   SUPPLIER
@@ -15,6 +17,7 @@ enum UserRole {
 }
 
 enum ListingStatus {
+  DRAFT
   ACTIVE
   FULL
   IN_TRANSIT
@@ -23,16 +26,21 @@ enum ListingStatus {
 }
 
 enum BookingStatus {
+  QUOTE_REQUESTED
+  QUOTED
   PENDING
   CONFIRMED
   PICKED_UP
   IN_TRANSIT
+  CUSTOMS_HOLD
   DELIVERED
   CANCELLED
+  DISPUTED
 }
 
 enum PaymentStatus {
   PENDING
+  PROCESSING
   PAID
   REFUNDED
   FAILED
@@ -43,7 +51,35 @@ enum BidStatus {
   ACCEPTED
   REJECTED
   EXPIRED
+  WITHDRAWN
 }
+
+enum NotificationType {
+  BOOKING_CREATED
+  BOOKING_CONFIRMED
+  BOOKING_STATUS_UPDATE
+  BOOKING_CANCELLED
+  BID_RECEIVED
+  BID_ACCEPTED
+  BID_REJECTED
+  QUOTE_REQUESTED
+  QUOTE_RECEIVED
+  MESSAGE_RECEIVED
+  PAYMENT_RECEIVED
+  PAYMENT_FAILED
+  REVIEW_RECEIVED
+  LISTING_EXPIRING
+  SYSTEM
+}
+
+enum MessageType {
+  TEXT
+  SYSTEM
+  QUOTE
+  FILE
+}
+
+// ─── MODELS ───────────────────────────────────────────────────────────────────
 
 model User {
   id              String    @id @default(cuid())
@@ -53,17 +89,38 @@ model User {
   role            UserRole
   phone           String?
   company         String?
+  bio             String?
   avatarUrl       String?
-  stripeAccountId String?
+  website         String?
+  address         String?
+  city            String?
+  country         String?
+
+  // Stripe
+  stripeCustomerId  String?
+  stripeAccountId   String?
+
+  // Settings
+  emailNotifications  Boolean  @default(true)
+  smsNotifications    Boolean  @default(false)
+
   verified        Boolean   @default(false)
+  lastLoginAt     DateTime?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
-  listings        Listing[]  @relation("carrierListings")
-  bookings        Booking[]  @relation("shipperBookings")
-  bids            Bid[]      @relation("bidder")
-  reviews         Review[]   @relation("reviewAuthor")
-  receivedReviews Review[]   @relation("reviewTarget")
+  // Relations
+  listings         Listing[]       @relation("carrierListings")
+  bookings         Booking[]       @relation("shipperBookings")
+  bids             Bid[]           @relation("bidder")
+  reviews          Review[]        @relation("reviewAuthor")
+  receivedReviews  Review[]        @relation("reviewTarget")
+  notifications    Notification[]
+  sentMessages     Message[]       @relation("messageSender")
+  conversations1   Conversation[]  @relation("conversationUser1")
+  conversations2   Conversation[]  @relation("conversationUser2")
+  quotes           Quote[]         @relation("quoteRequester")
+  quotesReceived   Quote[]         @relation("quoteProvider")
 
   @@index([email])
   @@index([role])
@@ -77,49 +134,76 @@ model Listing {
   title              String
   description        String?
 
-  // Vehicle details
-  vehicleType        String        // Van, Truck, Refrigerated, Flatbed
+  // Vehicle
+  vehicleType        String
   vehicleName        String?
+  hasRefrigeration   Boolean       @default(false)
+  hasTailLift        Boolean       @default(false)
+  hasGPS             Boolean       @default(true)
+  insuranceValue     Float?
 
   // Route
   originPort         String
   originRegion       String?
+  originCountry      String?
+  originLat          Float?
+  originLng          Float?
   destinationPort    String
   destinationRegion  String?
+  destinationCountry String?
+  destinationLat     Float?
+  destinationLng     Float?
+  stops              String?       // JSON array of intermediate stops
+  estimatedDistance   Float?        // km
+
+  // Schedule
   departureDate      DateTime
   estimatedArrival   DateTime?
+  isRecurring        Boolean       @default(false)
+  recurringSchedule  String?       // e.g. "weekly", "biweekly"
 
   // Capacity
   totalCapacityKg    Float
   totalCapacityM3    Float
   availableKg        Float
   availableM3        Float
+  maxItemLength      Float?        // cm — for oversized items
+  maxItemWidth       Float?
+  maxItemHeight      Float?
 
   // Pricing
   pricePerKg         Float?
   pricePerM3         Float?
   flatRate           Float?
   currency           String        @default("EUR")
+  minimumCharge      Float?
 
   // Bidding
   biddingEnabled     Boolean       @default(false)
   minBidPrice        Float?
 
-  // Status
+  // Accepted cargo types (JSON array)
+  acceptedCargo      String?       // e.g. ["Provisions","Equipment","Wine"]
+  restrictedItems    String?       // Items NOT allowed
+
+  // Status & meta
   status             ListingStatus @default(ACTIVE)
   featured           Boolean       @default(false)
+  viewCount          Int           @default(0)
 
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt
 
   bookings           Booking[]
   bids               Bid[]
+  quotes             Quote[]
 
   @@index([carrierId])
   @@index([status])
   @@index([departureDate])
   @@index([originPort])
   @@index([destinationPort])
+  @@index([featured])
 }
 
 model Booking {
@@ -129,31 +213,63 @@ model Booking {
   shipperId         String
   shipper           User          @relation("shipperBookings", fields: [shipperId], references: [id], onDelete: Cascade)
 
-  // Cargo details
+  // Cargo
   cargoDescription  String
   cargoType         String?
   weightKg          Float
   volumeM3          Float
+  itemCount         Int           @default(1)
   specialHandling   String?
+  temperatureReq    String?       // e.g. "2-8°C"
+  isFragile         Boolean       @default(false)
+  isDangerous       Boolean       @default(false)
+  customsRequired   Boolean       @default(false)
+  declaredValue     Float?
 
-  // Pickup/delivery
+  // Pickup
   pickupAddress     String?
+  pickupCity        String?
+  pickupCountry     String?
   pickupContact     String?
+  pickupPhone       String?
+  pickupEmail       String?
+  pickupDate        DateTime?
+  pickupNotes       String?
+
+  // Delivery
   deliveryAddress   String?
+  deliveryCity      String?
+  deliveryCountry   String?
   deliveryContact   String?
+  deliveryPhone     String?
+  deliveryEmail     String?
   deliveryNotes     String?
+  yachtName         String?
+  berthNumber       String?
+  marinaName        String?
 
   // Pricing
   totalPrice        Float
+  platformFee       Float         @default(0)
+  carrierPayout     Float         @default(0)
   currency          String        @default("EUR")
 
   // Payment
-  stripePaymentId   String?
-  paymentStatus     PaymentStatus @default(PENDING)
+  stripePaymentId       String?
+  stripePaymentIntentId String?
+  paymentStatus         PaymentStatus @default(PENDING)
+  paidAt                DateTime?
 
   // Status & Tracking
   status            BookingStatus @default(PENDING)
   trackingCode      String?       @unique
+  estimatedDelivery DateTime?
+  actualDelivery    DateTime?
+
+  // Proof of delivery
+  podSignature      String?
+  podPhotoUrl       String?
+  podNotes          String?
 
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
@@ -165,6 +281,7 @@ model Booking {
   @@index([shipperId])
   @@index([status])
   @@index([trackingCode])
+  @@index([paymentStatus])
 }
 
 model Bid {
@@ -179,13 +296,53 @@ model Bid {
   weightKg    Float
   volumeM3    Float
   message     String?
+  cargoType   String?
   status      BidStatus @default(PENDING)
+  expiresAt   DateTime?
+
+  counterOffer  Float?
+  counterMessage String?
 
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
   @@index([listingId])
   @@index([bidderId])
+  @@index([status])
+}
+
+model Quote {
+  id            String   @id @default(cuid())
+  listingId     String?
+  listing       Listing? @relation(fields: [listingId], references: [id], onDelete: SetNull)
+  requesterId   String
+  requester     User     @relation("quoteRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  providerId    String?
+  provider      User?    @relation("quoteProvider", fields: [providerId], references: [id], onDelete: SetNull)
+
+  // Request details
+  originPort      String
+  destinationPort String
+  cargoDescription String
+  cargoType       String?
+  weightKg        Float
+  volumeM3        Float
+  preferredDate   DateTime?
+  specialRequirements String?
+
+  // Quote response
+  quotedPrice     Float?
+  quotedCurrency  String    @default("EUR")
+  validUntil      DateTime?
+  responseMessage String?
+
+  status          String    @default("PENDING") // PENDING, QUOTED, ACCEPTED, EXPIRED, CANCELLED
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([requesterId])
+  @@index([providerId])
   @@index([status])
 }
 
@@ -196,7 +353,10 @@ model TrackingEvent {
 
   status      String
   location    String?
+  lat         Float?
+  lng         Float?
   description String
+  photoUrl    String?
   timestamp   DateTime @default(now())
 
   @@index([bookingId])
@@ -212,11 +372,82 @@ model Review {
   targetId    String
   target      User     @relation("reviewTarget", fields: [targetId], references: [id], onDelete: Cascade)
 
-  rating      Int      // 1-5
-  comment     String?
+  rating          Int       // 1-5
+  comment         String?
+  communicationRating Int?  // 1-5
+  timelinessRating    Int?  // 1-5
+  conditionRating     Int?  // 1-5
+
+  response        String?   // Carrier can respond to review
+  responseAt      DateTime?
 
   createdAt   DateTime @default(now())
 
   @@index([targetId])
   @@index([authorId])
+  @@index([rating])
+}
+
+model Notification {
+  id          String           @id @default(cuid())
+  userId      String
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  type        NotificationType
+  title       String
+  message     String
+  linkUrl     String?
+  metadata    String?          // JSON
+
+  read        Boolean          @default(false)
+  readAt      DateTime?
+  emailSent   Boolean          @default(false)
+
+  createdAt   DateTime         @default(now())
+
+  @@index([userId])
+  @@index([read])
+  @@index([createdAt])
+}
+
+model Conversation {
+  id        String   @id @default(cuid())
+  user1Id   String
+  user1     User     @relation("conversationUser1", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2Id   String
+  user2     User     @relation("conversationUser2", fields: [user2Id], references: [id], onDelete: Cascade)
+
+  subject   String?
+  bookingRef String?  // Optional link to a booking
+
+  lastMessageAt DateTime @default(now())
+  createdAt     DateTime @default(now())
+
+  messages  Message[]
+
+  @@unique([user1Id, user2Id])
+  @@index([user1Id])
+  @@index([user2Id])
+  @@index([lastMessageAt])
+}
+
+model Message {
+  id              String       @id @default(cuid())
+  conversationId  String
+  conversation    Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId        String
+  sender          User         @relation("messageSender", fields: [senderId], references: [id], onDelete: Cascade)
+
+  content         String
+  type            MessageType  @default(TEXT)
+  attachmentUrl   String?
+
+  read            Boolean      @default(false)
+  readAt          DateTime?
+
+  createdAt       DateTime     @default(now())
+
+  @@index([conversationId])
+  @@index([senderId])
+  @@index([createdAt])
 }

@@ -3,7 +3,7 @@ import "./globals.css"
 import ClientLayout from "./components/ClientLayout"
 
 export const metadata: Metadata = {
-  title: "Hull & Haulage — Premium Yacht Logistics Marketplace",
+  title: "YachtHop — Premium Yacht Logistics Marketplace",
   description: "The marketplace for yacht logistics. Suppliers offer van space to ports and marinas. Yachts and suppliers book space for deliveries. Simple, premium, reliable.",
   keywords: ["yacht logistics", "marine delivery", "yacht supplies", "port delivery", "maritime transport"],
 }

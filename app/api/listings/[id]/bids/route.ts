@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { verifyToken, getTokenFromHeader } from '@/lib/auth'
+import { notifyBidReceived } from '@/lib/notifications'
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -82,6 +83,21 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         bidder: { select: { id: true, name: true, company: true } },
       },
     })
+
+    // Send notification to carrier
+    try {
+      await notifyBidReceived({
+        carrierId: listing.carrierId,
+        bidderName: bid.bidder.name,
+        amount: bid.amount,
+        currency: bid.currency,
+        listingTitle: listing.title,
+        weightKg: bid.weightKg,
+        volumeM3: bid.volumeM3,
+      })
+    } catch (notifErr) {
+      console.error('Notification error:', notifErr)
+    }
 
     return NextResponse.json({ bid }, { status: 201 })
   } catch (error) {

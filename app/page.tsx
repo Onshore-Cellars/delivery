@@ -16,10 +16,10 @@ export default function Home() {
             <div className="flex items-center">
               <Link href="/" className="flex items-center gap-2">
                 <div className="w-9 h-9 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center">
-                  <span className="text-gold-400 font-bold text-sm">HH</span>
+                  <span className="text-gold-400 font-bold text-sm">YH</span>
                 </div>
                 <span className="text-lg font-bold text-white tracking-tight">
-                  Hull & Haulage
+                  YachtHop
                 </span>
               </Link>
             </div>
@@ -302,9 +302,9 @@ export default function Home() {
             <div className="md:col-span-2">
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
-                  <span className="text-gold-400 font-bold text-sm">HH</span>
+                  <span className="text-gold-400 font-bold text-sm">YH</span>
                 </div>
-                <span className="text-lg font-bold text-white tracking-tight">Hull & Haulage</span>
+                <span className="text-lg font-bold text-white tracking-tight">YachtHop</span>
               </div>
               <p className="text-slate-400 text-sm max-w-sm leading-relaxed">
                 The premium marketplace for yacht logistics. Connecting carriers with spare capacity
@@ -330,7 +330,7 @@ export default function Home() {
           </div>
           <div className="mt-12 pt-8 border-t border-white/5">
             <p className="text-center text-sm text-slate-500">
-              &copy; {new Date().getFullYear()} Hull & Haulage. All rights reserved.
+              &copy; {new Date().getFullYear()} YachtHop. All rights reserved.
             </p>
           </div>
         </div>
