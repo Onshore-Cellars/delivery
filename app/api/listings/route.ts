@@ -1,207 +1,146 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
-import { verifyToken } from '@/lib/auth'
+import { verifyToken, getTokenFromHeader } from '@/lib/auth'
+import { Prisma } from '@prisma/client'
 
-interface ListingFilter {
-  isActive: boolean
-  originAddress?: {
-    contains: string
-    mode: 'insensitive'
-  }
-  destinationAddress?: {
-    contains: string
-    mode: 'insensitive'
-  }
-  departureDate?: {
-    gte?: Date
-    lte?: Date
-  }
-  availableWeight?: {
-    gte: number
-  }
-  availableVolume?: {
-    gte: number
-  }
-}
-
-// GET all listings with optional filters
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const origin = searchParams.get('origin')
     const destination = searchParams.get('destination')
     const dateFrom = searchParams.get('dateFrom')
-    const dateTo = searchParams.get('dateTo')
     const minWeight = searchParams.get('minWeight')
     const minVolume = searchParams.get('minVolume')
+    const page = parseInt(searchParams.get('page') || '1')
+    const limit = parseInt(searchParams.get('limit') || '20')
 
-    const where: ListingFilter = {
-      isActive: true,
+    const where: Prisma.ListingWhereInput = {
+      status: 'ACTIVE',
     }
 
     if (origin) {
-      where.originAddress = {
-        contains: origin,
-        mode: 'insensitive',
-      }
+      where.OR = [
+        { originPort: { contains: origin, mode: 'insensitive' } },
+        { originRegion: { contains: origin, mode: 'insensitive' } },
+      ]
     }
 
     if (destination) {
-      where.destinationAddress = {
-        contains: destination,
-        mode: 'insensitive',
-      }
+      where.AND = [
+        ...(Array.isArray(where.AND) ? where.AND : where.AND ? [where.AND] : []),
+        {
+          OR: [
+            { destinationPort: { contains: destination, mode: 'insensitive' } },
+            { destinationRegion: { contains: destination, mode: 'insensitive' } },
+          ],
+        },
+      ]
     }
 
     if (dateFrom) {
-      where.departureDate = {
-        gte: new Date(dateFrom),
-      }
-    }
-
-    if (dateTo && where.departureDate) {
-      where.departureDate = {
-        ...where.departureDate,
-        lte: new Date(dateTo),
-      }
+      where.departureDate = { gte: new Date(dateFrom) }
     }
 
     if (minWeight) {
-      where.availableWeight = {
-        gte: parseFloat(minWeight),
-      }
+      where.availableKg = { gte: parseFloat(minWeight) }
     }
 
     if (minVolume) {
-      where.availableVolume = {
-        gte: parseFloat(minVolume),
-      }
+      where.availableM3 = { gte: parseFloat(minVolume) }
     }
 
-    const listings = await prisma.vanListing.findMany({
-      where,
-      include: {
-        carrier: {
-          select: {
-            id: true,
-            name: true,
-            company: true,
-            email: true,
-            phone: true,
+    const [listings, total] = await Promise.all([
+      prisma.listing.findMany({
+        where,
+        include: {
+          carrier: {
+            select: { id: true, name: true, company: true, avatarUrl: true },
           },
+          _count: { select: { bookings: true } },
         },
-      },
-      orderBy: {
-        departureDate: 'asc',
+        orderBy: [{ featured: 'desc' }, { departureDate: 'asc' }],
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      prisma.listing.count({ where }),
+    ])
+
+    return NextResponse.json({
+      listings,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit),
       },
     })
-
-    return NextResponse.json({ listings })
   } catch (error) {
-    console.error('Error fetching listings:', error)
-    return NextResponse.json(
-      { error: 'An error occurred while fetching listings' },
-      { status: 500 }
-    )
+    console.error('Listings fetch error:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
-// POST create a new listing
 export async function POST(request: NextRequest) {
   try {
-    // Get token from Authorization header
-    const authHeader = request.headers.get('authorization')
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+    const token = getTokenFromHeader(request.headers.get('authorization'))
+    if (!token) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const token = authHeader.substring(7)
     const decoded = verifyToken(token)
+    if (!decoded) {
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
+    }
 
-    if (!decoded || decoded.role !== 'CARRIER') {
-      return NextResponse.json(
-        { error: 'Only carriers can create listings' },
-        { status: 403 }
-      )
+    if (decoded.role !== 'CARRIER' && decoded.role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Only carriers can create listings' }, { status: 403 })
     }
 
     const body = await request.json()
     const {
-      vehicleType,
-      licensePlate,
-      originAddress,
-      destinationAddress,
-      departureDate,
-      arrivalDate,
-      totalWeight,
-      totalVolume,
-      availableWeight,
-      availableVolume,
-      pricePerKg,
-      pricePerCubicMeter,
-      fixedPrice,
+      title, description, vehicleType, vehicleName,
+      originPort, originRegion, destinationPort, destinationRegion,
+      departureDate, estimatedArrival,
+      totalCapacityKg, totalCapacityM3,
+      pricePerKg, pricePerM3, flatRate, currency,
     } = body
 
-    // Validate required fields
-    if (
-      !vehicleType ||
-      !originAddress ||
-      !destinationAddress ||
-      !departureDate ||
-      !totalWeight ||
-      !totalVolume ||
-      availableWeight === undefined ||
-      availableVolume === undefined
-    ) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      )
+    if (!title || !vehicleType || !originPort || !destinationPort || !departureDate || !totalCapacityKg || !totalCapacityM3) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    // Create listing
-    const listing = await prisma.vanListing.create({
+    const listing = await prisma.listing.create({
       data: {
         carrierId: decoded.userId,
+        title,
+        description: description || null,
         vehicleType,
-        licensePlate,
-        originAddress,
-        destinationAddress,
+        vehicleName: vehicleName || null,
+        originPort,
+        originRegion: originRegion || null,
+        destinationPort,
+        destinationRegion: destinationRegion || null,
         departureDate: new Date(departureDate),
-        arrivalDate: arrivalDate ? new Date(arrivalDate) : null,
-        totalWeight: parseFloat(totalWeight),
-        totalVolume: parseFloat(totalVolume),
-        availableWeight: parseFloat(availableWeight),
-        availableVolume: parseFloat(availableVolume),
+        estimatedArrival: estimatedArrival ? new Date(estimatedArrival) : null,
+        totalCapacityKg: parseFloat(totalCapacityKg),
+        totalCapacityM3: parseFloat(totalCapacityM3),
+        availableKg: parseFloat(totalCapacityKg),
+        availableM3: parseFloat(totalCapacityM3),
         pricePerKg: pricePerKg ? parseFloat(pricePerKg) : null,
-        pricePerCubicMeter: pricePerCubicMeter ? parseFloat(pricePerCubicMeter) : null,
-        fixedPrice: fixedPrice ? parseFloat(fixedPrice) : null,
+        pricePerM3: pricePerM3 ? parseFloat(pricePerM3) : null,
+        flatRate: flatRate ? parseFloat(flatRate) : null,
+        currency: currency || 'EUR',
       },
       include: {
         carrier: {
-          select: {
-            id: true,
-            name: true,
-            company: true,
-            email: true,
-            phone: true,
-          },
+          select: { id: true, name: true, company: true },
         },
       },
     })
 
-    return NextResponse.json(
-      { message: 'Listing created successfully', listing },
-      { status: 201 }
-    )
+    return NextResponse.json({ listing }, { status: 201 })
   } catch (error) {
-    console.error('Error creating listing:', error)
-    return NextResponse.json(
-      { error: 'An error occurred while creating the listing' },
-      { status: 500 }
-    )
+    console.error('Listing creation error:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

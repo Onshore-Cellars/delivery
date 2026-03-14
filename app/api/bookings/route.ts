@@ -1,196 +1,150 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
-import { verifyToken } from '@/lib/auth'
-import { BookingStatus } from '@prisma/client'
+import { verifyToken, getTokenFromHeader, generateTrackingCode } from '@/lib/auth'
 
-// GET user's bookings
 export async function GET(request: NextRequest) {
   try {
-    // Get token from Authorization header
-    const authHeader = request.headers.get('authorization')
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+    const token = getTokenFromHeader(request.headers.get('authorization'))
+    if (!token) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const token = authHeader.substring(7)
     const decoded = verifyToken(token)
-
     if (!decoded) {
-      return NextResponse.json(
-        { error: 'Invalid token' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
+    }
+
+    const { searchParams } = new URL(request.url)
+    const status = searchParams.get('status')
+
+    const where: Record<string, unknown> = {}
+
+    if (decoded.role === 'CARRIER') {
+      where.listing = { carrierId: decoded.userId }
+    } else {
+      where.shipperId = decoded.userId
+    }
+
+    if (status) {
+      where.status = status
     }
 
     const bookings = await prisma.booking.findMany({
-      where: {
-        shipperId: decoded.userId,
-      },
+      where,
       include: {
         listing: {
           include: {
-            carrier: {
-              select: {
-                id: true,
-                name: true,
-                company: true,
-                email: true,
-                phone: true,
-              },
-            },
+            carrier: { select: { id: true, name: true, company: true } },
           },
         },
+        shipper: { select: { id: true, name: true, company: true } },
       },
-      orderBy: {
-        createdAt: 'desc',
-      },
+      orderBy: { createdAt: 'desc' },
     })
 
     return NextResponse.json({ bookings })
   } catch (error) {
-    console.error('Error fetching bookings:', error)
-    return NextResponse.json(
-      { error: 'An error occurred while fetching bookings' },
-      { status: 500 }
-    )
+    console.error('Bookings fetch error:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
-// POST create a new booking
 export async function POST(request: NextRequest) {
   try {
-    // Get token from Authorization header
-    const authHeader = request.headers.get('authorization')
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+    const token = getTokenFromHeader(request.headers.get('authorization'))
+    if (!token) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const token = authHeader.substring(7)
     const decoded = verifyToken(token)
-
-    if (!decoded || (decoded.role !== 'SHIPPER' && decoded.role !== 'YACHT_CLIENT')) {
-      return NextResponse.json(
-        { error: 'Only shippers and yacht clients can create bookings' },
-        { status: 403 }
-      )
+    if (!decoded) {
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }
 
     const body = await request.json()
     const {
-      listingId,
-      weightBooked,
-      volumeBooked,
-      itemDescription,
-      pickupAddress,
-      deliveryAddress,
+      listingId, cargoDescription, cargoType, weightKg, volumeM3,
+      specialHandling, pickupAddress, pickupContact,
+      deliveryAddress, deliveryContact, deliveryNotes,
     } = body
 
-    // Validate required fields
-    if (!listingId || !weightBooked || !volumeBooked || !itemDescription) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      )
+    if (!listingId || !cargoDescription || !weightKg || !volumeM3) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    // Check if listing exists and has enough capacity
-    const listing = await prisma.vanListing.findUnique({
-      where: { id: listingId },
-    })
-
-    if (!listing || !listing.isActive) {
-      return NextResponse.json(
-        { error: 'Listing not found or inactive' },
-        { status: 404 }
-      )
+    const listing = await prisma.listing.findUnique({ where: { id: listingId } })
+    if (!listing || listing.status !== 'ACTIVE') {
+      return NextResponse.json({ error: 'Listing not found or no longer available' }, { status: 404 })
     }
 
-    if (listing.availableWeight < parseFloat(weightBooked)) {
-      return NextResponse.json(
-        { error: 'Insufficient weight capacity' },
-        { status: 400 }
-      )
+    if (listing.carrierId === decoded.userId) {
+      return NextResponse.json({ error: 'You cannot book your own listing' }, { status: 400 })
     }
 
-    if (listing.availableVolume < parseFloat(volumeBooked)) {
-      return NextResponse.json(
-        { error: 'Insufficient volume capacity' },
-        { status: 400 }
-      )
+    const weight = parseFloat(weightKg)
+    const volume = parseFloat(volumeM3)
+
+    if (weight > listing.availableKg || volume > listing.availableM3) {
+      return NextResponse.json({ error: 'Requested capacity exceeds available space' }, { status: 400 })
     }
 
-    // Calculate total price
     let totalPrice = 0
-    if (listing.fixedPrice) {
-      totalPrice = listing.fixedPrice
+    if (listing.flatRate) {
+      totalPrice = listing.flatRate
     } else {
-      if (listing.pricePerKg) {
-        totalPrice += listing.pricePerKg * parseFloat(weightBooked)
-      }
-      if (listing.pricePerCubicMeter) {
-        totalPrice += listing.pricePerCubicMeter * parseFloat(volumeBooked)
-      }
+      if (listing.pricePerKg) totalPrice += weight * listing.pricePerKg
+      if (listing.pricePerM3) totalPrice += volume * listing.pricePerM3
     }
 
-    // Create booking and update listing in a transaction
-    const booking = await prisma.$transaction(async (tx) => {
-      // Create booking
-      const newBooking = await tx.booking.create({
+    const trackingCode = generateTrackingCode()
+
+    const [booking] = await prisma.$transaction([
+      prisma.booking.create({
         data: {
           listingId,
           shipperId: decoded.userId,
-          weightBooked: parseFloat(weightBooked),
-          volumeBooked: parseFloat(volumeBooked),
-          itemDescription,
-          pickupAddress,
-          deliveryAddress,
+          cargoDescription,
+          cargoType: cargoType || null,
+          weightKg: weight,
+          volumeM3: volume,
+          specialHandling: specialHandling || null,
+          pickupAddress: pickupAddress || null,
+          pickupContact: pickupContact || null,
+          deliveryAddress: deliveryAddress || null,
+          deliveryContact: deliveryContact || null,
+          deliveryNotes: deliveryNotes || null,
           totalPrice,
-          status: BookingStatus.PENDING,
+          trackingCode,
+          currency: listing.currency,
         },
         include: {
           listing: {
             include: {
-              carrier: {
-                select: {
-                  id: true,
-                  name: true,
-                  company: true,
-                  email: true,
-                  phone: true,
-                },
-              },
+              carrier: { select: { id: true, name: true, company: true } },
             },
           },
         },
-      })
-
-      // Update listing capacity
-      await tx.vanListing.update({
+      }),
+      prisma.listing.update({
         where: { id: listingId },
         data: {
-          availableWeight: listing.availableWeight - parseFloat(weightBooked),
-          availableVolume: listing.availableVolume - parseFloat(volumeBooked),
+          availableKg: { decrement: weight },
+          availableM3: { decrement: volume },
         },
+      }),
+    ])
+
+    const updatedListing = await prisma.listing.findUnique({ where: { id: listingId } })
+    if (updatedListing && (updatedListing.availableKg <= 0 || updatedListing.availableM3 <= 0)) {
+      await prisma.listing.update({
+        where: { id: listingId },
+        data: { status: 'FULL' },
       })
+    }
 
-      return newBooking
-    })
-
-    return NextResponse.json(
-      { message: 'Booking created successfully', booking },
-      { status: 201 }
-    )
+    return NextResponse.json({ booking }, { status: 201 })
   } catch (error) {
-    console.error('Error creating booking:', error)
-    return NextResponse.json(
-      { error: 'An error occurred while creating the booking' },
-      { status: 500 }
-    )
+    console.error('Booking creation error:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

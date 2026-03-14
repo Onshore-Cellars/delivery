@@ -10,33 +10,32 @@ export async function GET(request: NextRequest) {
     }
 
     const decoded = verifyToken(token)
-    if (!decoded || decoded.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
+    if (!decoded) {
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }
 
-    const users = await prisma.user.findMany({
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId },
       select: {
         id: true,
         email: true,
         name: true,
         role: true,
-        phone: true,
         company: true,
+        phone: true,
+        avatarUrl: true,
         verified: true,
         createdAt: true,
-        _count: {
-          select: {
-            listings: true,
-            bookings: true,
-          },
-        },
       },
-      orderBy: { createdAt: 'desc' },
     })
 
-    return NextResponse.json({ users })
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    }
+
+    return NextResponse.json({ user })
   } catch (error) {
-    console.error('Error fetching users:', error)
+    console.error('Auth me error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
