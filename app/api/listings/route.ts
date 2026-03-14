@@ -11,6 +11,11 @@ export async function GET(request: NextRequest) {
     const dateFrom = searchParams.get('dateFrom')
     const minWeight = searchParams.get('minWeight')
     const minVolume = searchParams.get('minVolume')
+    const minPrice = searchParams.get('minPrice')
+    const maxPrice = searchParams.get('maxPrice')
+    const vehicleType = searchParams.get('vehicleType')
+    const featuredParam = searchParams.get('featured')
+    const sort = searchParams.get('sort')
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '20')
 
@@ -49,6 +54,56 @@ export async function GET(request: NextRequest) {
       where.availableM3 = { gte: parseFloat(minVolume) }
     }
 
+    if (vehicleType) {
+      where.vehicleType = vehicleType
+    }
+
+    if (searchParams.get('hasRefrigeration') === 'true') where.hasRefrigeration = true
+    if (searchParams.get('hasTailLift') === 'true') where.hasTailLift = true
+    if (searchParams.get('hasGPS') === 'true') where.hasGPS = true
+
+    if (featuredParam === 'true') {
+      where.featured = true
+    }
+
+    if (minPrice || maxPrice) {
+      const priceConditions: Prisma.ListingWhereInput[] = []
+      if (minPrice) {
+        priceConditions.push({
+          OR: [
+            { flatRate: { gte: parseFloat(minPrice) } },
+            { pricePerKg: { gte: parseFloat(minPrice) } },
+          ],
+        })
+      }
+      if (maxPrice) {
+        priceConditions.push({
+          OR: [
+            { flatRate: { lte: parseFloat(maxPrice) } },
+            { pricePerKg: { lte: parseFloat(maxPrice) } },
+          ],
+        })
+      }
+      where.AND = [
+        ...(Array.isArray(where.AND) ? where.AND : where.AND ? [where.AND] : []),
+        ...priceConditions,
+      ]
+    }
+
+    // Build orderBy based on sort param
+    let orderBy: Prisma.ListingOrderByWithRelationInput[] = [{ featured: 'desc' }, { departureDate: 'asc' }]
+    if (sort === 'price_asc') {
+      orderBy = [{ flatRate: { sort: 'asc', nulls: 'last' } }, { pricePerKg: { sort: 'asc', nulls: 'last' } }]
+    } else if (sort === 'price_desc') {
+      orderBy = [{ flatRate: { sort: 'desc', nulls: 'last' } }, { pricePerKg: { sort: 'desc', nulls: 'last' } }]
+    } else if (sort === 'capacity') {
+      orderBy = [{ availableKg: 'desc' }]
+    } else if (sort === 'newest') {
+      orderBy = [{ createdAt: 'desc' }]
+    } else if (sort === 'departure') {
+      orderBy = [{ departureDate: 'asc' }]
+    }
+
     const [listings, total] = await Promise.all([
       prisma.listing.findMany({
         where,
@@ -58,7 +113,7 @@ export async function GET(request: NextRequest) {
           },
           _count: { select: { bookings: true } },
         },
-        orderBy: [{ featured: 'desc' }, { departureDate: 'asc' }],
+        orderBy,
         skip: (page - 1) * limit,
         take: limit,
       }),
@@ -99,10 +154,12 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const {
       title, description, vehicleType, vehicleName,
-      originPort, originRegion, destinationPort, destinationRegion,
-      departureDate, estimatedArrival,
-      totalCapacityKg, totalCapacityM3,
-      pricePerKg, pricePerM3, flatRate, currency,
+      hasRefrigeration, hasTailLift, hasGPS, insuranceValue,
+      originPort, originRegion, originCountry, destinationPort, destinationRegion, destinationCountry,
+      departureDate, estimatedArrival, isRecurring, recurringSchedule,
+      totalCapacityKg, totalCapacityM3, maxItemLength, maxItemWidth, maxItemHeight,
+      pricePerKg, pricePerM3, flatRate, currency, minimumCharge,
+      biddingEnabled, minBidPrice, acceptedCargo, restrictedItems,
     } = body
 
     if (!title || !vehicleType || !originPort || !destinationPort || !departureDate || !totalCapacityKg || !totalCapacityM3) {
@@ -116,20 +173,36 @@ export async function POST(request: NextRequest) {
         description: description || null,
         vehicleType,
         vehicleName: vehicleName || null,
+        hasRefrigeration: hasRefrigeration || false,
+        hasTailLift: hasTailLift || false,
+        hasGPS: hasGPS !== false,
+        insuranceValue: insuranceValue ? parseFloat(insuranceValue) : null,
         originPort,
         originRegion: originRegion || null,
+        originCountry: originCountry || null,
         destinationPort,
         destinationRegion: destinationRegion || null,
+        destinationCountry: destinationCountry || null,
         departureDate: new Date(departureDate),
         estimatedArrival: estimatedArrival ? new Date(estimatedArrival) : null,
+        isRecurring: isRecurring || false,
+        recurringSchedule: recurringSchedule || null,
         totalCapacityKg: parseFloat(totalCapacityKg),
         totalCapacityM3: parseFloat(totalCapacityM3),
         availableKg: parseFloat(totalCapacityKg),
         availableM3: parseFloat(totalCapacityM3),
+        maxItemLength: maxItemLength ? parseFloat(maxItemLength) : null,
+        maxItemWidth: maxItemWidth ? parseFloat(maxItemWidth) : null,
+        maxItemHeight: maxItemHeight ? parseFloat(maxItemHeight) : null,
         pricePerKg: pricePerKg ? parseFloat(pricePerKg) : null,
         pricePerM3: pricePerM3 ? parseFloat(pricePerM3) : null,
         flatRate: flatRate ? parseFloat(flatRate) : null,
         currency: currency || 'EUR',
+        minimumCharge: minimumCharge ? parseFloat(minimumCharge) : null,
+        biddingEnabled: biddingEnabled || false,
+        minBidPrice: minBidPrice ? parseFloat(minBidPrice) : null,
+        acceptedCargo: acceptedCargo || null,
+        restrictedItems: restrictedItems || null,
       },
       include: {
         carrier: {

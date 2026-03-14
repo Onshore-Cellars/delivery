@@ -65,6 +65,14 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       return NextResponse.json({ error: 'Amount, weight, and volume are required' }, { status: 400 })
     }
 
+    // Prevent duplicate pending bids
+    const existingBid = await prisma.bid.findFirst({
+      where: { listingId: id, bidderId: decoded.userId, status: 'PENDING' },
+    })
+    if (existingBid) {
+      return NextResponse.json({ error: 'You already have a pending bid on this listing' }, { status: 409 })
+    }
+
     if (listing.minBidPrice && parseFloat(amount) < listing.minBidPrice) {
       return NextResponse.json({ error: `Minimum bid is ${listing.minBidPrice} ${listing.currency}` }, { status: 400 })
     }

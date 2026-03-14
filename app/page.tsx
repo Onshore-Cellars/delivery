@@ -322,9 +322,10 @@ export default function Home() {
             <div>
               <h4 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Company</h4>
               <div className="space-y-2.5">
-                <Link href="#" className="block text-sm text-slate-400 hover:text-white transition-colors">About</Link>
-                <Link href="#" className="block text-sm text-slate-400 hover:text-white transition-colors">Terms</Link>
-                <Link href="#" className="block text-sm text-slate-400 hover:text-white transition-colors">Privacy</Link>
+                <Link href="/about" className="block text-sm text-slate-400 hover:text-white transition-colors">About</Link>
+                <Link href="/terms" className="block text-sm text-slate-400 hover:text-white transition-colors">Terms</Link>
+                <Link href="/privacy" className="block text-sm text-slate-400 hover:text-white transition-colors">Privacy</Link>
+                <Link href="/help" className="block text-sm text-slate-400 hover:text-white transition-colors">Help</Link>
               </div>
             </div>
           </div>

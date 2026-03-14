@@ -65,6 +65,10 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
       return NextResponse.json({ quote: updated })
     } else if (action === 'cancel') {
+      // Only requester or provider can cancel
+      if (quote.requesterId !== decoded.userId && quote.providerId !== decoded.userId && decoded.role !== 'ADMIN') {
+        return NextResponse.json({ error: 'Not authorized' }, { status: 403 })
+      }
       const updated = await prisma.quote.update({
         where: { id },
         data: { status: 'CANCELLED' },

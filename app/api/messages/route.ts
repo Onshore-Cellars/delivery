@@ -67,6 +67,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Cannot message yourself' }, { status: 400 })
     }
 
+    // Validate recipient exists
+    const recipient = await prisma.user.findUnique({ where: { id: recipientId }, select: { id: true } })
+    if (!recipient) {
+      return NextResponse.json({ error: 'Recipient not found' }, { status: 404 })
+    }
+
     // Find or create conversation
     const [u1, u2] = [decoded.userId, recipientId].sort()
     let conversation = await prisma.conversation.findUnique({

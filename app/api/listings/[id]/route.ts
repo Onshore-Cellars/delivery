@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
+import { verifyToken, getTokenFromHeader } from '@/lib/auth'
 
 // GET single listing with full details
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -61,6 +62,87 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     })
   } catch (error) {
     console.error('Listing detail error:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
+
+// PATCH update listing (carrier only)
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params
+    const token = getTokenFromHeader(request.headers.get('authorization'))
+    if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const decoded = verifyToken(token)
+    if (!decoded) return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
+
+    const listing = await prisma.listing.findUnique({ where: { id } })
+    if (!listing) return NextResponse.json({ error: 'Listing not found' }, { status: 404 })
+    if (listing.carrierId !== decoded.userId && decoded.role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Not authorized' }, { status: 403 })
+    }
+
+    const body = await request.json()
+    const allowedFields = [
+      'title', 'description', 'vehicleType', 'vehicleName',
+      'hasRefrigeration', 'hasTailLift', 'hasGPS', 'insuranceValue',
+      'originPort', 'originRegion', 'originCountry',
+      'destinationPort', 'destinationRegion', 'destinationCountry',
+      'departureDate', 'estimatedArrival',
+      'totalCapacityKg', 'totalCapacityM3', 'availableKg', 'availableM3',
+      'pricePerKg', 'pricePerM3', 'flatRate', 'currency', 'minimumCharge',
+      'biddingEnabled', 'minBidPrice', 'acceptedCargo', 'restrictedItems',
+      'status',
+    ]
+
+    const data: Record<string, unknown> = {}
+    for (const field of allowedFields) {
+      if (body[field] !== undefined) {
+        if (field === 'departureDate' || field === 'estimatedArrival') {
+          data[field] = new Date(body[field])
+        } else {
+          data[field] = body[field]
+        }
+      }
+    }
+
+    const updated = await prisma.listing.update({ where: { id }, data })
+    return NextResponse.json({ listing: updated })
+  } catch (error) {
+    console.error('Listing update error:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
+
+// DELETE listing (carrier only, only if no active bookings)
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params
+    const token = getTokenFromHeader(request.headers.get('authorization'))
+    if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const decoded = verifyToken(token)
+    if (!decoded) return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
+
+    const listing = await prisma.listing.findUnique({
+      where: { id },
+      include: { _count: { select: { bookings: true } } },
+    })
+    if (!listing) return NextResponse.json({ error: 'Listing not found' }, { status: 404 })
+    if (listing.carrierId !== decoded.userId && decoded.role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Not authorized' }, { status: 403 })
+    }
+
+    // Check for active bookings
+    const activeBookings = await prisma.booking.count({
+      where: { listingId: id, status: { in: ['PENDING', 'CONFIRMED', 'PICKED_UP', 'IN_TRANSIT'] } },
+    })
+    if (activeBookings > 0) {
+      return NextResponse.json({ error: 'Cannot delete listing with active bookings' }, { status: 400 })
+    }
+
+    await prisma.listing.update({ where: { id }, data: { status: 'CANCELLED' } })
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('Listing delete error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { verifyToken, getTokenFromHeader, generateTrackingCode } from '@/lib/auth'
+import { createNotification } from '@/lib/notifications'
 
 // Accept or reject a bid (carrier only)
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -69,6 +70,18 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         where: { id },
         data: { status: 'REJECTED' },
       })
+
+      // Notify bidder of rejection
+      try {
+        await createNotification({
+          userId: bid.bidderId,
+          type: 'BID_REJECTED',
+          title: 'Bid Not Accepted',
+          message: `Your bid on ${bid.listing.title} was not accepted. You can submit a new bid or browse other listings.`,
+          linkUrl: '/marketplace',
+        })
+      } catch {}
+
       return NextResponse.json({ bid: updatedBid })
     } else {
       return NextResponse.json({ error: 'Action must be accept or reject' }, { status: 400 })

@@ -204,6 +204,8 @@ model Listing {
   @@index([originPort])
   @@index([destinationPort])
   @@index([featured])
+  @@index([status, departureDate])
+  @@index([originPort, destinationPort])
 }
 
 model Booking {
@@ -282,6 +284,8 @@ model Booking {
   @@index([status])
   @@index([trackingCode])
   @@index([paymentStatus])
+  @@index([listingId, status])
+  @@index([shipperId, status])
 }
 
 model Bid {
@@ -408,6 +412,7 @@ model Notification {
   @@index([userId])
   @@index([read])
   @@index([createdAt])
+  @@index([userId, read, createdAt])
 }
 
 model Conversation {

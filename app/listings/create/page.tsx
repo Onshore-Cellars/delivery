@@ -1,20 +1,26 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '../../components/AuthProvider'
+import { vehicleSpecs, vehicleTypes, getVehicleMakes, getModelsForMake, type VehicleSpec } from '@/lib/vehicles'
 
 export default function CreateListingPage() {
   const { user, token } = useAuth()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [selectedMake, setSelectedMake] = useState('')
+  const [selectedSpec, setSelectedSpec] = useState<VehicleSpec | null>(null)
   const [form, setForm] = useState({
     title: '',
     description: '',
-    vehicleType: 'Van',
+    vehicleType: '',
     vehicleName: '',
+    hasRefrigeration: false,
+    hasTailLift: false,
+    hasGPS: true,
     originPort: '',
     originRegion: '',
     destinationPort: '',
@@ -23,13 +29,49 @@ export default function CreateListingPage() {
     estimatedArrival: '',
     totalCapacityKg: '',
     totalCapacityM3: '',
+    maxItemLength: '',
+    maxItemWidth: '',
+    maxItemHeight: '',
     pricePerKg: '',
     pricePerM3: '',
     flatRate: '',
     currency: 'EUR',
+    minimumCharge: '',
     biddingEnabled: false,
     minBidPrice: '',
+    acceptedCargo: '',
+    restrictedItems: '',
   })
+
+  const makes = useMemo(() => getVehicleMakes(), [])
+  const modelsForMake = useMemo(() => selectedMake ? getModelsForMake(selectedMake) : [], [selectedMake])
+
+  const handleMakeChange = (make: string) => {
+    setSelectedMake(make)
+    setSelectedSpec(null)
+  }
+
+  const handleModelSelect = (modelStr: string) => {
+    if (!modelStr) {
+      setSelectedSpec(null)
+      return
+    }
+    const spec = vehicleSpecs.find(v => v.make === selectedMake && v.model === modelStr)
+    if (spec) {
+      setSelectedSpec(spec)
+      setForm(prev => ({
+        ...prev,
+        vehicleType: spec.type,
+        vehicleName: `${spec.make} ${spec.model}`,
+        totalCapacityKg: String(spec.maxPayloadKg),
+        totalCapacityM3: String(spec.cargoVolumeM3),
+        maxItemLength: String(spec.cargoLengthCm),
+        maxItemWidth: String(spec.cargoWidthCm),
+        maxItemHeight: String(spec.cargoHeightCm),
+        hasRefrigeration: spec.type === 'Refrigerated Van',
+      }))
+    }
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const target = e.target
@@ -71,6 +113,10 @@ export default function CreateListingPage() {
     )
   }
 
+  const inputCls = "w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none"
+  const selectCls = `${inputCls} bg-white`
+  const labelCls = "block text-sm font-medium text-navy-900 mb-1.5"
+
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -89,17 +135,82 @@ export default function CreateListingPage() {
             </div>
           )}
 
+          {/* Vehicle Selection */}
+          <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+            <h2 className="text-lg font-bold text-navy-900 mb-1">Vehicle Selection</h2>
+            <p className="text-xs text-slate-400 mb-4">Select your vehicle to auto-fill capacity specs, or enter manually below.</p>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className={labelCls}>Vehicle Make</label>
+                  <select
+                    className={selectCls}
+                    value={selectedMake}
+                    onChange={e => handleMakeChange(e.target.value)}
+                  >
+                    <option value="">— Select Make —</option>
+                    {makes.map(m => <option key={m} value={m}>{m}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className={labelCls}>Vehicle Model</label>
+                  <select
+                    className={selectCls}
+                    value={selectedSpec?.model || ''}
+                    onChange={e => handleModelSelect(e.target.value)}
+                    disabled={!selectedMake}
+                  >
+                    <option value="">— Select Model —</option>
+                    {modelsForMake.map(v => (
+                      <option key={v.model} value={v.model}>
+                        {v.model} — {v.maxPayloadKg}kg / {v.cargoVolumeM3}m&sup3;
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {selectedSpec && (
+                <div className="rounded-lg bg-navy-50 border border-navy-100 p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-lg">&#128666;</span>
+                    <span className="font-semibold text-navy-900 text-sm">{selectedSpec.make} {selectedSpec.model}</span>
+                    <span className="ml-auto text-xs font-medium px-2 py-0.5 rounded-full bg-navy-100 text-navy-700">{selectedSpec.type}</span>
+                  </div>
+                  <div className="grid grid-cols-4 gap-3 text-xs">
+                    <div className="bg-white rounded-lg p-2.5 text-center">
+                      <div className="font-bold text-navy-900 text-base">{selectedSpec.maxPayloadKg}</div>
+                      <div className="text-slate-400 mt-0.5">kg payload</div>
+                    </div>
+                    <div className="bg-white rounded-lg p-2.5 text-center">
+                      <div className="font-bold text-navy-900 text-base">{selectedSpec.cargoVolumeM3}</div>
+                      <div className="text-slate-400 mt-0.5">m&sup3; volume</div>
+                    </div>
+                    <div className="bg-white rounded-lg p-2.5 text-center">
+                      <div className="font-bold text-navy-900 text-base">{selectedSpec.cargoLengthCm}</div>
+                      <div className="text-slate-400 mt-0.5">cm length</div>
+                    </div>
+                    <div className="bg-white rounded-lg p-2.5 text-center">
+                      <div className="font-bold text-navy-900 text-base">{selectedSpec.cargoWidthCm}x{selectedSpec.cargoHeightCm}</div>
+                      <div className="text-slate-400 mt-0.5">cm W&times;H</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* Route Details */}
           <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
             <h2 className="text-lg font-bold text-navy-900 mb-4">Route Details</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-navy-900 mb-1.5">Listing Title *</label>
+                <label className={labelCls}>Listing Title *</label>
                 <input
                   name="title"
                   type="text"
                   required
-                  className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none"
+                  className={inputCls}
                   placeholder="e.g. Antibes to Monaco - Weekly Run"
                   value={form.title}
                   onChange={handleChange}
@@ -107,11 +218,11 @@ export default function CreateListingPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-navy-900 mb-1.5">Description</label>
+                <label className={labelCls}>Description</label>
                 <textarea
                   name="description"
                   rows={3}
-                  className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none resize-none"
+                  className={`${inputCls} resize-none`}
                   placeholder="Describe your route, vehicle condition, any restrictions..."
                   value={form.description}
                   onChange={handleChange}
@@ -120,23 +231,23 @@ export default function CreateListingPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-navy-900 mb-1.5">Origin Port *</label>
+                  <label className={labelCls}>Origin Port *</label>
                   <input
                     name="originPort"
                     type="text"
                     required
-                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none"
+                    className={inputCls}
                     placeholder="e.g. Port Vauban, Antibes"
                     value={form.originPort}
                     onChange={handleChange}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-navy-900 mb-1.5">Origin Region</label>
+                  <label className={labelCls}>Origin Region</label>
                   <input
                     name="originRegion"
                     type="text"
-                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none"
+                    className={inputCls}
                     placeholder="e.g. French Riviera"
                     value={form.originRegion}
                     onChange={handleChange}
@@ -146,23 +257,23 @@ export default function CreateListingPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-navy-900 mb-1.5">Destination Port *</label>
+                  <label className={labelCls}>Destination Port *</label>
                   <input
                     name="destinationPort"
                     type="text"
                     required
-                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none"
+                    className={inputCls}
                     placeholder="e.g. Port Hercules, Monaco"
                     value={form.destinationPort}
                     onChange={handleChange}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-navy-900 mb-1.5">Destination Region</label>
+                  <label className={labelCls}>Destination Region</label>
                   <input
                     name="destinationRegion"
                     type="text"
-                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none"
+                    className={inputCls}
                     placeholder="e.g. Monaco"
                     value={form.destinationRegion}
                     onChange={handleChange}
@@ -172,22 +283,22 @@ export default function CreateListingPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-navy-900 mb-1.5">Departure Date *</label>
+                  <label className={labelCls}>Departure Date *</label>
                   <input
                     name="departureDate"
                     type="datetime-local"
                     required
-                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none"
+                    className={inputCls}
                     value={form.departureDate}
                     onChange={handleChange}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-navy-900 mb-1.5">Est. Arrival</label>
+                  <label className={labelCls}>Est. Arrival</label>
                   <input
                     name="estimatedArrival"
                     type="datetime-local"
-                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none"
+                    className={inputCls}
                     value={form.estimatedArrival}
                     onChange={handleChange}
                   />
@@ -198,31 +309,30 @@ export default function CreateListingPage() {
 
           {/* Vehicle & Capacity */}
           <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
-            <h2 className="text-lg font-bold text-navy-900 mb-4">Vehicle & Capacity</h2>
+            <h2 className="text-lg font-bold text-navy-900 mb-1">Vehicle & Capacity</h2>
+            {selectedSpec && <p className="text-xs text-emerald-500 font-medium mb-4">Auto-filled from {selectedSpec.make} {selectedSpec.model} specs. You can override any value.</p>}
+            {!selectedSpec && <p className="text-xs text-slate-400 mb-4">Enter capacity manually, or select a vehicle above to auto-fill.</p>}
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-navy-900 mb-1.5">Vehicle Type *</label>
+                  <label className={labelCls}>Vehicle Type *</label>
                   <select
                     name="vehicleType"
                     required
-                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none bg-white"
+                    className={selectCls}
                     value={form.vehicleType}
                     onChange={handleChange}
                   >
-                    <option value="Van">Van</option>
-                    <option value="Truck">Truck</option>
-                    <option value="Refrigerated">Refrigerated Van</option>
-                    <option value="Flatbed">Flatbed</option>
-                    <option value="Sprinter">Sprinter</option>
+                    <option value="">— Select Type —</option>
+                    {vehicleTypes.map(t => <option key={t} value={t}>{t}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-navy-900 mb-1.5">Vehicle Name</label>
+                  <label className={labelCls}>Vehicle Name</label>
                   <input
                     name="vehicleName"
                     type="text"
-                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none"
+                    className={inputCls}
                     placeholder="e.g. Mercedes Sprinter 316"
                     value={form.vehicleName}
                     onChange={handleChange}
@@ -232,31 +342,115 @@ export default function CreateListingPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-navy-900 mb-1.5">Total Weight Capacity (kg) *</label>
+                  <label className={labelCls}>Max Payload (kg) *</label>
                   <input
                     name="totalCapacityKg"
                     type="number"
                     required
                     step="0.1"
-                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none"
+                    className={inputCls}
                     placeholder="e.g. 1200"
                     value={form.totalCapacityKg}
                     onChange={handleChange}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-navy-900 mb-1.5">Total Volume Capacity (m&sup3;) *</label>
+                  <label className={labelCls}>Cargo Volume (m&sup3;) *</label>
                   <input
                     name="totalCapacityM3"
                     type="number"
                     required
                     step="0.1"
-                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none"
+                    className={inputCls}
                     placeholder="e.g. 8.5"
                     value={form.totalCapacityM3}
                     onChange={handleChange}
                   />
                 </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className={labelCls}>Max Item Length (cm)</label>
+                  <input
+                    name="maxItemLength"
+                    type="number"
+                    step="1"
+                    className={inputCls}
+                    placeholder="e.g. 347"
+                    value={form.maxItemLength}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div>
+                  <label className={labelCls}>Max Item Width (cm)</label>
+                  <input
+                    name="maxItemWidth"
+                    type="number"
+                    step="1"
+                    className={inputCls}
+                    placeholder="e.g. 183"
+                    value={form.maxItemWidth}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div>
+                  <label className={labelCls}>Max Item Height (cm)</label>
+                  <input
+                    name="maxItemHeight"
+                    type="number"
+                    step="1"
+                    className={inputCls}
+                    placeholder="e.g. 193"
+                    value={form.maxItemHeight}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+
+              {/* Vehicle Features */}
+              <div className="pt-4 border-t border-slate-100 grid grid-cols-3 gap-4">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" name="hasRefrigeration" checked={form.hasRefrigeration} onChange={handleChange} className="w-4 h-4 rounded border-slate-300 text-navy-700 focus:ring-navy-400" />
+                  <span className="text-sm text-navy-900">Refrigeration</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" name="hasTailLift" checked={form.hasTailLift} onChange={handleChange} className="w-4 h-4 rounded border-slate-300 text-navy-700 focus:ring-navy-400" />
+                  <span className="text-sm text-navy-900">Tail Lift</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" name="hasGPS" checked={form.hasGPS} onChange={handleChange} className="w-4 h-4 rounded border-slate-300 text-navy-700 focus:ring-navy-400" />
+                  <span className="text-sm text-navy-900">GPS Tracking</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          {/* Cargo Restrictions */}
+          <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+            <h2 className="text-lg font-bold text-navy-900 mb-4">Cargo Details</h2>
+            <div className="space-y-4">
+              <div>
+                <label className={labelCls}>Accepted Cargo Types</label>
+                <input
+                  name="acceptedCargo"
+                  type="text"
+                  className={inputCls}
+                  placeholder="e.g. Marine parts, provisions, electronics, general supplies"
+                  value={form.acceptedCargo}
+                  onChange={handleChange}
+                />
+              </div>
+              <div>
+                <label className={labelCls}>Restricted Items</label>
+                <input
+                  name="restrictedItems"
+                  type="text"
+                  className={inputCls}
+                  placeholder="e.g. Hazardous materials, flammables, live animals"
+                  value={form.restrictedItems}
+                  onChange={handleChange}
+                />
               </div>
             </div>
           </div>
@@ -267,36 +461,36 @@ export default function CreateListingPage() {
             <div className="space-y-4">
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-navy-900 mb-1.5">Price per kg</label>
+                  <label className={labelCls}>Price per kg</label>
                   <input
                     name="pricePerKg"
                     type="number"
                     step="0.01"
-                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none"
+                    className={inputCls}
                     placeholder="e.g. 2.50"
                     value={form.pricePerKg}
                     onChange={handleChange}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-navy-900 mb-1.5">Price per m&sup3;</label>
+                  <label className={labelCls}>Price per m&sup3;</label>
                   <input
                     name="pricePerM3"
                     type="number"
                     step="0.01"
-                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none"
+                    className={inputCls}
                     placeholder="e.g. 50.00"
                     value={form.pricePerM3}
                     onChange={handleChange}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-navy-900 mb-1.5">Or Flat Rate</label>
+                  <label className={labelCls}>Or Flat Rate</label>
                   <input
                     name="flatRate"
                     type="number"
                     step="0.01"
-                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none"
+                    className={inputCls}
                     placeholder="e.g. 500.00"
                     value={form.flatRate}
                     onChange={handleChange}
@@ -304,18 +498,32 @@ export default function CreateListingPage() {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-navy-900 mb-1.5">Currency</label>
-                <select
-                  name="currency"
-                  className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none bg-white"
-                  value={form.currency}
-                  onChange={handleChange}
-                >
-                  <option value="EUR">EUR</option>
-                  <option value="GBP">GBP</option>
-                  <option value="USD">USD</option>
-                </select>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className={labelCls}>Currency</label>
+                  <select
+                    name="currency"
+                    className={selectCls}
+                    value={form.currency}
+                    onChange={handleChange}
+                  >
+                    <option value="EUR">EUR</option>
+                    <option value="GBP">GBP</option>
+                    <option value="USD">USD</option>
+                  </select>
+                </div>
+                <div>
+                  <label className={labelCls}>Minimum Charge</label>
+                  <input
+                    name="minimumCharge"
+                    type="number"
+                    step="0.01"
+                    className={inputCls}
+                    placeholder="e.g. 50.00"
+                    value={form.minimumCharge}
+                    onChange={handleChange}
+                  />
+                </div>
               </div>
 
               {/* Bidding */}
@@ -338,12 +546,12 @@ export default function CreateListingPage() {
                 </div>
                 {form.biddingEnabled && (
                   <div className="mt-3">
-                    <label className="block text-sm font-medium text-navy-900 mb-1.5">Minimum Bid Price</label>
+                    <label className={labelCls}>Minimum Bid Price</label>
                     <input
                       name="minBidPrice"
                       type="number"
                       step="0.01"
-                      className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none"
+                      className={inputCls}
                       placeholder="Optional minimum bid amount"
                       value={form.minBidPrice}
                       onChange={handleChange}

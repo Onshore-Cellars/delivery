@@ -181,3 +181,137 @@ input::placeholder, textarea::placeholder {
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
+
+/* ─── PRINT STYLES ────────────────────────────────────────────────────────── */
+
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 12pt;
+  }
+
+  nav, .no-print, button, .btn-primary, .btn-gold {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  .bg-white, .bg-slate-50, .bg-slate-100 {
+    background: white !important;
+  }
+
+  .shadow-sm, .shadow-lg, .shadow-2xl {
+    box-shadow: none !important;
+  }
+
+  .rounded-xl, .rounded-2xl, .rounded-lg {
+    border-radius: 0 !important;
+  }
+
+  .border {
+    border-color: #ddd !important;
+  }
+
+  a {
+    color: inherit !important;
+    text-decoration: none !important;
+  }
+
+  .hero-gradient, .pattern-overlay {
+    background: #0f1628 !important;
+  }
+
+  /* Ensure page breaks work correctly */
+  .page-break-before { page-break-before: always; }
+  .page-break-after { page-break-after: always; }
+  .no-page-break { page-break-inside: avoid; }
+}
+
+.print-only {
+  display: none;
+}
+
+/* ─── ACCESSIBILITY ───────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .card-hover:hover {
+    transform: none;
+  }
+}
+
+/* Skip to content link */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 0;
+  z-index: 100;
+  padding: 0.5rem 1rem;
+  background: var(--color-navy-900);
+  color: white;
+  font-weight: 600;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* High contrast mode support */
+@media (forced-colors: active) {
+  .btn-primary, .btn-gold, .badge {
+    border: 1px solid;
+  }
+}
+
+/* ─── ADDITIONAL UTILITIES ────────────────────────────────────────────────── */
+
+/* Tooltip */
+.tooltip {
+  position: relative;
+}
+
+.tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.375rem 0.75rem;
+  background: var(--color-navy-900);
+  color: white;
+  font-size: 0.75rem;
+  border-radius: 0.375rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  margin-bottom: 0.5rem;
+}
+
+.tooltip:hover::after {
+  opacity: 1;
+}
+
+/* Bar chart utility for admin */
+.bar-chart-bar {
+  transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Notification pulse */
+@keyframes notifPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.notif-pulse {
+  animation: notifPulse 2s ease-in-out infinite;
+}

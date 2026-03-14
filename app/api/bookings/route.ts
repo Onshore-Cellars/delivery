@@ -82,8 +82,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'You cannot book your own listing' }, { status: 400 })
     }
 
+    // Prevent duplicate active bookings
+    const existingBooking = await prisma.booking.findFirst({
+      where: {
+        listingId,
+        shipperId: decoded.userId,
+        status: { in: ['PENDING', 'CONFIRMED', 'PICKED_UP', 'IN_TRANSIT'] },
+      },
+    })
+    if (existingBooking) {
+      return NextResponse.json({ error: 'You already have an active booking on this listing' }, { status: 409 })
+    }
+
     const weight = parseFloat(weightKg)
     const volume = parseFloat(volumeM3)
+
+    if (isNaN(weight) || isNaN(volume) || weight <= 0 || volume <= 0) {
+      return NextResponse.json({ error: 'Weight and volume must be positive numbers' }, { status: 400 })
+    }
 
     if (weight > listing.availableKg || volume > listing.availableM3) {
       return NextResponse.json({ error: 'Requested capacity exceeds available space' }, { status: 400 })
