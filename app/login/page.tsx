@@ -1,15 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useAuth } from '../components/AuthProvider'
 
 export default function LoginPage() {
-  const router = useRouter()
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  })
+  const { login } = useAuth()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -17,107 +15,110 @@ export default function LoginPage() {
     e.preventDefault()
     setError('')
     setLoading(true)
-
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Login failed')
-      }
-
-      // Store token and user data
-      localStorage.setItem('token', data.token)
-      localStorage.setItem('user', JSON.stringify(data.user))
-
-      // Redirect to dashboard
-      router.push('/dashboard')
+      await login(email, password)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred')
+      setError(err instanceof Error ? err.message : 'Login failed')
     } finally {
       setLoading(false)
     }
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    })
-  }
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to Yachting Logistics
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Or{' '}
-            <Link href="/register" className="font-medium text-blue-600 hover:text-blue-500">
-              create a new account
+    <div className="min-h-screen flex">
+      {/* Left — form */}
+      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+        <div className="w-full max-w-md">
+          <div className="mb-8">
+            <Link href="/" className="flex items-center gap-2 mb-8">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-navy-800 to-navy-900 flex items-center justify-center">
+                <span className="text-gold-400 font-bold text-sm">YH</span>
+              </div>
+              <span className="text-lg font-bold text-navy-900 tracking-tight">YachtHop</span>
             </Link>
-          </p>
-        </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="rounded-md bg-red-50 p-4">
-              <div className="text-sm text-red-800">{error}</div>
-            </div>
-          )}
-          <div className="rounded-md shadow-sm -space-y-px">
+            <h1 className="text-3xl font-extrabold text-navy-900 tracking-tight">Welcome back</h1>
+            <p className="mt-2 text-slate-500">
+              Sign in to manage your shipments and listings.
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {error && (
+              <div className="px-4 py-3 rounded-lg bg-red-50 border border-red-100">
+                <p className="text-sm text-red-700">{error}</p>
+              </div>
+            )}
+
             <div>
-              <label htmlFor="email" className="sr-only">
-                Email address
+              <label htmlFor="email" className="block text-sm font-medium text-navy-900 mb-1.5">
+                Email
               </label>
               <input
                 id="email"
-                name="email"
                 type="email"
-                autoComplete="email"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
-                value={formData.email}
-                onChange={handleChange}
+                autoComplete="email"
+                className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-white text-navy-900 text-sm focus:border-navy-400 focus:ring-2 focus:ring-navy-100 transition-all outline-none"
+                placeholder="you@company.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
+
             <div>
-              <label htmlFor="password" className="sr-only">
+              <label htmlFor="password" className="block text-sm font-medium text-navy-900 mb-1.5">
                 Password
               </label>
               <input
                 id="password"
-                name="password"
                 type="password"
-                autoComplete="current-password"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
-                value={formData.password}
-                onChange={handleChange}
+                autoComplete="current-password"
+                className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-white text-navy-900 text-sm focus:border-navy-400 focus:ring-2 focus:ring-navy-100 transition-all outline-none"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
-          </div>
 
-          <div>
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              className="w-full btn-primary !py-3 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Signing in...' : 'Sign in'}
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  Signing in...
+                </span>
+              ) : 'Sign In'}
             </button>
+          </form>
+
+          <p className="mt-6 text-center text-sm text-slate-500">
+            Don&apos;t have an account?{' '}
+            <Link href="/register" className="font-semibold text-navy-700 hover:text-navy-900 transition-colors">
+              Create one
+            </Link>
+          </p>
+        </div>
+      </div>
+
+      {/* Right — decorative panel */}
+      <div className="hidden lg:flex lg:flex-1 hero-gradient pattern-overlay items-center justify-center p-12">
+        <div className="max-w-md text-center">
+          <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center mx-auto mb-8">
+            <span className="text-gold-400 font-bold text-2xl">YH</span>
           </div>
-        </form>
+          <h2 className="text-3xl font-bold text-white mb-4">Premium Yacht Logistics</h2>
+          <p className="text-slate-300 leading-relaxed">
+            The trusted marketplace for carriers and yacht owners across the Mediterranean.
+            Streamline your yacht deliveries with YachtHop.
+          </p>
+        </div>
       </div>
     </div>
   )

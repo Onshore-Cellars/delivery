@@ -1,74 +1,67 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
-import { hashPassword } from '@/lib/auth'
-import { UserRole } from '@prisma/client'
+import { hashPassword, generateToken } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     const { email, password, name, role, phone, company } = body
 
-    // Validate required fields
-    if (!email || !password || !role) {
-      return NextResponse.json(
-        { error: 'Email, password, and role are required' },
-        { status: 400 }
-      )
+    if (!email || !password || !name || !role) {
+      return NextResponse.json({ error: 'Email, password, name, and role are required' }, { status: 400 })
     }
 
-    // Validate role
-    if (!Object.values(UserRole).includes(role as UserRole)) {
-      return NextResponse.json(
-        { error: 'Invalid role. Must be CARRIER, SHIPPER, YACHT_CLIENT, or ADMIN' },
-        { status: 400 }
-      )
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      return NextResponse.json({ error: 'Please enter a valid email address' }, { status: 400 })
     }
 
-    // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    })
-
-    if (existingUser) {
-      return NextResponse.json(
-        { error: 'User with this email already exists' },
-        { status: 409 }
-      )
+    if (password.length < 8) {
+      return NextResponse.json({ error: 'Password must be at least 8 characters' }, { status: 400 })
     }
 
-    // Hash password
+    if (name.length > 100 || email.length > 255) {
+      return NextResponse.json({ error: 'Input exceeds maximum length' }, { status: 400 })
+    }
+
+    const validRoles = ['CARRIER', 'SUPPLIER', 'YACHT_OWNER']
+    if (!validRoles.includes(role)) {
+      return NextResponse.json({ error: 'Invalid role' }, { status: 400 })
+    }
+
+    const existing = await prisma.user.findUnique({ where: { email } })
+    if (existing) {
+      return NextResponse.json({ error: 'An account with this email already exists' }, { status: 409 })
+    }
+
     const hashedPassword = await hashPassword(password)
 
-    // Create user
     const user = await prisma.user.create({
       data: {
         email,
         password: hashedPassword,
         name,
-        role: role as UserRole,
-        phone,
-        company,
+        role,
+        phone: phone || null,
+        company: company || null,
       },
       select: {
         id: true,
         email: true,
         name: true,
         role: true,
-        phone: true,
         company: true,
+        phone: true,
+        verified: true,
         createdAt: true,
       },
     })
 
-    return NextResponse.json(
-      { message: 'User created successfully', user },
-      { status: 201 }
-    )
+    const token = generateToken({ userId: user.id, email: user.email, role: user.role })
+
+    return NextResponse.json({ user, token }, { status: 201 })
   } catch (error) {
     console.error('Registration error:', error)
-    return NextResponse.json(
-      { error: 'An error occurred during registration' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

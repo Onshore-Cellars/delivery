@@ -1,175 +1,956 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useAuth } from '../components/AuthProvider'
+
+// ─── Types ───────────────────────────────────────────────────────────────────
 
 interface Stats {
-  users: {
-    total: number
-    carriers: number
-    shippers: number
-    yachtClients: number
-  }
-  listings: {
-    total: number
-    active: number
-  }
-  bookings: {
-    total: number
-    pending: number
-    confirmed: number
-  }
-  revenue: {
-    total: number
-  }
+  users: { total: number; carriers: number; suppliers: number; yachtOwners: number }
+  listings: { total: number; active: number }
+  bookings: { total: number; pending: number; confirmed: number }
+  revenue: { total: number }
 }
 
+interface RecentBooking {
+  id: string
+  totalPrice: number
+  platformFee: number
+  status: string
+  paymentStatus: string
+  createdAt: string
+  shipper: { name: string; company?: string }
+  listing: { title: string; originPort: string; destinationPort: string }
+}
+
+interface AdminUser {
+  id: string
+  name: string
+  email: string
+  role: string
+  company?: string
+  phone?: string
+  verified: boolean
+  createdAt: string
+  _count: { listings: number; bookings: number }
+}
+
+interface AdminListing {
+  id: string
+  title: string
+  status: string
+  featured: boolean
+  originPort: string
+  destinationPort: string
+  departureDate: string
+  totalCapacityKg: number
+  availableKg: number
+  pricePerKg?: number
+  flatRate?: number
+  createdAt: string
+  carrier: { name: string; company?: string }
+  _count: { bookings: number }
+}
+
+interface ActivityItem {
+  id: string
+  type: 'booking' | 'registration' | 'review'
+  title: string
+  description: string
+  timestamp: string
+  meta?: string
+}
+
+type TabKey = 'overview' | 'users' | 'bookings' | 'listings' | 'activity'
+
+// ─── Constants ───────────────────────────────────────────────────────────────
+
+const statusColors: Record<string, string> = {
+  QUOTE_REQUESTED: 'bg-purple-50 text-purple-700 border-purple-200',
+  QUOTED: 'bg-violet-50 text-violet-700 border-violet-200',
+  PENDING: 'bg-amber-50 text-amber-700 border-amber-200',
+  CONFIRMED: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  PICKED_UP: 'bg-cyan-50 text-cyan-700 border-cyan-200',
+  IN_TRANSIT: 'bg-blue-50 text-blue-700 border-blue-200',
+  CUSTOMS_HOLD: 'bg-orange-50 text-orange-700 border-orange-200',
+  DELIVERED: 'bg-slate-100 text-slate-600 border-slate-200',
+  CANCELLED: 'bg-red-50 text-red-700 border-red-200',
+  DISPUTED: 'bg-rose-50 text-rose-700 border-rose-200',
+}
+
+const listingStatusColors: Record<string, string> = {
+  DRAFT: 'bg-slate-50 text-slate-600 border-slate-200',
+  ACTIVE: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  FULL: 'bg-amber-50 text-amber-700 border-amber-200',
+  IN_TRANSIT: 'bg-blue-50 text-blue-700 border-blue-200',
+  COMPLETED: 'bg-slate-100 text-slate-600 border-slate-200',
+  CANCELLED: 'bg-red-50 text-red-700 border-red-200',
+}
+
+const paymentStatusColors: Record<string, string> = {
+  PENDING: 'bg-amber-50 text-amber-700 border-amber-200',
+  PROCESSING: 'bg-blue-50 text-blue-700 border-blue-200',
+  PAID: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  REFUNDED: 'bg-purple-50 text-purple-700 border-purple-200',
+  FAILED: 'bg-red-50 text-red-700 border-red-200',
+}
+
+const TAB_CONFIG: { key: TabKey; label: string; icon: string }[] = [
+  { key: 'overview', label: 'Overview', icon: '\u2630' },
+  { key: 'users', label: 'Users', icon: '\u263A' },
+  { key: 'bookings', label: 'Bookings', icon: '\u2693' },
+  { key: 'listings', label: 'Listings', icon: '\u2318' },
+  { key: 'activity', label: 'Activity', icon: '\u2691' },
+]
+
+// ─── Component ───────────────────────────────────────────────────────────────
+
 export default function AdminPage() {
+  const { user, token, loading: authLoading } = useAuth()
   const router = useRouter()
+
+  // State
   const [stats, setStats] = useState<Stats | null>(null)
+  const [allBookings, setAllBookings] = useState<RecentBooking[]>([])
+  const [allUsers, setAllUsers] = useState<AdminUser[]>([])
+  const [allListings, setAllListings] = useState<AdminListing[]>([])
   const [loading, setLoading] = useState(true)
+  const [tab, setTab] = useState<TabKey>('overview')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [actionLoading, setActionLoading] = useState<string | null>(null)
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
 
-  useEffect(() => {
-    // Check if user is admin
-    const token = localStorage.getItem('token')
-    const userData = localStorage.getItem('user')
+  // ─── Helpers ──────────────────────────────────────────────────────────────
 
-    if (!token || !userData) {
-      router.push('/login')
-      return
-    }
+  const formatDate = (d: string) =>
+    new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
 
-    const user = JSON.parse(userData)
-    if (user.role !== 'ADMIN') {
-      router.push('/dashboard')
-      return
-    }
+  const formatDateTime = (d: string) =>
+    new Date(d).toLocaleDateString('en-GB', {
+      day: 'numeric', month: 'short', year: 'numeric',
+      hour: '2-digit', minute: '2-digit',
+    })
 
-    fetchStats(token)
-  }, [router])
+  const formatCurrency = (amount: number) => `\u20AC${amount.toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
-  const fetchStats = async (token: string) => {
+  const showToast = (message: string, type: 'success' | 'error' = 'success') => {
+    setToast({ message, type })
+    setTimeout(() => setToast(null), 3000)
+  }
+
+  // ─── Data Fetching ────────────────────────────────────────────────────────
+
+  const fetchData = useCallback(async () => {
+    if (!token) return
     try {
-      const response = await fetch('/api/admin/stats', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+      const [statsRes, usersRes, listingsRes] = await Promise.all([
+        fetch('/api/admin/stats', { headers: { Authorization: `Bearer ${token}` } }),
+        fetch('/api/admin/users', { headers: { Authorization: `Bearer ${token}` } }),
+        fetch('/api/listings?limit=100', { headers: { Authorization: `Bearer ${token}` } }),
+      ])
 
-      if (response.ok) {
-        const data = await response.json()
+      if (statsRes.ok) {
+        const data = await statsRes.json()
         setStats(data.stats)
+        setAllBookings(data.recentBookings || [])
+      }
+      if (usersRes.ok) {
+        const data = await usersRes.json()
+        setAllUsers(data.users || [])
+      }
+      if (listingsRes.ok) {
+        const data = await listingsRes.json()
+        setAllListings(data.listings || [])
       }
     } catch (err) {
-      console.error('Error fetching stats:', err)
+      console.error('Error:', err)
     } finally {
       setLoading(false)
     }
+  }, [token])
+
+  useEffect(() => {
+    if (!authLoading && (!user || user.role !== 'ADMIN')) {
+      router.push('/dashboard')
+      return
+    }
+    if (token) fetchData()
+  }, [authLoading, user, token, router, fetchData])
+
+  // ─── User Actions ─────────────────────────────────────────────────────────
+
+  const handleUserAction = async (userId: string, action: 'verify' | 'suspend') => {
+    if (!token) return
+    setActionLoading(`${userId}-${action}`)
+    try {
+      const res = await fetch('/api/admin/users', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ userId, action }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setAllUsers(prev => prev.map(u => u.id === userId ? data.user : u))
+        showToast(data.message)
+      } else {
+        const data = await res.json()
+        showToast(data.error || 'Action failed', 'error')
+      }
+    } catch {
+      showToast('Network error', 'error')
+    } finally {
+      setActionLoading(null)
+    }
   }
 
-  if (loading) {
+  // ─── Booking Actions ──────────────────────────────────────────────────────
+
+  const handleBookingStatus = async (bookingId: string, status: string) => {
+    if (!token) return
+    setActionLoading(`booking-${bookingId}`)
+    try {
+      const res = await fetch(`/api/bookings/${bookingId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status }),
+      })
+      if (res.ok) {
+        setAllBookings(prev => prev.map(b => b.id === bookingId ? { ...b, status } : b))
+        showToast(`Booking status updated to ${status}`)
+      } else {
+        showToast('Failed to update booking', 'error')
+      }
+    } catch {
+      showToast('Network error', 'error')
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
+  const handleRefund = async (bookingId: string) => {
+    if (!token || !confirm('Process refund for this booking? This cannot be undone.')) return
+    setActionLoading(`refund-${bookingId}`)
+    try {
+      const res = await fetch(`/api/bookings/${bookingId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status: 'CANCELLED', paymentStatus: 'REFUNDED' }),
+      })
+      if (res.ok) {
+        setAllBookings(prev => prev.map(b =>
+          b.id === bookingId ? { ...b, status: 'CANCELLED', paymentStatus: 'REFUNDED' } : b
+        ))
+        showToast('Refund processed successfully')
+      } else {
+        showToast('Failed to process refund', 'error')
+      }
+    } catch {
+      showToast('Network error', 'error')
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
+  // ─── Listing Actions ──────────────────────────────────────────────────────
+
+  const handleToggleFeatured = async (listingId: string, currentFeatured: boolean) => {
+    if (!token) return
+    setActionLoading(`listing-${listingId}`)
+    try {
+      const res = await fetch(`/api/listings/${listingId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ featured: !currentFeatured }),
+      })
+      if (res.ok) {
+        setAllListings(prev => prev.map(l =>
+          l.id === listingId ? { ...l, featured: !currentFeatured } : l
+        ))
+        showToast(currentFeatured ? 'Listing unfeatured' : 'Listing featured')
+      } else {
+        showToast('Failed to update listing', 'error')
+      }
+    } catch {
+      showToast('Network error', 'error')
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
+  // ─── CSV Export ────────────────────────────────────────────────────────────
+
+  const exportCSV = (type: 'users' | 'bookings' | 'listings') => {
+    let csv = ''
+    let filename = ''
+
+    if (type === 'users') {
+      csv = 'Name,Email,Role,Company,Verified,Listings,Bookings,Joined\n'
+      csv += filteredUsers.map(u =>
+        `"${u.name}","${u.email}","${u.role}","${u.company || ''}","${u.verified}","${u._count.listings}","${u._count.bookings}","${formatDate(u.createdAt)}"`
+      ).join('\n')
+      filename = 'users-export.csv'
+    } else if (type === 'bookings') {
+      csv = 'ID,Status,Payment,Shipper,Route,Price,Date\n'
+      csv += filteredBookings.map(b =>
+        `"${b.id}","${b.status}","${b.paymentStatus || 'N/A'}","${b.shipper.name}","${b.listing.originPort} > ${b.listing.destinationPort}","${b.totalPrice}","${formatDate(b.createdAt)}"`
+      ).join('\n')
+      filename = 'bookings-export.csv'
+    } else {
+      csv = 'Title,Status,Featured,Origin,Destination,Carrier,Bookings,Created\n'
+      csv += filteredListings.map(l =>
+        `"${l.title}","${l.status}","${l.featured}","${l.originPort}","${l.destinationPort}","${l.carrier?.name || ''}","${l._count?.bookings || 0}","${formatDate(l.createdAt)}"`
+      ).join('\n')
+      filename = 'listings-export.csv'
+    }
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = filename
+    a.click()
+    URL.revokeObjectURL(url)
+    showToast(`${type} exported successfully`)
+  }
+
+  // ─── Search & Filter ──────────────────────────────────────────────────────
+
+  const q = searchQuery.toLowerCase()
+
+  const filteredUsers = useMemo(() =>
+    allUsers.filter(u =>
+      !q || u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q) ||
+      u.role.toLowerCase().includes(q) || (u.company || '').toLowerCase().includes(q)
+    ), [allUsers, q])
+
+  const filteredBookings = useMemo(() =>
+    allBookings.filter(b =>
+      !q || b.shipper.name.toLowerCase().includes(q) || b.listing.title.toLowerCase().includes(q) ||
+      b.status.toLowerCase().includes(q) || b.listing.originPort.toLowerCase().includes(q) ||
+      b.listing.destinationPort.toLowerCase().includes(q)
+    ), [allBookings, q])
+
+  const filteredListings = useMemo(() =>
+    allListings.filter(l =>
+      !q || l.title?.toLowerCase().includes(q) || l.originPort?.toLowerCase().includes(q) ||
+      l.destinationPort?.toLowerCase().includes(q) || l.status?.toLowerCase().includes(q) ||
+      (l.carrier?.name || '').toLowerCase().includes(q)
+    ), [allListings, q])
+
+  // ─── Activity Feed ────────────────────────────────────────────────────────
+
+  const activityFeed = useMemo((): ActivityItem[] => {
+    const items: ActivityItem[] = []
+    allBookings.forEach(b => {
+      items.push({
+        id: `b-${b.id}`,
+        type: 'booking',
+        title: `Booking: ${b.listing.title}`,
+        description: `${b.shipper.name} booked ${b.listing.originPort} \u2192 ${b.listing.destinationPort} \u2014 ${formatCurrency(b.totalPrice)}`,
+        timestamp: b.createdAt,
+        meta: b.status,
+      })
+    })
+    allUsers.forEach(u => {
+      items.push({
+        id: `u-${u.id}`,
+        type: 'registration',
+        title: `New ${u.role.replace('_', ' ').toLowerCase()}: ${u.name}`,
+        description: `${u.email}${u.company ? ` \u2014 ${u.company}` : ''}`,
+        timestamp: u.createdAt,
+      })
+    })
+    items.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+    return items.slice(0, 30)
+  }, [allBookings, allUsers])
+
+  // ─── Revenue Analytics ────────────────────────────────────────────────────
+
+  const revenueByMonth = useMemo(() => {
+    const months: Record<string, number> = {}
+    allBookings.forEach(b => {
+      if (b.status === 'CANCELLED') return
+      const d = new Date(b.createdAt)
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+      months[key] = (months[key] || 0) + b.totalPrice
+    })
+    const sorted = Object.entries(months).sort((a, b) => a[0].localeCompare(b[0])).slice(-6)
+    const max = Math.max(...sorted.map(([, v]) => v), 1)
+    return sorted.map(([month, total]) => ({
+      month: new Date(month + '-01').toLocaleDateString('en-GB', { month: 'short', year: '2-digit' }),
+      total,
+      pct: (total / max) * 100,
+    }))
+  }, [allBookings])
+
+  // ─── Stats Derivations ────────────────────────────────────────────────────
+
+  const newUsersThisWeek = useMemo(() => {
+    const weekAgo = new Date()
+    weekAgo.setDate(weekAgo.getDate() - 7)
+    return allUsers.filter(u => new Date(u.createdAt) >= weekAgo).length
+  }, [allUsers])
+
+  const bookingsByStatus = useMemo(() => {
+    const counts: Record<string, number> = {}
+    allBookings.forEach(b => {
+      counts[b.status] = (counts[b.status] || 0) + 1
+    })
+    return counts
+  }, [allBookings])
+
+  const usersByRole = useMemo(() => {
+    const counts: Record<string, number> = {}
+    allUsers.forEach(u => {
+      counts[u.role] = (counts[u.role] || 0) + 1
+    })
+    return counts
+  }, [allUsers])
+
+  // ─── Guard ────────────────────────────────────────────────────────────────
+
+  if (authLoading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p>Loading...</p>
+        <div className="loading-shimmer w-64 h-8 rounded-lg" />
       </div>
     )
   }
 
+  // ─── Render ───────────────────────────────────────────────────────────────
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <h1 className="text-xl font-bold text-gray-900">Yachting Logistics - Admin</h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link href="/dashboard" className="text-gray-700 hover:text-gray-900">
-                Dashboard
-              </Link>
-              <Link href="/marketplace" className="text-gray-700 hover:text-gray-900">
-                Marketplace
-              </Link>
-            </div>
-          </div>
+    <div className="min-h-screen bg-slate-50">
+      {/* Toast */}
+      {toast && (
+        <div className={`fixed top-4 right-4 z-50 px-5 py-3 rounded-xl shadow-lg text-sm font-medium transition-all ${
+          toast.type === 'success'
+            ? 'bg-emerald-600 text-white'
+            : 'bg-red-600 text-white'
+        }`}>
+          {toast.message}
         </div>
-      </nav>
+      )}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-8">Admin Dashboard</h2>
-
-        {stats && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h3 className="text-sm font-medium text-gray-500 mb-2">Total Users</h3>
-              <p className="text-3xl font-bold text-gray-900">{stats.users.total}</p>
-              <div className="mt-4 text-sm text-gray-600">
-                <p>Carriers: {stats.users.carriers}</p>
-                <p>Shippers: {stats.users.shippers}</p>
-                <p>Yacht Clients: {stats.users.yachtClients}</p>
-              </div>
-            </div>
-
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h3 className="text-sm font-medium text-gray-500 mb-2">Listings</h3>
-              <p className="text-3xl font-bold text-gray-900">{stats.listings.total}</p>
-              <div className="mt-4 text-sm text-gray-600">
-                <p>Active: {stats.listings.active}</p>
-                <p>Inactive: {stats.listings.total - stats.listings.active}</p>
-              </div>
-            </div>
-
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h3 className="text-sm font-medium text-gray-500 mb-2">Bookings</h3>
-              <p className="text-3xl font-bold text-gray-900">{stats.bookings.total}</p>
-              <div className="mt-4 text-sm text-gray-600">
-                <p>Pending: {stats.bookings.pending}</p>
-                <p>Confirmed: {stats.bookings.confirmed}</p>
-              </div>
-            </div>
-
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h3 className="text-sm font-medium text-gray-500 mb-2">Total Revenue</h3>
-              <p className="text-3xl font-bold text-gray-900">
-                €{stats.revenue.total.toFixed(2)}
-              </p>
-            </div>
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-2xl font-extrabold text-navy-900 tracking-tight">Admin Panel</h1>
+            <p className="text-slate-500 mt-1">Platform management and analytics</p>
           </div>
-        )}
-
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Platform Management</h3>
-          <div className="space-y-4">
-            <div className="border-b border-gray-200 pb-4">
-              <h4 className="font-medium text-gray-900 mb-2">User Management</h4>
-              <p className="text-sm text-gray-600 mb-3">
-                View and manage all users on the platform
-              </p>
-              <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm">
-                View All Users
-              </button>
-            </div>
-            <div className="border-b border-gray-200 pb-4">
-              <h4 className="font-medium text-gray-900 mb-2">Listings Management</h4>
-              <p className="text-sm text-gray-600 mb-3">
-                Monitor and moderate van listings
-              </p>
-              <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm">
-                View All Listings
-              </button>
-            </div>
-            <div>
-              <h4 className="font-medium text-gray-900 mb-2">Transaction History</h4>
-              <p className="text-sm text-gray-600 mb-3">
-                View all bookings and transactions
-              </p>
-              <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm">
-                View Transactions
-              </button>
+          <div className="flex items-center gap-3">
+            {/* Global Search */}
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search users, bookings, listings..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="pl-9 pr-4 py-2 w-72 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-navy-500 focus:border-transparent"
+              />
+              <svg className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
             </div>
           </div>
         </div>
+
+        {/* Tabs */}
+        <div className="flex gap-1 mb-8 bg-white rounded-xl p-1 shadow-sm border border-slate-100 w-fit">
+          {TAB_CONFIG.map(t => (
+            <button
+              key={t.key}
+              onClick={() => setTab(t.key)}
+              className={`px-5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
+                tab === t.key
+                  ? 'bg-navy-900 text-white shadow-sm'
+                  : 'text-slate-500 hover:text-navy-900 hover:bg-slate-50'
+              }`}
+            >
+              <span className="text-xs">{t.icon}</span>
+              {t.label}
+            </button>
+          ))}
+        </div>
+
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {[1, 2, 3, 4].map(i => <div key={i} className="loading-shimmer h-32 rounded-xl" />)}
+          </div>
+        ) : (
+          <>
+            {/* ═══════════════════ OVERVIEW TAB ═══════════════════ */}
+            {tab === 'overview' && stats && (
+              <div className="space-y-8">
+                {/* Primary Stats Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-5">
+                    <div className="flex items-center justify-between">
+                      <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Revenue</div>
+                      <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600 text-sm font-bold">&euro;</div>
+                    </div>
+                    <div className="mt-2 text-3xl font-extrabold text-navy-900">{formatCurrency(stats.revenue.total)}</div>
+                    <div className="mt-2 text-xs text-slate-500">Platform lifetime revenue</div>
+                  </div>
+                  <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-5">
+                    <div className="flex items-center justify-between">
+                      <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Active Listings</div>
+                      <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 text-sm font-bold">#</div>
+                    </div>
+                    <div className="mt-2 text-3xl font-extrabold text-navy-900">{stats.listings.active}</div>
+                    <div className="mt-2 text-xs text-slate-500">{stats.listings.total} total listings</div>
+                  </div>
+                  <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-5">
+                    <div className="flex items-center justify-between">
+                      <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Pending Bookings</div>
+                      <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600 text-sm font-bold">!</div>
+                    </div>
+                    <div className="mt-2 text-3xl font-extrabold text-navy-900">{stats.bookings.pending}</div>
+                    <div className="mt-2 text-xs text-slate-500">{stats.bookings.confirmed} confirmed &middot; {stats.bookings.total} total</div>
+                  </div>
+                  <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-5">
+                    <div className="flex items-center justify-between">
+                      <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">New Users (This Week)</div>
+                      <div className="w-8 h-8 rounded-lg bg-violet-50 flex items-center justify-center text-violet-600 text-sm font-bold">+</div>
+                    </div>
+                    <div className="mt-2 text-3xl font-extrabold text-navy-900">{newUsersThisWeek}</div>
+                    <div className="mt-2 text-xs text-slate-500">{stats.users.total} total users</div>
+                  </div>
+                </div>
+
+                {/* Row: Revenue Chart + Breakdown Cards */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {/* Revenue Bar Chart */}
+                  <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+                    <h2 className="font-semibold text-navy-900 mb-4">Revenue by Month</h2>
+                    {revenueByMonth.length === 0 ? (
+                      <div className="text-center text-slate-400 text-sm py-12">No revenue data yet</div>
+                    ) : (
+                      <div className="flex items-end gap-3 h-48">
+                        {revenueByMonth.map((m, i) => (
+                          <div key={i} className="flex-1 flex flex-col items-center gap-2">
+                            <div className="text-xs font-medium text-navy-900">{formatCurrency(m.total)}</div>
+                            <div className="w-full relative flex items-end" style={{ height: '140px' }}>
+                              <div
+                                className="w-full rounded-t-lg transition-all duration-500"
+                                style={{
+                                  height: `${Math.max(m.pct, 4)}%`,
+                                  background: 'linear-gradient(180deg, #1e3a5f 0%, #2d5a8e 100%)',
+                                }}
+                              />
+                            </div>
+                            <div className="text-xs text-slate-500">{m.month}</div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Breakdowns */}
+                  <div className="space-y-4">
+                    {/* Users by Role */}
+                    <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-5">
+                      <h3 className="text-sm font-semibold text-navy-900 mb-3">Users by Role</h3>
+                      <div className="space-y-2">
+                        {Object.entries(usersByRole).map(([role, count]) => (
+                          <div key={role} className="flex items-center justify-between">
+                            <span className="text-xs text-slate-600">{role.replace('_', ' ')}</span>
+                            <span className="text-xs font-semibold text-navy-900 bg-slate-100 px-2 py-0.5 rounded-full">{count}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Bookings by Status */}
+                    <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-5">
+                      <h3 className="text-sm font-semibold text-navy-900 mb-3">Bookings by Status</h3>
+                      <div className="space-y-2">
+                        {Object.entries(bookingsByStatus).map(([status, count]) => (
+                          <div key={status} className="flex items-center justify-between">
+                            <span className={`text-xs px-2 py-0.5 rounded-full border ${statusColors[status] || 'bg-slate-50 text-slate-600 border-slate-200'}`}>
+                              {status.replace('_', ' ')}
+                            </span>
+                            <span className="text-xs font-semibold text-navy-900">{count}</span>
+                          </div>
+                        ))}
+                        {Object.keys(bookingsByStatus).length === 0 && (
+                          <div className="text-xs text-slate-400">No bookings yet</div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Recent Bookings (on Overview) */}
+                <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+                  <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                    <h2 className="font-semibold text-navy-900">Recent Bookings</h2>
+                    <button
+                      onClick={() => setTab('bookings')}
+                      className="text-xs text-navy-600 hover:text-navy-900 font-medium"
+                    >
+                      View all &rarr;
+                    </button>
+                  </div>
+                  <div className="divide-y divide-slate-100">
+                    {allBookings.slice(0, 5).map(b => (
+                      <div key={b.id} className="px-6 py-3 flex items-center justify-between hover:bg-slate-50">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className={`badge border ${statusColors[b.status] || ''}`}>{b.status.replace(/_/g, ' ')}</span>
+                            <span className="text-sm font-medium text-navy-900">{b.listing.title}</span>
+                          </div>
+                          <div className="text-xs text-slate-400 mt-0.5">
+                            {b.shipper.name} &middot; {b.listing.originPort} &rarr; {b.listing.destinationPort}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-sm font-semibold text-navy-900">{formatCurrency(b.totalPrice)}</div>
+                          <div className="text-xs text-slate-400">{formatDate(b.createdAt)}</div>
+                        </div>
+                      </div>
+                    ))}
+                    {allBookings.length === 0 && (
+                      <div className="p-8 text-center text-slate-400 text-sm">No bookings yet</div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ═══════════════════ USERS TAB ═══════════════════ */}
+            {tab === 'users' && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="font-semibold text-navy-900">All Users ({filteredUsers.length})</h2>
+                  <button
+                    onClick={() => exportCSV('users')}
+                    className="px-4 py-2 bg-navy-900 text-white text-xs font-medium rounded-lg hover:bg-navy-800 transition-colors"
+                  >
+                    Export CSV
+                  </button>
+                </div>
+                <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="bg-slate-50 text-left">
+                          <th className="px-6 py-3 font-medium text-slate-500">Name</th>
+                          <th className="px-6 py-3 font-medium text-slate-500">Email</th>
+                          <th className="px-6 py-3 font-medium text-slate-500">Role</th>
+                          <th className="px-6 py-3 font-medium text-slate-500">Company</th>
+                          <th className="px-6 py-3 font-medium text-slate-500">Status</th>
+                          <th className="px-6 py-3 font-medium text-slate-500">Listings</th>
+                          <th className="px-6 py-3 font-medium text-slate-500">Bookings</th>
+                          <th className="px-6 py-3 font-medium text-slate-500">Joined</th>
+                          <th className="px-6 py-3 font-medium text-slate-500">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {filteredUsers.map(u => (
+                          <tr key={u.id} className="hover:bg-slate-50">
+                            <td className="px-6 py-3 font-medium text-navy-900">{u.name}</td>
+                            <td className="px-6 py-3 text-slate-600">{u.email}</td>
+                            <td className="px-6 py-3">
+                              <span className="badge bg-navy-50 text-navy-700 border border-navy-200">
+                                {u.role.replace('_', ' ')}
+                              </span>
+                            </td>
+                            <td className="px-6 py-3 text-slate-600">{u.company || '-'}</td>
+                            <td className="px-6 py-3">
+                              {u.verified ? (
+                                <span className="badge bg-emerald-50 text-emerald-700 border border-emerald-200">Verified</span>
+                              ) : (
+                                <span className="badge bg-amber-50 text-amber-700 border border-amber-200">Unverified</span>
+                              )}
+                            </td>
+                            <td className="px-6 py-3 text-slate-600 text-center">{u._count.listings}</td>
+                            <td className="px-6 py-3 text-slate-600 text-center">{u._count.bookings}</td>
+                            <td className="px-6 py-3 text-slate-400">{formatDate(u.createdAt)}</td>
+                            <td className="px-6 py-3">
+                              {u.role !== 'ADMIN' && (
+                                <div className="flex gap-1">
+                                  {!u.verified ? (
+                                    <button
+                                      onClick={() => handleUserAction(u.id, 'verify')}
+                                      disabled={actionLoading === `${u.id}-verify`}
+                                      className="px-2.5 py-1 text-xs font-medium rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition-colors disabled:opacity-50"
+                                    >
+                                      {actionLoading === `${u.id}-verify` ? '...' : 'Verify'}
+                                    </button>
+                                  ) : (
+                                    <button
+                                      onClick={() => handleUserAction(u.id, 'suspend')}
+                                      disabled={actionLoading === `${u.id}-suspend`}
+                                      className="px-2.5 py-1 text-xs font-medium rounded-md bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 transition-colors disabled:opacity-50"
+                                    >
+                                      {actionLoading === `${u.id}-suspend` ? '...' : 'Suspend'}
+                                    </button>
+                                  )}
+                                </div>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                        {filteredUsers.length === 0 && (
+                          <tr>
+                            <td colSpan={9} className="px-6 py-8 text-center text-slate-400 text-sm">
+                              {searchQuery ? 'No users match your search' : 'No users found'}
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ═══════════════════ BOOKINGS TAB ═══════════════════ */}
+            {tab === 'bookings' && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="font-semibold text-navy-900">All Bookings ({filteredBookings.length})</h2>
+                  <button
+                    onClick={() => exportCSV('bookings')}
+                    className="px-4 py-2 bg-navy-900 text-white text-xs font-medium rounded-lg hover:bg-navy-800 transition-colors"
+                  >
+                    Export CSV
+                  </button>
+                </div>
+                <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+                  <div className="divide-y divide-slate-100">
+                    {filteredBookings.map(b => (
+                      <div key={b.id} className="px-6 py-4 hover:bg-slate-50">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1 flex-wrap">
+                              <span className={`badge border ${statusColors[b.status] || ''}`}>{b.status.replace(/_/g, ' ')}</span>
+                              {b.paymentStatus && (
+                                <span className={`badge border ${paymentStatusColors[b.paymentStatus] || ''}`}>
+                                  Pay: {b.paymentStatus}
+                                </span>
+                              )}
+                              <span className="font-medium text-navy-900">{b.listing.title}</span>
+                            </div>
+                            <div className="text-xs text-slate-400">
+                              Shipper: {b.shipper.name}{b.shipper.company && ` (${b.shipper.company})`} &middot;
+                              {b.listing.originPort} &rarr; {b.listing.destinationPort}
+                            </div>
+                            <div className="text-xs text-slate-400 mt-0.5">
+                              ID: {b.id.slice(0, 12)}... &middot; {formatDateTime(b.createdAt)}
+                            </div>
+                          </div>
+                          <div className="text-right shrink-0">
+                            <div className="font-semibold text-navy-900">{formatCurrency(b.totalPrice)}</div>
+                            {/* Actions */}
+                            <div className="flex gap-1 mt-2 justify-end flex-wrap">
+                              {b.status === 'PENDING' && (
+                                <button
+                                  onClick={() => handleBookingStatus(b.id, 'CONFIRMED')}
+                                  disabled={!!actionLoading}
+                                  className="px-2 py-1 text-xs font-medium rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 disabled:opacity-50"
+                                >
+                                  Confirm
+                                </button>
+                              )}
+                              {b.status === 'CONFIRMED' && (
+                                <button
+                                  onClick={() => handleBookingStatus(b.id, 'PICKED_UP')}
+                                  disabled={!!actionLoading}
+                                  className="px-2 py-1 text-xs font-medium rounded-md bg-cyan-50 text-cyan-700 border border-cyan-200 hover:bg-cyan-100 disabled:opacity-50"
+                                >
+                                  Mark Picked Up
+                                </button>
+                              )}
+                              {(b.status === 'PICKED_UP' || b.status === 'CONFIRMED') && (
+                                <button
+                                  onClick={() => handleBookingStatus(b.id, 'IN_TRANSIT')}
+                                  disabled={!!actionLoading}
+                                  className="px-2 py-1 text-xs font-medium rounded-md bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 disabled:opacity-50"
+                                >
+                                  In Transit
+                                </button>
+                              )}
+                              {b.status === 'IN_TRANSIT' && (
+                                <button
+                                  onClick={() => handleBookingStatus(b.id, 'DELIVERED')}
+                                  disabled={!!actionLoading}
+                                  className="px-2 py-1 text-xs font-medium rounded-md bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200 disabled:opacity-50"
+                                >
+                                  Delivered
+                                </button>
+                              )}
+                              {b.status !== 'CANCELLED' && b.status !== 'DELIVERED' && (
+                                <button
+                                  onClick={() => handleBookingStatus(b.id, 'CANCELLED')}
+                                  disabled={!!actionLoading}
+                                  className="px-2 py-1 text-xs font-medium rounded-md bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 disabled:opacity-50"
+                                >
+                                  Cancel
+                                </button>
+                              )}
+                              {b.paymentStatus !== 'REFUNDED' && b.status !== 'PENDING' && (
+                                <button
+                                  onClick={() => handleRefund(b.id)}
+                                  disabled={!!actionLoading}
+                                  className="px-2 py-1 text-xs font-medium rounded-md bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100 disabled:opacity-50"
+                                >
+                                  Refund
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    {filteredBookings.length === 0 && (
+                      <div className="p-8 text-center text-slate-400 text-sm">
+                        {searchQuery ? 'No bookings match your search' : 'No bookings yet'}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ═══════════════════ LISTINGS TAB ═══════════════════ */}
+            {tab === 'listings' && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="font-semibold text-navy-900">All Listings ({filteredListings.length})</h2>
+                  <button
+                    onClick={() => exportCSV('listings')}
+                    className="px-4 py-2 bg-navy-900 text-white text-xs font-medium rounded-lg hover:bg-navy-800 transition-colors"
+                  >
+                    Export CSV
+                  </button>
+                </div>
+                <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="bg-slate-50 text-left">
+                          <th className="px-6 py-3 font-medium text-slate-500">Title</th>
+                          <th className="px-6 py-3 font-medium text-slate-500">Route</th>
+                          <th className="px-6 py-3 font-medium text-slate-500">Carrier</th>
+                          <th className="px-6 py-3 font-medium text-slate-500">Status</th>
+                          <th className="px-6 py-3 font-medium text-slate-500">Departure</th>
+                          <th className="px-6 py-3 font-medium text-slate-500">Capacity</th>
+                          <th className="px-6 py-3 font-medium text-slate-500">Bookings</th>
+                          <th className="px-6 py-3 font-medium text-slate-500">Featured</th>
+                          <th className="px-6 py-3 font-medium text-slate-500">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {filteredListings.map(l => (
+                          <tr key={l.id} className="hover:bg-slate-50">
+                            <td className="px-6 py-3 font-medium text-navy-900 max-w-[200px] truncate">{l.title}</td>
+                            <td className="px-6 py-3 text-slate-600 text-xs">
+                              {l.originPort} &rarr; {l.destinationPort}
+                            </td>
+                            <td className="px-6 py-3 text-slate-600">{l.carrier?.name || '-'}</td>
+                            <td className="px-6 py-3">
+                              <span className={`badge border ${listingStatusColors[l.status] || 'bg-slate-50 text-slate-600 border-slate-200'}`}>
+                                {l.status}
+                              </span>
+                            </td>
+                            <td className="px-6 py-3 text-slate-400 text-xs">{l.departureDate ? formatDate(l.departureDate) : '-'}</td>
+                            <td className="px-6 py-3 text-slate-600 text-xs">
+                              {l.availableKg?.toLocaleString() || '?'} / {l.totalCapacityKg?.toLocaleString() || '?'} kg
+                            </td>
+                            <td className="px-6 py-3 text-slate-600 text-center">{l._count?.bookings || 0}</td>
+                            <td className="px-6 py-3">
+                              {l.featured ? (
+                                <span className="badge bg-amber-50 text-amber-700 border border-amber-200">Featured</span>
+                              ) : (
+                                <span className="text-xs text-slate-400">-</span>
+                              )}
+                            </td>
+                            <td className="px-6 py-3">
+                              <button
+                                onClick={() => handleToggleFeatured(l.id, l.featured)}
+                                disabled={actionLoading === `listing-${l.id}`}
+                                className={`px-2.5 py-1 text-xs font-medium rounded-md border transition-colors disabled:opacity-50 ${
+                                  l.featured
+                                    ? 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                                    : 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100'
+                                }`}
+                              >
+                                {actionLoading === `listing-${l.id}` ? '...' : l.featured ? 'Unfeature' : 'Feature'}
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                        {filteredListings.length === 0 && (
+                          <tr>
+                            <td colSpan={9} className="px-6 py-8 text-center text-slate-400 text-sm">
+                              {searchQuery ? 'No listings match your search' : 'No listings found'}
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ═══════════════════ ACTIVITY TAB ═══════════════════ */}
+            {tab === 'activity' && (
+              <div className="space-y-4">
+                <h2 className="font-semibold text-navy-900">Recent Activity</h2>
+                <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+                  <div className="divide-y divide-slate-100">
+                    {activityFeed.map(item => (
+                      <div key={item.id} className="px-6 py-4 hover:bg-slate-50 flex items-start gap-4">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5 ${
+                          item.type === 'booking'
+                            ? 'bg-blue-50 text-blue-600'
+                            : item.type === 'registration'
+                            ? 'bg-emerald-50 text-emerald-600'
+                            : 'bg-amber-50 text-amber-600'
+                        }`}>
+                          {item.type === 'booking' ? 'B' : item.type === 'registration' ? 'U' : 'R'}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-sm font-medium text-navy-900">{item.title}</span>
+                            {item.meta && (
+                              <span className={`badge border text-xs ${statusColors[item.meta] || 'bg-slate-50 text-slate-600 border-slate-200'}`}>
+                                {item.meta.replace(/_/g, ' ')}
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-xs text-slate-500 mt-0.5">{item.description}</div>
+                        </div>
+                        <div className="text-xs text-slate-400 shrink-0">{formatDateTime(item.timestamp)}</div>
+                      </div>
+                    ))}
+                    {activityFeed.length === 0 && (
+                      <div className="p-8 text-center text-slate-400 text-sm">No activity yet</div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   )

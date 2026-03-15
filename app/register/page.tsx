@@ -1,184 +1,249 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, Suspense } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
+import { useAuth } from '../components/AuthProvider'
 
-export default function RegisterPage() {
-  const router = useRouter()
+function RegisterForm() {
+  const { register } = useAuth()
+  const searchParams = useSearchParams()
+  const defaultRole = searchParams.get('role') || ''
+
   const [formData, setFormData] = useState({
+    name: '',
     email: '',
     password: '',
-    name: '',
-    role: 'SHIPPER',
-    phone: '',
+    role: defaultRole || '',
     company: '',
+    phone: '',
   })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!formData.role) {
+      setError('Please select an account type')
+      return
+    }
     setError('')
     setLoading(true)
-
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Registration failed')
-      }
-
-      // Redirect to login
-      router.push('/login')
+      await register(formData)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred')
+      setError(err instanceof Error ? err.message : 'Registration failed')
     } finally {
       setLoading(false)
     }
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    })
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
+  const roles = [
+    {
+      value: 'CARRIER',
+      label: 'Carrier',
+      desc: 'I have van space to offer',
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+        </svg>
+      ),
+    },
+    {
+      value: 'SUPPLIER',
+      label: 'Supplier',
+      desc: 'I supply goods to yachts',
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+        </svg>
+      ),
+    },
+    {
+      value: 'YACHT_OWNER',
+      label: 'Yacht Owner',
+      desc: 'I need deliveries to my yacht',
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+        </svg>
+      ),
+    },
+  ]
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Create your account
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Or{' '}
-            <Link href="/login" className="font-medium text-blue-600 hover:text-blue-500">
-              sign in to existing account
-            </Link>
+    <div className="min-h-screen flex">
+      {/* Left — decorative */}
+      <div className="hidden lg:flex lg:flex-1 hero-gradient pattern-overlay items-center justify-center p-12">
+        <div className="max-w-md text-center">
+          <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center mx-auto mb-8">
+            <span className="text-gold-400 font-bold text-2xl">YH</span>
+          </div>
+          <h2 className="text-3xl font-bold text-white mb-4">Join the Marketplace</h2>
+          <p className="text-slate-300 leading-relaxed">
+            Whether you&apos;re a carrier with spare capacity or a yacht owner needing reliable delivery,
+            YachtHop connects you with the right partners across the Mediterranean.
           </p>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="rounded-md bg-red-50 p-4">
-              <div className="text-sm text-red-800">{error}</div>
-            </div>
-          )}
-          <div className="rounded-md shadow-sm space-y-4">
+      </div>
+
+      {/* Right — form */}
+      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
+        <div className="w-full max-w-md">
+          <div className="mb-8">
+            <Link href="/" className="flex items-center gap-2 mb-8">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-navy-800 to-navy-900 flex items-center justify-center">
+                <span className="text-gold-400 font-bold text-sm">YH</span>
+              </div>
+              <span className="text-lg font-bold text-navy-900 tracking-tight">YachtHop</span>
+            </Link>
+            <h1 className="text-3xl font-extrabold text-navy-900 tracking-tight">Create your account</h1>
+            <p className="mt-2 text-slate-500">Get started in under a minute.</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {error && (
+              <div className="px-4 py-3 rounded-lg bg-red-50 border border-red-100">
+                <p className="text-sm text-red-700">{error}</p>
+              </div>
+            )}
+
+            {/* Role selection */}
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                Full Name
-              </label>
+              <label className="block text-sm font-medium text-navy-900 mb-2">I am a...</label>
+              <div className="grid grid-cols-3 gap-3">
+                {roles.map((role) => (
+                  <button
+                    key={role.value}
+                    type="button"
+                    onClick={() => setFormData({ ...formData, role: role.value })}
+                    className={`relative flex flex-col items-center p-3 rounded-xl border-2 transition-all text-center ${
+                      formData.role === role.value
+                        ? 'border-navy-700 bg-navy-50'
+                        : 'border-slate-200 hover:border-slate-300 bg-white'
+                    }`}
+                  >
+                    <div className={`mb-1.5 ${formData.role === role.value ? 'text-navy-700' : 'text-slate-400'}`}>
+                      {role.icon}
+                    </div>
+                    <span className={`text-xs font-semibold ${formData.role === role.value ? 'text-navy-900' : 'text-slate-700'}`}>
+                      {role.label}
+                    </span>
+                    <span className="text-[10px] text-slate-500 mt-0.5 leading-tight">{role.desc}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-navy-900 mb-1.5">Full Name</label>
               <input
                 id="name"
                 name="name"
                 type="text"
                 required
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="John Doe"
+                className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-white text-navy-900 text-sm focus:border-navy-400 focus:ring-2 focus:ring-navy-100 transition-all outline-none"
+                placeholder="John Smith"
                 value={formData.name}
                 onChange={handleChange}
               />
             </div>
+
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email address
-              </label>
+              <label htmlFor="email" className="block text-sm font-medium text-navy-900 mb-1.5">Email</label>
               <input
                 id="email"
                 name="email"
                 type="email"
-                autoComplete="email"
                 required
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="john@example.com"
+                autoComplete="email"
+                className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-white text-navy-900 text-sm focus:border-navy-400 focus:ring-2 focus:ring-navy-100 transition-all outline-none"
+                placeholder="you@company.com"
                 value={formData.email}
                 onChange={handleChange}
               />
             </div>
+
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
+              <label htmlFor="password" className="block text-sm font-medium text-navy-900 mb-1.5">Password</label>
               <input
                 id="password"
                 name="password"
                 type="password"
-                autoComplete="new-password"
                 required
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="Password"
+                autoComplete="new-password"
+                minLength={8}
+                className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-white text-navy-900 text-sm focus:border-navy-400 focus:ring-2 focus:ring-navy-100 transition-all outline-none"
+                placeholder="Min 8 characters"
                 value={formData.password}
                 onChange={handleChange}
               />
             </div>
-            <div>
-              <label htmlFor="role" className="block text-sm font-medium text-gray-700">
-                Account Type
-              </label>
-              <select
-                id="role"
-                name="role"
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                value={formData.role}
-                onChange={handleChange}
-              >
-                <option value="CARRIER">Carrier (I have van space to offer)</option>
-                <option value="SHIPPER">Shipper (I need to book space)</option>
-                <option value="YACHT_CLIENT">Yacht Client (End user)</option>
-              </select>
-            </div>
-            <div>
-              <label htmlFor="company" className="block text-sm font-medium text-gray-700">
-                Company (Optional)
-              </label>
-              <input
-                id="company"
-                name="company"
-                type="text"
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="Your Company"
-                value={formData.company}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
-                Phone (Optional)
-              </label>
-              <input
-                id="phone"
-                name="phone"
-                type="tel"
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="+1234567890"
-                value={formData.phone}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
 
-          <div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="company" className="block text-sm font-medium text-navy-900 mb-1.5">Company</label>
+                <input
+                  id="company"
+                  name="company"
+                  type="text"
+                  className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-white text-navy-900 text-sm focus:border-navy-400 focus:ring-2 focus:ring-navy-100 transition-all outline-none"
+                  placeholder="Optional"
+                  value={formData.company}
+                  onChange={handleChange}
+                />
+              </div>
+              <div>
+                <label htmlFor="phone" className="block text-sm font-medium text-navy-900 mb-1.5">Phone</label>
+                <input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-white text-navy-900 text-sm focus:border-navy-400 focus:ring-2 focus:ring-navy-100 transition-all outline-none"
+                  placeholder="Optional"
+                  value={formData.phone}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              className="w-full btn-primary !py-3 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Creating account...' : 'Create account'}
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  Creating account...
+                </span>
+              ) : 'Create Account'}
             </button>
-          </div>
-        </form>
+          </form>
+
+          <p className="mt-6 text-center text-sm text-slate-500">
+            Already have an account?{' '}
+            <Link href="/login" className="font-semibold text-navy-700 hover:text-navy-900 transition-colors">
+              Sign in
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
+  )
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="loading-shimmer w-96 h-96 rounded-xl" /></div>}>
+      <RegisterForm />
+    </Suspense>
   )
 }

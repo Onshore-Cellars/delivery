@@ -1,8 +1,8 @@
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 
-const SALT_ROUNDS = 10
-const JWT_SECRET = process.env.NEXTAUTH_SECRET || 'your-secret-key'
+const SALT_ROUNDS = 12
+const JWT_SECRET = process.env.NEXTAUTH_SECRET || 'yachthop-secret-change-me'
 
 export interface DecodedToken {
   userId: string
@@ -20,8 +20,8 @@ export async function verifyPassword(password: string, hashedPassword: string): 
   return bcrypt.compare(password, hashedPassword)
 }
 
-export function generateToken(payload: object, expiresIn: string = '7d'): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn } as jwt.SignOptions)
+export function generateToken(payload: { userId: string; email: string; role: string }): string {
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' } as jwt.SignOptions)
 }
 
 export function verifyToken(token: string): DecodedToken | null {
@@ -30,4 +30,18 @@ export function verifyToken(token: string): DecodedToken | null {
   } catch {
     return null
   }
+}
+
+export function getTokenFromHeader(authHeader: string | null): string | null {
+  if (!authHeader?.startsWith('Bearer ')) return null
+  return authHeader.slice(7)
+}
+
+export function generateTrackingCode(): string {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+  let code = 'YH-'
+  for (let i = 0; i < 8; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length))
+  }
+  return code
 }

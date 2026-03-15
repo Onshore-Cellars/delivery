@@ -7,57 +7,36 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { email, password } = body
 
-    // Validate required fields
     if (!email || !password) {
-      return NextResponse.json(
-        { error: 'Email and password are required' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Email and password are required' }, { status: 400 })
     }
 
-    // Find user
-    const user = await prisma.user.findUnique({
-      where: { email },
-    })
-
+    const user = await prisma.user.findUnique({ where: { email } })
     if (!user) {
-      return NextResponse.json(
-        { error: 'Invalid credentials' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 })
     }
 
-    // Verify password
-    const isValidPassword = await verifyPassword(password, user.password)
-
-    if (!isValidPassword) {
-      return NextResponse.json(
-        { error: 'Invalid credentials' },
-        { status: 401 }
-      )
+    const valid = await verifyPassword(password, user.password)
+    if (!valid) {
+      return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 })
     }
 
-    // Generate JWT token
-    const token = generateToken({
-      userId: user.id,
-      email: user.email,
-      role: user.role,
-    })
-
-    // Return user data without password
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password: userPassword, ...userWithoutPassword } = user
+    const token = generateToken({ userId: user.id, email: user.email, role: user.role })
 
     return NextResponse.json({
-      message: 'Login successful',
-      user: userWithoutPassword,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        company: user.company,
+        phone: user.phone,
+        verified: user.verified,
+      },
       token,
     })
   } catch (error) {
     console.error('Login error:', error)
-    return NextResponse.json(
-      { error: 'An error occurred during login' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
