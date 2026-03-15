@@ -56,4 +56,4 @@ ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
 # Run migrations (don't block startup if they fail) and start
-CMD ["sh", "-c", "prisma migrate deploy --schema ./prisma/schema.prisma || echo 'Migration failed, starting anyway...' && node server.js"]
+CMD ["sh", "-c", "prisma migrate deploy --schema ./prisma/schema.prisma || echo 'Migration failed, starting anyway...'; node server.js"]
