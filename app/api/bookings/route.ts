@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { verifyToken } from '@/lib/auth'
-import { BookingStatus } from '@prisma/client'
+import { BookingStatus } from '@/app/generated/prisma'
 
 // GET user's bookings
 export async function GET(request: NextRequest) {
