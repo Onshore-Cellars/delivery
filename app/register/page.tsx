@@ -179,7 +179,7 @@ function RegisterForm() {
                 autoComplete="new-password"
                 minLength={8}
                 className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-white text-navy-900 text-sm focus:border-navy-400 focus:ring-2 focus:ring-navy-100 transition-all outline-none"
-                placeholder="Min 8 characters"
+                placeholder="Min 8 chars, uppercase, lowercase, number"
                 value={formData.password}
                 onChange={handleChange}
               />

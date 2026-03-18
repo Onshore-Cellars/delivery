@@ -2,7 +2,17 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 
 const SALT_ROUNDS = 12
-const JWT_SECRET = process.env.NEXTAUTH_SECRET || 'yachthop-secret-change-me'
+
+function getJwtSecret(): string {
+  const secret = process.env.NEXTAUTH_SECRET
+  if (!secret) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('NEXTAUTH_SECRET must be set in production')
+    }
+    return 'yachthop-dev-secret-not-for-production'
+  }
+  return secret
+}
 
 export interface DecodedToken {
   userId: string
@@ -21,12 +31,12 @@ export async function verifyPassword(password: string, hashedPassword: string): 
 }
 
 export function generateToken(payload: { userId: string; email: string; role: string }): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' } as jwt.SignOptions)
+  return jwt.sign(payload, getJwtSecret(), { expiresIn: '7d' } as jwt.SignOptions)
 }
 
 export function verifyToken(token: string): DecodedToken | null {
   try {
-    return jwt.verify(token, JWT_SECRET) as DecodedToken
+    return jwt.verify(token, getJwtSecret()) as DecodedToken
   } catch {
     return null
   }
