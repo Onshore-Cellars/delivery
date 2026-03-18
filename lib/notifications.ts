@@ -15,38 +15,47 @@ interface CreateNotificationParams {
 export async function createNotification(params: CreateNotificationParams) {
   const { userId, type, title, message, linkUrl, metadata, sendEmailNotification = true } = params
 
-  const notification = await prisma.notification.create({
-    data: {
-      userId,
-      type,
-      title,
-      message,
-      linkUrl: linkUrl || null,
-      metadata: metadata ? JSON.stringify(metadata) : null,
-    },
-  })
-
-  // Send email if user has email notifications enabled
-  if (sendEmailNotification) {
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { email: true, name: true, emailNotifications: true },
+  try {
+    const notification = await prisma.notification.create({
+      data: {
+        userId,
+        type,
+        title,
+        message,
+        linkUrl: linkUrl || null,
+        metadata: metadata ? JSON.stringify(metadata) : null,
+      },
     })
 
-    if (user?.emailNotifications) {
-      await sendEmail({
-        to: user.email,
-        subject: title,
-        html: `<p>Hi ${user.name},</p><p>${message}</p>`,
-      })
-      await prisma.notification.update({
-        where: { id: notification.id },
-        data: { emailSent: true },
-      })
-    }
-  }
+    // Send email if user has email notifications enabled
+    if (sendEmailNotification) {
+      try {
+        const user = await prisma.user.findUnique({
+          where: { id: userId },
+          select: { email: true, name: true, emailNotifications: true },
+        })
 
-  return notification
+        if (user?.emailNotifications) {
+          await sendEmail({
+            to: user.email,
+            subject: title,
+            html: `<p>Hi ${user.name},</p><p>${message}</p>`,
+          })
+          await prisma.notification.update({
+            where: { id: notification.id },
+            data: { emailSent: true },
+          })
+        }
+      } catch (emailError) {
+        console.error('Failed to send notification email:', emailError)
+      }
+    }
+
+    return notification
+  } catch (error) {
+    console.error('Failed to create notification:', error)
+    return null
+  }
 }
 
 // ─── SPECIFIC NOTIFICATION HELPERS ────────────────────────────────────────────

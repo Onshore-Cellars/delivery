@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from './AuthProvider'
 
 export default function Navbar() {
@@ -10,30 +10,31 @@ export default function Navbar() {
   const [unreadNotifs, setUnreadNotifs] = useState(0)
   const [unreadMessages, setUnreadMessages] = useState(0)
 
-  const fetchCounts = useCallback(async () => {
-    if (!token) return
-    try {
-      const [notifRes, msgRes] = await Promise.all([
-        fetch('/api/notifications?limit=1', { headers: { Authorization: `Bearer ${token}` } }),
-        fetch('/api/messages', { headers: { Authorization: `Bearer ${token}` } }),
-      ])
-      if (notifRes.ok) {
-        const data = await notifRes.json()
-        setUnreadNotifs(data.unreadCount || 0)
-      }
-      if (msgRes.ok) {
-        const data = await msgRes.json()
-        const total = (data.conversations || []).reduce((sum: number, c: { unreadCount: number }) => sum + (c.unreadCount || 0), 0)
-        setUnreadMessages(total)
-      }
-    } catch {}
-  }, [token])
-
   useEffect(() => {
-    fetchCounts()
-    const interval = setInterval(fetchCounts, 30000)
-    return () => clearInterval(interval)
-  }, [fetchCounts])
+    let active = true
+    const load = async () => {
+      if (!token || !active) return
+      try {
+        const [notifRes, msgRes] = await Promise.all([
+          fetch('/api/notifications?limit=1', { headers: { Authorization: `Bearer ${token}` } }),
+          fetch('/api/messages', { headers: { Authorization: `Bearer ${token}` } }),
+        ])
+        if (!active) return
+        if (notifRes.ok) {
+          const data = await notifRes.json()
+          setUnreadNotifs(data.unreadCount || 0)
+        }
+        if (msgRes.ok) {
+          const data = await msgRes.json()
+          const total = (data.conversations || []).reduce((sum: number, c: { unreadCount: number }) => sum + (c.unreadCount || 0), 0)
+          setUnreadMessages(total)
+        }
+      } catch { /* network error — silent */ }
+    }
+    load()
+    const interval = setInterval(load, 30000)
+    return () => { active = false; clearInterval(interval) }
+  }, [token])
 
   // Lock body scroll when mobile menu is open
   useEffect(() => {
