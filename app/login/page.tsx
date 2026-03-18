@@ -27,17 +27,17 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex">
       {/* Left — form */}
-      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+      <div className="flex-1 flex items-center justify-center px-5 sm:px-8 lg:px-12">
         <div className="w-full max-w-md">
-          <div className="mb-8">
-            <Link href="/" className="flex items-center gap-2 mb-8">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-navy-800 to-navy-900 flex items-center justify-center">
+          <div className="mb-10">
+            <Link href="/" className="flex items-center gap-2.5 mb-10">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-navy-800 to-navy-950 flex items-center justify-center shadow-sm">
                 <span className="text-gold-400 font-bold text-sm">YH</span>
               </div>
               <span className="text-lg font-bold text-navy-900 tracking-tight">YachtHop</span>
             </Link>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-navy-900 tracking-tight">Welcome back</h1>
-            <p className="mt-2 text-sm sm:text-base text-slate-500">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-navy-900 tracking-[-0.02em]">Welcome back</h1>
+            <p className="mt-2.5 text-sm sm:text-base text-slate-500 leading-relaxed">
               Sign in to manage your yacht logistics.
             </p>
           </div>
@@ -58,7 +58,7 @@ export default function LoginPage() {
                 type="email"
                 required
                 autoComplete="email"
-                className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-white text-navy-900 text-sm focus:border-navy-400 focus:ring-2 focus:ring-navy-100 transition-all outline-none"
+                className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-navy-900 text-sm focus:border-navy-400 focus:ring-2 focus:ring-navy-100 focus:bg-white transition-all outline-none"
                 placeholder="you@company.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -74,7 +74,7 @@ export default function LoginPage() {
                 type="password"
                 required
                 autoComplete="current-password"
-                className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-white text-navy-900 text-sm focus:border-navy-400 focus:ring-2 focus:ring-navy-100 transition-all outline-none"
+                className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-navy-900 text-sm focus:border-navy-400 focus:ring-2 focus:ring-navy-100 focus:bg-white transition-all outline-none"
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -108,14 +108,18 @@ export default function LoginPage() {
       </div>
 
       {/* Right — decorative panel */}
-      <div className="hidden lg:flex lg:flex-1 hero-gradient pattern-overlay items-center justify-center p-12">
-        <div className="max-w-md text-center">
-          <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center mx-auto mb-8">
-            <span className="text-gold-400 font-bold text-2xl">YH</span>
+      <div className="hidden lg:flex lg:flex-1 hero-gradient pattern-overlay items-center justify-center p-16 relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-1/4 right-1/4 w-[300px] h-[300px] bg-gold-500/[0.05] rounded-full blur-[100px]" />
+          <div className="absolute bottom-1/4 left-1/4 w-[200px] h-[200px] bg-sea-500/[0.04] rounded-full blur-[80px]" />
+        </div>
+        <div className="relative max-w-md text-center">
+          <div className="w-20 h-20 rounded-3xl bg-white/[0.08] backdrop-blur-md border border-white/[0.12] flex items-center justify-center mx-auto mb-10 shadow-2xl">
+            <span className="text-gold-400 font-bold text-3xl">YH</span>
           </div>
-          <h2 className="text-3xl font-bold text-white mb-4">The Yachting Industry&apos;s Logistics Hub</h2>
-          <p className="text-slate-300 leading-relaxed">
-            Share van space, book deliveries, and coordinate supplies across the Med &mdash; built exclusively for yacht provisioners, vendors, crew, and management.
+          <h2 className="text-3xl font-bold text-white mb-5 tracking-[-0.02em]">The Yachting Industry&apos;s Logistics Hub</h2>
+          <p className="text-slate-300/90 leading-relaxed text-lg font-light">
+            Share van space, book deliveries, and coordinate supplies across the Med &mdash; built exclusively for the yachting industry.
           </p>
         </div>
       </div>

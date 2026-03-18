@@ -451,7 +451,7 @@ export default function AdminPage() {
   // ─── Render ───────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100/50">
       {/* Toast */}
       {toast && (
         <div className={`fixed top-4 right-4 z-50 px-5 py-3 rounded-xl shadow-lg text-sm font-medium transition-all ${
@@ -463,11 +463,12 @@ export default function AdminPage() {
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-8 sm:py-10">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-xl sm:text-2xl font-extrabold text-navy-900 tracking-tight">Admin Panel</h1>
+            <p className="text-[11px] font-semibold text-gold-600 uppercase tracking-[0.15em] mb-1">Administration</p>
+            <h1 className="text-xl sm:text-2xl font-extrabold text-navy-900 tracking-[-0.02em]">Admin Panel</h1>
             <p className="text-sm text-slate-500 mt-1">Platform management and analytics</p>
           </div>
           <div className="flex items-center gap-3">

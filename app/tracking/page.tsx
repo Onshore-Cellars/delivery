@@ -66,19 +66,20 @@ export default function TrackingPage() {
   const currentStep = data ? statusSteps.indexOf(data.booking.status) : -1
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="max-w-3xl mx-auto px-5 sm:px-6 lg:px-8 py-6 sm:py-8">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100/50">
+      <div className="max-w-3xl mx-auto px-5 sm:px-6 lg:px-8 py-8 sm:py-10">
         <div className="mb-8">
-          <h1 className="text-xl sm:text-2xl font-extrabold text-navy-900 tracking-tight">Track Shipment</h1>
-          <p className="text-slate-500 mt-1">Enter your tracking code to see real-time delivery status.</p>
+          <p className="text-[11px] font-semibold text-gold-600 uppercase tracking-[0.15em] mb-1">Logistics</p>
+          <h1 className="text-xl sm:text-2xl font-extrabold text-navy-900 tracking-[-0.02em]">Track Shipment</h1>
+          <p className="text-slate-500 mt-1.5">Enter your tracking code to see real-time delivery status.</p>
         </div>
 
         {/* Search */}
-        <form onSubmit={handleTrack} className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 mb-8">
+        <form onSubmit={handleTrack} className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-slate-100/80 p-6 mb-8">
           <div className="flex gap-3">
             <input
               type="text"
-              className="flex-1 px-4 py-3 rounded-lg border border-slate-200 text-sm text-navy-900 font-mono tracking-wider focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none uppercase"
+              className="flex-1 px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-sm text-navy-900 font-mono tracking-wider focus:border-navy-400 focus:ring-2 focus:ring-navy-100 focus:bg-white transition-all outline-none uppercase"
               placeholder="YH-XXXXXXXX"
               value={code}
               onChange={(e) => setCode(e.target.value.toUpperCase())}
@@ -94,7 +95,7 @@ export default function TrackingPage() {
         {data && (
           <div className="space-y-6 animate-fade-in">
             {/* Status Progress */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+            <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-slate-100/80 p-6">
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <span className="text-xs font-mono text-slate-400">{data.booking.trackingCode}</span>
@@ -146,7 +147,7 @@ export default function TrackingPage() {
 
             {/* Route & Details */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+              <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-slate-100/80 p-6">
                 <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Route</h3>
                 <div className="flex items-center gap-3 mb-4">
                   <div>
@@ -169,7 +170,7 @@ export default function TrackingPage() {
                 </div>
               </div>
 
-              <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+              <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-slate-100/80 p-6">
                 <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Cargo</h3>
                 <dl className="space-y-2 text-sm">
                   {data.booking.cargoType && (
@@ -198,7 +199,7 @@ export default function TrackingPage() {
 
             {/* Timeline */}
             {data.events.length > 0 && (
-              <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+              <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-slate-100/80 p-6">
                 <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Timeline</h3>
                 <div className="space-y-0">
                   {data.events.map((event, i) => (

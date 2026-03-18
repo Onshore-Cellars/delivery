@@ -75,9 +75,12 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="max-w-3xl mx-auto px-5 sm:px-6 lg:px-8 py-6 sm:py-8">
-        <h1 className="text-xl sm:text-2xl font-extrabold text-navy-900 tracking-tight mb-8">Profile & Settings</h1>
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100/50">
+      <div className="max-w-3xl mx-auto px-5 sm:px-6 lg:px-8 py-8 sm:py-10">
+        <div className="mb-8">
+          <p className="text-[11px] font-semibold text-gold-600 uppercase tracking-[0.15em] mb-1">Account</p>
+          <h1 className="text-xl sm:text-2xl font-extrabold text-navy-900 tracking-[-0.02em]">Profile & Settings</h1>
+        </div>
 
         {success && (
           <div className="mb-6 px-4 py-3 rounded-lg bg-emerald-50 border border-emerald-200">
@@ -86,9 +89,9 @@ export default function ProfilePage() {
         )}
 
         {/* Profile Card */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 mb-6">
+        <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-slate-100/80 p-6 sm:p-8 mb-6">
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-16 h-16 rounded-full bg-navy-100 flex items-center justify-center">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-navy-100 to-navy-200 flex items-center justify-center shadow-sm">
               <span className="text-xl font-bold text-navy-700">{profile.name.split(' ').map(n => n[0]).join('')}</span>
             </div>
             <div>
@@ -157,7 +160,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Notification Settings */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+        <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-slate-100/80 p-6 sm:p-8">
           <h2 className="font-bold text-navy-900 mb-4">Notification Settings</h2>
           <div className="space-y-4">
             <div className="flex items-center justify-between">

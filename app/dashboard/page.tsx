@@ -104,15 +104,16 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-6 sm:py-8">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100/50">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-8 sm:py-10">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8">
           <div>
-            <h1 className="text-xl sm:text-2xl font-extrabold text-navy-900 tracking-tight">Dashboard</h1>
-            <p className="text-sm text-slate-500 mt-0.5">
-              Welcome back, {user.name}
-              {user.company && <span className="text-slate-400"> &middot; {user.company}</span>}
+            <p className="text-[11px] font-semibold text-gold-600 uppercase tracking-[0.15em] mb-1">Dashboard</p>
+            <h1 className="text-xl sm:text-2xl font-extrabold text-navy-900 tracking-[-0.02em]">Welcome back, {user.name}</h1>
+            <p className="text-sm text-slate-500 mt-1">
+              {user.company && <span>{user.company} &middot; </span>}
+              {user.role === 'CARRIER' ? 'Manage your routes and bookings' : 'Track your deliveries'}
             </p>
           </div>
           {user.role === 'CARRIER' && (
@@ -126,7 +127,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 mb-6 sm:mb-8 bg-white rounded-xl p-1 shadow-sm border border-slate-100 overflow-x-auto">
+        <div className="flex gap-1 mb-8 sm:mb-10 bg-white rounded-xl p-1 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-slate-100/80 overflow-x-auto">
           {['overview', ...(user.role === 'CARRIER' ? ['listings'] : []), 'bookings'].map((t) => (
             <button
               key={t}
@@ -182,14 +183,18 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Recent activity */}
-                <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
-                  <div className="px-4 sm:px-6 py-4 border-b border-slate-100">
-                    <h2 className="font-semibold text-navy-900">Recent Bookings</h2>
+                <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-slate-100/80 overflow-hidden">
+                  <div className="px-5 sm:px-6 py-5 border-b border-slate-100/80">
+                    <h2 className="font-bold text-navy-900 text-base">Recent Bookings</h2>
                   </div>
                   {bookings.length === 0 ? (
-                    <div className="p-12 text-center">
-                      <p className="text-slate-400 mb-4">No bookings yet</p>
-                      <Link href="/marketplace" className="btn-primary text-sm !py-2 !px-5">Browse Marketplace</Link>
+                    <div className="p-14 text-center">
+                      <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto mb-4">
+                        <svg className="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+                      </div>
+                      <p className="text-slate-500 font-medium mb-1.5">No bookings yet</p>
+                      <p className="text-sm text-slate-400 mb-5">Browse available listings to get started</p>
+                      <Link href="/marketplace" className="btn-primary text-sm !py-2.5 !px-6">Browse Marketplace</Link>
                     </div>
                   ) : (
                     <div className="divide-y divide-slate-100">
@@ -303,9 +308,9 @@ export default function DashboardPage() {
 
 function StatCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-4 sm:p-5">
-      <div className="text-[11px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">{label}</div>
-      <div className="mt-1.5 sm:mt-2 text-xl sm:text-2xl font-extrabold text-navy-900">{value}</div>
+    <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-slate-100/80 p-5 sm:p-6 hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] transition-shadow">
+      <div className="text-[11px] sm:text-xs font-semibold text-slate-400 uppercase tracking-[0.12em]">{label}</div>
+      <div className="mt-2 sm:mt-3 text-2xl sm:text-3xl font-extrabold text-navy-900 tracking-[-0.02em]">{value}</div>
     </div>
   )
 }

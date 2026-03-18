@@ -78,30 +78,34 @@ function RegisterForm() {
   return (
     <div className="min-h-screen flex">
       {/* Left — decorative */}
-      <div className="hidden lg:flex lg:flex-1 hero-gradient pattern-overlay items-center justify-center p-12">
-        <div className="max-w-md text-center">
-          <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center mx-auto mb-8">
-            <span className="text-gold-400 font-bold text-2xl">YH</span>
+      <div className="hidden lg:flex lg:flex-1 hero-gradient pattern-overlay items-center justify-center p-16 relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-1/3 right-1/3 w-[300px] h-[300px] bg-gold-500/[0.05] rounded-full blur-[100px]" />
+          <div className="absolute bottom-1/3 left-1/3 w-[200px] h-[200px] bg-sea-500/[0.04] rounded-full blur-[80px]" />
+        </div>
+        <div className="relative max-w-md text-center">
+          <div className="w-20 h-20 rounded-3xl bg-white/[0.08] backdrop-blur-md border border-white/[0.12] flex items-center justify-center mx-auto mb-10 shadow-2xl">
+            <span className="text-gold-400 font-bold text-3xl">YH</span>
           </div>
-          <h2 className="text-3xl font-bold text-white mb-4">The Yachting Logistics Marketplace</h2>
-          <p className="text-slate-300 leading-relaxed">
+          <h2 className="text-3xl font-bold text-white mb-5 tracking-[-0.02em]">The Yachting Logistics Marketplace</h2>
+          <p className="text-slate-300/90 leading-relaxed text-lg font-light">
             Provisioners, vendors, yacht management, crew &mdash; share van space, post loads, bid on transport. Built exclusively for the yachting industry.
           </p>
         </div>
       </div>
 
       {/* Right — form */}
-      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
+      <div className="flex-1 flex items-center justify-center px-5 sm:px-8 lg:px-12 py-12">
         <div className="w-full max-w-md">
-          <div className="mb-8">
-            <Link href="/" className="flex items-center gap-2 mb-8">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-navy-800 to-navy-900 flex items-center justify-center">
+          <div className="mb-10">
+            <Link href="/" className="flex items-center gap-2.5 mb-10">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-navy-800 to-navy-950 flex items-center justify-center shadow-sm">
                 <span className="text-gold-400 font-bold text-sm">YH</span>
               </div>
               <span className="text-lg font-bold text-navy-900 tracking-tight">YachtHop</span>
             </Link>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-navy-900 tracking-tight">Create your account</h1>
-            <p className="mt-2 text-sm sm:text-base text-slate-500">Join the yachting logistics marketplace.</p>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-navy-900 tracking-[-0.02em]">Create your account</h1>
+            <p className="mt-2.5 text-sm sm:text-base text-slate-500 leading-relaxed">Join the yachting logistics marketplace.</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -122,8 +126,8 @@ function RegisterForm() {
                     onClick={() => setFormData({ ...formData, role: role.value })}
                     className={`relative flex sm:flex-col items-center sm:text-center gap-3 sm:gap-0 p-3.5 sm:p-3 rounded-xl border-2 transition-all ${
                       formData.role === role.value
-                        ? 'border-navy-700 bg-navy-50'
-                        : 'border-slate-200 hover:border-slate-300 bg-white'
+                        ? 'border-navy-700 bg-navy-50 shadow-[0_0_0_1px_rgba(15,23,42,0.05)]'
+                        : 'border-slate-200 hover:border-slate-300 bg-slate-50/50 hover:bg-white'
                     }`}
                   >
                     <div className={`sm:mb-1.5 ${formData.role === role.value ? 'text-navy-700' : 'text-slate-400'}`}>
@@ -147,7 +151,7 @@ function RegisterForm() {
                 name="name"
                 type="text"
                 required
-                className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-white text-navy-900 text-sm focus:border-navy-400 focus:ring-2 focus:ring-navy-100 transition-all outline-none"
+                className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-navy-900 text-sm focus:border-navy-400 focus:ring-2 focus:ring-navy-100 focus:bg-white transition-all outline-none"
                 placeholder="John Smith"
                 value={formData.name}
                 onChange={handleChange}
@@ -162,7 +166,7 @@ function RegisterForm() {
                 type="email"
                 required
                 autoComplete="email"
-                className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-white text-navy-900 text-sm focus:border-navy-400 focus:ring-2 focus:ring-navy-100 transition-all outline-none"
+                className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-navy-900 text-sm focus:border-navy-400 focus:ring-2 focus:ring-navy-100 focus:bg-white transition-all outline-none"
                 placeholder="you@company.com"
                 value={formData.email}
                 onChange={handleChange}
@@ -178,7 +182,7 @@ function RegisterForm() {
                 required
                 autoComplete="new-password"
                 minLength={8}
-                className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-white text-navy-900 text-sm focus:border-navy-400 focus:ring-2 focus:ring-navy-100 transition-all outline-none"
+                className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-navy-900 text-sm focus:border-navy-400 focus:ring-2 focus:ring-navy-100 focus:bg-white transition-all outline-none"
                 placeholder="Min 8 chars, uppercase, lowercase, number"
                 value={formData.password}
                 onChange={handleChange}
@@ -192,7 +196,7 @@ function RegisterForm() {
                   id="company"
                   name="company"
                   type="text"
-                  className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-white text-navy-900 text-sm focus:border-navy-400 focus:ring-2 focus:ring-navy-100 transition-all outline-none"
+                  className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-navy-900 text-sm focus:border-navy-400 focus:ring-2 focus:ring-navy-100 focus:bg-white transition-all outline-none"
                   placeholder="Optional"
                   value={formData.company}
                   onChange={handleChange}
@@ -204,7 +208,7 @@ function RegisterForm() {
                   id="phone"
                   name="phone"
                   type="tel"
-                  className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-white text-navy-900 text-sm focus:border-navy-400 focus:ring-2 focus:ring-navy-100 transition-all outline-none"
+                  className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-navy-900 text-sm focus:border-navy-400 focus:ring-2 focus:ring-navy-100 focus:bg-white transition-all outline-none"
                   placeholder="Optional"
                   value={formData.phone}
                   onChange={handleChange}

@@ -159,7 +159,7 @@ export default function ListingDetailPage() {
   const acceptedCargo = listing.acceptedCargo ? JSON.parse(listing.acceptedCargo) : []
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100/50">
       <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8 py-6 sm:py-8">
         <Link href="/marketplace" className="text-sm text-slate-500 hover:text-navy-700 transition-colors">&larr; Back to Marketplace</Link>
 

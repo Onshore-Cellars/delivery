@@ -248,7 +248,7 @@ export default function ReviewsPage() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-slate-50">
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100/50">
         <div className="max-w-4xl mx-auto px-5 sm:px-6 lg:px-8 py-6 sm:py-12">
           <div className="animate-pulse space-y-6">
             <div className="h-8 bg-slate-200 rounded w-48" />
@@ -282,12 +282,13 @@ export default function ReviewsPage() {
   const currentReviews = activeTab === 'about' ? aboutMeReviews : writtenReviews
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="max-w-4xl mx-auto px-5 sm:px-6 lg:px-8 py-6 sm:py-12">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100/50">
+      <div className="max-w-4xl mx-auto px-5 sm:px-6 lg:px-8 py-8 sm:py-12">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-xl sm:text-2xl font-extrabold text-navy-900 tracking-tight">Reviews</h1>
+            <p className="text-[11px] font-semibold text-gold-600 uppercase tracking-[0.15em] mb-1">Feedback</p>
+            <h1 className="text-xl sm:text-2xl font-extrabold text-navy-900 tracking-[-0.02em]">Reviews</h1>
             <p className="text-sm text-slate-500 mt-1">Manage your ratings and feedback</p>
           </div>
           <button

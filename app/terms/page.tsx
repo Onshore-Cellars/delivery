@@ -1,11 +1,12 @@
 export default function TermsPage() {
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="max-w-3xl mx-auto px-5 sm:px-6 lg:px-8 py-8 sm:py-12">
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-navy-900 tracking-tight mb-2">Terms of Service</h1>
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100/50">
+      <div className="max-w-3xl mx-auto px-5 sm:px-6 lg:px-8 py-10 sm:py-14">
+        <p className="text-[11px] font-semibold text-gold-600 uppercase tracking-[0.15em] mb-1.5">Legal</p>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-navy-900 tracking-[-0.02em] mb-2">Terms of Service</h1>
         <p className="text-sm text-slate-400 mb-8">Last updated: March 2026</p>
 
-        <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-5 sm:p-8 prose prose-slate max-w-none">
+        <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-slate-100/80 p-6 sm:p-10 prose prose-slate max-w-none">
           <h2 className="text-lg font-bold text-navy-900 mt-0">1. Acceptance of Terms</h2>
           <p className="text-slate-600 text-sm leading-relaxed">
             By accessing or using YachtHop (&quot;the Platform&quot;), you agree to be bound by these Terms of Service.

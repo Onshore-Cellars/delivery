@@ -51,11 +51,12 @@ export default function HelpPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="max-w-4xl mx-auto px-5 sm:px-6 lg:px-8 py-8 sm:py-12">
-        <div className="text-center mb-8 sm:mb-12">
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-navy-900 tracking-tight">Help Centre</h1>
-          <p className="mt-2 sm:mt-3 text-base sm:text-lg text-slate-500">Everything you need to know about YachtHop</p>
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100/50">
+      <div className="max-w-4xl mx-auto px-5 sm:px-6 lg:px-8 py-10 sm:py-14">
+        <div className="text-center mb-10 sm:mb-14">
+          <p className="text-[11px] font-semibold text-gold-600 uppercase tracking-[0.15em] mb-1.5">Support</p>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-navy-900 tracking-[-0.02em]">Help Centre</h1>
+          <p className="mt-2.5 sm:mt-3 text-base sm:text-lg text-slate-500">Everything you need to know about YachtHop</p>
         </div>
 
         {/* Quick Links */}
@@ -65,7 +66,7 @@ export default function HelpPage() {
             { title: 'Track Shipment', desc: 'Enter your tracking code', href: '/tracking', icon: 'M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7' },
             { title: 'Create Account', desc: 'Get started for free', href: '/register', icon: 'M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z' },
           ].map(link => (
-            <Link key={link.href} href={link.href} className="bg-white rounded-xl shadow-sm border border-slate-100 p-4 sm:p-6 card-hover text-center">
+            <Link key={link.href} href={link.href} className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-slate-100/80 p-5 sm:p-7 card-hover text-center">
               <svg className="w-8 h-8 text-navy-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={link.icon} />
               </svg>
@@ -80,7 +81,7 @@ export default function HelpPage() {
           {faqs.map(section => (
             <div key={section.category}>
               <h2 className="text-lg sm:text-xl font-bold text-navy-900 mb-3 sm:mb-4">{section.category}</h2>
-              <div className="bg-white rounded-xl shadow-sm border border-slate-100 divide-y divide-slate-100">
+              <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-slate-100/80 divide-y divide-slate-100">
                 {section.items.map((item, i) => {
                   const id = `${section.category}-${i}`
                   const isOpen = openItems.has(id)
@@ -109,7 +110,7 @@ export default function HelpPage() {
         </div>
 
         {/* Contact */}
-        <div className="mt-8 sm:mt-12 bg-white rounded-xl shadow-sm border border-slate-100 p-5 sm:p-8 text-center">
+        <div className="mt-10 sm:mt-14 bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-slate-100/80 p-6 sm:p-10 text-center">
           <h2 className="text-xl font-bold text-navy-900 mb-2">Still need help?</h2>
           <p className="text-slate-500 text-sm mb-6">Our support team is here for you</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

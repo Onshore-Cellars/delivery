@@ -113,19 +113,20 @@ export default function CreateListingPage() {
     )
   }
 
-  const inputCls = "w-full px-4 py-3 sm:py-2.5 rounded-lg border border-slate-200 text-base sm:text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none"
-  const selectCls = `${inputCls} bg-white`
+  const inputCls = "w-full px-4 py-3 sm:py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-base sm:text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 focus:bg-white transition-all outline-none"
+  const selectCls = `${inputCls} bg-slate-50/50`
   const labelCls = "block text-sm font-medium text-navy-900 mb-1.5"
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="max-w-3xl mx-auto px-5 sm:px-6 lg:px-8 py-6 sm:py-8">
-        <div className="mb-6 sm:mb-8">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100/50">
+      <div className="max-w-3xl mx-auto px-5 sm:px-6 lg:px-8 py-8 sm:py-10">
+        <div className="mb-8 sm:mb-10">
           <Link href="/dashboard" className="text-sm text-slate-500 hover:text-navy-700 transition-colors">
             &larr; Back to Dashboard
           </Link>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-navy-900 tracking-tight mt-3 sm:mt-4">List Your Van Space</h1>
-          <p className="text-sm text-slate-500 mt-1">Share spare capacity on your next yacht-route run.</p>
+          <p className="text-[11px] font-semibold text-gold-600 uppercase tracking-[0.15em] mt-4 sm:mt-5 mb-1">New Listing</p>
+          <h1 className="text-xl sm:text-2xl font-extrabold text-navy-900 tracking-[-0.02em]">List Your Van Space</h1>
+          <p className="text-sm text-slate-500 mt-1.5">Share spare capacity on your next yacht-route run.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
@@ -136,7 +137,7 @@ export default function CreateListingPage() {
           )}
 
           {/* Vehicle Selection */}
-          <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-4 sm:p-6">
+          <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-slate-100/80 p-5 sm:p-6">
             <h2 className="text-lg font-bold text-navy-900 mb-1">Vehicle Selection</h2>
             <p className="text-xs text-slate-400 mb-4">Select your vehicle to auto-fill capacity specs, or enter manually below.</p>
             <div className="space-y-4">
@@ -201,7 +202,7 @@ export default function CreateListingPage() {
           </div>
 
           {/* Route Details */}
-          <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-4 sm:p-6">
+          <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-slate-100/80 p-5 sm:p-6">
             <h2 className="text-lg font-bold text-navy-900 mb-4">Route Details</h2>
             <div className="space-y-4">
               <div>
@@ -308,7 +309,7 @@ export default function CreateListingPage() {
           </div>
 
           {/* Vehicle & Capacity */}
-          <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-4 sm:p-6">
+          <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-slate-100/80 p-5 sm:p-6">
             <h2 className="text-lg font-bold text-navy-900 mb-1">Vehicle & Capacity</h2>
             {selectedSpec && <p className="text-xs text-emerald-500 font-medium mb-4">Auto-filled from {selectedSpec.make} {selectedSpec.model} specs. You can override any value.</p>}
             {!selectedSpec && <p className="text-xs text-slate-400 mb-4">Enter capacity manually, or select a vehicle above to auto-fill.</p>}
@@ -427,7 +428,7 @@ export default function CreateListingPage() {
           </div>
 
           {/* Cargo Restrictions */}
-          <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-4 sm:p-6">
+          <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-slate-100/80 p-5 sm:p-6">
             <h2 className="text-lg font-bold text-navy-900 mb-4">Cargo Details</h2>
             <div className="space-y-4">
               <div>
@@ -456,7 +457,7 @@ export default function CreateListingPage() {
           </div>
 
           {/* Pricing */}
-          <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-4 sm:p-6">
+          <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-slate-100/80 p-5 sm:p-6">
             <h2 className="text-lg font-bold text-navy-900 mb-4">Pricing</h2>
             <div className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

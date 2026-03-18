@@ -88,9 +88,9 @@ const SORT_OPTIONS = [
 ]
 
 const inputClass =
-  'w-full px-4 py-3 sm:py-2.5 rounded-lg border border-slate-200 bg-white text-base sm:text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 transition-all outline-none'
+  'w-full px-4 py-3 sm:py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-base sm:text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 focus:bg-white transition-all outline-none'
 const selectClass =
-  'w-full px-4 py-3 sm:py-2.5 rounded-lg border border-slate-200 bg-white text-base sm:text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 transition-all outline-none appearance-none'
+  'w-full px-4 py-3 sm:py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-base sm:text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 focus:bg-white transition-all outline-none appearance-none'
 
 export default function MarketplacePage() {
   const { user, token } = useAuth()
@@ -477,8 +477,8 @@ export default function MarketplacePage() {
   // ---------- Listing card component ----------
   const ListingCard = ({ listing, featured = false }: { listing: Listing; featured?: boolean }) => (
     <div
-      className={`bg-white rounded-xl shadow-sm border p-4 sm:p-6 card-hover ${
-        listing.featured || featured ? 'border-gold-300 ring-1 ring-gold-200' : 'border-slate-100'
+      className={`bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border p-5 sm:p-6 card-hover ${
+        listing.featured || featured ? 'border-gold-300 ring-1 ring-gold-200' : 'border-slate-100/80'
       }`}
     >
       {(listing.featured || featured) && (
@@ -571,14 +571,15 @@ export default function MarketplacePage() {
   )
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100/50">
       {/* Search header */}
-      <div className="bg-white border-b border-slate-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-5 sm:py-6">
-          <div className="flex items-center justify-between mb-3 sm:mb-4">
+      <div className="bg-white border-b border-slate-200/80 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-6 sm:py-8">
+          <div className="flex items-center justify-between mb-4 sm:mb-5">
             <div>
-              <h1 className="text-xl sm:text-2xl font-extrabold text-navy-900 tracking-tight">Marketplace</h1>
-              <p className="text-xs sm:text-sm text-slate-500 mt-0.5">Find van space to yacht destinations</p>
+              <p className="text-[11px] font-semibold text-gold-600 uppercase tracking-[0.15em] mb-1">Browse</p>
+              <h1 className="text-xl sm:text-2xl font-extrabold text-navy-900 tracking-[-0.02em]">Marketplace</h1>
+              <p className="text-xs sm:text-sm text-slate-500 mt-1">Find van space to yacht destinations</p>
             </div>
 
             {/* Mobile filter toggle */}
@@ -919,22 +920,14 @@ export default function MarketplacePage() {
             ))}
           </div>
         ) : listings.length === 0 ? (
-          <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-16 text-center">
-            <svg
-              className="mx-auto w-12 h-12 text-slate-300 mb-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-            <p className="text-slate-500 mb-2">No routes found</p>
-            <p className="text-sm text-slate-400 mb-4">Try adjusting your search filters</p>
+          <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-slate-100/80 p-16 text-center">
+            <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto mb-5">
+              <svg className="w-7 h-7 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <p className="text-slate-500 font-medium mb-1.5">No routes found</p>
+            <p className="text-sm text-slate-400 mb-5">Try adjusting your search filters</p>
             {hasActiveFilters && (
               <button onClick={resetFilters} className="btn-primary text-sm !py-2 !px-5">
                 Clear All Filters
@@ -1002,7 +995,7 @@ export default function MarketplacePage() {
       {/* Booking Modal */}
       {bookingModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy-950/60 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-2xl shadow-[0_25px_60px_-12px_rgba(0,0,0,0.15)] max-w-lg w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-slate-100">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-bold text-navy-900">Book Space</h2>

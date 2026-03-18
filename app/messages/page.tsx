@@ -119,11 +119,14 @@ export default function MessagesPage() {
   if (authLoading || !user) return <div className="min-h-screen flex items-center justify-center"><div className="loading-shimmer w-64 h-8 rounded-lg" /></div>
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8 py-6 sm:py-8">
-        <h1 className="text-xl sm:text-2xl font-extrabold text-navy-900 tracking-tight mb-6">Messages</h1>
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100/50">
+      <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8 py-8 sm:py-10">
+        <div className="mb-6">
+          <p className="text-[11px] font-semibold text-gold-600 uppercase tracking-[0.15em] mb-1">Communication</p>
+          <h1 className="text-xl sm:text-2xl font-extrabold text-navy-900 tracking-[-0.02em]">Messages</h1>
+        </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden" style={{ height: 'calc(100vh - 200px)' }}>
+        <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-slate-100/80 overflow-hidden" style={{ height: 'calc(100vh - 220px)' }}>
           <div className="flex h-full">
             {/* Conversation list */}
             <div className={`${activeConv ? 'hidden md:block' : ''} w-full md:w-80 border-r border-slate-100 overflow-y-auto`}>
