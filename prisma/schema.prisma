@@ -86,7 +86,8 @@ model User {
   id              String    @id @default(cuid())
   email           String    @unique
   name            String
-  password        String
+  password        String?
+  googleId        String?   @unique
   role            UserRole
   phone           String?
   company         String?

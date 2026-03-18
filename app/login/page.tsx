@@ -1,15 +1,68 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { useAuth } from '../components/AuthProvider'
 
+declare global {
+  interface Window {
+    google?: {
+      accounts: {
+        id: {
+          initialize: (config: Record<string, unknown>) => void
+          renderButton: (element: HTMLElement, config: Record<string, unknown>) => void
+        }
+      }
+    }
+  }
+}
+
 export default function LoginPage() {
-  const { login } = useAuth()
+  const { login, googleSignIn } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+
+  const handleGoogleResponse = useCallback(async (response: { credential: string }) => {
+    setError('')
+    setLoading(true)
+    try {
+      await googleSignIn(response.credential)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Google sign-in failed')
+    } finally {
+      setLoading(false)
+    }
+  }, [googleSignIn])
+
+  useEffect(() => {
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
+    if (!clientId) return
+
+    const script = document.createElement('script')
+    script.src = 'https://accounts.google.com/gsi/client'
+    script.async = true
+    script.defer = true
+    script.onload = () => {
+      window.google?.accounts.id.initialize({
+        client_id: clientId,
+        callback: handleGoogleResponse,
+      })
+      const btnEl = document.getElementById('google-signin-btn')
+      if (btnEl) {
+        window.google?.accounts.id.renderButton(btnEl, {
+          theme: 'outline',
+          size: 'large',
+          width: '100%',
+          text: 'signin_with',
+          shape: 'pill',
+        })
+      }
+    }
+    document.head.appendChild(script)
+    return () => { script.remove() }
+  }, [handleGoogleResponse])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -97,6 +150,20 @@ export default function LoginPage() {
               ) : 'Sign In'}
             </button>
           </form>
+
+          {process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID && (
+            <>
+              <div className="relative my-6">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-slate-200" />
+                </div>
+                <div className="relative flex justify-center text-xs">
+                  <span className="bg-white px-3 text-slate-400 uppercase tracking-wider">or</span>
+                </div>
+              </div>
+              <div id="google-signin-btn" className="flex justify-center" />
+            </>
+          )}
 
           <p className="mt-6 text-center text-sm text-slate-500">
             Don&apos;t have an account?{' '}

@@ -20,6 +20,7 @@ interface AuthContextType {
   loading: boolean
   login: (email: string, password: string) => Promise<void>
   register: (data: RegisterData) => Promise<void>
+  googleSignIn: (idToken: string, role?: string) => Promise<{ needsRole?: boolean }>
   logout: () => void
   refreshUser: () => Promise<void>
 }
@@ -102,6 +103,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     router.push('/dashboard')
   }
 
+  const googleSignIn = async (idToken: string, role?: string): Promise<{ needsRole?: boolean }> => {
+    const res = await fetch('/api/auth/google', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ idToken, role }),
+    })
+    const data = await res.json()
+    if (!res.ok) {
+      if (data.error === 'ROLE_REQUIRED') return { needsRole: true }
+      throw new Error(data.error || 'Google sign-in failed')
+    }
+
+    localStorage.setItem('yh_token', data.token)
+    setToken(data.token)
+    setUser(data.user)
+    router.push('/dashboard')
+    return {}
+  }
+
   const logout = () => {
     localStorage.removeItem('yh_token')
     setUser(null)
@@ -110,7 +130,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout, refreshUser }}>
+    <AuthContext.Provider value={{ user, token, loading, login, register, googleSignIn, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   )
