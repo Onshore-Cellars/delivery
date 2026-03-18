@@ -1,13 +1,6 @@
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
 import "./globals.css"
 import ClientLayout from "./components/ClientLayout"
-
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800", "900"],
-  display: "swap",
-})
 
 export const metadata: Metadata = {
   title: "Onshore Deliver — Delivery Logistics Marketplace",
@@ -22,7 +15,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.className} antialiased`}>
+      <body className="antialiased">
         <a href="#main-content" className="skip-link">Skip to content</a>
         <ClientLayout>{children}</ClientLayout>
       </body>

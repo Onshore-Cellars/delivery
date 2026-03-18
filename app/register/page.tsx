@@ -24,12 +24,7 @@ function RegisterForm() {
   const defaultRole = searchParams.get('role') || ''
 
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    role: defaultRole || '',
-    company: '',
-    phone: '',
+    name: '', email: '', password: '', role: defaultRole || '', company: '', phone: '',
   })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -46,51 +41,31 @@ function RegisterForm() {
         setLoading(false)
         return
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Google sign-in failed')
-    } finally {
-      setLoading(false)
-    }
+    } catch (err) { setError(err instanceof Error ? err.message : 'Google sign-in failed') }
+    finally { setLoading(false) }
   }, [googleSignIn, formData.role])
 
   const handleGoogleWithRole = async () => {
-    if (!pendingGoogleToken || !formData.role) {
-      setError('Please select your account type first')
-      return
-    }
+    if (!pendingGoogleToken || !formData.role) { setError('Please select your account type first'); return }
     setError('')
     setLoading(true)
-    try {
-      await googleSignIn(pendingGoogleToken, formData.role)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Google sign-in failed')
-    } finally {
-      setLoading(false)
-    }
+    try { await googleSignIn(pendingGoogleToken, formData.role) }
+    catch (err) { setError(err instanceof Error ? err.message : 'Google sign-in failed') }
+    finally { setLoading(false) }
   }
 
   useEffect(() => {
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
     if (!clientId) return
-
     const script = document.createElement('script')
     script.src = 'https://accounts.google.com/gsi/client'
     script.async = true
     script.defer = true
     script.onload = () => {
-      window.google?.accounts.id.initialize({
-        client_id: clientId,
-        callback: handleGoogleResponse,
-      })
+      window.google?.accounts.id.initialize({ client_id: clientId, callback: handleGoogleResponse })
       const btnEl = document.getElementById('google-signup-btn')
       if (btnEl) {
-        window.google?.accounts.id.renderButton(btnEl, {
-          theme: 'outline',
-          size: 'large',
-          width: '100%',
-          text: 'signup_with',
-          shape: 'pill',
-        })
+        window.google?.accounts.id.renderButton(btnEl, { theme: 'outline', size: 'large', width: '100%', text: 'signup_with', shape: 'pill' })
       }
     }
     document.head.appendChild(script)
@@ -99,19 +74,12 @@ function RegisterForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!formData.role) {
-      setError('Please select an account type')
-      return
-    }
+    if (!formData.role) { setError('Please select an account type'); return }
     setError('')
     setLoading(true)
-    try {
-      await register(formData)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Registration failed')
-    } finally {
-      setLoading(false)
-    }
+    try { await register(formData) }
+    catch (err) { setError(err instanceof Error ? err.message : 'Registration failed') }
+    finally { setLoading(false) }
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -119,180 +87,98 @@ function RegisterForm() {
   }
 
   const roles = [
-    {
-      value: 'CARRIER',
-      label: 'Carrier / Driver',
-      desc: 'I have van space on delivery routes',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-        </svg>
-      ),
+    { value: 'CARRIER', label: 'Carrier / Driver', desc: 'I have van space on delivery routes',
+      icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
     },
-    {
-      value: 'SUPPLIER',
-      label: 'Provisioner / Vendor',
-      desc: 'I supply goods and provisions',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-        </svg>
-      ),
+    { value: 'SUPPLIER', label: 'Provisioner', desc: 'I supply goods and provisions',
+      icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
     },
-    {
-      value: 'YACHT_OWNER',
-      label: 'Owner / Management',
-      desc: 'I manage operations and need deliveries',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
-        </svg>
-      ),
+    { value: 'YACHT_OWNER', label: 'Owner / Mgmt', desc: 'I manage operations and need deliveries',
+      icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" /></svg>
     },
   ]
 
+  const inputClass = "w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-white text-[#0f172a] text-[15px] placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all outline-none"
+
   return (
-    <div className="min-h-screen flex">
-      {/* Left — decorative */}
-      <div className="hidden lg:flex lg:flex-1 bg-black items-center justify-center p-16 relative overflow-hidden">
-        <div className="relative max-w-md text-center">
-          <h2 className="text-3xl font-semibold text-[#f5f5f7] mb-5 tracking-tight">The Delivery Logistics Marketplace</h2>
-          <p className="text-[#86868b] leading-relaxed text-lg">
-            Provisioners, vendors, fleet management &mdash; share van space, post loads, bid on transport.
-          </p>
-        </div>
-      </div>
-
-      {/* Right — form */}
-      <div className="flex-1 flex items-center justify-center px-5 sm:px-8 lg:px-12 py-12">
+    <div className="min-h-screen bg-white flex flex-col">
+      <div className="flex-1 flex items-center justify-center px-5 sm:px-8 py-12">
         <div className="w-full max-w-md">
-          <div className="mb-10">
-            <Link href="/" className="flex items-center gap-2 mb-10 hover:no-underline">
-              <span className="text-lg font-semibold text-[#1d1d1f] tracking-tight">Onshore</span>
-            </Link>
-            <h1 className="text-2xl sm:text-3xl font-semibold text-[#1d1d1f] tracking-tight">Create your account</h1>
-            <p className="mt-2.5 text-[15px] text-[#86868b] leading-relaxed">Join the delivery logistics marketplace.</p>
-          </div>
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2.5 mb-10 hover:no-underline">
+            <div className="w-8 h-8 rounded-lg bg-[#2563eb] flex items-center justify-center">
+              <span className="text-white text-sm font-bold">O</span>
+            </div>
+            <span className="text-lg font-bold text-[#0f172a]">Onshore</span>
+          </Link>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#0f172a] tracking-tight">Create your account</h1>
+          <p className="mt-2 text-sm sm:text-base text-slate-500">Join the delivery logistics marketplace.</p>
+
+          <form onSubmit={handleSubmit} className="mt-8 space-y-5">
             {error && (
-              <div className="px-4 py-3 rounded-lg bg-red-50 border border-red-100">
+              <div className="px-4 py-3 rounded-xl bg-red-50 border border-red-100">
                 <p className="text-sm text-red-700">{error}</p>
               </div>
             )}
 
             {/* Role selection */}
             <div>
-              <label className="block text-sm font-medium text-[#1d1d1f] mb-2">I am a...</label>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <label className="block text-sm font-semibold text-[#0f172a] mb-3">I am a...</label>
+              <div className="grid grid-cols-3 gap-2.5">
                 {roles.map((role) => (
                   <button
                     key={role.value}
                     type="button"
                     onClick={() => setFormData({ ...formData, role: role.value })}
-                    className={`relative flex sm:flex-col items-center sm:text-center gap-3 sm:gap-0 p-3.5 sm:p-3 rounded-xl border-2 transition-all ${
+                    className={`relative flex flex-col items-center text-center p-3.5 rounded-xl border-2 transition-all ${
                       formData.role === role.value
-                        ? 'border-[#1d1d1f] bg-[#f5f5f7] shadow-[0_0_0_1px_rgba(15,23,42,0.05)]'
-                        : 'border-slate-200 hover:border-slate-300 bg-slate-50/50 hover:bg-white'
+                        ? 'border-blue-600 bg-blue-50'
+                        : 'border-slate-200 hover:border-slate-300 bg-white'
                     }`}
                   >
-                    <div className={`sm:mb-1.5 ${formData.role === role.value ? 'text-[#1d1d1f]' : 'text-slate-400'}`}>
+                    <div className={`mb-2 ${formData.role === role.value ? 'text-blue-600' : 'text-slate-400'}`}>
                       {role.icon}
                     </div>
-                    <div className="sm:text-center">
-                      <span className={`text-sm sm:text-xs font-semibold block ${formData.role === role.value ? 'text-[#1d1d1f]' : 'text-slate-700'}`}>
-                        {role.label}
-                      </span>
-                      <span className="text-xs sm:text-[10px] text-slate-500 mt-0.5 leading-tight block">{role.desc}</span>
-                    </div>
+                    <span className={`text-xs font-bold block leading-tight ${formData.role === role.value ? 'text-blue-700' : 'text-slate-700'}`}>
+                      {role.label}
+                    </span>
+                    <span className="text-[10px] text-slate-500 mt-1 leading-tight hidden sm:block">{role.desc}</span>
                   </button>
                 ))}
               </div>
             </div>
 
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-[#1d1d1f] mb-1.5">Full Name</label>
-              <input
-                id="name"
-                name="name"
-                type="text"
-                required
-                className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-[#1d1d1f] text-sm focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10 focus:bg-white transition-all outline-none"
-                placeholder="John Smith"
-                value={formData.name}
-                onChange={handleChange}
-              />
+              <label htmlFor="name" className="block text-sm font-semibold text-[#0f172a] mb-2">Full Name</label>
+              <input id="name" name="name" type="text" required className={inputClass} placeholder="John Smith" value={formData.name} onChange={handleChange} />
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-[#1d1d1f] mb-1.5">Email</label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                autoComplete="email"
-                className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-[#1d1d1f] text-sm focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10 focus:bg-white transition-all outline-none"
-                placeholder="you@company.com"
-                value={formData.email}
-                onChange={handleChange}
-              />
+              <label htmlFor="email" className="block text-sm font-semibold text-[#0f172a] mb-2">Email</label>
+              <input id="email" name="email" type="email" required autoComplete="email" className={inputClass} placeholder="you@company.com" value={formData.email} onChange={handleChange} />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-[#1d1d1f] mb-1.5">Password</label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                autoComplete="new-password"
-                minLength={8}
-                className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-[#1d1d1f] text-sm focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10 focus:bg-white transition-all outline-none"
-                placeholder="Min 8 chars, uppercase, lowercase, number"
-                value={formData.password}
-                onChange={handleChange}
-              />
+              <label htmlFor="password" className="block text-sm font-semibold text-[#0f172a] mb-2">Password</label>
+              <input id="password" name="password" type="password" required autoComplete="new-password" minLength={8} className={inputClass} placeholder="Min 8 characters" value={formData.password} onChange={handleChange} />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               <div>
-                <label htmlFor="company" className="block text-sm font-medium text-[#1d1d1f] mb-1.5">Company</label>
-                <input
-                  id="company"
-                  name="company"
-                  type="text"
-                  className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-[#1d1d1f] text-sm focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10 focus:bg-white transition-all outline-none"
-                  placeholder="Optional"
-                  value={formData.company}
-                  onChange={handleChange}
-                />
+                <label htmlFor="company" className="block text-sm font-semibold text-[#0f172a] mb-2">Company</label>
+                <input id="company" name="company" type="text" className={inputClass} placeholder="Optional" value={formData.company} onChange={handleChange} />
               </div>
               <div>
-                <label htmlFor="phone" className="block text-sm font-medium text-[#1d1d1f] mb-1.5">Phone</label>
-                <input
-                  id="phone"
-                  name="phone"
-                  type="tel"
-                  className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-[#1d1d1f] text-sm focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10 focus:bg-white transition-all outline-none"
-                  placeholder="Optional"
-                  value={formData.phone}
-                  onChange={handleChange}
-                />
+                <label htmlFor="phone" className="block text-sm font-semibold text-[#0f172a] mb-2">Phone</label>
+                <input id="phone" name="phone" type="tel" className={inputClass} placeholder="Optional" value={formData.phone} onChange={handleChange} />
               </div>
             </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full btn-primary !py-3 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-            >
+            <button type="submit" disabled={loading} className="w-full btn-primary !py-3.5 !text-[15px] disabled:opacity-50">
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
-                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                  </svg>
+                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
                   Creating account...
                 </span>
               ) : 'Create Account'}
@@ -302,19 +188,12 @@ function RegisterForm() {
           {process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID && (
             <>
               <div className="relative my-6">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-slate-200" />
-                </div>
-                <div className="relative flex justify-center text-xs">
-                  <span className="bg-white px-3 text-slate-400 uppercase tracking-wider">or</span>
-                </div>
+                <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200" /></div>
+                <div className="relative flex justify-center text-xs"><span className="bg-white px-3 text-slate-400 uppercase tracking-wider font-medium">or</span></div>
               </div>
               {pendingGoogleToken ? (
-                <button
-                  onClick={handleGoogleWithRole}
-                  disabled={loading || !formData.role}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-sm font-medium text-[#1d1d1f] transition-all disabled:opacity-50"
-                >
+                <button onClick={handleGoogleWithRole} disabled={loading || !formData.role}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-sm font-semibold text-[#0f172a] transition-all disabled:opacity-50">
                   <svg className="w-5 h-5" viewBox="0 0 24 24">
                     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
                     <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -329,11 +208,9 @@ function RegisterForm() {
             </>
           )}
 
-          <p className="mt-6 text-center text-sm text-slate-500">
+          <p className="mt-8 text-center text-sm text-slate-500">
             Already have an account?{' '}
-            <Link href="/login" className="font-semibold text-[#1d1d1f] hover:text-[#1d1d1f] transition-colors">
-              Sign in
-            </Link>
+            <Link href="/login" className="font-semibold text-blue-600 hover:text-blue-700">Sign in</Link>
           </p>
         </div>
       </div>
