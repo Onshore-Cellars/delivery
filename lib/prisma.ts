@@ -6,9 +6,8 @@ const globalForPrisma = globalThis as unknown as {
 
 function createPrismaClient(): PrismaClient {
   if (!process.env.DATABASE_URL) {
-    if (process.env.NODE_ENV === 'production') {
-      throw new Error('DATABASE_URL must be set in production')
-    }
+    // Only warn at module load — the actual connection will fail at query time
+    // This avoids crashing during `next build` when DATABASE_URL isn't available
     console.warn('DATABASE_URL is not set — database queries will fail')
   }
   return new PrismaClient()
