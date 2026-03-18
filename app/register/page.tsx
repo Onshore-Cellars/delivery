@@ -114,25 +114,27 @@ function RegisterForm() {
             {/* Role selection */}
             <div>
               <label className="block text-sm font-medium text-navy-900 mb-2">I am a...</label>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {roles.map((role) => (
                   <button
                     key={role.value}
                     type="button"
                     onClick={() => setFormData({ ...formData, role: role.value })}
-                    className={`relative flex flex-col items-center p-3 rounded-xl border-2 transition-all text-center ${
+                    className={`relative flex sm:flex-col items-center sm:text-center gap-3 sm:gap-0 p-3.5 sm:p-3 rounded-xl border-2 transition-all ${
                       formData.role === role.value
                         ? 'border-navy-700 bg-navy-50'
                         : 'border-slate-200 hover:border-slate-300 bg-white'
                     }`}
                   >
-                    <div className={`mb-1.5 ${formData.role === role.value ? 'text-navy-700' : 'text-slate-400'}`}>
+                    <div className={`sm:mb-1.5 ${formData.role === role.value ? 'text-navy-700' : 'text-slate-400'}`}>
                       {role.icon}
                     </div>
-                    <span className={`text-xs font-semibold ${formData.role === role.value ? 'text-navy-900' : 'text-slate-700'}`}>
-                      {role.label}
-                    </span>
-                    <span className="text-[10px] text-slate-500 mt-0.5 leading-tight">{role.desc}</span>
+                    <div className="sm:text-center">
+                      <span className={`text-sm sm:text-xs font-semibold block ${formData.role === role.value ? 'text-navy-900' : 'text-slate-700'}`}>
+                        {role.label}
+                      </span>
+                      <span className="text-xs sm:text-[10px] text-slate-500 mt-0.5 leading-tight block">{role.desc}</span>
+                    </div>
                   </button>
                 ))}
               </div>
@@ -183,7 +185,7 @@ function RegisterForm() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="company" className="block text-sm font-medium text-navy-900 mb-1.5">Company</label>
                 <input

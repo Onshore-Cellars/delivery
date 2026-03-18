@@ -140,13 +140,13 @@ export default function ProfilePage() {
                 ].map(([key, label, type]) => (
                   <div key={key}>
                     <label className="block text-sm font-medium text-navy-900 mb-1">{label}</label>
-                    <input type={type} className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-navy-900 focus:border-navy-400 outline-none" value={(form[key] as string) || ''} onChange={e => setForm({...form, [key]: e.target.value})} />
+                    <input type={type} className="w-full px-4 py-3 sm:py-2.5 rounded-lg border border-slate-200 text-base sm:text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none" value={(form[key] as string) || ''} onChange={e => setForm({...form, [key]: e.target.value})} />
                   </div>
                 ))}
               </div>
               <div>
                 <label className="block text-sm font-medium text-navy-900 mb-1">Bio</label>
-                <textarea rows={3} className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-navy-900 focus:border-navy-400 outline-none resize-none" value={(form.bio as string) || ''} onChange={e => setForm({...form, bio: e.target.value})} />
+                <textarea rows={3} className="w-full px-4 py-3 sm:py-2.5 rounded-lg border border-slate-200 text-base sm:text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none resize-none" value={(form.bio as string) || ''} onChange={e => setForm({...form, bio: e.target.value})} />
               </div>
               <div className="flex gap-3">
                 <button type="submit" disabled={saving} className="btn-gold text-sm !py-2.5 disabled:opacity-50">{saving ? 'Saving...' : 'Save Changes'}</button>

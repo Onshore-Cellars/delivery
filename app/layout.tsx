@@ -22,7 +22,7 @@ export default function RootLayout({
       </head>
       <body className="antialiased">
         <a href="#main-content" className="skip-link">Skip to content</a>
-        <ClientLayout><main id="main-content">{children}</main></ClientLayout>
+        <ClientLayout>{children}</ClientLayout>
       </body>
     </html>
   )

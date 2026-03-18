@@ -98,12 +98,30 @@ const paymentStatusColors: Record<string, string> = {
 }
 
 const TAB_CONFIG: { key: TabKey; label: string; icon: string }[] = [
-  { key: 'overview', label: 'Overview', icon: '\u2630' },
-  { key: 'users', label: 'Users', icon: '\u263A' },
-  { key: 'bookings', label: 'Bookings', icon: '\u2693' },
-  { key: 'listings', label: 'Listings', icon: '\u2318' },
-  { key: 'activity', label: 'Activity', icon: '\u2691' },
+  { key: 'overview', label: 'Overview', icon: 'overview' },
+  { key: 'users', label: 'Users', icon: 'users' },
+  { key: 'bookings', label: 'Bookings', icon: 'bookings' },
+  { key: 'listings', label: 'Listings', icon: 'listings' },
+  { key: 'activity', label: 'Activity', icon: 'activity' },
 ]
+
+function TabIcon({ name, className }: { name: string; className?: string }) {
+  const cls = className || 'w-4 h-4'
+  switch (name) {
+    case 'overview':
+      return <svg className={cls} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" /></svg>
+    case 'users':
+      return <svg className={cls} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg>
+    case 'bookings':
+      return <svg className={cls} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15a2.25 2.25 0 012.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" /></svg>
+    case 'listings':
+      return <svg className={cls} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>
+    case 'activity':
+      return <svg className={cls} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+    default:
+      return null
+  }
+}
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
@@ -446,12 +464,12 @@ export default function AdminPage() {
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-2xl font-extrabold text-navy-900 tracking-tight">Admin Panel</h1>
-            <p className="text-slate-500 mt-1">Platform management and analytics</p>
+            <h1 className="text-xl sm:text-2xl font-extrabold text-navy-900 tracking-tight">Admin Panel</h1>
+            <p className="text-sm text-slate-500 mt-1">Platform management and analytics</p>
           </div>
           <div className="flex items-center gap-3">
             {/* Global Search */}
@@ -461,7 +479,7 @@ export default function AdminPage() {
                 placeholder="Search users, bookings, listings..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                className="pl-9 pr-4 py-2 w-72 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-navy-500 focus:border-transparent"
+                className="pl-9 pr-4 py-2.5 w-full sm:w-72 rounded-xl border border-slate-200 bg-white text-sm focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none"
               />
               <svg className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -471,21 +489,23 @@ export default function AdminPage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 mb-8 bg-white rounded-xl p-1 shadow-sm border border-slate-100 w-fit">
+        <div className="overflow-x-auto -mx-5 px-5 sm:mx-0 sm:px-0 mb-8">
+          <div className="flex gap-1 bg-white rounded-xl p-1 shadow-sm border border-slate-100 w-fit min-w-full sm:min-w-0">
           {TAB_CONFIG.map(t => (
             <button
               key={t.key}
               onClick={() => setTab(t.key)}
-              className={`px-5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
+              className={`px-5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 whitespace-nowrap ${
                 tab === t.key
                   ? 'bg-navy-900 text-white shadow-sm'
                   : 'text-slate-500 hover:text-navy-900 hover:bg-slate-50'
               }`}
             >
-              <span className="text-xs">{t.icon}</span>
+              <TabIcon name={t.icon} className="w-4 h-4" />
               {t.label}
             </button>
           ))}
+          </div>
         </div>
 
         {loading ? (

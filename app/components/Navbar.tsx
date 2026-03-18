@@ -160,7 +160,7 @@ export default function Navbar() {
           <div className="mobile-menu-overlay absolute inset-0" onClick={close} />
 
           {/* Panel */}
-          <div className="absolute top-0 right-0 w-[280px] h-full bg-white shadow-2xl animate-fade-up flex flex-col" style={{ animationDuration: '200ms' }}>
+          <div className="absolute top-0 right-0 w-[280px] h-full bg-white shadow-2xl animate-slide-in-right flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between h-16 px-5 border-b border-slate-100">
               <span className="text-sm font-bold text-navy-900">Menu</span>

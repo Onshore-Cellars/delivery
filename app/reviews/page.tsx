@@ -104,8 +104,8 @@ function SubRatingBar({ label, value }: { label: string; value: number }) {
       <span className="text-sm text-slate-500 w-28 shrink-0">{label}</span>
       <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
         <div
-          className="h-full rounded-full transition-all duration-500"
-          style={{ width: `${(value / 5) * 100}%`, backgroundColor: '#EAB308' }}
+          className="h-full rounded-full bg-gold-500 transition-all duration-500"
+          style={{ width: `${(value / 5) * 100}%` }}
         />
       </div>
       <span className="text-sm font-medium text-slate-700 w-8 text-right">{value.toFixed(1)}</span>
@@ -276,7 +276,7 @@ export default function ReviewsPage() {
   if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-slate-50">
-        <div className="max-w-4xl mx-auto px-4 py-8 sm:py-12">
+        <div className="max-w-4xl mx-auto px-5 sm:px-6 lg:px-8 py-6 sm:py-12">
           <div className="animate-pulse space-y-6">
             <div className="h-8 bg-slate-200 rounded w-48" />
             <div className="bg-white rounded-xl shadow-sm p-8">
@@ -310,27 +310,26 @@ export default function ReviewsPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <div className="max-w-4xl mx-auto px-4 py-8 sm:py-8 sm:py-12">
+      <div className="max-w-4xl mx-auto px-5 sm:px-6 lg:px-8 py-6 sm:py-12">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Reviews</h1>
-            <p className="text-slate-500 mt-1">Manage your ratings and feedback</p>
+            <h1 className="text-xl sm:text-2xl font-extrabold text-navy-900 tracking-tight">Reviews</h1>
+            <p className="text-sm text-slate-500 mt-1">Manage your ratings and feedback</p>
           </div>
           <button
             onClick={() => setShowNewReview(!showNewReview)}
-            className="px-5 py-2.5 text-white text-sm font-medium rounded-lg shadow-sm transition-all hover:shadow-md"
-            style={{ backgroundColor: '#1e3a5f' }}
+            className="btn-gold text-sm !py-2.5 !px-5"
           >
             {showNewReview ? 'Cancel' : 'Write a Review'}
           </button>
         </div>
 
         {/* Rating Summary */}
-        <div className="bg-white rounded-xl shadow-sm p-6 sm:p-8 mb-6">
+        <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 sm:p-8 mb-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
             <div className="flex flex-col items-center text-center min-w-[120px]">
-              <div className="text-5xl font-bold text-slate-900">{average > 0 ? average.toFixed(1) : '—'}</div>
+              <div className="text-5xl font-extrabold text-navy-900">{average > 0 ? average.toFixed(1) : '—'}</div>
               <StarRating rating={Math.round(average)} size="md" />
               <p className="text-sm text-slate-500 mt-1">
                 {count} {count === 1 ? 'review' : 'reviews'}
@@ -369,8 +368,8 @@ export default function ReviewsPage() {
 
         {/* Write New Review Form */}
         {showNewReview && (
-          <div className="bg-white rounded-xl shadow-sm p-6 sm:p-8 mb-6 border border-slate-200">
-            <h2 className="text-lg font-semibold text-slate-900 mb-6">Write a New Review</h2>
+          <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 sm:p-8 mb-6">
+            <h2 className="text-lg font-bold text-navy-900 mb-6">Write a New Review</h2>
 
             {submitSuccess && (
               <div className="mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-700 text-sm">
@@ -386,16 +385,16 @@ export default function ReviewsPage() {
             <form onSubmit={handleSubmitReview} className="space-y-6">
               {/* Booking Selection */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Select a Completed Booking</label>
+                <label className="block text-sm font-medium text-navy-900 mb-2">Select a Completed Booking</label>
                 {loadingBookings ? (
-                  <div className="h-10 bg-slate-100 rounded-lg animate-pulse" />
+                  <div className="loading-shimmer h-10 rounded-lg" />
                 ) : completedBookings.length === 0 ? (
                   <p className="text-sm text-slate-500 italic">No completed bookings available for review.</p>
                 ) : (
                   <select
                     value={selectedBooking}
                     onChange={(e) => setSelectedBooking(e.target.value)}
-                    className="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 sm:py-2.5 border border-slate-200 rounded-lg text-base sm:text-sm text-navy-900 bg-white focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none"
                   >
                     <option value="">Choose a booking...</option>
                     {completedBookings.map((b) => (
@@ -409,35 +408,35 @@ export default function ReviewsPage() {
 
               {/* Overall Rating */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Overall Rating</label>
+                <label className="block text-sm font-medium text-navy-900 mb-2">Overall Rating</label>
                 <StarRating rating={newRating} onChange={setNewRating} interactive size="lg" />
               </div>
 
               {/* Sub-ratings */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Communication</label>
+                  <label className="block text-sm font-medium text-navy-900 mb-2">Communication</label>
                   <StarRating rating={newCommunication} onChange={setNewCommunication} interactive size="md" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Timeliness</label>
+                  <label className="block text-sm font-medium text-navy-900 mb-2">Timeliness</label>
                   <StarRating rating={newTimeliness} onChange={setNewTimeliness} interactive size="md" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Condition</label>
+                  <label className="block text-sm font-medium text-navy-900 mb-2">Condition</label>
                   <StarRating rating={newCondition} onChange={setNewCondition} interactive size="md" />
                 </div>
               </div>
 
               {/* Comment */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Your Review</label>
+                <label className="block text-sm font-medium text-navy-900 mb-2">Your Review</label>
                 <textarea
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
                   rows={4}
                   placeholder="Share your experience..."
-                  className="w-full px-4 py-3 border border-slate-200 rounded-lg text-sm text-slate-700 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-lg text-base sm:text-sm text-navy-900 resize-none focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none"
                 />
               </div>
 
@@ -445,8 +444,7 @@ export default function ReviewsPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-6 py-2.5 text-white text-sm font-medium rounded-lg shadow-sm transition-all hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{ backgroundColor: '#1e3a5f' }}
+                  className="btn-primary text-sm !py-2.5 !px-6 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {submitting ? 'Submitting...' : 'Submit Review'}
                 </button>
@@ -456,40 +454,38 @@ export default function ReviewsPage() {
         )}
 
         {/* Tabs */}
-        <div className="flex gap-1 bg-white rounded-xl shadow-sm p-1 mb-6">
+        <div className="flex gap-1 bg-white rounded-xl shadow-sm border border-slate-100 p-1 mb-6">
           <button
             onClick={() => setActiveTab('about')}
-            className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-all ${
+            className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all ${
               activeTab === 'about'
-                ? 'text-white shadow-sm'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                ? 'bg-navy-900 text-white shadow-sm'
+                : 'text-slate-500 hover:text-navy-900 hover:bg-slate-50'
             }`}
-            style={activeTab === 'about' ? { backgroundColor: '#1e3a5f' } : undefined}
           >
             Reviews About Me ({aboutMeReviews.length})
           </button>
           <button
             onClick={() => setActiveTab('written')}
-            className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-all ${
+            className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all ${
               activeTab === 'written'
-                ? 'text-white shadow-sm'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                ? 'bg-navy-900 text-white shadow-sm'
+                : 'text-slate-500 hover:text-navy-900 hover:bg-slate-50'
             }`}
-            style={activeTab === 'written' ? { backgroundColor: '#1e3a5f' } : undefined}
           >
-            Reviews I&#39;ve Written ({writtenReviews.length})
+            Reviews I&apos;ve Written ({writtenReviews.length})
           </button>
         </div>
 
         {/* Reviews List */}
         {currentReviews.length === 0 ? (
-          <div className="bg-white rounded-xl shadow-sm p-12 text-center">
+          <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-12 text-center">
             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-slate-100 flex items-center justify-center">
               <svg className="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-slate-900 mb-1">
+            <h3 className="text-lg font-bold text-navy-900 mb-1">
               {activeTab === 'about' ? 'No reviews yet' : 'You haven\'t written any reviews'}
             </h3>
             <p className="text-sm text-slate-500 max-w-sm mx-auto">
@@ -500,8 +496,7 @@ export default function ReviewsPage() {
             {activeTab === 'written' && (
               <button
                 onClick={() => setShowNewReview(true)}
-                className="mt-4 px-5 py-2 text-sm font-medium text-white rounded-lg transition-all hover:shadow-md"
-                style={{ backgroundColor: '#1e3a5f' }}
+                className="mt-4 btn-primary text-sm !py-2.5 !px-5"
               >
                 Write Your First Review
               </button>
@@ -510,18 +505,15 @@ export default function ReviewsPage() {
         ) : (
           <div className="space-y-4">
             {currentReviews.map((review) => (
-              <div key={review.id} className="bg-white rounded-xl shadow-sm p-6">
+              <div key={review.id} className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
                 {/* Review Header */}
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <div
-                      className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-semibold shrink-0"
-                      style={{ backgroundColor: '#1e3a5f' }}
-                    >
+                    <div className="w-10 h-10 rounded-full bg-navy-900 flex items-center justify-center text-white text-sm font-semibold shrink-0">
                       {(activeTab === 'about' ? review.author.name : review.target.name).charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <p className="font-medium text-slate-900">
+                      <p className="font-medium text-navy-900">
                         {activeTab === 'about' ? review.author.name : review.target.name}
                       </p>
                       <p className="text-xs text-slate-400">{formatDate(review.createdAt)}</p>
@@ -573,20 +565,19 @@ export default function ReviewsPage() {
                           onChange={(e) => setResponseText(e.target.value)}
                           rows={3}
                           placeholder="Write your response..."
-                          className="w-full px-4 py-3 border border-slate-200 rounded-lg text-sm text-slate-700 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="w-full px-4 py-3 border border-slate-200 rounded-lg text-base sm:text-sm text-navy-900 resize-none focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none"
                         />
                         <div className="flex gap-2 justify-end">
                           <button
                             onClick={() => { setRespondingTo(null); setResponseText('') }}
-                            className="px-4 py-2 text-sm text-slate-600 hover:text-slate-900 transition-colors"
+                            className="px-4 py-2 text-sm text-slate-500 hover:text-navy-900 transition-colors"
                           >
                             Cancel
                           </button>
                           <button
                             onClick={() => handleSubmitResponse(review.id)}
                             disabled={submittingResponse || !responseText.trim()}
-                            className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-all hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
-                            style={{ backgroundColor: '#1e3a5f' }}
+                            className="btn-primary text-sm !py-2 !px-4 disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             {submittingResponse ? 'Sending...' : 'Send Response'}
                           </button>
@@ -595,8 +586,7 @@ export default function ReviewsPage() {
                     ) : (
                       <button
                         onClick={() => { setRespondingTo(review.id); setResponseText('') }}
-                        className="text-sm font-medium transition-colors hover:underline"
-                        style={{ color: '#1e3a5f' }}
+                        className="text-sm font-medium text-navy-700 hover:text-navy-900 transition-colors hover:underline"
                       >
                         Respond to this review
                       </button>
