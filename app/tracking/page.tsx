@@ -66,11 +66,11 @@ export default function TrackingPage() {
   const currentStep = data ? statusSteps.indexOf(data.booking.status) : -1
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100/50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-3xl mx-auto px-5 sm:px-6 lg:px-8 py-8 sm:py-10">
         <div className="mb-8">
-          <p className="text-[11px] font-semibold text-gold-600 uppercase tracking-[0.15em] mb-1">Logistics</p>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-navy-900 tracking-[-0.02em]">Track Shipment</h1>
+          <p className="text-[11px] font-semibold text-[#0071e3] uppercase tracking-[0.15em] mb-1">Logistics</p>
+          <h1 className="text-xl sm:text-2xl font-semibold text-[#1d1d1f] tracking-[-0.02em]">Track Shipment</h1>
           <p className="text-slate-500 mt-1.5">Enter your tracking code to see real-time delivery status.</p>
         </div>
 
@@ -79,8 +79,8 @@ export default function TrackingPage() {
           <div className="flex gap-3">
             <input
               type="text"
-              className="flex-1 px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-sm text-navy-900 font-mono tracking-wider focus:border-navy-400 focus:ring-2 focus:ring-navy-100 focus:bg-white transition-all outline-none uppercase"
-              placeholder="YH-XXXXXXXX"
+              className="flex-1 px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-sm text-[#1d1d1f] font-mono tracking-wider focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10 focus:bg-white transition-all outline-none uppercase"
+              placeholder="OD-XXXXXXXX"
               value={code}
               onChange={(e) => setCode(e.target.value.toUpperCase())}
             />
@@ -99,7 +99,7 @@ export default function TrackingPage() {
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <span className="text-xs font-mono text-slate-400">{data.booking.trackingCode}</span>
-                  <h2 className="text-lg font-bold text-navy-900">{data.booking.cargoDescription}</h2>
+                  <h2 className="text-lg font-bold text-[#1d1d1f]">{data.booking.cargoDescription}</h2>
                 </div>
                 <span className={`badge border ${
                   data.booking.status === 'DELIVERED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
@@ -118,7 +118,7 @@ export default function TrackingPage() {
                       <div key={step} className="flex flex-col items-center flex-1">
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold z-10 ${
                           i <= currentStep
-                            ? 'bg-navy-800 text-white'
+                            ? 'bg-[#1d1d1f] text-white'
                             : 'bg-slate-100 text-slate-400'
                         }`}>
                           {i <= currentStep ? (
@@ -129,7 +129,7 @@ export default function TrackingPage() {
                             i + 1
                           )}
                         </div>
-                        <span className={`text-[10px] mt-1.5 font-medium ${i <= currentStep ? 'text-navy-700' : 'text-slate-400'}`}>
+                        <span className={`text-[10px] mt-1.5 font-medium ${i <= currentStep ? 'text-[#1d1d1f]' : 'text-slate-400'}`}>
                           {step.replace('_', ' ')}
                         </span>
                       </div>
@@ -137,7 +137,7 @@ export default function TrackingPage() {
                   </div>
                   <div className="absolute top-4 left-0 right-0 h-0.5 bg-slate-100 -z-0 mx-8">
                     <div
-                      className="h-full bg-navy-800 transition-all duration-500"
+                      className="h-full bg-[#1d1d1f] transition-all duration-500"
                       style={{ width: `${(currentStep / (statusSteps.length - 1)) * 100}%` }}
                     />
                   </div>
@@ -151,14 +151,14 @@ export default function TrackingPage() {
                 <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Route</h3>
                 <div className="flex items-center gap-3 mb-4">
                   <div>
-                    <div className="font-bold text-navy-900">{data.route.origin}</div>
+                    <div className="font-bold text-[#1d1d1f]">{data.route.origin}</div>
                     <div className="text-xs text-slate-400">{formatDate(data.route.departure)}</div>
                   </div>
                   <svg className="w-5 h-5 text-slate-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                   </svg>
                   <div>
-                    <div className="font-bold text-navy-900">{data.route.destination}</div>
+                    <div className="font-bold text-[#1d1d1f]">{data.route.destination}</div>
                     {data.route.estimatedArrival && (
                       <div className="text-xs text-slate-400">{formatDate(data.route.estimatedArrival)}</div>
                     )}
@@ -176,21 +176,21 @@ export default function TrackingPage() {
                   {data.booking.cargoType && (
                     <div className="flex justify-between">
                       <dt className="text-slate-500">Type</dt>
-                      <dd className="font-medium text-navy-900">{data.booking.cargoType}</dd>
+                      <dd className="font-medium text-[#1d1d1f]">{data.booking.cargoType}</dd>
                     </div>
                   )}
                   <div className="flex justify-between">
                     <dt className="text-slate-500">Weight</dt>
-                    <dd className="font-medium text-navy-900">{data.booking.weightKg}kg</dd>
+                    <dd className="font-medium text-[#1d1d1f]">{data.booking.weightKg}kg</dd>
                   </div>
                   <div className="flex justify-between">
                     <dt className="text-slate-500">Volume</dt>
-                    <dd className="font-medium text-navy-900">{data.booking.volumeM3}m&sup3;</dd>
+                    <dd className="font-medium text-[#1d1d1f]">{data.booking.volumeM3}m&sup3;</dd>
                   </div>
                   {data.booking.deliveryAddress && (
                     <div className="flex justify-between">
                       <dt className="text-slate-500">Delivery</dt>
-                      <dd className="font-medium text-navy-900 text-right">{data.booking.deliveryAddress}</dd>
+                      <dd className="font-medium text-[#1d1d1f] text-right">{data.booking.deliveryAddress}</dd>
                     </div>
                   )}
                 </dl>
@@ -205,11 +205,11 @@ export default function TrackingPage() {
                   {data.events.map((event, i) => (
                     <div key={event.id} className="flex gap-4">
                       <div className="flex flex-col items-center">
-                        <div className={`w-3 h-3 rounded-full ${i === 0 ? 'bg-navy-700' : 'bg-slate-300'}`} />
+                        <div className={`w-3 h-3 rounded-full ${i === 0 ? 'bg-[#1d1d1f]' : 'bg-slate-300'}`} />
                         {i < data.events.length - 1 && <div className="w-px h-full bg-slate-200 my-1" />}
                       </div>
                       <div className="pb-6">
-                        <div className="text-sm font-medium text-navy-900">{event.description}</div>
+                        <div className="text-sm font-medium text-[#1d1d1f]">{event.description}</div>
                         <div className="text-xs text-slate-400 mt-0.5">
                           {formatDate(event.timestamp)}
                           {event.location && <span> &middot; {event.location}</span>}

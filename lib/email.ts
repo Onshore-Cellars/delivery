@@ -15,8 +15,8 @@ interface EmailTemplate {
   text: string
 }
 
-const APP_NAME = 'YachtHop'
-const FROM_EMAIL = process.env.EMAIL_FROM || 'noreply@yachthop.com'
+const APP_NAME = 'Onshore Deliver'
+const FROM_EMAIL = process.env.EMAIL_FROM || 'noreply@onshore.delivery'
 const APP_URL = process.env.NEXTAUTH_URL || 'http://localhost:3000'
 
 // ─── SEND EMAIL ───────────────────────────────────────────────────────────────
@@ -66,7 +66,7 @@ function wrapEmail(content: string): string {
     <!-- Header -->
     <div style="text-align:center;padding:24px 0;border-bottom:1px solid #e2e8f0;">
       <div style="display:inline-block;background:linear-gradient(135deg,#0f1628,#162040);border-radius:8px;padding:8px 16px;">
-        <span style="color:#d4b85e;font-weight:bold;font-size:18px;letter-spacing:1px;">YachtHop</span>
+        <span style="color:#0071e3;font-weight:bold;font-size:18px;letter-spacing:1px;">Onshore Deliver</span>
       </div>
     </div>
 
@@ -79,7 +79,7 @@ function wrapEmail(content: string): string {
     <div style="text-align:center;padding:24px 0;border-top:1px solid #e2e8f0;color:#94a3b8;font-size:12px;">
       <p>&copy; ${new Date().getFullYear()} ${APP_NAME}. All rights reserved.</p>
       <p style="margin-top:8px;">
-        <a href="${APP_URL}" style="color:#3a5499;text-decoration:none;">Visit YachtHop</a>
+        <a href="${APP_URL}" style="color:#0071e3;text-decoration:none;">Visit Onshore Deliver</a>
       </p>
     </div>
   </div>
@@ -131,7 +131,7 @@ export function bookingConfirmationEmail(data: {
     </div>
 
     <div style="background:#0f1628;border-radius:8px;padding:16px;text-align:center;margin:24px 0;">
-      <span style="color:#d4b85e;font-size:24px;font-weight:bold;">${data.totalPrice}</span>
+      <span style="color:#0071e3;font-size:24px;font-weight:bold;">${data.totalPrice}</span>
     </div>
 
     <a href="${APP_URL}/tracking?code=${data.trackingCode}" style="display:block;background:linear-gradient(135deg,#0f1628,#162040);color:white;text-align:center;padding:14px 24px;border-radius:8px;font-weight:600;text-decoration:none;margin:24px 0;">

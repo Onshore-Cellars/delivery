@@ -7,16 +7,16 @@ const faqs = [
   {
     category: 'Getting Started',
     items: [
-      { q: 'How do I create an account?', a: 'Click "Get Started" and choose your role: Carrier/Driver (you have van space), Provisioner/Vendor (you supply goods to yachts), or Owner/Management (you manage yachts and need deliveries). Fill in your details and you\'re ready to go.' },
-      { q: 'Is YachtHop free to use?', a: 'Creating an account and browsing listings is completely free. We charge a 10% platform fee on completed bookings, which is deducted from the carrier\'s payout automatically.' },
+      { q: 'How do I create an account?', a: 'Click "Get Started" and choose your role: Carrier/Driver (you have van space), Provisioner/Vendor (you supply goods), or Owner/Management (you manage operations and need deliveries). Fill in your details and you\'re ready to go.' },
+      { q: 'Is Onshore Deliver free to use?', a: 'Creating an account and browsing listings is completely free. We charge a 10% platform fee on completed bookings, which is deducted from the carrier\'s payout automatically.' },
       { q: 'What areas do you cover?', a: 'We cover ports and marinas across the Mediterranean, including France, Italy, Spain, Greece, Croatia, and more. Our network is growing — check the marketplace for current routes.' },
     ],
   },
   {
     category: 'For Provisioners & Vendors',
     items: [
-      { q: 'How do I book a delivery?', a: 'Browse the marketplace, find a route that matches your needs, and click "Book Space". Enter your cargo details, delivery address (including yacht name and berth if applicable), and confirm your booking.' },
-      { q: 'How do I track my shipment?', a: 'Every booking gets a unique tracking code (YH-XXXXXXXX). Visit the Track page, enter your code, and see real-time status updates from pickup to dockside delivery.' },
+      { q: 'How do I book a delivery?', a: 'Browse the marketplace, find a route that matches your needs, and click "Book Space". Enter your cargo details, delivery address (including vessel or site name if applicable), and confirm your booking.' },
+      { q: 'How do I track my shipment?', a: 'Every booking gets a unique tracking code (OD-XXXXXXXX). Visit the Track page, enter your code, and see real-time status updates from pickup to final delivery.' },
       { q: 'What if my delivery is damaged or lost?', a: 'Contact the carrier directly through our messaging system. If you cannot resolve the issue, our support team can help mediate. Carriers maintain their own insurance — check the listing for insurance details.' },
       { q: 'Can I request a custom quote?', a: 'Yes! Go to the Quotes page and submit a quote request with your route, cargo details, and preferred dates. Carriers in the area will respond with pricing.' },
     ],
@@ -51,12 +51,12 @@ export default function HelpPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100/50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-4xl mx-auto px-5 sm:px-6 lg:px-8 py-10 sm:py-14">
         <div className="text-center mb-10 sm:mb-14">
-          <p className="text-[11px] font-semibold text-gold-600 uppercase tracking-[0.15em] mb-1.5">Support</p>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-navy-900 tracking-[-0.02em]">Help Centre</h1>
-          <p className="mt-2.5 sm:mt-3 text-base sm:text-lg text-slate-500">Everything you need to know about YachtHop</p>
+          <p className="text-[11px] font-semibold text-[#0071e3] uppercase tracking-[0.15em] mb-1.5">Support</p>
+          <h1 className="text-2xl sm:text-3xl font-semibold text-[#1d1d1f] tracking-[-0.02em]">Help Centre</h1>
+          <p className="mt-2.5 sm:mt-3 text-base sm:text-lg text-slate-500">Everything you need to know about Onshore Deliver</p>
         </div>
 
         {/* Quick Links */}
@@ -67,10 +67,10 @@ export default function HelpPage() {
             { title: 'Create Account', desc: 'Get started for free', href: '/register', icon: 'M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z' },
           ].map(link => (
             <Link key={link.href} href={link.href} className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-slate-100/80 p-5 sm:p-7 card-hover text-center">
-              <svg className="w-8 h-8 text-navy-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-8 h-8 text-[#1d1d1f] mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={link.icon} />
               </svg>
-              <h3 className="font-semibold text-navy-900 text-sm">{link.title}</h3>
+              <h3 className="font-semibold text-[#1d1d1f] text-sm">{link.title}</h3>
               <p className="text-xs text-slate-400 mt-1">{link.desc}</p>
             </Link>
           ))}
@@ -80,7 +80,7 @@ export default function HelpPage() {
         <div className="space-y-6 sm:space-y-8">
           {faqs.map(section => (
             <div key={section.category}>
-              <h2 className="text-lg sm:text-xl font-bold text-navy-900 mb-3 sm:mb-4">{section.category}</h2>
+              <h2 className="text-lg sm:text-xl font-bold text-[#1d1d1f] mb-3 sm:mb-4">{section.category}</h2>
               <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-slate-100/80 divide-y divide-slate-100">
                 {section.items.map((item, i) => {
                   const id = `${section.category}-${i}`
@@ -91,7 +91,7 @@ export default function HelpPage() {
                         onClick={() => toggle(id)}
                         className="w-full flex items-center justify-between px-4 sm:px-6 py-3.5 sm:py-4 text-left hover:bg-slate-50 active:bg-slate-100 transition-colors"
                       >
-                        <span className="text-sm font-medium text-navy-900 pr-4">{item.q}</span>
+                        <span className="text-sm font-medium text-[#1d1d1f] pr-4">{item.q}</span>
                         <svg className={`w-5 h-5 text-slate-400 flex-shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                         </svg>
@@ -111,10 +111,10 @@ export default function HelpPage() {
 
         {/* Contact */}
         <div className="mt-10 sm:mt-14 bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-slate-100/80 p-6 sm:p-10 text-center">
-          <h2 className="text-xl font-bold text-navy-900 mb-2">Still need help?</h2>
+          <h2 className="text-xl font-bold text-[#1d1d1f] mb-2">Still need help?</h2>
           <p className="text-slate-500 text-sm mb-6">Our support team is here for you</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="mailto:support@yachthop.com" className="btn-primary text-sm !py-2.5 !px-6 inline-flex items-center gap-2">
+            <a href="mailto:support@onshore.delivery" className="btn-primary text-sm !py-2.5 !px-6 inline-flex items-center gap-2">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
               Email Support
             </a>

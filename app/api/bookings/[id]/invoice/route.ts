@@ -62,7 +62,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       return new Response('Not authorized to view this invoice', { status: 403 })
     }
 
-    const invoiceNumber = `YH-INV-${booking.id.slice(-8).toUpperCase()}`
+    const invoiceNumber = `OD-INV-${booking.id.slice(-8).toUpperCase()}`
     const invoiceDate = booking.paidAt
       ? new Date(booking.paidAt).toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' })
       : new Date(booking.createdAt).toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' })
@@ -103,7 +103,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Invoice ${invoiceNumber} - YachtHop</title>
+  <title>Invoice ${invoiceNumber} - Onshore Deliver</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -369,8 +369,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   <div class="invoice-container">
     <div class="header">
       <div class="brand">
-        <h1>YachtHop</h1>
-        <p>Yacht Logistics Marketplace</p>
+        <h1>Onshore Deliver</h1>
+        <p>Delivery Logistics Marketplace</p>
       </div>
       <div class="invoice-meta">
         <h2>Invoice</h2>
@@ -494,8 +494,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     </div>
 
     <div class="footer">
-      <p><span class="brand-name">YachtHop</span> &mdash; Yacht Logistics Marketplace</p>
-      <p style="margin-top: 6px;">This invoice was generated automatically. For questions, contact support@yachthop.com</p>
+      <p><span class="brand-name">Onshore Deliver</span> &mdash; Delivery Logistics Marketplace</p>
+      <p style="margin-top: 6px;">This invoice was generated automatically. For questions, contact support@onshore.delivery</p>
     </div>
   </div>
 

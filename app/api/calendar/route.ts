@@ -15,7 +15,7 @@ function escapeICS(text: string): string {
 }
 
 function generateUID(id: string, type: string): string {
-  return `${type}-${id}@yachthop.com`
+  return `${type}-${id}@onshore.delivery`
 }
 
 export async function GET(request: NextRequest) {
@@ -64,10 +64,10 @@ export async function GET(request: NextRequest) {
     const lines: string[] = [
       'BEGIN:VCALENDAR',
       'VERSION:2.0',
-      'PRODID:-//YachtHop//Delivery Calendar//EN',
+      'PRODID:-//Onshore Deliver//Delivery Calendar//EN',
       'CALSCALE:GREGORIAN',
       'METHOD:PUBLISH',
-      'X-WR-CALNAME:YachtHop Deliveries',
+      'X-WR-CALNAME:Onshore Deliveries',
       'X-WR-TIMEZONE:UTC',
     ]
 
@@ -141,7 +141,7 @@ export async function GET(request: NextRequest) {
       status: 200,
       headers: {
         'Content-Type': 'text/calendar; charset=utf-8',
-        'Content-Disposition': 'attachment; filename="yachthop-calendar.ics"',
+        'Content-Disposition': 'attachment; filename="onshore-calendar.ics"',
       },
     })
   } catch (error) {

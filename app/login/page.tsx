@@ -83,15 +83,12 @@ export default function LoginPage() {
       <div className="flex-1 flex items-center justify-center px-5 sm:px-8 lg:px-12">
         <div className="w-full max-w-md">
           <div className="mb-10">
-            <Link href="/" className="flex items-center gap-2.5 mb-10">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-navy-800 to-navy-950 flex items-center justify-center shadow-sm">
-                <span className="text-gold-400 font-bold text-sm">YH</span>
-              </div>
-              <span className="text-lg font-bold text-navy-900 tracking-tight">YachtHop</span>
+            <Link href="/" className="flex items-center gap-2 mb-10 hover:no-underline">
+              <span className="text-lg font-semibold text-[#1d1d1f] tracking-tight">Onshore</span>
             </Link>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-navy-900 tracking-[-0.02em]">Welcome back</h1>
-            <p className="mt-2.5 text-sm sm:text-base text-slate-500 leading-relaxed">
-              Sign in to manage your yacht logistics.
+            <h1 className="text-2xl sm:text-3xl font-semibold text-[#1d1d1f] tracking-tight">Welcome back</h1>
+            <p className="mt-2.5 text-[15px] text-[#86868b] leading-relaxed">
+              Sign in to manage your deliveries.
             </p>
           </div>
 
@@ -103,7 +100,7 @@ export default function LoginPage() {
             )}
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-navy-900 mb-1.5">
+              <label htmlFor="email" className="block text-sm font-medium text-[#1d1d1f] mb-1.5">
                 Email
               </label>
               <input
@@ -111,7 +108,7 @@ export default function LoginPage() {
                 type="email"
                 required
                 autoComplete="email"
-                className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-navy-900 text-sm focus:border-navy-400 focus:ring-2 focus:ring-navy-100 focus:bg-white transition-all outline-none"
+                className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-[#1d1d1f] text-sm focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10 focus:bg-white transition-all outline-none"
                 placeholder="you@company.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -119,7 +116,7 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-navy-900 mb-1.5">
+              <label htmlFor="password" className="block text-sm font-medium text-[#1d1d1f] mb-1.5">
                 Password
               </label>
               <input
@@ -127,7 +124,7 @@ export default function LoginPage() {
                 type="password"
                 required
                 autoComplete="current-password"
-                className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-navy-900 text-sm focus:border-navy-400 focus:ring-2 focus:ring-navy-100 focus:bg-white transition-all outline-none"
+                className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-[#1d1d1f] text-sm focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10 focus:bg-white transition-all outline-none"
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -167,7 +164,7 @@ export default function LoginPage() {
 
           <p className="mt-6 text-center text-sm text-slate-500">
             Don&apos;t have an account?{' '}
-            <Link href="/register" className="font-semibold text-navy-700 hover:text-navy-900 transition-colors">
+            <Link href="/register" className="font-semibold text-[#1d1d1f] hover:text-[#1d1d1f] transition-colors">
               Create one
             </Link>
           </p>
@@ -175,18 +172,11 @@ export default function LoginPage() {
       </div>
 
       {/* Right — decorative panel */}
-      <div className="hidden lg:flex lg:flex-1 hero-gradient pattern-overlay items-center justify-center p-16 relative overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/4 right-1/4 w-[300px] h-[300px] bg-gold-500/[0.05] rounded-full blur-[100px]" />
-          <div className="absolute bottom-1/4 left-1/4 w-[200px] h-[200px] bg-sea-500/[0.04] rounded-full blur-[80px]" />
-        </div>
+      <div className="hidden lg:flex lg:flex-1 bg-black items-center justify-center p-16 relative overflow-hidden">
         <div className="relative max-w-md text-center">
-          <div className="w-20 h-20 rounded-3xl bg-white/[0.08] backdrop-blur-md border border-white/[0.12] flex items-center justify-center mx-auto mb-10 shadow-2xl">
-            <span className="text-gold-400 font-bold text-3xl">YH</span>
-          </div>
-          <h2 className="text-3xl font-bold text-white mb-5 tracking-[-0.02em]">The Yachting Industry&apos;s Logistics Hub</h2>
-          <p className="text-slate-300/90 leading-relaxed text-lg font-light">
-            Share van space, book deliveries, and coordinate supplies across the Med &mdash; built exclusively for the yachting industry.
+          <h2 className="text-3xl font-semibold text-[#f5f5f7] mb-5 tracking-tight">The Delivery Logistics Marketplace</h2>
+          <p className="text-[#86868b] leading-relaxed text-lg">
+            Share van space, book deliveries, and coordinate supplies across the Med.
           </p>
         </div>
       </div>

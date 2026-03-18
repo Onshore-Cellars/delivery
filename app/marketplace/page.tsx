@@ -88,9 +88,9 @@ const SORT_OPTIONS = [
 ]
 
 const inputClass =
-  'w-full px-4 py-3 sm:py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-base sm:text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 focus:bg-white transition-all outline-none'
+  'w-full px-4 py-3 sm:py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-base sm:text-sm text-[#1d1d1f] focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10 focus:bg-white transition-all outline-none'
 const selectClass =
-  'w-full px-4 py-3 sm:py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-base sm:text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 focus:bg-white transition-all outline-none appearance-none'
+  'w-full px-4 py-3 sm:py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-base sm:text-sm text-[#1d1d1f] focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10 focus:bg-white transition-all outline-none appearance-none'
 
 export default function MarketplacePage() {
   const { user, token } = useAuth()
@@ -330,7 +330,7 @@ export default function MarketplacePage() {
     <div className="space-y-5">
       {/* Vehicle Type */}
       <div>
-        <label className="block text-sm font-medium text-navy-900 mb-1.5">Vehicle Type</label>
+        <label className="block text-sm font-medium text-[#1d1d1f] mb-1.5">Vehicle Type</label>
         <select
           className={selectClass}
           value={filters.vehicleType}
@@ -346,7 +346,7 @@ export default function MarketplacePage() {
 
       {/* Price Range */}
       <div>
-        <label className="block text-sm font-medium text-navy-900 mb-1.5">Price Range</label>
+        <label className="block text-sm font-medium text-[#1d1d1f] mb-1.5">Price Range</label>
         <div className="grid grid-cols-2 gap-2">
           <input
             type="number"
@@ -369,7 +369,7 @@ export default function MarketplacePage() {
 
       {/* Available Capacity */}
       <div>
-        <label className="block text-sm font-medium text-navy-900 mb-1.5">Min Available Capacity</label>
+        <label className="block text-sm font-medium text-[#1d1d1f] mb-1.5">Min Available Capacity</label>
         <div className="grid grid-cols-2 gap-2">
           <div className="relative">
             <input
@@ -399,7 +399,7 @@ export default function MarketplacePage() {
 
       {/* Special Features */}
       <div>
-        <label className="block text-sm font-medium text-navy-900 mb-2">Special Features</label>
+        <label className="block text-sm font-medium text-[#1d1d1f] mb-2">Special Features</label>
         <div className="flex flex-wrap gap-3">
           {[
             { key: 'refrigerated' as const, label: 'Refrigerated' },
@@ -410,7 +410,7 @@ export default function MarketplacePage() {
               key={key}
               className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer text-sm transition-colors ${
                 filters.features[key]
-                  ? 'border-navy-400 bg-navy-50 text-navy-900'
+                  ? 'border-[#0071e3] bg-[#f5f5f7] text-[#1d1d1f]'
                   : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
               }`}
             >
@@ -426,7 +426,7 @@ export default function MarketplacePage() {
                 }
               />
               <svg
-                className={`w-4 h-4 ${filters.features[key] ? 'text-navy-600' : 'text-slate-300'}`}
+                className={`w-4 h-4 ${filters.features[key] ? 'text-[#1d1d1f]' : 'text-slate-300'}`}
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -445,7 +445,7 @@ export default function MarketplacePage() {
 
       {/* Sort By */}
       <div>
-        <label className="block text-sm font-medium text-navy-900 mb-1.5">Sort By</label>
+        <label className="block text-sm font-medium text-[#1d1d1f] mb-1.5">Sort By</label>
         <select
           className={selectClass}
           value={filters.sort}
@@ -478,18 +478,18 @@ export default function MarketplacePage() {
   const ListingCard = ({ listing, featured = false }: { listing: Listing; featured?: boolean }) => (
     <div
       className={`bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border p-5 sm:p-6 card-hover ${
-        listing.featured || featured ? 'border-gold-300 ring-1 ring-gold-200' : 'border-slate-100/80'
+        listing.featured || featured ? 'border-[#0071e3] ring-1 ring-[#0071e3]/20' : 'border-slate-100/80'
       }`}
     >
       {(listing.featured || featured) && (
         <div className="mb-3">
-          <span className="badge bg-gold-50 text-gold-700 border border-gold-200">Featured</span>
+          <span className="badge bg-[#0071e3]/10 text-[#0071e3] border border-[#0071e3]/20">Featured</span>
         </div>
       )}
 
       <div className="flex items-start justify-between mb-4">
         <div className="min-w-0 flex-1">
-          <h3 className="font-semibold text-navy-900 text-lg truncate">{listing.title}</h3>
+          <h3 className="font-semibold text-[#1d1d1f] text-lg truncate">{listing.title}</h3>
           <p className="text-sm text-slate-500 mt-0.5">
             {listing.carrier.name}
             {listing.carrier.company && (
@@ -497,7 +497,7 @@ export default function MarketplacePage() {
             )}
           </p>
         </div>
-        <span className="badge bg-navy-50 text-navy-700 border border-navy-200 ml-3 whitespace-nowrap">
+        <span className="badge bg-[#f5f5f7] text-[#1d1d1f] border border-[#d2d2d7] ml-3 whitespace-nowrap">
           {listing.vehicleType}
         </span>
       </div>
@@ -506,7 +506,7 @@ export default function MarketplacePage() {
       <div className="flex items-center gap-2 sm:gap-3 mb-4">
         <div className="flex-1 min-w-0">
           <div className="text-xs text-slate-400 uppercase tracking-wider">From</div>
-          <div className="font-semibold text-navy-900 truncate">{listing.originPort}</div>
+          <div className="font-semibold text-[#1d1d1f] truncate">{listing.originPort}</div>
           {listing.originRegion && <div className="text-xs text-slate-400 truncate">{listing.originRegion}</div>}
         </div>
         <div className="flex items-center flex-shrink-0">
@@ -517,14 +517,14 @@ export default function MarketplacePage() {
         </div>
         <div className="flex-1 min-w-0">
           <div className="text-xs text-slate-400 uppercase tracking-wider">To</div>
-          <div className="font-semibold text-navy-900 truncate">{listing.destinationPort}</div>
+          <div className="font-semibold text-[#1d1d1f] truncate">{listing.destinationPort}</div>
           {listing.destinationRegion && (
             <div className="text-xs text-slate-400 truncate">{listing.destinationRegion}</div>
           )}
         </div>
         <div className="text-right flex-shrink-0">
           <div className="text-xs text-slate-400 uppercase tracking-wider">Departs</div>
-          <div className="font-semibold text-navy-900">{formatDate(listing.departureDate)}</div>
+          <div className="font-semibold text-[#1d1d1f]">{formatDate(listing.departureDate)}</div>
         </div>
       </div>
 
@@ -533,21 +533,21 @@ export default function MarketplacePage() {
         <div className="flex gap-4">
           <div>
             <div className="text-xs text-slate-400">Weight</div>
-            <div className="text-sm font-semibold text-navy-900">{listing.availableKg.toFixed(0)}kg</div>
+            <div className="text-sm font-semibold text-[#1d1d1f]">{listing.availableKg.toFixed(0)}kg</div>
           </div>
           <div>
             <div className="text-xs text-slate-400">Volume</div>
-            <div className="text-sm font-semibold text-navy-900">{listing.availableM3.toFixed(1)}m&sup3;</div>
+            <div className="text-sm font-semibold text-[#1d1d1f]">{listing.availableM3.toFixed(1)}m&sup3;</div>
           </div>
         </div>
         <div className="flex items-center gap-3">
           <div className="text-right">
             {listing.flatRate ? (
-              <div className="text-lg font-bold text-navy-900">
+              <div className="text-lg font-bold text-[#1d1d1f]">
                 {formatCurrency(listing.flatRate, listing.currency)}
               </div>
             ) : (
-              <div className="text-sm font-semibold text-navy-900">
+              <div className="text-sm font-semibold text-[#1d1d1f]">
                 {listing.pricePerKg && <span>{formatCurrency(listing.pricePerKg, listing.currency)}/kg</span>}
                 {listing.pricePerKg && listing.pricePerM3 && <span className="text-slate-300"> &middot; </span>}
                 {listing.pricePerM3 && (
@@ -557,7 +557,7 @@ export default function MarketplacePage() {
             )}
           </div>
           {user ? (
-            <button onClick={() => openBooking(listing)} className="btn-gold text-sm !py-2 !px-4">
+            <button onClick={() => openBooking(listing)} className="btn-primary text-sm !py-2 !px-4">
               Book
             </button>
           ) : (
@@ -571,21 +571,21 @@ export default function MarketplacePage() {
   )
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100/50">
+    <div className="min-h-screen bg-white">
       {/* Search header */}
       <div className="bg-white border-b border-slate-200/80 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
         <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-6 sm:py-8">
           <div className="flex items-center justify-between mb-4 sm:mb-5">
             <div>
-              <p className="text-[11px] font-semibold text-gold-600 uppercase tracking-[0.15em] mb-1">Browse</p>
-              <h1 className="text-xl sm:text-2xl font-extrabold text-navy-900 tracking-[-0.02em]">Marketplace</h1>
-              <p className="text-xs sm:text-sm text-slate-500 mt-1">Find van space to yacht destinations</p>
+              <p className="text-[11px] font-semibold text-[#0071e3] uppercase tracking-[0.15em] mb-1">Browse</p>
+              <h1 className="text-xl sm:text-2xl font-semibold text-[#1d1d1f] tracking-[-0.02em]">Marketplace</h1>
+              <p className="text-xs sm:text-sm text-slate-500 mt-1">Find van space to any destination</p>
             </div>
 
             {/* Mobile filter toggle */}
             <button
               onClick={() => setMobileFiltersOpen(true)}
-              className="lg:hidden flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-sm font-medium text-navy-900 hover:bg-slate-50 active:bg-slate-100 transition-colors"
+              className="lg:hidden flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-sm font-medium text-[#1d1d1f] hover:bg-slate-50 active:bg-slate-100 transition-colors"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -597,7 +597,7 @@ export default function MarketplacePage() {
               </svg>
               Filters
               {hasActiveFilters && (
-                <span className="w-2 h-2 rounded-full bg-gold-500" />
+                <span className="w-2 h-2 rounded-full bg-[#0071e3]" />
               )}
             </button>
           </div>
@@ -633,7 +633,7 @@ export default function MarketplacePage() {
           <div className="hidden lg:flex items-center mt-3">
             <button
               onClick={() => setAdvancedOpen(!advancedOpen)}
-              className="flex items-center gap-1.5 text-sm font-medium text-navy-600 hover:text-navy-900 transition-colors"
+              className="flex items-center gap-1.5 text-sm font-medium text-[#1d1d1f] hover:text-[#1d1d1f] transition-colors"
             >
               <svg
                 className={`w-4 h-4 transition-transform ${advancedOpen ? 'rotate-180' : ''}`}
@@ -645,7 +645,7 @@ export default function MarketplacePage() {
               </svg>
               Advanced Filters
               {hasActiveFilters && (
-                <span className="w-2 h-2 rounded-full bg-gold-500 ml-1" />
+                <span className="w-2 h-2 rounded-full bg-[#0071e3] ml-1" />
               )}
             </button>
             {hasActiveFilters && (
@@ -668,7 +668,7 @@ export default function MarketplacePage() {
               <div className="grid grid-cols-2 xl:grid-cols-4 gap-5">
                 {/* Vehicle Type */}
                 <div>
-                  <label className="block text-sm font-medium text-navy-900 mb-1.5">Vehicle Type</label>
+                  <label className="block text-sm font-medium text-[#1d1d1f] mb-1.5">Vehicle Type</label>
                   <select
                     className={selectClass}
                     value={filters.vehicleType}
@@ -684,7 +684,7 @@ export default function MarketplacePage() {
 
                 {/* Price Range */}
                 <div>
-                  <label className="block text-sm font-medium text-navy-900 mb-1.5">Price Range</label>
+                  <label className="block text-sm font-medium text-[#1d1d1f] mb-1.5">Price Range</label>
                   <div className="grid grid-cols-2 gap-2">
                     <input
                       type="number"
@@ -707,7 +707,7 @@ export default function MarketplacePage() {
 
                 {/* Min Capacity */}
                 <div>
-                  <label className="block text-sm font-medium text-navy-900 mb-1.5">Min Capacity</label>
+                  <label className="block text-sm font-medium text-[#1d1d1f] mb-1.5">Min Capacity</label>
                   <div className="grid grid-cols-2 gap-2">
                     <div className="relative">
                       <input
@@ -739,7 +739,7 @@ export default function MarketplacePage() {
 
                 {/* Sort By */}
                 <div>
-                  <label className="block text-sm font-medium text-navy-900 mb-1.5">Sort By</label>
+                  <label className="block text-sm font-medium text-[#1d1d1f] mb-1.5">Sort By</label>
                   <select
                     className={selectClass}
                     value={filters.sort}
@@ -756,7 +756,7 @@ export default function MarketplacePage() {
 
               {/* Special Features */}
               <div className="mt-5">
-                <label className="block text-sm font-medium text-navy-900 mb-2">Special Features</label>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-2">Special Features</label>
                 <div className="flex flex-wrap gap-3">
                   {[
                     { key: 'refrigerated' as const, label: 'Refrigerated' },
@@ -767,7 +767,7 @@ export default function MarketplacePage() {
                       key={key}
                       className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer text-sm transition-colors ${
                         filters.features[key]
-                          ? 'border-navy-400 bg-navy-50 text-navy-900'
+                          ? 'border-[#0071e3] bg-[#f5f5f7] text-[#1d1d1f]'
                           : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
                       }`}
                     >
@@ -783,7 +783,7 @@ export default function MarketplacePage() {
                         }
                       />
                       <svg
-                        className={`w-4 h-4 ${filters.features[key] ? 'text-navy-600' : 'text-slate-300'}`}
+                        className={`w-4 h-4 ${filters.features[key] ? 'text-[#1d1d1f]' : 'text-slate-300'}`}
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -826,7 +826,7 @@ export default function MarketplacePage() {
         <div className="fixed inset-0 z-50 lg:hidden">
           {/* Backdrop */}
           <div
-            className="absolute inset-0 bg-navy-950/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setMobileFiltersOpen(false)}
           />
           {/* Panel */}
@@ -836,7 +836,7 @@ export default function MarketplacePage() {
           >
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-bold text-navy-900">Filters</h2>
+                <h2 className="text-lg font-bold text-[#1d1d1f]">Filters</h2>
                 <button
                   onClick={() => setMobileFiltersOpen(false)}
                   className="p-2 rounded-lg hover:bg-slate-100 text-slate-400"
@@ -859,10 +859,10 @@ export default function MarketplacePage() {
         {featuredListings.length > 0 && (
           <div className="mb-10">
             <div className="flex items-center gap-3 mb-4">
-              <svg className="w-5 h-5 text-gold-500" fill="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-[#0071e3]" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
               </svg>
-              <h2 className="text-xl font-bold text-navy-900">Featured Routes</h2>
+              <h2 className="text-xl font-bold text-[#1d1d1f]">Featured Routes</h2>
             </div>
             {featuredLoading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -895,7 +895,7 @@ export default function MarketplacePage() {
             <div className="hidden sm:flex items-center gap-2">
               <span className="text-sm text-slate-400">Sort:</span>
               <select
-                className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none"
+                className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-sm text-[#1d1d1f] focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10 outline-none"
                 value={filters.sort}
                 onChange={(e) => {
                   setFilters({ ...filters, sort: e.target.value })
@@ -967,7 +967,7 @@ export default function MarketplacePage() {
                       onClick={() => goToPage(p)}
                       className={`min-w-[36px] h-9 rounded-lg text-sm font-medium transition-colors ${
                         p === pagination.page
-                          ? 'bg-navy-900 text-white shadow-sm'
+                          ? 'bg-[#1d1d1f] text-white shadow-sm'
                           : 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
                       }`}
                     >
@@ -994,11 +994,11 @@ export default function MarketplacePage() {
 
       {/* Booking Modal */}
       {bookingModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy-950/60 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-[0_25px_60px_-12px_rgba(0,0,0,0.15)] max-w-lg w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-slate-100">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-navy-900">Book Space</h2>
+                <h2 className="text-xl font-bold text-[#1d1d1f]">Book Space</h2>
                 <button
                   onClick={() => setBookingModal(null)}
                   className="p-2 rounded-lg hover:bg-slate-100 text-slate-400"
@@ -1021,7 +1021,7 @@ export default function MarketplacePage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold text-navy-900 mb-2">Booking Confirmed!</h3>
+                <h3 className="text-xl font-bold text-[#1d1d1f] mb-2">Booking Confirmed!</h3>
                 <p className="text-slate-500 mb-6">
                   Your space has been reserved. Check your dashboard for details.
                 </p>
@@ -1046,11 +1046,11 @@ export default function MarketplacePage() {
                 )}
 
                 <div>
-                  <label className="block text-sm font-medium text-navy-900 mb-1.5">Cargo Description *</label>
+                  <label className="block text-sm font-medium text-[#1d1d1f] mb-1.5">Cargo Description *</label>
                   <input
                     type="text"
                     required
-                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none"
+                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-[#1d1d1f] focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10 outline-none"
                     placeholder="e.g. Wine cases for MY Ocean Dream"
                     value={bookingForm.cargoDescription}
                     onChange={(e) => setBookingForm({ ...bookingForm, cargoDescription: e.target.value })}
@@ -1058,9 +1058,9 @@ export default function MarketplacePage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-navy-900 mb-1.5">Cargo Type</label>
+                  <label className="block text-sm font-medium text-[#1d1d1f] mb-1.5">Cargo Type</label>
                   <select
-                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none bg-white"
+                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-[#1d1d1f] focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10 outline-none bg-white"
                     value={bookingForm.cargoType}
                     onChange={(e) => setBookingForm({ ...bookingForm, cargoType: e.target.value })}
                   >
@@ -1078,26 +1078,26 @@ export default function MarketplacePage() {
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-sm font-medium text-navy-900 mb-1.5">Weight (kg) *</label>
+                    <label className="block text-sm font-medium text-[#1d1d1f] mb-1.5">Weight (kg) *</label>
                     <input
                       type="number"
                       required
                       step="0.1"
                       max={bookingModal.availableKg}
-                      className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none"
+                      className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-[#1d1d1f] focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10 outline-none"
                       placeholder={`Max ${bookingModal.availableKg}kg`}
                       value={bookingForm.weightKg}
                       onChange={(e) => setBookingForm({ ...bookingForm, weightKg: e.target.value })}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-navy-900 mb-1.5">Volume (m&sup3;) *</label>
+                    <label className="block text-sm font-medium text-[#1d1d1f] mb-1.5">Volume (m&sup3;) *</label>
                     <input
                       type="number"
                       required
                       step="0.1"
                       max={bookingModal.availableM3}
-                      className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none"
+                      className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-[#1d1d1f] focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10 outline-none"
                       placeholder={`Max ${bookingModal.availableM3}m\u00B3`}
                       value={bookingForm.volumeM3}
                       onChange={(e) => setBookingForm({ ...bookingForm, volumeM3: e.target.value })}
@@ -1106,10 +1106,10 @@ export default function MarketplacePage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-navy-900 mb-1.5">Delivery Address</label>
+                  <label className="block text-sm font-medium text-[#1d1d1f] mb-1.5">Delivery Address</label>
                   <input
                     type="text"
-                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none"
+                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-[#1d1d1f] focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10 outline-none"
                     placeholder="Marina berth or port address"
                     value={bookingForm.deliveryAddress}
                     onChange={(e) => setBookingForm({ ...bookingForm, deliveryAddress: e.target.value })}
@@ -1117,10 +1117,10 @@ export default function MarketplacePage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-navy-900 mb-1.5">Special Handling</label>
+                  <label className="block text-sm font-medium text-[#1d1d1f] mb-1.5">Special Handling</label>
                   <input
                     type="text"
-                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none"
+                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-[#1d1d1f] focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10 outline-none"
                     placeholder="e.g. Refrigerated, fragile, temperature-controlled"
                     value={bookingForm.specialHandling}
                     onChange={(e) => setBookingForm({ ...bookingForm, specialHandling: e.target.value })}
@@ -1129,9 +1129,9 @@ export default function MarketplacePage() {
 
                 {/* Price estimate */}
                 {bookingForm.weightKg && bookingForm.volumeM3 && (
-                  <div className="bg-navy-50 rounded-lg p-4 border border-navy-100">
-                    <div className="text-xs text-navy-500 uppercase tracking-wider mb-1">Estimated Price</div>
-                    <div className="text-2xl font-bold text-navy-900">
+                  <div className="bg-[#f5f5f7] rounded-lg p-4 border border-[#d2d2d7]">
+                    <div className="text-xs text-[#0071e3] uppercase tracking-wider mb-1">Estimated Price</div>
+                    <div className="text-2xl font-bold text-[#1d1d1f]">
                       {bookingModal.flatRate
                         ? formatCurrency(bookingModal.flatRate, bookingModal.currency)
                         : formatCurrency(
@@ -1150,7 +1150,7 @@ export default function MarketplacePage() {
                 <button
                   type="submit"
                   disabled={bookingLoading}
-                  className="w-full btn-gold !py-3 text-sm disabled:opacity-50"
+                  className="w-full btn-primary !py-3 text-sm disabled:opacity-50"
                 >
                   {bookingLoading ? 'Confirming...' : 'Confirm Booking'}
                 </button>

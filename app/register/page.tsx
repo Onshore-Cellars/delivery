@@ -122,7 +122,7 @@ function RegisterForm() {
     {
       value: 'CARRIER',
       label: 'Carrier / Driver',
-      desc: 'I have van space on yacht routes',
+      desc: 'I have van space on delivery routes',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
@@ -132,7 +132,7 @@ function RegisterForm() {
     {
       value: 'SUPPLIER',
       label: 'Provisioner / Vendor',
-      desc: 'I supply goods to the yachting industry',
+      desc: 'I supply goods and provisions',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
@@ -142,7 +142,7 @@ function RegisterForm() {
     {
       value: 'YACHT_OWNER',
       label: 'Owner / Management',
-      desc: 'I manage yachts and need deliveries',
+      desc: 'I manage operations and need deliveries',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
@@ -154,18 +154,11 @@ function RegisterForm() {
   return (
     <div className="min-h-screen flex">
       {/* Left — decorative */}
-      <div className="hidden lg:flex lg:flex-1 hero-gradient pattern-overlay items-center justify-center p-16 relative overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/3 right-1/3 w-[300px] h-[300px] bg-gold-500/[0.05] rounded-full blur-[100px]" />
-          <div className="absolute bottom-1/3 left-1/3 w-[200px] h-[200px] bg-sea-500/[0.04] rounded-full blur-[80px]" />
-        </div>
+      <div className="hidden lg:flex lg:flex-1 bg-black items-center justify-center p-16 relative overflow-hidden">
         <div className="relative max-w-md text-center">
-          <div className="w-20 h-20 rounded-3xl bg-white/[0.08] backdrop-blur-md border border-white/[0.12] flex items-center justify-center mx-auto mb-10 shadow-2xl">
-            <span className="text-gold-400 font-bold text-3xl">YH</span>
-          </div>
-          <h2 className="text-3xl font-bold text-white mb-5 tracking-[-0.02em]">The Yachting Logistics Marketplace</h2>
-          <p className="text-slate-300/90 leading-relaxed text-lg font-light">
-            Provisioners, vendors, yacht management, crew &mdash; share van space, post loads, bid on transport. Built exclusively for the yachting industry.
+          <h2 className="text-3xl font-semibold text-[#f5f5f7] mb-5 tracking-tight">The Delivery Logistics Marketplace</h2>
+          <p className="text-[#86868b] leading-relaxed text-lg">
+            Provisioners, vendors, fleet management &mdash; share van space, post loads, bid on transport.
           </p>
         </div>
       </div>
@@ -174,14 +167,11 @@ function RegisterForm() {
       <div className="flex-1 flex items-center justify-center px-5 sm:px-8 lg:px-12 py-12">
         <div className="w-full max-w-md">
           <div className="mb-10">
-            <Link href="/" className="flex items-center gap-2.5 mb-10">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-navy-800 to-navy-950 flex items-center justify-center shadow-sm">
-                <span className="text-gold-400 font-bold text-sm">YH</span>
-              </div>
-              <span className="text-lg font-bold text-navy-900 tracking-tight">YachtHop</span>
+            <Link href="/" className="flex items-center gap-2 mb-10 hover:no-underline">
+              <span className="text-lg font-semibold text-[#1d1d1f] tracking-tight">Onshore</span>
             </Link>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-navy-900 tracking-[-0.02em]">Create your account</h1>
-            <p className="mt-2.5 text-sm sm:text-base text-slate-500 leading-relaxed">Join the yachting logistics marketplace.</p>
+            <h1 className="text-2xl sm:text-3xl font-semibold text-[#1d1d1f] tracking-tight">Create your account</h1>
+            <p className="mt-2.5 text-[15px] text-[#86868b] leading-relaxed">Join the delivery logistics marketplace.</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -193,7 +183,7 @@ function RegisterForm() {
 
             {/* Role selection */}
             <div>
-              <label className="block text-sm font-medium text-navy-900 mb-2">I am a...</label>
+              <label className="block text-sm font-medium text-[#1d1d1f] mb-2">I am a...</label>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {roles.map((role) => (
                   <button
@@ -202,15 +192,15 @@ function RegisterForm() {
                     onClick={() => setFormData({ ...formData, role: role.value })}
                     className={`relative flex sm:flex-col items-center sm:text-center gap-3 sm:gap-0 p-3.5 sm:p-3 rounded-xl border-2 transition-all ${
                       formData.role === role.value
-                        ? 'border-navy-700 bg-navy-50 shadow-[0_0_0_1px_rgba(15,23,42,0.05)]'
+                        ? 'border-[#1d1d1f] bg-[#f5f5f7] shadow-[0_0_0_1px_rgba(15,23,42,0.05)]'
                         : 'border-slate-200 hover:border-slate-300 bg-slate-50/50 hover:bg-white'
                     }`}
                   >
-                    <div className={`sm:mb-1.5 ${formData.role === role.value ? 'text-navy-700' : 'text-slate-400'}`}>
+                    <div className={`sm:mb-1.5 ${formData.role === role.value ? 'text-[#1d1d1f]' : 'text-slate-400'}`}>
                       {role.icon}
                     </div>
                     <div className="sm:text-center">
-                      <span className={`text-sm sm:text-xs font-semibold block ${formData.role === role.value ? 'text-navy-900' : 'text-slate-700'}`}>
+                      <span className={`text-sm sm:text-xs font-semibold block ${formData.role === role.value ? 'text-[#1d1d1f]' : 'text-slate-700'}`}>
                         {role.label}
                       </span>
                       <span className="text-xs sm:text-[10px] text-slate-500 mt-0.5 leading-tight block">{role.desc}</span>
@@ -221,13 +211,13 @@ function RegisterForm() {
             </div>
 
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-navy-900 mb-1.5">Full Name</label>
+              <label htmlFor="name" className="block text-sm font-medium text-[#1d1d1f] mb-1.5">Full Name</label>
               <input
                 id="name"
                 name="name"
                 type="text"
                 required
-                className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-navy-900 text-sm focus:border-navy-400 focus:ring-2 focus:ring-navy-100 focus:bg-white transition-all outline-none"
+                className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-[#1d1d1f] text-sm focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10 focus:bg-white transition-all outline-none"
                 placeholder="John Smith"
                 value={formData.name}
                 onChange={handleChange}
@@ -235,14 +225,14 @@ function RegisterForm() {
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-navy-900 mb-1.5">Email</label>
+              <label htmlFor="email" className="block text-sm font-medium text-[#1d1d1f] mb-1.5">Email</label>
               <input
                 id="email"
                 name="email"
                 type="email"
                 required
                 autoComplete="email"
-                className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-navy-900 text-sm focus:border-navy-400 focus:ring-2 focus:ring-navy-100 focus:bg-white transition-all outline-none"
+                className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-[#1d1d1f] text-sm focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10 focus:bg-white transition-all outline-none"
                 placeholder="you@company.com"
                 value={formData.email}
                 onChange={handleChange}
@@ -250,7 +240,7 @@ function RegisterForm() {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-navy-900 mb-1.5">Password</label>
+              <label htmlFor="password" className="block text-sm font-medium text-[#1d1d1f] mb-1.5">Password</label>
               <input
                 id="password"
                 name="password"
@@ -258,7 +248,7 @@ function RegisterForm() {
                 required
                 autoComplete="new-password"
                 minLength={8}
-                className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-navy-900 text-sm focus:border-navy-400 focus:ring-2 focus:ring-navy-100 focus:bg-white transition-all outline-none"
+                className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-[#1d1d1f] text-sm focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10 focus:bg-white transition-all outline-none"
                 placeholder="Min 8 chars, uppercase, lowercase, number"
                 value={formData.password}
                 onChange={handleChange}
@@ -267,24 +257,24 @@ function RegisterForm() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="company" className="block text-sm font-medium text-navy-900 mb-1.5">Company</label>
+                <label htmlFor="company" className="block text-sm font-medium text-[#1d1d1f] mb-1.5">Company</label>
                 <input
                   id="company"
                   name="company"
                   type="text"
-                  className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-navy-900 text-sm focus:border-navy-400 focus:ring-2 focus:ring-navy-100 focus:bg-white transition-all outline-none"
+                  className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-[#1d1d1f] text-sm focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10 focus:bg-white transition-all outline-none"
                   placeholder="Optional"
                   value={formData.company}
                   onChange={handleChange}
                 />
               </div>
               <div>
-                <label htmlFor="phone" className="block text-sm font-medium text-navy-900 mb-1.5">Phone</label>
+                <label htmlFor="phone" className="block text-sm font-medium text-[#1d1d1f] mb-1.5">Phone</label>
                 <input
                   id="phone"
                   name="phone"
                   type="tel"
-                  className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-navy-900 text-sm focus:border-navy-400 focus:ring-2 focus:ring-navy-100 focus:bg-white transition-all outline-none"
+                  className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-[#1d1d1f] text-sm focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10 focus:bg-white transition-all outline-none"
                   placeholder="Optional"
                   value={formData.phone}
                   onChange={handleChange}
@@ -323,7 +313,7 @@ function RegisterForm() {
                 <button
                   onClick={handleGoogleWithRole}
                   disabled={loading || !formData.role}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-sm font-medium text-navy-900 transition-all disabled:opacity-50"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-sm font-medium text-[#1d1d1f] transition-all disabled:opacity-50"
                 >
                   <svg className="w-5 h-5" viewBox="0 0 24 24">
                     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
@@ -341,7 +331,7 @@ function RegisterForm() {
 
           <p className="mt-6 text-center text-sm text-slate-500">
             Already have an account?{' '}
-            <Link href="/login" className="font-semibold text-navy-700 hover:text-navy-900 transition-colors">
+            <Link href="/login" className="font-semibold text-[#1d1d1f] hover:text-[#1d1d1f] transition-colors">
               Sign in
             </Link>
           </p>

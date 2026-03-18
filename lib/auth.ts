@@ -9,7 +9,7 @@ function getJwtSecret(): string {
     if (process.env.NODE_ENV === 'production') {
       throw new Error('NEXTAUTH_SECRET must be set in production')
     }
-    return 'yachthop-dev-secret-not-for-production'
+    return 'onshore-dev-secret-not-for-production'
   }
   return secret
 }
@@ -49,7 +49,7 @@ export function getTokenFromHeader(authHeader: string | null): string | null {
 
 export function generateTrackingCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
-  let code = 'YH-'
+  let code = 'OD-'
   for (let i = 0; i < 8; i++) {
     code += chars.charAt(Math.floor(Math.random() * chars.length))
   }

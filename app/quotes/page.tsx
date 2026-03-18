@@ -219,18 +219,18 @@ export default function QuotesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100/50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-5xl mx-auto px-5 sm:px-6 lg:px-8 py-8 sm:py-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <p className="text-[11px] font-semibold text-gold-600 uppercase tracking-[0.15em] mb-1">Pricing</p>
-            <h1 className="text-xl sm:text-2xl font-extrabold text-navy-900 tracking-[-0.02em]">Quotes</h1>
+            <p className="text-[11px] font-semibold text-[#0071e3] uppercase tracking-[0.15em] mb-1">Pricing</p>
+            <h1 className="text-xl sm:text-2xl font-semibold text-[#1d1d1f] tracking-[-0.02em]">Quotes</h1>
             <p className="text-sm text-slate-500 mt-1">Request, manage, and respond to shipping quotes</p>
           </div>
           <button
             onClick={() => setShowNewForm(!showNewForm)}
-            className="btn-gold text-sm !py-2.5 !px-5"
+            className="btn-primary text-sm !py-2.5 !px-5"
           >
             {showNewForm ? 'Cancel' : '+ Request Quote'}
           </button>
@@ -239,7 +239,7 @@ export default function QuotesPage() {
         {/* New Quote Form */}
         {showNewForm && (
           <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 mb-6">
-            <h2 className="text-lg font-bold text-navy-900 mb-4">Request a Quote</h2>
+            <h2 className="text-lg font-bold text-[#1d1d1f] mb-4">Request a Quote</h2>
             {createError && (
               <div className="mb-4 px-4 py-3 rounded-lg bg-red-50 border border-red-100">
                 <p className="text-sm text-red-700">{createError}</p>
@@ -248,22 +248,22 @@ export default function QuotesPage() {
             <form onSubmit={handleCreateQuote} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-navy-900 mb-1.5">Origin Port *</label>
+                  <label className="block text-sm font-medium text-[#1d1d1f] mb-1.5">Origin Port *</label>
                   <input
                     type="text"
                     required
-                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none"
+                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-[#1d1d1f] focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10 outline-none"
                     placeholder="e.g. Antibes, France"
                     value={quoteForm.originPort}
                     onChange={e => setQuoteForm({ ...quoteForm, originPort: e.target.value })}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-navy-900 mb-1.5">Destination Port *</label>
+                  <label className="block text-sm font-medium text-[#1d1d1f] mb-1.5">Destination Port *</label>
                   <input
                     type="text"
                     required
-                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none"
+                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-[#1d1d1f] focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10 outline-none"
                     placeholder="e.g. Palma de Mallorca, Spain"
                     value={quoteForm.destinationPort}
                     onChange={e => setQuoteForm({ ...quoteForm, destinationPort: e.target.value })}
@@ -272,11 +272,11 @@ export default function QuotesPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-navy-900 mb-1.5">Cargo Description *</label>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-1.5">Cargo Description *</label>
                 <input
                   type="text"
                   required
-                  className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none"
+                  className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-[#1d1d1f] focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10 outline-none"
                   placeholder="e.g. Engine spare parts for MY Eclipse"
                   value={quoteForm.cargoDescription}
                   onChange={e => setQuoteForm({ ...quoteForm, cargoDescription: e.target.value })}
@@ -285,9 +285,9 @@ export default function QuotesPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-navy-900 mb-1.5">Cargo Type</label>
+                  <label className="block text-sm font-medium text-[#1d1d1f] mb-1.5">Cargo Type</label>
                   <select
-                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none bg-white"
+                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-[#1d1d1f] focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10 outline-none bg-white"
                     value={quoteForm.cargoType}
                     onChange={e => setQuoteForm({ ...quoteForm, cargoType: e.target.value })}
                   >
@@ -301,26 +301,26 @@ export default function QuotesPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-navy-900 mb-1.5">Weight (kg) *</label>
+                  <label className="block text-sm font-medium text-[#1d1d1f] mb-1.5">Weight (kg) *</label>
                   <input
                     type="number"
                     required
                     step="0.1"
                     min="0"
-                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none"
+                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-[#1d1d1f] focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10 outline-none"
                     placeholder="e.g. 250"
                     value={quoteForm.weightKg}
                     onChange={e => setQuoteForm({ ...quoteForm, weightKg: e.target.value })}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-navy-900 mb-1.5">Volume (m&sup3;) *</label>
+                  <label className="block text-sm font-medium text-[#1d1d1f] mb-1.5">Volume (m&sup3;) *</label>
                   <input
                     type="number"
                     required
                     step="0.1"
                     min="0"
-                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none"
+                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-[#1d1d1f] focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10 outline-none"
                     placeholder="e.g. 1.5"
                     value={quoteForm.volumeM3}
                     onChange={e => setQuoteForm({ ...quoteForm, volumeM3: e.target.value })}
@@ -330,19 +330,19 @@ export default function QuotesPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-navy-900 mb-1.5">Preferred Date</label>
+                  <label className="block text-sm font-medium text-[#1d1d1f] mb-1.5">Preferred Date</label>
                   <input
                     type="date"
-                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none"
+                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-[#1d1d1f] focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10 outline-none"
                     value={quoteForm.preferredDate}
                     onChange={e => setQuoteForm({ ...quoteForm, preferredDate: e.target.value })}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-navy-900 mb-1.5">Special Requirements</label>
+                  <label className="block text-sm font-medium text-[#1d1d1f] mb-1.5">Special Requirements</label>
                   <input
                     type="text"
-                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none"
+                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-[#1d1d1f] focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10 outline-none"
                     placeholder="e.g. Refrigerated, fragile, time-sensitive"
                     value={quoteForm.specialRequirements}
                     onChange={e => setQuoteForm({ ...quoteForm, specialRequirements: e.target.value })}
@@ -376,8 +376,8 @@ export default function QuotesPage() {
             onClick={() => setActiveTab('received')}
             className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-semibold transition-colors ${
               activeTab === 'received'
-                ? 'bg-navy-900 text-white'
-                : 'text-slate-500 hover:text-navy-900 hover:bg-slate-50'
+                ? 'bg-[#1d1d1f] text-white'
+                : 'text-slate-500 hover:text-[#1d1d1f] hover:bg-slate-50'
             }`}
           >
             Received
@@ -393,8 +393,8 @@ export default function QuotesPage() {
             onClick={() => setActiveTab('sent')}
             className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-semibold transition-colors ${
               activeTab === 'sent'
-                ? 'bg-navy-900 text-white'
-                : 'text-slate-500 hover:text-navy-900 hover:bg-slate-50'
+                ? 'bg-[#1d1d1f] text-white'
+                : 'text-slate-500 hover:text-[#1d1d1f] hover:bg-slate-50'
             }`}
           >
             Sent
@@ -452,11 +452,11 @@ export default function QuotesPage() {
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-center gap-3 min-w-0">
                         <div className="flex items-center gap-2 min-w-0">
-                          <span className="font-semibold text-navy-900 truncate">{quote.originPort}</span>
+                          <span className="font-semibold text-[#1d1d1f] truncate">{quote.originPort}</span>
                           <svg className="w-4 h-4 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                           </svg>
-                          <span className="font-semibold text-navy-900 truncate">{quote.destinationPort}</span>
+                          <span className="font-semibold text-[#1d1d1f] truncate">{quote.destinationPort}</span>
                         </div>
                       </div>
                       <span className={`badge ${status.classes} flex-shrink-0 ml-3`}>{status.label}</span>
@@ -468,22 +468,22 @@ export default function QuotesPage() {
                     <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm mb-4">
                       <div>
                         <span className="text-slate-400">Weight:</span>{' '}
-                        <span className="font-medium text-navy-900">{quote.weightKg.toFixed(1)} kg</span>
+                        <span className="font-medium text-[#1d1d1f]">{quote.weightKg.toFixed(1)} kg</span>
                       </div>
                       <div>
                         <span className="text-slate-400">Volume:</span>{' '}
-                        <span className="font-medium text-navy-900">{quote.volumeM3.toFixed(1)} m&sup3;</span>
+                        <span className="font-medium text-[#1d1d1f]">{quote.volumeM3.toFixed(1)} m&sup3;</span>
                       </div>
                       {quote.cargoType && (
                         <div>
                           <span className="text-slate-400">Type:</span>{' '}
-                          <span className="font-medium text-navy-900">{quote.cargoType}</span>
+                          <span className="font-medium text-[#1d1d1f]">{quote.cargoType}</span>
                         </div>
                       )}
                       {quote.preferredDate && (
                         <div>
                           <span className="text-slate-400">Preferred:</span>{' '}
-                          <span className="font-medium text-navy-900">{formatDate(quote.preferredDate)}</span>
+                          <span className="font-medium text-[#1d1d1f]">{formatDate(quote.preferredDate)}</span>
                         </div>
                       )}
                     </div>
@@ -496,23 +496,23 @@ export default function QuotesPage() {
 
                     {/* Quoted price + response */}
                     {quote.quotedPrice != null && (
-                      <div className="bg-navy-50 rounded-lg p-4 border border-navy-100 mb-4">
+                      <div className="bg-[#f5f5f7] rounded-lg p-4 border border-[#d2d2d7] mb-4">
                         <div className="flex items-center justify-between">
                           <div>
-                            <div className="text-xs text-navy-500 uppercase tracking-wider mb-0.5">Quoted Price</div>
-                            <div className="text-2xl font-bold text-navy-900">
+                            <div className="text-xs text-[#0071e3] uppercase tracking-wider mb-0.5">Quoted Price</div>
+                            <div className="text-2xl font-bold text-[#1d1d1f]">
                               {formatCurrency(quote.quotedPrice, quote.quotedCurrency)}
                             </div>
                           </div>
                           {quote.validUntil && (
                             <div className="text-right">
-                              <div className="text-xs text-navy-500 uppercase tracking-wider mb-0.5">Valid Until</div>
-                              <div className="text-sm font-semibold text-navy-900">{formatDate(quote.validUntil)}</div>
+                              <div className="text-xs text-[#0071e3] uppercase tracking-wider mb-0.5">Valid Until</div>
+                              <div className="text-sm font-semibold text-[#1d1d1f]">{formatDate(quote.validUntil)}</div>
                             </div>
                           )}
                         </div>
                         {quote.responseMessage && (
-                          <p className="text-sm text-navy-700 mt-3 pt-3 border-t border-navy-100">
+                          <p className="text-sm text-[#1d1d1f] mt-3 pt-3 border-t border-[#d2d2d7]">
                             {quote.responseMessage}
                           </p>
                         )}
@@ -524,12 +524,12 @@ export default function QuotesPage() {
                       <div className="flex items-center gap-2 text-sm text-slate-500">
                         {otherParty && (
                           <>
-                            <div className="w-6 h-6 rounded-full bg-navy-100 flex items-center justify-center flex-shrink-0">
-                              <span className="text-[10px] font-semibold text-navy-700">
+                            <div className="w-6 h-6 rounded-full bg-[#f5f5f7] flex items-center justify-center flex-shrink-0">
+                              <span className="text-[10px] font-semibold text-[#1d1d1f]">
                                 {otherParty.name.split(' ').map(n => n[0]).join('')}
                               </span>
                             </div>
-                            <span>{isRequester ? 'Provider' : 'Requester'}: <span className="font-medium text-navy-900">{otherParty.name}</span></span>
+                            <span>{isRequester ? 'Provider' : 'Requester'}: <span className="font-medium text-[#1d1d1f]">{otherParty.name}</span></span>
                             {otherParty.company && <span className="text-slate-400">&middot; {otherParty.company}</span>}
                           </>
                         )}
@@ -548,7 +548,7 @@ export default function QuotesPage() {
                               setRespondingTo(isRespondingToThis ? null : quote.id)
                               setRespondForm(emptyRespondForm)
                             }}
-                            className="btn-gold text-xs !py-1.5 !px-3"
+                            className="btn-primary text-xs !py-1.5 !px-3"
                           >
                             {isRespondingToThis ? 'Close' : 'Respond'}
                           </button>
@@ -583,35 +583,35 @@ export default function QuotesPage() {
                   {/* Respond form (carrier only) */}
                   {isRespondingToThis && (
                     <div className="bg-slate-50 border-t border-slate-100 p-6">
-                      <h3 className="text-sm font-bold text-navy-900 mb-3">Respond to Quote Request</h3>
+                      <h3 className="text-sm font-bold text-[#1d1d1f] mb-3">Respond to Quote Request</h3>
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
                         <div>
-                          <label className="block text-xs font-medium text-navy-900 mb-1">Price (EUR) *</label>
+                          <label className="block text-xs font-medium text-[#1d1d1f] mb-1">Price (EUR) *</label>
                           <input
                             type="number"
                             step="0.01"
                             min="0"
                             required
-                            className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none bg-white"
+                            className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm text-[#1d1d1f] focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10 outline-none bg-white"
                             placeholder="e.g. 1500.00"
                             value={respondForm.quotedPrice}
                             onChange={e => setRespondForm({ ...respondForm, quotedPrice: e.target.value })}
                           />
                         </div>
                         <div>
-                          <label className="block text-xs font-medium text-navy-900 mb-1">Valid Until</label>
+                          <label className="block text-xs font-medium text-[#1d1d1f] mb-1">Valid Until</label>
                           <input
                             type="date"
-                            className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none bg-white"
+                            className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm text-[#1d1d1f] focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10 outline-none bg-white"
                             value={respondForm.validUntil}
                             onChange={e => setRespondForm({ ...respondForm, validUntil: e.target.value })}
                           />
                         </div>
                         <div>
-                          <label className="block text-xs font-medium text-navy-900 mb-1">Message</label>
+                          <label className="block text-xs font-medium text-[#1d1d1f] mb-1">Message</label>
                           <input
                             type="text"
-                            className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none bg-white"
+                            className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm text-[#1d1d1f] focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10 outline-none bg-white"
                             placeholder="Optional note..."
                             value={respondForm.responseMessage}
                             onChange={e => setRespondForm({ ...respondForm, responseMessage: e.target.value })}

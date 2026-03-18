@@ -10,9 +10,9 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: "YachtHop — Premium Yacht Logistics Marketplace",
-  description: "The marketplace for yacht logistics. Suppliers offer van space to ports and marinas. Yachts and suppliers book space for deliveries. Simple, premium, reliable.",
-  keywords: ["yacht logistics", "marine delivery", "yacht supplies", "port delivery", "maritime transport"],
+  title: "Onshore Deliver — Delivery Logistics Marketplace",
+  description: "The marketplace for delivery logistics. Carriers share van space to ports and marinas. Book space for provisions, equipment, and supplies. Simple, premium, reliable.",
+  keywords: ["delivery logistics", "marine delivery", "port delivery", "maritime transport", "van space sharing"],
 }
 
 export default function RootLayout({

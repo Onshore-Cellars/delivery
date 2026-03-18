@@ -451,7 +451,7 @@ export default function AdminPage() {
   // ─── Render ───────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100/50">
+    <div className="min-h-screen bg-white">
       {/* Toast */}
       {toast && (
         <div className={`fixed top-4 right-4 z-50 px-5 py-3 rounded-xl shadow-lg text-sm font-medium transition-all ${
@@ -467,8 +467,8 @@ export default function AdminPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <p className="text-[11px] font-semibold text-gold-600 uppercase tracking-[0.15em] mb-1">Administration</p>
-            <h1 className="text-xl sm:text-2xl font-extrabold text-navy-900 tracking-[-0.02em]">Admin Panel</h1>
+            <p className="text-[11px] font-semibold text-[#0071e3] uppercase tracking-[0.15em] mb-1">Administration</p>
+            <h1 className="text-xl sm:text-2xl font-semibold text-[#1d1d1f] tracking-[-0.02em]">Admin Panel</h1>
             <p className="text-sm text-slate-500 mt-1">Platform management and analytics</p>
           </div>
           <div className="flex items-center gap-3">
@@ -479,7 +479,7 @@ export default function AdminPage() {
                 placeholder="Search users, bookings, listings..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                className="pl-9 pr-4 py-2.5 w-full sm:w-72 rounded-xl border border-slate-200 bg-white text-sm focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none"
+                className="pl-9 pr-4 py-2.5 w-full sm:w-72 rounded-xl border border-slate-200 bg-white text-sm focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10 outline-none"
               />
               <svg className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -497,8 +497,8 @@ export default function AdminPage() {
               onClick={() => setTab(t.key)}
               className={`px-5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 whitespace-nowrap ${
                 tab === t.key
-                  ? 'bg-navy-900 text-white shadow-sm'
-                  : 'text-slate-500 hover:text-navy-900 hover:bg-slate-50'
+                  ? 'bg-[#1d1d1f] text-white shadow-sm'
+                  : 'text-slate-500 hover:text-[#1d1d1f] hover:bg-slate-50'
               }`}
             >
               <TabIcon name={t.icon} className="w-4 h-4" />
@@ -524,7 +524,7 @@ export default function AdminPage() {
                       <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Revenue</div>
                       <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600 text-sm font-bold">&euro;</div>
                     </div>
-                    <div className="mt-2 text-3xl font-extrabold text-navy-900">{formatCurrency(stats.revenue.total)}</div>
+                    <div className="mt-2 text-3xl font-semibold text-[#1d1d1f]">{formatCurrency(stats.revenue.total)}</div>
                     <div className="mt-2 text-xs text-slate-500">Platform lifetime revenue</div>
                   </div>
                   <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-5">
@@ -532,7 +532,7 @@ export default function AdminPage() {
                       <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Active Listings</div>
                       <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 text-sm font-bold">#</div>
                     </div>
-                    <div className="mt-2 text-3xl font-extrabold text-navy-900">{stats.listings.active}</div>
+                    <div className="mt-2 text-3xl font-semibold text-[#1d1d1f]">{stats.listings.active}</div>
                     <div className="mt-2 text-xs text-slate-500">{stats.listings.total} total listings</div>
                   </div>
                   <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-5">
@@ -540,7 +540,7 @@ export default function AdminPage() {
                       <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Pending Bookings</div>
                       <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600 text-sm font-bold">!</div>
                     </div>
-                    <div className="mt-2 text-3xl font-extrabold text-navy-900">{stats.bookings.pending}</div>
+                    <div className="mt-2 text-3xl font-semibold text-[#1d1d1f]">{stats.bookings.pending}</div>
                     <div className="mt-2 text-xs text-slate-500">{stats.bookings.confirmed} confirmed &middot; {stats.bookings.total} total</div>
                   </div>
                   <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-5">
@@ -548,7 +548,7 @@ export default function AdminPage() {
                       <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">New Users (This Week)</div>
                       <div className="w-8 h-8 rounded-lg bg-violet-50 flex items-center justify-center text-violet-600 text-sm font-bold">+</div>
                     </div>
-                    <div className="mt-2 text-3xl font-extrabold text-navy-900">{newUsersThisWeek}</div>
+                    <div className="mt-2 text-3xl font-semibold text-[#1d1d1f]">{newUsersThisWeek}</div>
                     <div className="mt-2 text-xs text-slate-500">{stats.users.total} total users</div>
                   </div>
                 </div>
@@ -557,14 +557,14 @@ export default function AdminPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   {/* Revenue Bar Chart */}
                   <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-100 p-6">
-                    <h2 className="font-semibold text-navy-900 mb-4">Revenue by Month</h2>
+                    <h2 className="font-semibold text-[#1d1d1f] mb-4">Revenue by Month</h2>
                     {revenueByMonth.length === 0 ? (
                       <div className="text-center text-slate-400 text-sm py-12">No revenue data yet</div>
                     ) : (
                       <div className="flex items-end gap-3 h-48">
                         {revenueByMonth.map((m, i) => (
                           <div key={i} className="flex-1 flex flex-col items-center gap-2">
-                            <div className="text-xs font-medium text-navy-900">{formatCurrency(m.total)}</div>
+                            <div className="text-xs font-medium text-[#1d1d1f]">{formatCurrency(m.total)}</div>
                             <div className="w-full relative flex items-end" style={{ height: '140px' }}>
                               <div
                                 className="w-full rounded-t-lg transition-all duration-500"
@@ -585,12 +585,12 @@ export default function AdminPage() {
                   <div className="space-y-4">
                     {/* Users by Role */}
                     <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-5">
-                      <h3 className="text-sm font-semibold text-navy-900 mb-3">Users by Role</h3>
+                      <h3 className="text-sm font-semibold text-[#1d1d1f] mb-3">Users by Role</h3>
                       <div className="space-y-2">
                         {Object.entries(usersByRole).map(([role, count]) => (
                           <div key={role} className="flex items-center justify-between">
                             <span className="text-xs text-slate-600">{role.replace('_', ' ')}</span>
-                            <span className="text-xs font-semibold text-navy-900 bg-slate-100 px-2 py-0.5 rounded-full">{count}</span>
+                            <span className="text-xs font-semibold text-[#1d1d1f] bg-slate-100 px-2 py-0.5 rounded-full">{count}</span>
                           </div>
                         ))}
                       </div>
@@ -598,14 +598,14 @@ export default function AdminPage() {
 
                     {/* Bookings by Status */}
                     <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-5">
-                      <h3 className="text-sm font-semibold text-navy-900 mb-3">Bookings by Status</h3>
+                      <h3 className="text-sm font-semibold text-[#1d1d1f] mb-3">Bookings by Status</h3>
                       <div className="space-y-2">
                         {Object.entries(bookingsByStatus).map(([status, count]) => (
                           <div key={status} className="flex items-center justify-between">
                             <span className={`text-xs px-2 py-0.5 rounded-full border ${statusColors[status] || 'bg-slate-50 text-slate-600 border-slate-200'}`}>
                               {status.replace('_', ' ')}
                             </span>
-                            <span className="text-xs font-semibold text-navy-900">{count}</span>
+                            <span className="text-xs font-semibold text-[#1d1d1f]">{count}</span>
                           </div>
                         ))}
                         {Object.keys(bookingsByStatus).length === 0 && (
@@ -619,10 +619,10 @@ export default function AdminPage() {
                 {/* Recent Bookings (on Overview) */}
                 <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
                   <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-                    <h2 className="font-semibold text-navy-900">Recent Bookings</h2>
+                    <h2 className="font-semibold text-[#1d1d1f]">Recent Bookings</h2>
                     <button
                       onClick={() => setTab('bookings')}
-                      className="text-xs text-navy-600 hover:text-navy-900 font-medium"
+                      className="text-xs text-[#1d1d1f] hover:text-[#1d1d1f] font-medium"
                     >
                       View all &rarr;
                     </button>
@@ -633,14 +633,14 @@ export default function AdminPage() {
                         <div>
                           <div className="flex items-center gap-2">
                             <span className={`badge border ${statusColors[b.status] || ''}`}>{b.status.replace(/_/g, ' ')}</span>
-                            <span className="text-sm font-medium text-navy-900">{b.listing.title}</span>
+                            <span className="text-sm font-medium text-[#1d1d1f]">{b.listing.title}</span>
                           </div>
                           <div className="text-xs text-slate-400 mt-0.5">
                             {b.shipper.name} &middot; {b.listing.originPort} &rarr; {b.listing.destinationPort}
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="text-sm font-semibold text-navy-900">{formatCurrency(b.totalPrice)}</div>
+                          <div className="text-sm font-semibold text-[#1d1d1f]">{formatCurrency(b.totalPrice)}</div>
                           <div className="text-xs text-slate-400">{formatDate(b.createdAt)}</div>
                         </div>
                       </div>
@@ -657,10 +657,10 @@ export default function AdminPage() {
             {tab === 'users' && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h2 className="font-semibold text-navy-900">All Users ({filteredUsers.length})</h2>
+                  <h2 className="font-semibold text-[#1d1d1f]">All Users ({filteredUsers.length})</h2>
                   <button
                     onClick={() => exportCSV('users')}
-                    className="px-4 py-2 bg-navy-900 text-white text-xs font-medium rounded-lg hover:bg-navy-800 transition-colors"
+                    className="px-4 py-2 bg-[#1d1d1f] text-white text-xs font-medium rounded-lg hover:bg-[#1d1d1f] transition-colors"
                   >
                     Export CSV
                   </button>
@@ -684,10 +684,10 @@ export default function AdminPage() {
                       <tbody className="divide-y divide-slate-100">
                         {filteredUsers.map(u => (
                           <tr key={u.id} className="hover:bg-slate-50">
-                            <td className="px-6 py-3 font-medium text-navy-900">{u.name}</td>
+                            <td className="px-6 py-3 font-medium text-[#1d1d1f]">{u.name}</td>
                             <td className="px-6 py-3 text-slate-600">{u.email}</td>
                             <td className="px-6 py-3">
-                              <span className="badge bg-navy-50 text-navy-700 border border-navy-200">
+                              <span className="badge bg-[#f5f5f7] text-[#1d1d1f] border border-[#d2d2d7]">
                                 {u.role.replace('_', ' ')}
                               </span>
                             </td>
@@ -745,10 +745,10 @@ export default function AdminPage() {
             {tab === 'bookings' && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h2 className="font-semibold text-navy-900">All Bookings ({filteredBookings.length})</h2>
+                  <h2 className="font-semibold text-[#1d1d1f]">All Bookings ({filteredBookings.length})</h2>
                   <button
                     onClick={() => exportCSV('bookings')}
-                    className="px-4 py-2 bg-navy-900 text-white text-xs font-medium rounded-lg hover:bg-navy-800 transition-colors"
+                    className="px-4 py-2 bg-[#1d1d1f] text-white text-xs font-medium rounded-lg hover:bg-[#1d1d1f] transition-colors"
                   >
                     Export CSV
                   </button>
@@ -766,7 +766,7 @@ export default function AdminPage() {
                                   Pay: {b.paymentStatus}
                                 </span>
                               )}
-                              <span className="font-medium text-navy-900">{b.listing.title}</span>
+                              <span className="font-medium text-[#1d1d1f]">{b.listing.title}</span>
                             </div>
                             <div className="text-xs text-slate-400">
                               Shipper: {b.shipper.name}{b.shipper.company && ` (${b.shipper.company})`} &middot;
@@ -777,7 +777,7 @@ export default function AdminPage() {
                             </div>
                           </div>
                           <div className="text-right shrink-0">
-                            <div className="font-semibold text-navy-900">{formatCurrency(b.totalPrice)}</div>
+                            <div className="font-semibold text-[#1d1d1f]">{formatCurrency(b.totalPrice)}</div>
                             {/* Actions */}
                             <div className="flex gap-1 mt-2 justify-end flex-wrap">
                               {b.status === 'PENDING' && (
@@ -853,10 +853,10 @@ export default function AdminPage() {
             {tab === 'listings' && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h2 className="font-semibold text-navy-900">All Listings ({filteredListings.length})</h2>
+                  <h2 className="font-semibold text-[#1d1d1f]">All Listings ({filteredListings.length})</h2>
                   <button
                     onClick={() => exportCSV('listings')}
-                    className="px-4 py-2 bg-navy-900 text-white text-xs font-medium rounded-lg hover:bg-navy-800 transition-colors"
+                    className="px-4 py-2 bg-[#1d1d1f] text-white text-xs font-medium rounded-lg hover:bg-[#1d1d1f] transition-colors"
                   >
                     Export CSV
                   </button>
@@ -880,7 +880,7 @@ export default function AdminPage() {
                       <tbody className="divide-y divide-slate-100">
                         {filteredListings.map(l => (
                           <tr key={l.id} className="hover:bg-slate-50">
-                            <td className="px-6 py-3 font-medium text-navy-900 max-w-[200px] truncate">{l.title}</td>
+                            <td className="px-6 py-3 font-medium text-[#1d1d1f] max-w-[200px] truncate">{l.title}</td>
                             <td className="px-6 py-3 text-slate-600 text-xs">
                               {l.originPort} &rarr; {l.destinationPort}
                             </td>
@@ -934,7 +934,7 @@ export default function AdminPage() {
             {/* ═══════════════════ ACTIVITY TAB ═══════════════════ */}
             {tab === 'activity' && (
               <div className="space-y-4">
-                <h2 className="font-semibold text-navy-900">Recent Activity</h2>
+                <h2 className="font-semibold text-[#1d1d1f]">Recent Activity</h2>
                 <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
                   <div className="divide-y divide-slate-100">
                     {activityFeed.map(item => (
@@ -950,7 +950,7 @@ export default function AdminPage() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-sm font-medium text-navy-900">{item.title}</span>
+                            <span className="text-sm font-medium text-[#1d1d1f]">{item.title}</span>
                             {item.meta && (
                               <span className={`badge border text-xs ${statusColors[item.meta] || 'bg-slate-50 text-slate-600 border-slate-200'}`}>
                                 {item.meta.replace(/_/g, ' ')}
