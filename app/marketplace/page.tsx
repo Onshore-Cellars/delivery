@@ -88,9 +88,9 @@ const SORT_OPTIONS = [
 ]
 
 const inputClass =
-  'w-full px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 transition-all outline-none'
+  'w-full px-4 py-3 sm:py-2.5 rounded-lg border border-slate-200 bg-white text-base sm:text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 transition-all outline-none'
 const selectClass =
-  'w-full px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 transition-all outline-none appearance-none'
+  'w-full px-4 py-3 sm:py-2.5 rounded-lg border border-slate-200 bg-white text-base sm:text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 transition-all outline-none appearance-none'
 
 export default function MarketplacePage() {
   const { user, token } = useAuth()
@@ -477,7 +477,7 @@ export default function MarketplacePage() {
   // ---------- Listing card component ----------
   const ListingCard = ({ listing, featured = false }: { listing: Listing; featured?: boolean }) => (
     <div
-      className={`bg-white rounded-xl shadow-sm border p-6 card-hover ${
+      className={`bg-white rounded-xl shadow-sm border p-4 sm:p-6 card-hover ${
         listing.featured || featured ? 'border-gold-300 ring-1 ring-gold-200' : 'border-slate-100'
       }`}
     >
@@ -503,7 +503,7 @@ export default function MarketplacePage() {
       </div>
 
       {/* Route */}
-      <div className="flex items-center gap-3 mb-4">
+      <div className="flex items-center gap-2 sm:gap-3 mb-4">
         <div className="flex-1 min-w-0">
           <div className="text-xs text-slate-400 uppercase tracking-wider">From</div>
           <div className="font-semibold text-navy-900 truncate">{listing.originPort}</div>
@@ -574,14 +574,17 @@ export default function MarketplacePage() {
     <div className="min-h-screen bg-slate-50">
       {/* Search header */}
       <div className="bg-white border-b border-slate-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-extrabold text-navy-900 tracking-tight">Marketplace</h1>
+        <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-5 sm:py-6">
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <div>
+              <h1 className="text-xl sm:text-2xl font-extrabold text-navy-900 tracking-tight">Marketplace</h1>
+              <p className="text-xs sm:text-sm text-slate-500 mt-0.5">Find van space to yacht destinations</p>
+            </div>
 
             {/* Mobile filter toggle */}
             <button
               onClick={() => setMobileFiltersOpen(true)}
-              className="lg:hidden flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 bg-white text-sm font-medium text-navy-900 hover:bg-slate-50 transition-colors"
+              className="lg:hidden flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-sm font-medium text-navy-900 hover:bg-slate-50 active:bg-slate-100 transition-colors"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -599,10 +602,10 @@ export default function MarketplacePage() {
           </div>
 
           {/* Primary search row */}
-          <div className="flex flex-col sm:flex-row gap-3">
+          <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3">
             <input
               type="text"
-              placeholder="Origin port or region..."
+              placeholder="Origin port, e.g. Antibes..."
               className={'flex-1 ' + inputClass}
               value={filters.origin}
               onChange={(e) => setFilters({ ...filters, origin: e.target.value })}
@@ -620,7 +623,7 @@ export default function MarketplacePage() {
               value={filters.dateFrom}
               onChange={(e) => setFilters({ ...filters, dateFrom: e.target.value })}
             />
-            <button onClick={handleSearch} className="btn-primary text-sm !py-2.5 !px-6 whitespace-nowrap">
+            <button onClick={handleSearch} className="btn-primary text-sm !py-3 sm:!py-2.5 !px-6 whitespace-nowrap">
               Search Routes
             </button>
           </div>
@@ -850,7 +853,7 @@ export default function MarketplacePage() {
       )}
 
       {/* Main content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Featured Section */}
         {featuredListings.length > 0 && (
           <div className="mb-10">
@@ -1055,7 +1058,7 @@ export default function MarketplacePage() {
                     type="text"
                     required
                     className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none"
-                    placeholder="e.g. Provisions for MY Ocean Dream"
+                    placeholder="e.g. Wine cases for MY Ocean Dream"
                     value={bookingForm.cargoDescription}
                     onChange={(e) => setBookingForm({ ...bookingForm, cargoDescription: e.target.value })}
                   />
@@ -1069,11 +1072,13 @@ export default function MarketplacePage() {
                     onChange={(e) => setBookingForm({ ...bookingForm, cargoType: e.target.value })}
                   >
                     <option value="">Select type...</option>
-                    <option value="Provisions">Provisions</option>
-                    <option value="Equipment">Equipment</option>
-                    <option value="Spare Parts">Spare Parts</option>
+                    <option value="Provisions">Provisions & Food</option>
                     <option value="Wine & Spirits">Wine & Spirits</option>
+                    <option value="Equipment">Marine Equipment</option>
+                    <option value="Spare Parts">Spare Parts</option>
                     <option value="Luxury Goods">Luxury Goods</option>
+                    <option value="Crew Gear">Crew Gear & Uniforms</option>
+                    <option value="Interior">Interior & Décor</option>
                     <option value="Other">Other</option>
                   </select>
                 </div>

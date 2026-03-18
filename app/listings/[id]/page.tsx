@@ -160,7 +160,7 @@ export default function ListingDetailPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8 py-6 sm:py-8">
         <Link href="/marketplace" className="text-sm text-slate-500 hover:text-navy-700 transition-colors">&larr; Back to Marketplace</Link>
 
         {formSuccess && (
@@ -180,8 +180,7 @@ export default function ListingDetailPage() {
             {/* Header */}
             <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
               {listing.featured && <span className="badge bg-gold-50 text-gold-700 border border-gold-200 mb-3">Featured</span>}
-              <h1 className="text-2xl font-extrabold text-navy-900">{listing.title}</h1>
-              {listing.description && <p className="mt-2 text-slate-600 leading-relaxed">{listing.description}</p>}
+              <h1 className="text-xl sm:text-2xl font-extrabold text-navy-900">{listing.title}</h1>              {listing.description && <p className="mt-2 text-slate-600 leading-relaxed">{listing.description}</p>}
 
               <div className="mt-6 flex flex-wrap gap-2">
                 <span className="badge bg-navy-50 text-navy-700 border border-navy-200">{listing.vehicleType}</span>
@@ -211,7 +210,7 @@ export default function ListingDetailPage() {
                   {listing.destinationRegion && <div className="text-sm text-slate-500">{listing.destinationRegion}{listing.destinationCountry && `, ${listing.destinationCountry}`}</div>}
                 </div>
               </div>
-              <div className="mt-4 grid grid-cols-2 gap-4 pt-4 border-t border-slate-100">
+              <div className="mt-4 grid grid-cols-2 sm:grid-cols-2 gap-3 sm:gap-4 pt-4 border-t border-slate-100">
                 <div>
                   <div className="text-xs text-slate-400">Departure</div>
                   <div className="font-semibold text-navy-900">{formatDate(listing.departureDate)}</div>

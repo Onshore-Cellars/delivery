@@ -7,13 +7,13 @@ const faqs = [
   {
     category: 'Getting Started',
     items: [
-      { q: 'How do I create an account?', a: 'Click "Get Started" on the homepage and choose your role: Carrier (you deliver goods), Supplier (you supply goods to yachts), or Yacht Owner (you need deliveries). Fill in your details and you\'re ready to go.' },
+      { q: 'How do I create an account?', a: 'Click "Get Started" and choose your role: Carrier/Driver (you have van space), Provisioner/Vendor (you supply goods to yachts), or Owner/Management (you manage yachts and need deliveries). Fill in your details and you\'re ready to go.' },
       { q: 'Is YachtHop free to use?', a: 'Creating an account and browsing listings is completely free. We charge a 10% platform fee on completed bookings, which is deducted from the carrier\'s payout automatically.' },
       { q: 'What areas do you cover?', a: 'We cover ports and marinas across the Mediterranean, including France, Italy, Spain, Greece, Croatia, and more. Our network is growing — check the marketplace for current routes.' },
     ],
   },
   {
-    category: 'For Shippers',
+    category: 'For Provisioners & Vendors',
     items: [
       { q: 'How do I book a delivery?', a: 'Browse the marketplace, find a route that matches your needs, and click "Book Space". Enter your cargo details, delivery address (including yacht name and berth if applicable), and confirm your booking.' },
       { q: 'How do I track my shipment?', a: 'Every booking gets a unique tracking code (YH-XXXXXXXX). Visit the Track page, enter your code, and see real-time status updates from pickup to dockside delivery.' },
@@ -52,20 +52,20 @@ export default function HelpPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-center mb-12">
-          <h1 className="text-3xl font-extrabold text-navy-900 tracking-tight">Help Centre</h1>
-          <p className="mt-3 text-lg text-slate-500">Everything you need to know about using YachtHop</p>
+      <div className="max-w-4xl mx-auto px-5 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <div className="text-center mb-8 sm:mb-12">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-navy-900 tracking-tight">Help Centre</h1>
+          <p className="mt-2 sm:mt-3 text-base sm:text-lg text-slate-500">Everything you need to know about YachtHop</p>
         </div>
 
         {/* Quick Links */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-8 sm:mb-12">
           {[
             { title: 'Browse Marketplace', desc: 'Find available routes', href: '/marketplace', icon: 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' },
             { title: 'Track Shipment', desc: 'Enter your tracking code', href: '/tracking', icon: 'M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7' },
             { title: 'Create Account', desc: 'Get started for free', href: '/register', icon: 'M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z' },
           ].map(link => (
-            <Link key={link.href} href={link.href} className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 card-hover text-center">
+            <Link key={link.href} href={link.href} className="bg-white rounded-xl shadow-sm border border-slate-100 p-4 sm:p-6 card-hover text-center">
               <svg className="w-8 h-8 text-navy-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={link.icon} />
               </svg>
@@ -76,10 +76,10 @@ export default function HelpPage() {
         </div>
 
         {/* FAQ Sections */}
-        <div className="space-y-8">
+        <div className="space-y-6 sm:space-y-8">
           {faqs.map(section => (
             <div key={section.category}>
-              <h2 className="text-xl font-bold text-navy-900 mb-4">{section.category}</h2>
+              <h2 className="text-lg sm:text-xl font-bold text-navy-900 mb-3 sm:mb-4">{section.category}</h2>
               <div className="bg-white rounded-xl shadow-sm border border-slate-100 divide-y divide-slate-100">
                 {section.items.map((item, i) => {
                   const id = `${section.category}-${i}`
@@ -88,7 +88,7 @@ export default function HelpPage() {
                     <div key={id}>
                       <button
                         onClick={() => toggle(id)}
-                        className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-slate-50 transition-colors"
+                        className="w-full flex items-center justify-between px-4 sm:px-6 py-3.5 sm:py-4 text-left hover:bg-slate-50 active:bg-slate-100 transition-colors"
                       >
                         <span className="text-sm font-medium text-navy-900 pr-4">{item.q}</span>
                         <svg className={`w-5 h-5 text-slate-400 flex-shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -96,7 +96,7 @@ export default function HelpPage() {
                         </svg>
                       </button>
                       {isOpen && (
-                        <div className="px-6 pb-4">
+                        <div className="px-4 sm:px-6 pb-4">
                           <p className="text-sm text-slate-600 leading-relaxed">{item.a}</p>
                         </div>
                       )}
@@ -109,7 +109,7 @@ export default function HelpPage() {
         </div>
 
         {/* Contact */}
-        <div className="mt-12 bg-white rounded-xl shadow-sm border border-slate-100 p-8 text-center">
+        <div className="mt-8 sm:mt-12 bg-white rounded-xl shadow-sm border border-slate-100 p-5 sm:p-8 text-center">
           <h2 className="text-xl font-bold text-navy-900 mb-2">Still need help?</h2>
           <p className="text-slate-500 text-sm mb-6">Our support team is here for you</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

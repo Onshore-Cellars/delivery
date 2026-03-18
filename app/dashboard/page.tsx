@@ -105,33 +105,33 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8">
           <div>
-            <h1 className="text-2xl font-extrabold text-navy-900 tracking-tight">Dashboard</h1>
-            <p className="text-slate-500 mt-1">
+            <h1 className="text-xl sm:text-2xl font-extrabold text-navy-900 tracking-tight">Dashboard</h1>
+            <p className="text-sm text-slate-500 mt-0.5">
               Welcome back, {user.name}
               {user.company && <span className="text-slate-400"> &middot; {user.company}</span>}
             </p>
           </div>
           {user.role === 'CARRIER' && (
-            <Link href="/listings/create" className="mt-4 sm:mt-0 btn-gold text-sm !py-2.5 !px-5 inline-flex items-center gap-2">
+            <Link href="/listings/create" className="mt-3 sm:mt-0 btn-gold text-sm !py-2.5 !px-5 inline-flex items-center justify-center gap-2">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
-              List Space
+              List Van Space
             </Link>
           )}
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 mb-8 bg-white rounded-xl p-1 shadow-sm border border-slate-100 w-fit">
+        <div className="flex gap-1 mb-6 sm:mb-8 bg-white rounded-xl p-1 shadow-sm border border-slate-100 overflow-x-auto">
           {['overview', ...(user.role === 'CARRIER' ? ['listings'] : []), 'bookings'].map((t) => (
             <button
               key={t}
               onClick={() => setTab(t as typeof tab)}
-              className={`px-5 py-2 rounded-lg text-sm font-medium transition-all ${
+              className={`px-4 sm:px-5 py-2.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
                 tab === t
                   ? 'bg-navy-900 text-white shadow-sm'
                   : 'text-slate-500 hover:text-navy-900 hover:bg-slate-50'
@@ -152,7 +152,7 @@ export default function DashboardPage() {
             {tab === 'overview' && (
               <div className="space-y-8">
                 {/* Stats */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                   {user.role === 'CARRIER' && (
                     <>
                       <StatCard label="Active Listings" value={listings.filter(l => l.status === 'ACTIVE').length.toString()} />
@@ -183,7 +183,7 @@ export default function DashboardPage() {
 
                 {/* Recent activity */}
                 <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
-                  <div className="px-6 py-4 border-b border-slate-100">
+                  <div className="px-4 sm:px-6 py-4 border-b border-slate-100">
                     <h2 className="font-semibold text-navy-900">Recent Bookings</h2>
                   </div>
                   {bookings.length === 0 ? (
@@ -194,7 +194,7 @@ export default function DashboardPage() {
                   ) : (
                     <div className="divide-y divide-slate-100">
                       {bookings.slice(0, 5).map(b => (
-                        <div key={b.id} className="px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
+                        <div key={b.id} className="px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between hover:bg-slate-50 transition-colors gap-2">
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-3">
                               <span className={`badge border ${statusColors[b.status] || 'bg-slate-100 text-slate-600'}`}>
@@ -206,7 +206,7 @@ export default function DashboardPage() {
                               {b.listing.originPort} &rarr; {b.listing.destinationPort} &middot; {formatDate(b.listing.departureDate)}
                             </div>
                           </div>
-                          <div className="text-right ml-4">
+                          <div className="text-left sm:text-right ml-0 sm:ml-4">
                             <div className="text-sm font-semibold text-navy-900">{formatCurrency(b.totalPrice, b.currency)}</div>
                             {b.trackingCode && <div className="text-xs text-slate-400 font-mono">{b.trackingCode}</div>}
                           </div>
@@ -228,8 +228,8 @@ export default function DashboardPage() {
                   </div>
                 ) : (
                   listings.map(l => (
-                    <div key={l.id} className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 card-hover">
-                      <div className="flex items-start justify-between">
+                    <div key={l.id} className="bg-white rounded-xl shadow-sm border border-slate-100 p-4 sm:p-6 card-hover">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                         <div>
                           <div className="flex items-center gap-3 mb-2">
                             <h3 className="font-semibold text-navy-900">{l.title}</h3>
@@ -239,11 +239,11 @@ export default function DashboardPage() {
                             {l.originPort} &rarr; {l.destinationPort} &middot; {formatDate(l.departureDate)}
                           </p>
                         </div>
-                        <div className="text-right">
+                        <div className="sm:text-right">
                           <div className="text-sm text-slate-500">
                             {l.availableKg.toFixed(0)}kg / {l.availableM3.toFixed(1)}m&sup3; available
                           </div>
-                          <div className="mt-1 w-32 h-2 bg-slate-100 rounded-full overflow-hidden">
+                          <div className="mt-1 w-full sm:w-32 h-2 bg-slate-100 rounded-full overflow-hidden">
                             <div
                               className="h-full bg-navy-600 rounded-full"
                               style={{ width: `${((l.totalCapacityKg - l.availableKg) / l.totalCapacityKg * 100)}%` }}
@@ -267,8 +267,8 @@ export default function DashboardPage() {
                   </div>
                 ) : (
                   bookings.map(b => (
-                    <div key={b.id} className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 card-hover">
-                      <div className="flex items-start justify-between">
+                    <div key={b.id} className="bg-white rounded-xl shadow-sm border border-slate-100 p-4 sm:p-6 card-hover">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                         <div>
                           <div className="flex items-center gap-3 mb-2">
                             <span className={`badge border ${statusColors[b.status]}`}>{b.status.replace('_', ' ')}</span>
@@ -281,7 +281,7 @@ export default function DashboardPage() {
                             Carrier: {b.listing.carrier.name}{b.listing.carrier.company && ` (${b.listing.carrier.company})`}
                           </p>
                         </div>
-                        <div className="text-right">
+                        <div className="sm:text-right">
                           <div className="text-lg font-bold text-navy-900">{formatCurrency(b.totalPrice, b.currency)}</div>
                           <div className="text-xs text-slate-400">{b.weightKg}kg &middot; {b.volumeM3}m&sup3;</div>
                           {b.trackingCode && (
@@ -303,9 +303,9 @@ export default function DashboardPage() {
 
 function StatCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-5">
-      <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{label}</div>
-      <div className="mt-2 text-2xl font-extrabold text-navy-900">{value}</div>
+    <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-4 sm:p-5">
+      <div className="text-[11px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">{label}</div>
+      <div className="mt-1.5 sm:mt-2 text-xl sm:text-2xl font-extrabold text-navy-900">{value}</div>
     </div>
   )
 }

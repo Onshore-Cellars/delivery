@@ -220,11 +220,11 @@ export default function QuotesPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-5xl mx-auto px-5 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-extrabold text-navy-900 tracking-tight">Quotes</h1>
+            <h1 className="text-xl sm:text-2xl font-extrabold text-navy-900 tracking-tight">Quotes</h1>
             <p className="text-sm text-slate-500 mt-1">Request, manage, and respond to shipping quotes</p>
           </div>
           <button

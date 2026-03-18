@@ -113,19 +113,19 @@ export default function CreateListingPage() {
     )
   }
 
-  const inputCls = "w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none"
+  const inputCls = "w-full px-4 py-3 sm:py-2.5 rounded-lg border border-slate-200 text-base sm:text-sm text-navy-900 focus:border-navy-400 focus:ring-2 focus:ring-navy-100 outline-none"
   const selectCls = `${inputCls} bg-white`
   const labelCls = "block text-sm font-medium text-navy-900 mb-1.5"
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
+      <div className="max-w-3xl mx-auto px-5 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <div className="mb-6 sm:mb-8">
           <Link href="/dashboard" className="text-sm text-slate-500 hover:text-navy-700 transition-colors">
             &larr; Back to Dashboard
           </Link>
-          <h1 className="text-2xl font-extrabold text-navy-900 tracking-tight mt-4">List Available Space</h1>
-          <p className="text-slate-500 mt-1">Create a new route listing to offer your van space.</p>
+          <h1 className="text-xl sm:text-2xl font-extrabold text-navy-900 tracking-tight mt-3 sm:mt-4">List Your Van Space</h1>
+          <p className="text-sm text-slate-500 mt-1">Share spare capacity on your next yacht-route run.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
@@ -136,11 +136,11 @@ export default function CreateListingPage() {
           )}
 
           {/* Vehicle Selection */}
-          <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-4 sm:p-6">
             <h2 className="text-lg font-bold text-navy-900 mb-1">Vehicle Selection</h2>
             <p className="text-xs text-slate-400 mb-4">Select your vehicle to auto-fill capacity specs, or enter manually below.</p>
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className={labelCls}>Vehicle Make</label>
                   <select
@@ -177,7 +177,7 @@ export default function CreateListingPage() {
                     <span className="font-semibold text-navy-900 text-sm">{selectedSpec.make} {selectedSpec.model}</span>
                     <span className="ml-auto text-xs font-medium px-2 py-0.5 rounded-full bg-navy-100 text-navy-700">{selectedSpec.type}</span>
                   </div>
-                  <div className="grid grid-cols-4 gap-3 text-xs">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
                     <div className="bg-white rounded-lg p-2.5 text-center">
                       <div className="font-bold text-navy-900 text-base">{selectedSpec.maxPayloadKg}</div>
                       <div className="text-slate-400 mt-0.5">kg payload</div>
@@ -201,7 +201,7 @@ export default function CreateListingPage() {
           </div>
 
           {/* Route Details */}
-          <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-4 sm:p-6">
             <h2 className="text-lg font-bold text-navy-900 mb-4">Route Details</h2>
             <div className="space-y-4">
               <div>
@@ -229,7 +229,7 @@ export default function CreateListingPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className={labelCls}>Origin Port *</label>
                   <input
@@ -255,7 +255,7 @@ export default function CreateListingPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className={labelCls}>Destination Port *</label>
                   <input
@@ -281,7 +281,7 @@ export default function CreateListingPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className={labelCls}>Departure Date *</label>
                   <input
@@ -308,12 +308,12 @@ export default function CreateListingPage() {
           </div>
 
           {/* Vehicle & Capacity */}
-          <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-4 sm:p-6">
             <h2 className="text-lg font-bold text-navy-900 mb-1">Vehicle & Capacity</h2>
             {selectedSpec && <p className="text-xs text-emerald-500 font-medium mb-4">Auto-filled from {selectedSpec.make} {selectedSpec.model} specs. You can override any value.</p>}
             {!selectedSpec && <p className="text-xs text-slate-400 mb-4">Enter capacity manually, or select a vehicle above to auto-fill.</p>}
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className={labelCls}>Vehicle Type *</label>
                   <select
@@ -340,7 +340,7 @@ export default function CreateListingPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className={labelCls}>Max Payload (kg) *</label>
                   <input
@@ -369,7 +369,7 @@ export default function CreateListingPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                 <div>
                   <label className={labelCls}>Max Item Length (cm)</label>
                   <input
@@ -409,7 +409,7 @@ export default function CreateListingPage() {
               </div>
 
               {/* Vehicle Features */}
-              <div className="pt-4 border-t border-slate-100 grid grid-cols-3 gap-4">
+              <div className="pt-4 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input type="checkbox" name="hasRefrigeration" checked={form.hasRefrigeration} onChange={handleChange} className="w-4 h-4 rounded border-slate-300 text-navy-700 focus:ring-navy-400" />
                   <span className="text-sm text-navy-900">Refrigeration</span>
@@ -427,7 +427,7 @@ export default function CreateListingPage() {
           </div>
 
           {/* Cargo Restrictions */}
-          <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-4 sm:p-6">
             <h2 className="text-lg font-bold text-navy-900 mb-4">Cargo Details</h2>
             <div className="space-y-4">
               <div>
@@ -436,7 +436,7 @@ export default function CreateListingPage() {
                   name="acceptedCargo"
                   type="text"
                   className={inputCls}
-                  placeholder="e.g. Marine parts, provisions, electronics, general supplies"
+                  placeholder="e.g. Marine parts, provisions, wine, electronics, general supplies"
                   value={form.acceptedCargo}
                   onChange={handleChange}
                 />
@@ -456,10 +456,10 @@ export default function CreateListingPage() {
           </div>
 
           {/* Pricing */}
-          <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-4 sm:p-6">
             <h2 className="text-lg font-bold text-navy-900 mb-4">Pricing</h2>
             <div className="space-y-4">
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className={labelCls}>Price per kg</label>
                   <input
@@ -498,7 +498,7 @@ export default function CreateListingPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className={labelCls}>Currency</label>
                   <select
@@ -562,15 +562,14 @@ export default function CreateListingPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
             <button
               type="submit"
               disabled={loading}
-              className="btn-gold !py-3 !px-8 text-sm disabled:opacity-50"
-            >
+              className="btn-gold !py-3 sm:!px-8 text-sm disabled:opacity-50 w-full sm:w-auto">
               {loading ? 'Creating...' : 'Publish Listing'}
             </button>
-            <Link href="/dashboard" className="text-sm text-slate-500 hover:text-navy-700 transition-colors">
+            <Link href="/dashboard" className="text-sm text-slate-500 hover:text-navy-700 transition-colors text-center">
               Cancel
             </Link>
           </div>

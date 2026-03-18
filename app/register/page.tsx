@@ -45,8 +45,8 @@ function RegisterForm() {
   const roles = [
     {
       value: 'CARRIER',
-      label: 'Carrier',
-      desc: 'I have van space to offer',
+      label: 'Carrier / Driver',
+      desc: 'I have van space on yacht routes',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
@@ -55,8 +55,8 @@ function RegisterForm() {
     },
     {
       value: 'SUPPLIER',
-      label: 'Supplier',
-      desc: 'I supply goods to yachts',
+      label: 'Provisioner / Vendor',
+      desc: 'I supply goods to the yachting industry',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
@@ -65,8 +65,8 @@ function RegisterForm() {
     },
     {
       value: 'YACHT_OWNER',
-      label: 'Yacht Owner',
-      desc: 'I need deliveries to my yacht',
+      label: 'Owner / Management',
+      desc: 'I manage yachts and need deliveries',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
@@ -83,10 +83,9 @@ function RegisterForm() {
           <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center mx-auto mb-8">
             <span className="text-gold-400 font-bold text-2xl">YH</span>
           </div>
-          <h2 className="text-3xl font-bold text-white mb-4">Join the Marketplace</h2>
+          <h2 className="text-3xl font-bold text-white mb-4">The Yachting Logistics Marketplace</h2>
           <p className="text-slate-300 leading-relaxed">
-            Whether you&apos;re a carrier with spare capacity or a yacht owner needing reliable delivery,
-            YachtHop connects you with the right partners across the Mediterranean.
+            Provisioners, vendors, yacht management, crew &mdash; share van space, post loads, bid on transport. Built exclusively for the yachting industry.
           </p>
         </div>
       </div>
@@ -101,8 +100,8 @@ function RegisterForm() {
               </div>
               <span className="text-lg font-bold text-navy-900 tracking-tight">YachtHop</span>
             </Link>
-            <h1 className="text-3xl font-extrabold text-navy-900 tracking-tight">Create your account</h1>
-            <p className="mt-2 text-slate-500">Get started in under a minute.</p>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-navy-900 tracking-tight">Create your account</h1>
+            <p className="mt-2 text-sm sm:text-base text-slate-500">Join the yachting logistics marketplace.</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">

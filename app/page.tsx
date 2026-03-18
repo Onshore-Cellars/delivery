@@ -2,326 +2,414 @@
 
 import Link from 'next/link'
 import { useAuth } from './components/AuthProvider'
-import Navbar from './components/Navbar'
+import { useState } from 'react'
 
 export default function Home() {
   const { user } = useAuth()
+  const [mobileNav, setMobileNav] = useState(false)
 
   return (
     <div className="min-h-screen">
-      {/* Landing gets its own navbar with transparent bg */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-transparent">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-20">
-            <div className="flex items-center">
-              <Link href="/" className="flex items-center gap-2">
-                <div className="w-9 h-9 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center">
-                  <span className="text-gold-400 font-bold text-sm">YH</span>
-                </div>
-                <span className="text-lg font-bold text-white tracking-tight">
-                  YachtHop
-                </span>
-              </Link>
-            </div>
-            <div className="hidden md:flex items-center gap-2">
-              <Link href="/marketplace" className="px-4 py-2 text-sm font-medium text-white/80 hover:text-white transition-colors">
+      {/* Navbar — transparent over hero */}
+      <nav className="fixed top-0 left-0 right-0 z-50">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 sm:h-20">
+            <Link href="/" className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center">
+                <span className="text-gold-400 font-bold text-sm">YH</span>
+              </div>
+              <span className="text-lg font-bold text-white tracking-tight">YachtHop</span>
+            </Link>
+
+            {/* Desktop */}
+            <div className="hidden md:flex items-center gap-1">
+              <Link href="/marketplace" className="px-4 py-2 text-sm font-medium text-white/70 hover:text-white transition-colors rounded-lg">
                 Marketplace
               </Link>
+              <Link href="/tracking" className="px-4 py-2 text-sm font-medium text-white/70 hover:text-white transition-colors rounded-lg">
+                Track
+              </Link>
               {user ? (
-                <Link href="/dashboard" className="btn-gold text-sm !py-2 !px-5">
-                  Dashboard
-                </Link>
+                <Link href="/dashboard" className="btn-gold text-sm !py-2 !px-5 !min-h-0">Dashboard</Link>
               ) : (
                 <>
-                  <Link href="/login" className="px-4 py-2 text-sm font-medium text-white/80 hover:text-white transition-colors">
+                  <Link href="/login" className="px-4 py-2 text-sm font-medium text-white/70 hover:text-white transition-colors rounded-lg">
                     Sign In
                   </Link>
-                  <Link href="/register" className="btn-gold text-sm !py-2 !px-5">
+                  <Link href="/register" className="btn-gold text-sm !py-2.5 !px-5 !min-h-0">
                     Get Started
                   </Link>
                 </>
               )}
             </div>
-            {/* Mobile: just show key links */}
-            <div className="md:hidden flex items-center gap-3">
-              <Link href="/marketplace" className="text-sm text-white/80">Marketplace</Link>
-              <Link href={user ? "/dashboard" : "/register"} className="btn-gold text-xs !py-1.5 !px-3">
-                {user ? "Dashboard" : "Get Started"}
-              </Link>
-            </div>
+
+            {/* Mobile hamburger */}
+            <button
+              onClick={() => setMobileNav(!mobileNav)}
+              className="md:hidden p-2 -mr-1 rounded-lg text-white/80 hover:text-white active:bg-white/10 transition-colors"
+              aria-label="Menu"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {mobileNav ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
+            </button>
           </div>
         </div>
+
+        {/* Mobile menu */}
+        {mobileNav && (
+          <>
+            <div className="mobile-menu-overlay fixed inset-0 z-40 md:hidden" onClick={() => setMobileNav(false)} />
+            <div className="md:hidden absolute top-full left-0 right-0 z-50 bg-navy-900/95 backdrop-blur-xl border-t border-white/10 shadow-2xl">
+              <div className="px-5 py-4 space-y-1 stagger">
+                <Link href="/marketplace" onClick={() => setMobileNav(false)} className="animate-fade-up block px-4 py-3 text-base font-medium text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+                  Marketplace
+                </Link>
+                <Link href="/tracking" onClick={() => setMobileNav(false)} className="animate-fade-up block px-4 py-3 text-base font-medium text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+                  Track Shipment
+                </Link>
+                {user ? (
+                  <Link href="/dashboard" onClick={() => setMobileNav(false)} className="animate-fade-up block px-4 py-3 text-base font-medium text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+                    Dashboard
+                  </Link>
+                ) : (
+                  <>
+                    <Link href="/login" onClick={() => setMobileNav(false)} className="animate-fade-up block px-4 py-3 text-base font-medium text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+                      Sign In
+                    </Link>
+                    <div className="animate-fade-up pt-2">
+                      <Link href="/register" onClick={() => setMobileNav(false)} className="btn-gold w-full text-center text-base !py-3">
+                        Get Started
+                      </Link>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          </>
+        )}
       </nav>
 
-      {/* Hero */}
+      {/* ── Hero ── */}
       <section className="hero-gradient pattern-overlay relative overflow-hidden">
-        {/* Decorative elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-gold-500/5 rounded-full blur-3xl" />
-          <div className="absolute top-1/2 -left-20 w-60 h-60 bg-sea-500/5 rounded-full blur-3xl" />
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-32 -right-32 w-64 sm:w-96 h-64 sm:h-96 bg-gold-500/[0.04] rounded-full blur-3xl" />
+          <div className="absolute bottom-0 -left-16 w-48 h-48 bg-sea-500/[0.03] rounded-full blur-3xl" />
           <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold-500/20 to-transparent" />
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-24 lg:pt-40 lg:pb-32">
+        <div className="relative max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pt-28 pb-16 sm:pt-36 sm:pb-24 lg:pt-44 lg:pb-32">
           <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm mb-6">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.06] border border-white/10 backdrop-blur-sm mb-5 sm:mb-6">
               <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-xs font-medium text-white/70 tracking-wide uppercase">
+              <span className="text-[11px] sm:text-xs font-medium text-white/60 tracking-widest uppercase">
                 Premium Yacht Logistics
               </span>
             </div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-[1.1] tracking-tight">
+            <h1 className="text-[2.25rem] leading-[1.1] sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight">
               Deliver to any yacht,{' '}
               <span className="gradient-text">anywhere.</span>
             </h1>
 
-            <p className="mt-6 text-lg sm:text-xl text-slate-300 max-w-2xl leading-relaxed">
-              The marketplace where suppliers share van space to ports and marinas.
-              Book space for provisions, equipment, and luxury goods — delivered dockside.
+            <p className="mt-5 sm:mt-6 text-base sm:text-lg lg:text-xl text-slate-300/90 max-w-2xl leading-relaxed">
+              Share van space to ports and marinas. Book capacity for provisions, 
+              equipment, and luxury goods — delivered dockside.
             </p>
 
-            <div className="mt-10 flex flex-col sm:flex-row gap-4">
-              <Link href="/register" className="btn-gold text-center text-base !py-3.5 !px-8">
-                Start Shipping
+            <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row gap-3 sm:gap-4">
+              <Link href="/marketplace" className="btn-gold text-center">
+                Find Available Space
               </Link>
-              <Link
-                href="/marketplace"
-                className="inline-flex items-center justify-center px-8 py-3.5 rounded-lg text-base font-semibold text-white border border-white/20 hover:bg-white/5 transition-all"
-              >
-                Browse Routes
-                <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              </Link>
-            </div>
-
-            {/* Stats */}
-            <div className="mt-16 grid grid-cols-3 gap-8 max-w-lg">
-              <div>
-                <div className="text-2xl sm:text-3xl font-bold text-white">50+</div>
-                <div className="text-sm text-slate-400 mt-1">Ports Covered</div>
-              </div>
-              <div>
-                <div className="text-2xl sm:text-3xl font-bold text-white">200+</div>
-                <div className="text-sm text-slate-400 mt-1">Active Carriers</div>
-              </div>
-              <div>
-                <div className="text-2xl sm:text-3xl font-bold text-white">98%</div>
-                <div className="text-sm text-slate-400 mt-1">On-Time Rate</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How it works */}
-      <section className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-navy-900 tracking-tight">
-              How it works
-            </h2>
-            <p className="mt-4 text-lg text-slate-500 max-w-2xl mx-auto">
-              Three simple steps to get your cargo delivered to any port or marina
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            <div className="text-center">
-              <div className="mx-auto w-16 h-16 rounded-2xl bg-navy-50 flex items-center justify-center mb-6">
-                <svg className="w-8 h-8 text-navy-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
-              <div className="text-xs font-bold text-gold-500 uppercase tracking-widest mb-2">Step 1</div>
-              <h3 className="text-xl font-bold text-navy-900 mb-3">Find a Route</h3>
-              <p className="text-slate-500 leading-relaxed">
-                Search for carriers heading to your port. Filter by date, capacity, and cargo type.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="mx-auto w-16 h-16 rounded-2xl bg-navy-50 flex items-center justify-center mb-6">
-                <svg className="w-8 h-8 text-navy-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                </svg>
-              </div>
-              <div className="text-xs font-bold text-gold-500 uppercase tracking-widest mb-2">Step 2</div>
-              <h3 className="text-xl font-bold text-navy-900 mb-3">Book Space</h3>
-              <p className="text-slate-500 leading-relaxed">
-                Reserve exactly the capacity you need. Pay securely online with instant confirmation.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="mx-auto w-16 h-16 rounded-2xl bg-navy-50 flex items-center justify-center mb-6">
-                <svg className="w-8 h-8 text-navy-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              <div className="text-xs font-bold text-gold-500 uppercase tracking-widest mb-2">Step 3</div>
-              <h3 className="text-xl font-bold text-navy-900 mb-3">Delivered Dockside</h3>
-              <p className="text-slate-500 leading-relaxed">
-                Track your cargo in real-time. Delivered directly to the marina, ready for your yacht.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* For Carriers / For Shippers */}
-      <section className="py-24 bg-slate-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* Carriers */}
-            <div className="bg-white rounded-2xl p-8 lg:p-10 shadow-sm border border-slate-100 card-hover">
-              <div className="w-12 h-12 rounded-xl bg-navy-900 flex items-center justify-center mb-6">
-                <svg className="w-6 h-6 text-gold-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold text-navy-900 mb-3">For Carriers & Suppliers</h3>
-              <p className="text-slate-500 mb-6 leading-relaxed">
-                Already running deliveries to ports? List your spare van space and earn extra revenue
-                on routes you're making anyway. Set your own prices, manage bookings on your terms.
-              </p>
-              <ul className="space-y-3 mb-8">
-                {['List available space in minutes', 'Set your own pricing model', 'Manage bookings from your dashboard', 'Get paid directly via Stripe'].map((item) => (
-                  <li key={item} className="flex items-center gap-3 text-sm text-slate-600">
-                    <div className="w-5 h-5 rounded-full bg-emerald-50 flex items-center justify-center flex-shrink-0">
-                      <svg className="w-3 h-3 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <Link href="/register?role=CARRIER" className="btn-primary inline-block text-sm !py-2.5">
-                Start as a Carrier
-              </Link>
-            </div>
-
-            {/* Shippers */}
-            <div className="bg-white rounded-2xl p-8 lg:p-10 shadow-sm border border-slate-100 card-hover">
-              <div className="w-12 h-12 rounded-xl bg-navy-900 flex items-center justify-center mb-6">
-                <svg className="w-6 h-6 text-gold-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold text-navy-900 mb-3">For Yacht Owners & Suppliers</h3>
-              <p className="text-slate-500 mb-6 leading-relaxed">
-                Need provisions, equipment, or supplies delivered to a yacht? Browse available routes,
-                book space, and track your delivery — all from one premium platform.
-              </p>
-              <ul className="space-y-3 mb-8">
-                {['Search routes by port and date', 'Book exactly the space you need', 'Track deliveries in real-time', 'Secure payment with full protection'].map((item) => (
-                  <li key={item} className="flex items-center gap-3 text-sm text-slate-600">
-                    <div className="w-5 h-5 rounded-full bg-emerald-50 flex items-center justify-center flex-shrink-0">
-                      <svg className="w-3 h-3 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <Link href="/register?role=YACHT_OWNER" className="btn-primary inline-block text-sm !py-2.5">
-                Start Shipping
+              <Link href="/listings/create" className="btn-outline text-center">
+                List Your Van Space
               </Link>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* Popular Routes */}
-      <section className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-navy-900 tracking-tight">
-              Popular Routes
-            </h2>
-            <p className="mt-4 text-lg text-slate-500">
-              Covering the Mediterranean&apos;s premier yachting destinations
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Stats — compact on mobile */}
+          <div className="mt-12 sm:mt-16 flex gap-8 sm:gap-12">
             {[
-              { from: 'Antibes', to: 'Monaco', region: 'French Riviera' },
-              { from: 'Palma', to: 'Ibiza', region: 'Balearics' },
-              { from: 'Genoa', to: 'Portofino', region: 'Italian Riviera' },
-              { from: 'Athens', to: 'Mykonos', region: 'Greek Islands' },
-            ].map((route) => (
-              <div
-                key={route.from + route.to}
-                className="group bg-slate-50 rounded-xl p-6 border border-slate-100 hover:border-navy-200 hover:shadow-lg transition-all cursor-pointer card-hover"
-              >
-                <div className="text-xs font-semibold text-gold-500 uppercase tracking-widest mb-3">{route.region}</div>
-                <div className="flex items-center gap-3">
-                  <span className="font-bold text-navy-900">{route.from}</span>
-                  <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
-                  <span className="font-bold text-navy-900">{route.to}</span>
-                </div>
-                <div className="mt-3 text-sm text-slate-500 group-hover:text-navy-600 transition-colors">
-                  View available space &rarr;
-                </div>
+              { value: '50+', label: 'Ports' },
+              { value: '200+', label: 'Carriers' },
+              { value: '98%', label: 'On-Time' },
+            ].map((stat) => (
+              <div key={stat.label}>
+                <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">{stat.value}</div>
+                <div className="text-xs sm:text-sm text-slate-400/80 mt-0.5">{stat.label}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="hero-gradient py-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            Ready to streamline your yacht logistics?
+      {/* ── What do you need? ── */}
+      <section className="py-16 sm:py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+          <div className="text-center mb-10 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-navy-900 tracking-tight">
+              What do you need?
+            </h2>
+            <p className="mt-3 sm:mt-4 text-base sm:text-lg text-slate-500 max-w-xl mx-auto">
+              Whether you&apos;re shipping or carrying, we&apos;ve got you covered.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 max-w-3xl mx-auto">
+            {/* Need Delivery */}
+            <Link
+              href="/marketplace"
+              className="group relative bg-gradient-to-br from-navy-50 to-white rounded-2xl p-6 sm:p-8 border border-navy-100 hover:border-navy-200 transition-all card-hover"
+            >
+              <div className="w-12 h-12 rounded-xl bg-navy-900 flex items-center justify-center mb-5">
+                <svg className="w-6 h-6 text-gold-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                </svg>
+              </div>
+              <h3 className="text-lg sm:text-xl font-bold text-navy-900 mb-2">I need something delivered</h3>
+              <p className="text-sm sm:text-base text-slate-500 leading-relaxed mb-4">
+                Provisions, equipment, wine, or supplies — find a carrier heading to your port.
+              </p>
+              <span className="inline-flex items-center gap-1 text-sm font-semibold text-navy-700 group-hover:text-navy-900 transition-colors">
+                Browse routes
+                <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </span>
+            </Link>
+
+            {/* Have Space */}
+            <Link
+              href="/listings/create"
+              className="group relative bg-gradient-to-br from-gold-50 to-white rounded-2xl p-6 sm:p-8 border border-gold-100 hover:border-gold-200 transition-all card-hover"
+            >
+              <div className="w-12 h-12 rounded-xl bg-navy-900 flex items-center justify-center mb-5">
+                <svg className="w-6 h-6 text-gold-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                </svg>
+              </div>
+              <h3 className="text-lg sm:text-xl font-bold text-navy-900 mb-2">I have van space available</h3>
+              <p className="text-sm sm:text-base text-slate-500 leading-relaxed mb-4">
+                Already heading to a port? List your spare capacity and earn on routes you&apos;re making.
+              </p>
+              <span className="inline-flex items-center gap-1 text-sm font-semibold text-navy-700 group-hover:text-navy-900 transition-colors">
+                List space
+                <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── How it works ── */}
+      <section className="py-16 sm:py-24 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+          <div className="text-center mb-10 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-navy-900 tracking-tight">
+              Simple as 1-2-3
+            </h2>
+            <p className="mt-3 sm:mt-4 text-base sm:text-lg text-slate-500 max-w-xl mx-auto">
+              Book cargo space in minutes, not hours.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-10 max-w-4xl mx-auto">
+            {[
+              {
+                step: '1',
+                title: 'Find a Route',
+                desc: 'Search by port, date, and cargo type. See real-time availability.',
+                icon: 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z',
+              },
+              {
+                step: '2',
+                title: 'Book & Pay',
+                desc: 'Reserve the exact space you need. Secure checkout with instant confirmation.',
+                icon: 'M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4',
+              },
+              {
+                step: '3',
+                title: 'Delivered Dockside',
+                desc: 'Track in real-time. Your goods arrive direct to the marina berth.',
+                icon: 'M5 13l4 4L19 7',
+              },
+            ].map((item) => (
+              <div key={item.step} className="text-center sm:text-left">
+                <div className="mx-auto sm:mx-0 w-14 h-14 rounded-2xl bg-white shadow-sm border border-slate-100 flex items-center justify-center mb-5">
+                  <svg className="w-6 h-6 text-navy-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={item.icon} />
+                  </svg>
+                </div>
+                <div className="text-[11px] font-bold text-gold-500 uppercase tracking-widest mb-1.5">Step {item.step}</div>
+                <h3 className="text-lg font-bold text-navy-900 mb-2">{item.title}</h3>
+                <p className="text-sm text-slate-500 leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Popular Routes ── */}
+      <section className="py-16 sm:py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+          <div className="flex items-end justify-between mb-8 sm:mb-12">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-navy-900 tracking-tight">
+                Popular Routes
+              </h2>
+              <p className="mt-2 text-sm sm:text-base text-slate-500">
+                The Mediterranean&apos;s premier yachting destinations
+              </p>
+            </div>
+            <Link href="/marketplace" className="hidden sm:inline-flex items-center gap-1 text-sm font-semibold text-navy-700 hover:text-navy-900 transition-colors">
+              View all
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </div>
+
+          {/* Horizontal scroll on mobile, grid on desktop */}
+          <div className="flex gap-4 overflow-x-auto pb-4 -mx-5 px-5 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:overflow-visible sm:pb-0">
+            {[
+              { from: 'Antibes', to: 'Monaco', region: 'French Riviera', emoji: '🇫🇷' },
+              { from: 'Palma', to: 'Ibiza', region: 'Balearics', emoji: '🇪🇸' },
+              { from: 'Genoa', to: 'Portofino', region: 'Italian Riviera', emoji: '🇮🇹' },
+              { from: 'Athens', to: 'Mykonos', region: 'Greek Islands', emoji: '🇬🇷' },
+            ].map((route) => (
+              <Link
+                key={route.from + route.to}
+                href={`/marketplace?origin=${route.from}&destination=${route.to}`}
+                className="group flex-shrink-0 w-[260px] sm:w-auto bg-slate-50 rounded-xl p-5 sm:p-6 border border-slate-100 hover:border-navy-200 hover:shadow-md transition-all card-hover"
+              >
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-base">{route.emoji}</span>
+                  <span className="text-xs font-semibold text-gold-600 uppercase tracking-widest">{route.region}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-navy-900 text-sm sm:text-base">{route.from}</span>
+                  <svg className="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                  <span className="font-bold text-navy-900 text-sm sm:text-base">{route.to}</span>
+                </div>
+                <div className="mt-3 text-xs sm:text-sm text-slate-400 group-hover:text-navy-600 transition-colors">
+                  View space &rarr;
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          <Link href="/marketplace" className="sm:hidden flex items-center justify-center gap-1 mt-6 text-sm font-semibold text-navy-700">
+            View all routes
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </Link>
+        </div>
+      </section>
+
+      {/* ── Who is this for ── */}
+      <section className="py-16 sm:py-24 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-8">
+            {/* Carriers */}
+            <div className="bg-white rounded-2xl p-6 sm:p-8 lg:p-10 shadow-sm border border-slate-100">
+              <h3 className="text-xl sm:text-2xl font-bold text-navy-900 mb-2">For Carriers & Drivers</h3>
+              <p className="text-sm sm:text-base text-slate-500 mb-5 leading-relaxed">
+                Already heading to a port or marina? Monetise your spare van space.
+              </p>
+              <ul className="space-y-2.5 mb-6">
+                {['List space in under 2 minutes', 'Set your own prices', 'Get paid directly via Stripe', 'Manage everything from your phone'].map((item) => (
+                  <li key={item} className="flex items-start gap-2.5 text-sm text-slate-600">
+                    <svg className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <Link href="/register?role=CARRIER" className="btn-primary text-sm !py-2.5">
+                Start as a Carrier
+              </Link>
+            </div>
+
+            {/* Shippers */}
+            <div className="bg-white rounded-2xl p-6 sm:p-8 lg:p-10 shadow-sm border border-slate-100">
+              <h3 className="text-xl sm:text-2xl font-bold text-navy-900 mb-2">For Yacht Owners & Suppliers</h3>
+              <p className="text-sm sm:text-base text-slate-500 mb-5 leading-relaxed">
+                Need provisions or supplies delivered to a yacht? We connect you with carriers on route.
+              </p>
+              <ul className="space-y-2.5 mb-6">
+                {['Search routes by port & date', 'Book exactly the space you need', 'Track deliveries in real-time', 'Secure payment with protection'].map((item) => (
+                  <li key={item} className="flex items-start gap-2.5 text-sm text-slate-600">
+                    <svg className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <Link href="/register?role=YACHT_OWNER" className="btn-primary text-sm !py-2.5">
+                Start Shipping
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA ── */}
+      <section className="hero-gradient py-16 sm:py-20">
+        <div className="max-w-3xl mx-auto px-5 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight">
+            Ready to simplify your yacht logistics?
           </h2>
-          <p className="mt-4 text-lg text-slate-300 max-w-2xl mx-auto">
-            Join the marketplace trusted by carriers and yacht owners across the Mediterranean.
+          <p className="mt-4 text-base sm:text-lg text-slate-300/90 max-w-xl mx-auto">
+            Join carriers and yacht owners across the Mediterranean.
           </p>
-          <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/register" className="btn-gold text-base !py-3.5 !px-8">
+          <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+            <Link href="/register" className="btn-gold text-center">
               Create Free Account
             </Link>
-            <Link href="/marketplace" className="inline-flex items-center justify-center px-8 py-3.5 rounded-lg text-base font-semibold text-white border border-white/20 hover:bg-white/5 transition-all">
+            <Link href="/marketplace" className="btn-outline text-center">
               Browse Marketplace
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
+      {/* ── Footer ── */}
       <footer className="bg-navy-950 border-t border-white/5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div className="md:col-span-2">
-              <div className="flex items-center gap-2 mb-4">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-10 sm:py-12">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-8">
+            <div className="col-span-2">
+              <div className="flex items-center gap-2 mb-3">
                 <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
                   <span className="text-gold-400 font-bold text-sm">YH</span>
                 </div>
                 <span className="text-lg font-bold text-white tracking-tight">YachtHop</span>
               </div>
-              <p className="text-slate-400 text-sm max-w-sm leading-relaxed">
-                The premium marketplace for yacht logistics. Connecting carriers with spare capacity
-                to yacht owners and suppliers who need reliable delivery to ports and marinas.
+              <p className="text-slate-400 text-sm max-w-xs leading-relaxed">
+                Premium yacht logistics. Connecting carriers with yacht owners and suppliers across the Med.
               </p>
             </div>
             <div>
-              <h4 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Platform</h4>
-              <div className="space-y-2.5">
+              <h4 className="text-xs font-semibold text-white uppercase tracking-wider mb-3">Platform</h4>
+              <div className="space-y-2">
                 <Link href="/marketplace" className="block text-sm text-slate-400 hover:text-white transition-colors">Marketplace</Link>
+                <Link href="/tracking" className="block text-sm text-slate-400 hover:text-white transition-colors">Track</Link>
                 <Link href="/register?role=CARRIER" className="block text-sm text-slate-400 hover:text-white transition-colors">Become a Carrier</Link>
-                <Link href="/register" className="block text-sm text-slate-400 hover:text-white transition-colors">Sign Up</Link>
               </div>
             </div>
             <div>
-              <h4 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Company</h4>
-              <div className="space-y-2.5">
+              <h4 className="text-xs font-semibold text-white uppercase tracking-wider mb-3">Company</h4>
+              <div className="space-y-2">
                 <Link href="/about" className="block text-sm text-slate-400 hover:text-white transition-colors">About</Link>
                 <Link href="/terms" className="block text-sm text-slate-400 hover:text-white transition-colors">Terms</Link>
                 <Link href="/privacy" className="block text-sm text-slate-400 hover:text-white transition-colors">Privacy</Link>
@@ -329,8 +417,8 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <div className="mt-12 pt-8 border-t border-white/5">
-            <p className="text-center text-sm text-slate-500">
+          <div className="mt-10 pt-6 border-t border-white/5">
+            <p className="text-center text-xs text-slate-500">
               &copy; {new Date().getFullYear()} YachtHop. All rights reserved.
             </p>
           </div>
