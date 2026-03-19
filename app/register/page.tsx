@@ -101,7 +101,7 @@ function RegisterForm() {
   const inputClass = "w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-white text-[#0f172a] text-[15px] placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all outline-none"
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="flex flex-col bg-white">
       <div className="flex-1 flex items-center justify-center px-5 sm:px-8 py-12">
         <div className="w-full max-w-md">
           {/* Logo */}
@@ -220,7 +220,7 @@ function RegisterForm() {
 
 export default function RegisterPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="loading-shimmer w-96 h-96 rounded-xl" /></div>}>
+    <Suspense fallback={<div className="flex items-center justify-center py-20"><div className="loading-shimmer w-64 h-8 rounded-xl" /></div>}>
       <RegisterForm />
     </Suspense>
   )
