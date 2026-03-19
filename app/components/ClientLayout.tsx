@@ -11,8 +11,11 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
 
   return (
     <AuthProvider>
-      {!isLandingPage && <Navbar />}
-      <main id="main-content" className={!isLandingPage ? 'pt-12' : ''}>
+      <Navbar />
+      <main
+        id="main-content"
+        className="pt-16 pb-20 md:pb-0"
+      >
         {children}
       </main>
     </AuthProvider>
