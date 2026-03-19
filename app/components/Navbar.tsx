@@ -81,7 +81,7 @@ export default function Navbar() {
   return (
     <>
       {/* ---- TOP NAVBAR (Desktop: full nav, Mobile: logo + actions) ---- */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-200 ${scrolled ? 'glass border-b border-slate-200/60 shadow-sm' : 'bg-white/0'}`}>
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-slate-200 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
