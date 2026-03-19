@@ -7,14 +7,15 @@ import { ReactNode } from 'react'
 
 export default function ClientLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname()
-  const isLandingPage = pathname === '/'
+  const isLanding = pathname === '/'
 
   return (
     <AuthProvider>
-      <Navbar />
+      {/* Landing page has its own nav built into the page */}
+      {!isLanding && <Navbar />}
       <main
         id="main-content"
-        className="pt-16 pb-20 md:pb-0"
+        className={isLanding ? '' : 'pt-16 pb-20 md:pb-0'}
       >
         {children}
       </main>
