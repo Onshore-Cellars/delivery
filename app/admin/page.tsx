@@ -442,7 +442,7 @@ export default function AdminPage() {
 
   if (authLoading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex items-center justify-center py-20">
         <div className="loading-shimmer w-64 h-8 rounded-lg" />
       </div>
     )
@@ -451,7 +451,7 @@ export default function AdminPage() {
   // ─── Render ───────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-white">
+    <>
       {/* Toast */}
       {toast && (
         <div className={`fixed top-4 right-4 z-50 px-5 py-3 rounded-xl shadow-lg text-sm font-medium transition-all ${
@@ -463,7 +463,7 @@ export default function AdminPage() {
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-8 sm:py-10">
+      <div className="page-container">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
@@ -972,6 +972,6 @@ export default function AdminPage() {
           </>
         )}
       </div>
-    </div>
+    </>
   )
 }

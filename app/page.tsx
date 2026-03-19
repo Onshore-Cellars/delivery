@@ -28,8 +28,8 @@ export default function Home() {
           ? 'bg-white/90 backdrop-blur-xl border-b border-slate-200/60 shadow-sm'
           : 'bg-transparent'
       }`}>
-        <div className="max-w-6xl mx-auto px-5 sm:px-8">
-          <div className="flex items-center justify-between h-16 sm:h-[72px]">
+        <div className="max-w-[1120px] mx-auto px-5 sm:px-8">
+          <div className="flex items-center justify-between h-14">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2.5 hover:no-underline">
               <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center border border-white/20">
@@ -118,7 +118,7 @@ export default function Home() {
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setMenuOpen(false)} />
           <div className="absolute top-0 right-0 w-full max-w-[300px] h-full bg-white shadow-2xl animate-slide-in-right">
             {/* Header */}
-            <div className="flex items-center justify-between h-16 px-5 border-b border-slate-100">
+            <div className="flex items-center justify-between h-14 px-5 border-b border-slate-100">
               <span className="text-base font-bold text-slate-900">Menu</span>
               <button onClick={() => setMenuOpen(false)} className="p-2 -mr-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-50">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -174,7 +174,7 @@ export default function Home() {
         {/* Background glow */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-blue-600/10 rounded-full blur-[120px]" />
 
-        <div className="relative max-w-6xl mx-auto px-6 sm:px-8 pt-32 sm:pt-44 pb-20 sm:pb-28">
+        <div className="relative max-w-[1120px] mx-auto px-6 sm:px-8 pt-32 sm:pt-44 pb-20 sm:pb-28">
           {/* Eyebrow */}
           <div className="animate-fade-up inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/[0.07] border border-white/10 mb-8">
             <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
@@ -217,7 +217,7 @@ export default function Home() {
 
       {/* ─── WHAT DO YOU NEED ─── */}
       <section className="bg-white">
-        <div className="max-w-6xl mx-auto px-6 sm:px-8 py-16 sm:py-24">
+        <div className="max-w-[1120px] mx-auto px-6 sm:px-8 py-16 sm:py-24">
           <div className="mb-10 sm:mb-14">
             <h2 className="text-[1.5rem] sm:text-[2.25rem] font-bold text-slate-900 tracking-tight leading-tight">
               What do you need?
@@ -265,7 +265,7 @@ export default function Home() {
 
       {/* ─── HOW IT WORKS ─── */}
       <section className="bg-slate-50 border-y border-slate-200/60">
-        <div className="max-w-6xl mx-auto px-6 sm:px-8 py-16 sm:py-24">
+        <div className="max-w-[1120px] mx-auto px-6 sm:px-8 py-16 sm:py-24">
           <div className="mb-10 sm:mb-14">
             <h2 className="text-[1.5rem] sm:text-[2.25rem] font-bold text-slate-900 tracking-tight">
               How it works
@@ -297,7 +297,7 @@ export default function Home() {
 
       {/* ─── POPULAR ROUTES ─── */}
       <section className="bg-white">
-        <div className="max-w-6xl mx-auto px-6 sm:px-8 py-16 sm:py-24">
+        <div className="max-w-[1120px] mx-auto px-6 sm:px-8 py-16 sm:py-24">
           <div className="flex items-end justify-between mb-8">
             <div>
               <h2 className="text-[1.5rem] sm:text-[2.25rem] font-bold text-slate-900 tracking-tight">
@@ -348,7 +348,7 @@ export default function Home() {
 
       {/* ─── FOR WHO ─── */}
       <section className="bg-slate-50 border-y border-slate-200/60">
-        <div className="max-w-6xl mx-auto px-6 sm:px-8 py-16 sm:py-24">
+        <div className="max-w-[1120px] mx-auto px-6 sm:px-8 py-16 sm:py-24">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div className="rounded-2xl bg-white border-2 border-slate-200 p-6 sm:p-8">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-xl text-xs font-bold mb-5 uppercase tracking-wide">
@@ -421,7 +421,7 @@ export default function Home() {
 
       {/* ─── FOOTER ─── */}
       <footer className="bg-white border-t border-slate-200">
-        <div className="max-w-6xl mx-auto px-6 sm:px-8 py-8 sm:py-10">
+        <div className="max-w-[1120px] mx-auto px-6 sm:px-8 py-8 sm:py-10">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center gap-2.5">
               <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center">

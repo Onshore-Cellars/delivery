@@ -212,15 +212,14 @@ export default function QuotesPage() {
 
   if (authLoading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex items-center justify-center py-20">
         <div className="loading-shimmer w-64 h-8 rounded-lg" />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-5xl mx-auto px-5 sm:px-6 lg:px-8 py-8 sm:py-10">
+    <div className="page-container">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -641,6 +640,5 @@ export default function QuotesPage() {
           </div>
         )}
       </div>
-    </div>
   )
 }

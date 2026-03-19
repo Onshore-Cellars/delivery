@@ -415,11 +415,11 @@ export default function MarketplacePage() {
   )
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* ---- SEARCH HEADER ---- */}
+    <div>
+      {/* Search header */}
       <div className="bg-white border-b border-slate-200">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-          <div className="flex items-center justify-between mb-5">
+        <div className="max-w-[1120px] mx-auto px-5 sm:px-6 lg:px-8 py-6 sm:py-8">
+          <div className="flex items-center justify-between mb-4 sm:mb-5">
             <div>
               <h1 className="text-xl sm:text-2xl font-bold text-[#0f172a] tracking-tight">Marketplace</h1>
               <p className="text-sm text-slate-500 mt-1">Find van space to any destination</p>
@@ -478,8 +478,8 @@ export default function MarketplacePage() {
         </div>
       )}
 
-      {/* ---- MAIN CONTENT ---- */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      {/* Main content */}
+      <div className="max-w-[1120px] mx-auto px-5 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Featured */}
         {featuredListings.length > 0 && (
           <div className="mb-8 sm:mb-10">

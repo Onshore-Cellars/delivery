@@ -84,7 +84,7 @@ export default function DashboardPage() {
 
   if (authLoading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex items-center justify-center py-20">
         <div className="loading-shimmer w-64 h-8 rounded-xl" />
       </div>
     )
@@ -99,24 +99,22 @@ export default function DashboardPage() {
   const tabs = ['overview', ...(user.role === 'CARRIER' ? ['listings'] : []), 'bookings']
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Header */}
-      <div className="bg-white border-b border-slate-200">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-[#0f172a] tracking-tight">Welcome back, {user.name}</h1>
-              <p className="text-sm text-slate-500 mt-1">
-                {user.company && <span>{user.company} &middot; </span>}
-                {user.role === 'CARRIER' ? 'Manage your routes and bookings' : 'Track your deliveries'}
-              </p>
-            </div>
-            {user.role === 'CARRIER' && (
-              <Link href="/listings/create" className="btn-primary !text-sm !py-3 !px-5 inline-flex items-center justify-center gap-2">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-                List Van Space
-              </Link>
-            )}
+    <div className="page-container">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8 gap-3">
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bold text-[#0f172a] tracking-tight">Welcome back, {user.name}</h1>
+            <p className="text-sm text-slate-500 mt-1">
+              {user.company && <span>{user.company} &middot; </span>}
+              {user.role === 'CARRIER' ? 'Manage your routes and bookings' : 'Track your deliveries'}
+            </p>
+          </div>
+          {user.role === 'CARRIER' && (
+            <Link href="/listings/create" className="btn-primary !text-sm !py-3 !px-5 inline-flex items-center justify-center gap-2">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+              List Van Space
+            </Link>
+          )}
           </div>
 
           {/* Tabs */}
@@ -135,11 +133,6 @@ export default function DashboardPage() {
               </button>
             ))}
           </div>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[1, 2, 3, 4].map(i => <div key={i} className="loading-shimmer h-28 rounded-2xl" />)}
@@ -282,7 +275,6 @@ export default function DashboardPage() {
             )}
           </>
         )}
-      </div>
     </div>
   )
 }

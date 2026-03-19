@@ -2,8 +2,7 @@ import Link from 'next/link'
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-4xl mx-auto px-5 sm:px-6 lg:px-8 py-10 sm:py-14">
+    <div className="page-container max-w-4xl">
         <p className="text-[11px] font-semibold text-[#0071e3] uppercase tracking-[0.15em] mb-1.5">About Us</p>
         <h1 className="text-2xl sm:text-3xl font-semibold text-[#1d1d1f] tracking-[-0.02em] mb-8 sm:mb-10">About Onshore Deliver</h1>
 
@@ -81,6 +80,5 @@ export default function AboutPage() {
           </div>
         </div>
       </div>
-    </div>
   )
 }

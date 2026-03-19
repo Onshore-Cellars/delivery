@@ -71,12 +71,11 @@ export default function ProfilePage() {
   }
 
   if (authLoading || loading || !profile) {
-    return <div className="min-h-screen flex items-center justify-center"><div className="loading-shimmer w-64 h-8 rounded-lg" /></div>
+    return <div className="flex items-center justify-center py-20"><div className="loading-shimmer w-64 h-8 rounded-lg" /></div>
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-3xl mx-auto px-5 sm:px-6 lg:px-8 py-8 sm:py-10">
+    <div className="page-container max-w-4xl">
         <div className="mb-8">
           <p className="text-[11px] font-semibold text-[#0071e3] uppercase tracking-[0.15em] mb-1">Account</p>
           <h1 className="text-xl sm:text-2xl font-semibold text-[#1d1d1f] tracking-[-0.02em]">Profile & Settings</h1>
@@ -198,6 +197,5 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
-    </div>
   )
 }
