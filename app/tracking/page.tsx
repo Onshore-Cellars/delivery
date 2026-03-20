@@ -66,7 +66,7 @@ export default function TrackingPage() {
   const currentStep = data ? statusSteps.indexOf(data.booking.status) : -1
 
   return (
-    <div className="page-container max-w-3xl">
+    <div className="page-container narrow">
         <div className="mb-8">
           <p className="text-[11px] font-semibold text-[#0071e3] uppercase tracking-[0.15em] mb-1">Logistics</p>
           <h1 className="text-xl sm:text-2xl font-semibold text-[#1d1d1f] tracking-[-0.02em]">Track Shipment</h1>

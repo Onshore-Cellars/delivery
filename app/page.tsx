@@ -28,14 +28,14 @@ export default function Home() {
           ? 'bg-white/90 backdrop-blur-xl border-b border-slate-200/60 shadow-sm'
           : 'bg-transparent'
       }`}>
-        <div className="max-w-4xl mx-auto px-6 sm:px-8">
-          <div className="flex items-center justify-between h-14">
+        <div className="site-container">
+          <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2.5 hover:no-underline">
-              <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center border border-white/20">
-                <span className={`text-sm font-bold transition-colors duration-300 ${scrolled ? 'text-blue-600' : 'text-white'}`}>O</span>
+              <div className={`w-8 h-8 rounded-sm flex items-center justify-center transition-colors duration-300 ${scrolled ? 'bg-[#C6904D]' : 'bg-white/20 border border-white/20'}`}>
+                <span className="text-white text-sm font-bold" style={{ fontFamily: 'var(--font-display)' }}>O</span>
               </div>
-              <span className={`text-lg font-bold tracking-tight transition-colors duration-300 ${scrolled ? 'text-slate-900' : 'text-white'}`}>
+              <span className={`text-lg font-semibold tracking-wide transition-colors duration-300 ${scrolled ? 'text-[#1a1a1a]' : 'text-white'}`} style={{ fontFamily: 'var(--font-display)' }}>
                 Onshore
               </span>
             </Link>
@@ -51,7 +51,7 @@ export default function Home() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors hover:no-underline ${
+                  className={`px-4 py-2 rounded text-sm font-medium transition-colors hover:no-underline ${
                     scrolled
                       ? 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                       : 'text-white/70 hover:text-white hover:bg-white/10'
@@ -66,7 +66,7 @@ export default function Home() {
               {user ? (
                 <Link
                   href="/dashboard"
-                  className="bg-blue-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-blue-700 hover:no-underline transition-colors"
+                  className="bg-[#C6904D] text-white text-sm font-semibold px-5 py-2.5 rounded hover:bg-[#b07d3f] hover:no-underline transition-colors"
                 >
                   Dashboard
                 </Link>
@@ -74,7 +74,7 @@ export default function Home() {
                 <>
                   <Link
                     href="/login"
-                    className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors hover:no-underline ${
+                    className={`px-4 py-2 rounded text-sm font-medium transition-colors hover:no-underline ${
                       scrolled
                         ? 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                         : 'text-white/70 hover:text-white hover:bg-white/10'
@@ -84,7 +84,7 @@ export default function Home() {
                   </Link>
                   <Link
                     href="/register"
-                    className="bg-blue-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-blue-700 hover:no-underline transition-colors"
+                    className="bg-[#C6904D] text-white text-sm font-semibold px-5 py-2.5 rounded hover:bg-[#b07d3f] hover:no-underline transition-colors"
                   >
                     Get Started
                   </Link>
@@ -95,7 +95,7 @@ export default function Home() {
             {/* Mobile hamburger */}
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className={`md:hidden p-2.5 -mr-2 rounded-xl transition-colors ${
+              className={`md:hidden p-2.5 -mr-2 rounded transition-colors ${
                 scrolled ? 'text-slate-700 hover:bg-slate-100' : 'text-white hover:bg-white/10'
               }`}
               aria-label="Menu"
@@ -118,9 +118,9 @@ export default function Home() {
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setMenuOpen(false)} />
           <div className="absolute top-0 right-0 w-full max-w-[300px] h-full bg-white shadow-2xl animate-slide-in-right">
             {/* Header */}
-            <div className="flex items-center justify-between h-14 px-5 border-b border-slate-100">
+            <div className="flex items-center justify-between h-16 px-5 border-b border-slate-100">
               <span className="text-base font-bold text-slate-900">Menu</span>
-              <button onClick={() => setMenuOpen(false)} className="p-2 -mr-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-50">
+              <button onClick={() => setMenuOpen(false)} className="p-2 -mr-2 rounded text-slate-400 hover:text-slate-600 hover:bg-slate-50">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -139,7 +139,7 @@ export default function Home() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setMenuOpen(false)}
-                  className="block px-4 py-3.5 rounded-xl text-[15px] font-medium text-slate-700 hover:bg-slate-50 hover:no-underline transition-colors"
+                  className="block px-4 py-3.5 rounded text-[15px] font-medium text-slate-700 hover:bg-slate-50 hover:no-underline transition-colors"
                 >
                   {link.label}
                 </Link>
@@ -168,20 +168,20 @@ export default function Home() {
       )}
 
       {/* ─── HERO ─── */}
-      <section className="relative bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 overflow-hidden">
+      <section className="relative bg-gradient-to-br from-[#1a1a1a] via-[#2a2520] to-[#1a1a1a] overflow-hidden">
         {/* Background grid */}
         <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '32px 32px' }} />
         {/* Background glow */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-blue-600/10 rounded-full blur-[120px]" />
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-[#C6904D]/10 rounded-full blur-[120px]" />
 
-        <div className="relative max-w-4xl mx-auto px-6 sm:px-10 pt-36 sm:pt-48 pb-24 sm:pb-32">
+        <div className="relative site-container pt-36 sm:pt-48 pb-24 sm:pb-32">
           {/* Eyebrow */}
           <div className="animate-fade-up inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/[0.07] border border-white/10 mb-10">
             <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
             <span className="text-xs font-semibold text-slate-300 tracking-wide uppercase">Now serving 50+ ports</span>
           </div>
 
-          <h1 className="animate-fade-up text-[1.75rem] sm:text-[2.75rem] md:text-[3.5rem] leading-[1.1] font-bold text-white tracking-[-0.02em] max-w-2xl">
+          <h1 className="animate-fade-up text-[1.75rem] sm:text-[2.75rem] md:text-[3.5rem] leading-[1.1] font-light text-white tracking-wide max-w-2xl" style={{ fontFamily: 'var(--font-display)' }}>
             Delivery logistics for the{' '}
             <span className="gradient-text">Mediterranean.</span>
           </h1>
@@ -217,9 +217,9 @@ export default function Home() {
 
       {/* ─── WHAT DO YOU NEED ─── */}
       <section className="bg-white">
-        <div className="max-w-4xl mx-auto px-6 sm:px-10 py-20 sm:py-28">
+        <div className="site-container py-20 sm:py-28">
           <div className="mb-12 sm:mb-16">
-            <h2 className="text-[1.5rem] sm:text-[2.25rem] font-bold text-slate-900 tracking-tight leading-tight">
+            <h2 className="text-[1.5rem] sm:text-[2.25rem] font-light text-[#1a1a1a] tracking-wide leading-tight" style={{ fontFamily: 'var(--font-display)' }}>
               What do you need?
             </h2>
             <p className="mt-2 text-[15px] sm:text-lg text-slate-500">
@@ -228,8 +228,8 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <Link href="/marketplace" className="group block rounded-2xl border-2 border-slate-200 bg-white p-7 sm:p-9 hover:no-underline hover:border-blue-300 hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300">
-              <div className="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center mb-5">
+            <Link href="/marketplace" className="group block rounded-lg border-2 border-slate-200 bg-white p-7 sm:p-9 hover:no-underline hover:border-[#C6904D]/40 hover:shadow-xl hover:shadow-[#C6904D]/5 transition-all duration-300">
+              <div className="w-12 h-12 rounded-lg bg-[#C6904D] flex items-center justify-center mb-5">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                 </svg>
@@ -238,14 +238,14 @@ export default function Home() {
               <p className="text-sm text-slate-500 leading-relaxed mb-5">
                 Find carriers heading to your port. Ship provisions, equipment, wine, or supplies to any marina.
               </p>
-              <span className="inline-flex items-center gap-1.5 text-blue-600 text-sm font-semibold group-hover:gap-2.5 transition-all">
+              <span className="inline-flex items-center gap-1.5 text-[#C6904D] text-sm font-semibold group-hover:gap-2.5 transition-all">
                 Browse routes
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
               </span>
             </Link>
 
-            <Link href="/listings/create" className="group block rounded-2xl border-2 border-slate-200 bg-white p-7 sm:p-9 hover:no-underline hover:border-slate-300 hover:shadow-xl hover:shadow-slate-500/5 transition-all duration-300">
-              <div className="w-12 h-12 rounded-2xl bg-slate-900 flex items-center justify-center mb-5">
+            <Link href="/listings/create" className="group block rounded-lg border-2 border-slate-200 bg-white p-7 sm:p-9 hover:no-underline hover:border-slate-300 hover:shadow-xl hover:shadow-slate-500/5 transition-all duration-300">
+              <div className="w-12 h-12 rounded-lg bg-slate-900 flex items-center justify-center mb-5">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                 </svg>
@@ -254,7 +254,7 @@ export default function Home() {
               <p className="text-sm text-slate-500 leading-relaxed mb-5">
                 Already heading to a port? List your spare capacity and earn on routes you&apos;re running.
               </p>
-              <span className="inline-flex items-center gap-1.5 text-blue-600 text-sm font-semibold group-hover:gap-2.5 transition-all">
+              <span className="inline-flex items-center gap-1.5 text-[#C6904D] text-sm font-semibold group-hover:gap-2.5 transition-all">
                 List space
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
               </span>
@@ -264,10 +264,10 @@ export default function Home() {
       </section>
 
       {/* ─── HOW IT WORKS ─── */}
-      <section className="bg-slate-50 border-y border-slate-200/60">
-        <div className="max-w-4xl mx-auto px-6 sm:px-10 py-20 sm:py-28">
+      <section className="bg-[#faf9f7] border-y border-[#e8e4de]/60">
+        <div className="site-container py-20 sm:py-28">
           <div className="mb-12 sm:mb-16">
-            <h2 className="text-[1.5rem] sm:text-[2.25rem] font-bold text-slate-900 tracking-tight">
+            <h2 className="text-[1.5rem] sm:text-[2.25rem] font-light text-[#1a1a1a] tracking-wide" style={{ fontFamily: 'var(--font-display)' }}>
               How it works
             </h2>
             <p className="mt-2 text-[15px] sm:text-lg text-slate-500">
@@ -281,10 +281,10 @@ export default function Home() {
               { num: '2', title: 'Book & pay', desc: 'Reserve the exact space you need. Secure checkout with instant confirmation.', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' },
               { num: '3', title: 'Delivered dockside', desc: 'Track in real-time. Your goods arrive direct to the marina berth.', icon: 'M5 13l4 4L19 7' },
             ].map(step => (
-              <div key={step.num} className="bg-white rounded-2xl border border-slate-200 p-7">
+              <div key={step.num} className="bg-white rounded-lg border border-slate-200 p-7">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
-                    <span className="text-sm font-bold text-blue-600">{step.num}</span>
+                  <div className="w-10 h-10 rounded bg-amber-100 flex items-center justify-center">
+                    <span className="text-sm font-bold text-[#C6904D]">{step.num}</span>
                   </div>
                   <h3 className="text-base font-bold text-slate-900">{step.title}</h3>
                 </div>
@@ -297,15 +297,15 @@ export default function Home() {
 
       {/* ─── POPULAR ROUTES ─── */}
       <section className="bg-white">
-        <div className="max-w-4xl mx-auto px-6 sm:px-10 py-20 sm:py-28">
+        <div className="site-container py-20 sm:py-28">
           <div className="flex items-end justify-between mb-10">
             <div>
-              <h2 className="text-[1.5rem] sm:text-[2.25rem] font-bold text-slate-900 tracking-tight">
+              <h2 className="text-[1.5rem] sm:text-[2.25rem] font-light text-[#1a1a1a] tracking-wide" style={{ fontFamily: 'var(--font-display)' }}>
                 Popular routes
               </h2>
               <p className="mt-2 text-[15px] sm:text-lg text-slate-500">Top Mediterranean destinations.</p>
             </div>
-            <Link href="/marketplace" className="hidden sm:inline-flex items-center gap-1 text-blue-600 text-sm font-semibold hover:underline">
+            <Link href="/marketplace" className="hidden sm:inline-flex items-center gap-1 text-[#C6904D] text-sm font-semibold hover:underline">
               View all
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
             </Link>
@@ -321,7 +321,7 @@ export default function Home() {
               <Link
                 key={route.from + route.to}
                 href={`/marketplace?origin=${route.from}&destination=${route.to}`}
-                className="group block rounded-2xl border-2 border-slate-200 p-4 sm:p-5 hover:no-underline hover:border-blue-300 hover:shadow-lg transition-all"
+                className="group block rounded-lg border-2 border-slate-200 p-4 sm:p-5 hover:no-underline hover:border-[#C6904D]/40 hover:shadow-lg transition-all"
               >
                 <div className="flex items-center gap-2 mb-3">
                   <span className="text-base">{route.emoji}</span>
@@ -334,12 +334,12 @@ export default function Home() {
                   </svg>
                   <div className="font-bold text-slate-900 text-sm">{route.to}</div>
                 </div>
-                <div className="mt-3 text-xs text-blue-600 font-semibold group-hover:underline">View space</div>
+                <div className="mt-3 text-xs text-[#C6904D] font-semibold group-hover:underline">View space</div>
               </Link>
             ))}
           </div>
 
-          <Link href="/marketplace" className="sm:hidden flex items-center justify-center gap-1 mt-6 text-blue-600 text-sm font-semibold">
+          <Link href="/marketplace" className="sm:hidden flex items-center justify-center gap-1 mt-6 text-[#C6904D] text-sm font-semibold">
             View all routes
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
           </Link>
@@ -347,14 +347,14 @@ export default function Home() {
       </section>
 
       {/* ─── FOR WHO ─── */}
-      <section className="bg-slate-50 border-y border-slate-200/60">
-        <div className="max-w-4xl mx-auto px-6 sm:px-10 py-20 sm:py-28">
+      <section className="bg-[#faf9f7] border-y border-[#e8e4de]/60">
+        <div className="site-container py-20 sm:py-28">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-            <div className="rounded-2xl bg-white border-2 border-slate-200 p-6 sm:p-8">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-xl text-xs font-bold mb-5 uppercase tracking-wide">
+            <div className="rounded-lg bg-white border-2 border-slate-200 p-6 sm:p-8">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-50 text-[#9a7039] rounded text-xs font-bold mb-5 uppercase tracking-wide">
                 Carriers
               </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-3">For carriers & drivers</h3>
+              <h3 className="text-xl font-semibold text-[#1a1a1a] mb-3">For carriers & drivers</h3>
               <p className="text-sm text-slate-500 mb-6 leading-relaxed">
                 Already heading to a port or marina? Monetise your spare van space.
               </p>
@@ -373,11 +373,11 @@ export default function Home() {
               </Link>
             </div>
 
-            <div className="rounded-2xl bg-white border-2 border-slate-200 p-6 sm:p-8">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-purple-50 text-purple-700 rounded-xl text-xs font-bold mb-5 uppercase tracking-wide">
+            <div className="rounded-lg bg-white border-2 border-slate-200 p-6 sm:p-8">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-50 text-[#9a7039] rounded text-xs font-bold mb-5 uppercase tracking-wide">
                 Shippers
               </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-3">For owners & suppliers</h3>
+              <h3 className="text-xl font-semibold text-[#1a1a1a] mb-3">For owners & suppliers</h3>
               <p className="text-sm text-slate-500 mb-6 leading-relaxed">
                 Need provisions or supplies delivered? We connect you with carriers on route.
               </p>
@@ -400,9 +400,9 @@ export default function Home() {
       </section>
 
       {/* ─── CTA ─── */}
-      <section className="bg-gradient-to-br from-slate-950 to-slate-900">
-        <div className="max-w-3xl mx-auto px-6 sm:px-10 py-20 sm:py-28 text-center">
-          <h2 className="text-[1.5rem] sm:text-[2.25rem] lg:text-[2.75rem] font-bold text-white tracking-tight leading-tight">
+      <section className="bg-gradient-to-br from-[#1a1a1a] to-[#2a2520]">
+        <div className="site-container py-20 sm:py-28 text-center">
+          <h2 className="text-[1.5rem] sm:text-[2.25rem] lg:text-[2.75rem] font-light text-white tracking-wide leading-tight" style={{ fontFamily: 'var(--font-display)' }}>
             Ready to simplify your delivery logistics?
           </h2>
           <p className="mt-4 text-[15px] sm:text-lg text-slate-400 max-w-md mx-auto">
@@ -421,13 +421,13 @@ export default function Home() {
 
       {/* ─── FOOTER ─── */}
       <footer className="bg-white border-t border-slate-200">
-        <div className="max-w-4xl mx-auto px-6 sm:px-10 py-10 sm:py-12">
+        <div className="site-container py-10 sm:py-12">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
             <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center">
-                <span className="text-white text-xs font-bold">O</span>
+              <div className="w-7 h-7 rounded-sm bg-[#C6904D] flex items-center justify-center">
+                <span className="text-white text-xs font-bold" style={{ fontFamily: 'var(--font-display)' }}>O</span>
               </div>
-              <span className="text-sm font-bold text-slate-900">Onshore Deliver</span>
+              <span className="text-sm font-semibold text-[#1a1a1a] tracking-wide" style={{ fontFamily: 'var(--font-display)' }}>Onshore Deliver</span>
             </div>
             <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-500">
               <Link href="/about" className="text-slate-500 hover:text-slate-900 hover:no-underline transition-colors">About</Link>

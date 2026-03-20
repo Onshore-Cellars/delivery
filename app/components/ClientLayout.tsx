@@ -9,7 +9,7 @@ import { ReactNode } from 'react'
 function Footer() {
   return (
     <footer className="border-t border-[#d2d2d7]/60 bg-white/60">
-      <div className="max-w-4xl mx-auto px-6 sm:px-8 py-8">
+      <div className="site-container py-8">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#86868b]">
           <p>&copy; {new Date().getFullYear()} Onshore Deliver. All rights reserved.</p>
           <div className="flex gap-6">
@@ -38,8 +38,8 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
         className={
           showChrome
             ? isAuthPage
-              ? 'pt-14 pb-20 md:pb-0 min-h-screen'
-              : 'pt-14 pb-20 md:pb-0 min-h-screen bg-[#f5f5f7]'
+              ? 'pt-16 pb-20 md:pb-0 min-h-screen'
+              : 'pt-16 pb-20 md:pb-0 min-h-screen bg-[#f5f5f7]'
             : ''
         }
       >
