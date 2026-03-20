@@ -119,7 +119,7 @@ export default function CreateListingPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-3xl mx-auto px-5 sm:px-6 lg:px-8 py-8 sm:py-10">
+      <div className="max-w-3xl mx-auto px-6 sm:px-8 py-8 sm:py-10">
         <div className="mb-8 sm:mb-10">
           <Link href="/dashboard" className="text-sm text-slate-500 hover:text-[#1d1d1f] transition-colors">
             &larr; Back to Dashboard

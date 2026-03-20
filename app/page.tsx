@@ -28,7 +28,7 @@ export default function Home() {
           ? 'bg-white/90 backdrop-blur-xl border-b border-slate-200/60 shadow-sm'
           : 'bg-transparent'
       }`}>
-        <div className="max-w-6xl mx-auto px-5 sm:px-8">
+        <div className="max-w-4xl mx-auto px-6 sm:px-8">
           <div className="flex items-center justify-between h-16 sm:h-[72px]">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2.5 hover:no-underline">
@@ -174,9 +174,9 @@ export default function Home() {
         {/* Background glow */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-blue-600/10 rounded-full blur-[120px]" />
 
-        <div className="relative max-w-6xl mx-auto px-6 sm:px-8 pt-32 sm:pt-44 pb-20 sm:pb-28">
+        <div className="relative max-w-4xl mx-auto px-6 sm:px-10 pt-36 sm:pt-48 pb-24 sm:pb-32">
           {/* Eyebrow */}
-          <div className="animate-fade-up inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/[0.07] border border-white/10 mb-8">
+          <div className="animate-fade-up inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/[0.07] border border-white/10 mb-10">
             <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
             <span className="text-xs font-semibold text-slate-300 tracking-wide uppercase">Now serving 50+ ports</span>
           </div>
@@ -186,11 +186,11 @@ export default function Home() {
             <span className="gradient-text">Mediterranean.</span>
           </h1>
 
-          <p className="animate-fade-up mt-5 text-[15px] sm:text-lg text-slate-400 max-w-lg leading-relaxed" style={{ animationDelay: '80ms' }}>
+          <p className="animate-fade-up mt-6 text-[15px] sm:text-lg text-slate-400 max-w-lg leading-relaxed" style={{ animationDelay: '80ms' }}>
             Share van space, book deliveries, and get supplies dockside. The marketplace that connects carriers with yacht owners and provisioners.
           </p>
 
-          <div className="animate-fade-up mt-8 flex flex-col sm:flex-row gap-3" style={{ animationDelay: '160ms' }}>
+          <div className="animate-fade-up mt-10 flex flex-col sm:flex-row gap-4" style={{ animationDelay: '160ms' }}>
             <Link href="/marketplace" className="btn-primary text-[15px] sm:text-base !px-7">
               Find Available Space
             </Link>
@@ -217,18 +217,18 @@ export default function Home() {
 
       {/* ─── WHAT DO YOU NEED ─── */}
       <section className="bg-white">
-        <div className="max-w-6xl mx-auto px-6 sm:px-8 py-16 sm:py-24">
-          <div className="mb-10 sm:mb-14">
+        <div className="max-w-4xl mx-auto px-6 sm:px-10 py-20 sm:py-28">
+          <div className="mb-12 sm:mb-16">
             <h2 className="text-[1.5rem] sm:text-[2.25rem] font-bold text-slate-900 tracking-tight leading-tight">
               What do you need?
             </h2>
-            <p className="mt-2 text-[15px] sm:text-lg text-slate-500">
+            <p className="mt-3 text-[15px] sm:text-lg text-slate-500">
               Whether you&apos;re shipping or filling spare capacity.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Link href="/marketplace" className="group block rounded-2xl border-2 border-slate-200 bg-white p-6 sm:p-8 hover:no-underline hover:border-blue-300 hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <Link href="/marketplace" className="group block rounded-2xl border-2 border-slate-200 bg-white p-7 sm:p-9 hover:no-underline hover:border-blue-300 hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300">
               <div className="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center mb-5">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
@@ -244,7 +244,7 @@ export default function Home() {
               </span>
             </Link>
 
-            <Link href="/listings/create" className="group block rounded-2xl border-2 border-slate-200 bg-white p-6 sm:p-8 hover:no-underline hover:border-slate-300 hover:shadow-xl hover:shadow-slate-500/5 transition-all duration-300">
+            <Link href="/listings/create" className="group block rounded-2xl border-2 border-slate-200 bg-white p-7 sm:p-9 hover:no-underline hover:border-slate-300 hover:shadow-xl hover:shadow-slate-500/5 transition-all duration-300">
               <div className="w-12 h-12 rounded-2xl bg-slate-900 flex items-center justify-center mb-5">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
@@ -265,23 +265,23 @@ export default function Home() {
 
       {/* ─── HOW IT WORKS ─── */}
       <section className="bg-slate-50 border-y border-slate-200/60">
-        <div className="max-w-6xl mx-auto px-6 sm:px-8 py-16 sm:py-24">
-          <div className="mb-10 sm:mb-14">
+        <div className="max-w-4xl mx-auto px-6 sm:px-10 py-20 sm:py-28">
+          <div className="mb-12 sm:mb-16">
             <h2 className="text-[1.5rem] sm:text-[2.25rem] font-bold text-slate-900 tracking-tight">
               How it works
             </h2>
-            <p className="mt-2 text-[15px] sm:text-lg text-slate-500">
+            <p className="mt-3 text-[15px] sm:text-lg text-slate-500">
               Book cargo space in three simple steps.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             {[
               { num: '1', title: 'Find a route', desc: 'Search by port, date, and cargo type. See real-time availability across the Med.', icon: 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' },
               { num: '2', title: 'Book & pay', desc: 'Reserve the exact space you need. Secure checkout with instant confirmation.', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' },
               { num: '3', title: 'Delivered dockside', desc: 'Track in real-time. Your goods arrive direct to the marina berth.', icon: 'M5 13l4 4L19 7' },
             ].map(step => (
-              <div key={step.num} className="bg-white rounded-2xl border border-slate-200 p-6">
+              <div key={step.num} className="bg-white rounded-2xl border border-slate-200 p-7">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
                     <span className="text-sm font-bold text-blue-600">{step.num}</span>
@@ -297,8 +297,8 @@ export default function Home() {
 
       {/* ─── POPULAR ROUTES ─── */}
       <section className="bg-white">
-        <div className="max-w-6xl mx-auto px-6 sm:px-8 py-16 sm:py-24">
-          <div className="flex items-end justify-between mb-8">
+        <div className="max-w-4xl mx-auto px-6 sm:px-10 py-20 sm:py-28">
+          <div className="flex items-end justify-between mb-10">
             <div>
               <h2 className="text-[1.5rem] sm:text-[2.25rem] font-bold text-slate-900 tracking-tight">
                 Popular routes
@@ -311,7 +311,7 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[
               { from: 'Antibes', to: 'Monaco', region: 'French Riviera', emoji: '🇫🇷' },
               { from: 'Palma', to: 'Ibiza', region: 'Balearics', emoji: '🇪🇸' },
@@ -348,9 +348,9 @@ export default function Home() {
 
       {/* ─── FOR WHO ─── */}
       <section className="bg-slate-50 border-y border-slate-200/60">
-        <div className="max-w-6xl mx-auto px-6 sm:px-8 py-16 sm:py-24">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div className="rounded-2xl bg-white border-2 border-slate-200 p-6 sm:p-8">
+        <div className="max-w-4xl mx-auto px-6 sm:px-10 py-20 sm:py-28">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <div className="rounded-2xl bg-white border-2 border-slate-200 p-7 sm:p-9">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-xl text-xs font-bold mb-5 uppercase tracking-wide">
                 Carriers
               </div>
@@ -373,7 +373,7 @@ export default function Home() {
               </Link>
             </div>
 
-            <div className="rounded-2xl bg-white border-2 border-slate-200 p-6 sm:p-8">
+            <div className="rounded-2xl bg-white border-2 border-slate-200 p-7 sm:p-9">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-purple-50 text-purple-700 rounded-xl text-xs font-bold mb-5 uppercase tracking-wide">
                 Shippers
               </div>
@@ -401,7 +401,7 @@ export default function Home() {
 
       {/* ─── CTA ─── */}
       <section className="bg-gradient-to-br from-slate-950 to-slate-900">
-        <div className="max-w-3xl mx-auto px-6 sm:px-8 py-16 sm:py-24 text-center">
+        <div className="max-w-3xl mx-auto px-6 sm:px-8 py-20 sm:py-28 text-center">
           <h2 className="text-[1.5rem] sm:text-[2.25rem] lg:text-[2.75rem] font-bold text-white tracking-tight leading-tight">
             Ready to simplify your delivery logistics?
           </h2>
@@ -421,8 +421,8 @@ export default function Home() {
 
       {/* ─── FOOTER ─── */}
       <footer className="bg-white border-t border-slate-200">
-        <div className="max-w-6xl mx-auto px-6 sm:px-8 py-8 sm:py-10">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="max-w-4xl mx-auto px-6 sm:px-10 py-10 sm:py-12">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
             <div className="flex items-center gap-2.5">
               <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center">
                 <span className="text-white text-xs font-bold">O</span>

@@ -328,7 +328,7 @@ export default function MarketplacePage() {
   )
 
   const ListingCard = ({ listing, featured = false }: { listing: Listing; featured?: boolean }) => (
-    <div className={`bg-white rounded-2xl border p-5 sm:p-6 card-hover transition-all ${
+    <div className={`bg-white rounded-2xl border p-6 sm:p-7 card-hover transition-all ${
       listing.featured || featured ? 'border-blue-200 shadow-sm shadow-blue-500/5' : 'border-slate-200'
     }`}>
       {(listing.featured || featured) && (
@@ -418,7 +418,7 @@ export default function MarketplacePage() {
     <div className="min-h-screen bg-slate-50">
       {/* ---- SEARCH HEADER ---- */}
       <div className="bg-white border-b border-slate-200">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <div className="max-w-4xl mx-auto px-6 sm:px-8 py-8 sm:py-10">
           <div className="flex items-center justify-between mb-5">
             <div>
               <h1 className="text-xl sm:text-2xl font-bold text-[#0f172a] tracking-tight">Marketplace</h1>
@@ -479,10 +479,10 @@ export default function MarketplacePage() {
       )}
 
       {/* ---- MAIN CONTENT ---- */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <div className="max-w-4xl mx-auto px-6 sm:px-8 py-8 sm:py-10">
         {/* Featured */}
         {featuredListings.length > 0 && (
-          <div className="mb-8 sm:mb-10">
+          <div className="mb-10 sm:mb-12">
             <div className="flex items-center gap-2.5 mb-4">
               <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
@@ -539,7 +539,7 @@ export default function MarketplacePage() {
           </div>
         ) : (
           <>
-            <div className="space-y-4">
+            <div className="space-y-5">
               {listings.map(listing => <ListingCard key={listing.id} listing={listing} />)}
             </div>
 

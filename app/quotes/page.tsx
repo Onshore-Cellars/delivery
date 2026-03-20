@@ -220,7 +220,7 @@ export default function QuotesPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-5xl mx-auto px-5 sm:px-6 lg:px-8 py-8 sm:py-10">
+      <div className="max-w-3xl mx-auto px-6 sm:px-8 py-8 sm:py-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>

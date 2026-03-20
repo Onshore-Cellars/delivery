@@ -160,7 +160,7 @@ export default function ListingDetailPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <div className="max-w-4xl mx-auto px-6 sm:px-8 py-8 sm:py-10">
         <Link href="/marketplace" className="text-sm text-slate-500 hover:text-[#1d1d1f] transition-colors">&larr; Back to Marketplace</Link>
 
         {formSuccess && (

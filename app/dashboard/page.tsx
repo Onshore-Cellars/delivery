@@ -102,7 +102,7 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
       <div className="bg-white border-b border-slate-200">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <div className="max-w-4xl mx-auto px-6 sm:px-8 py-8 sm:py-10">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
               <h1 className="text-xl sm:text-2xl font-bold text-[#0f172a] tracking-tight">Welcome back, {user.name}</h1>
@@ -139,7 +139,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Content */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <div className="max-w-4xl mx-auto px-6 sm:px-8 py-8 sm:py-10">
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[1, 2, 3, 4].map(i => <div key={i} className="loading-shimmer h-28 rounded-2xl" />)}
@@ -148,7 +148,7 @@ export default function DashboardPage() {
           <>
             {/* Overview */}
             {tab === 'overview' && (
-              <div className="space-y-6 sm:space-y-8">
+              <div className="space-y-8 sm:space-y-10">
                 {/* Stats */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                   {user.role === 'CARRIER' ? (

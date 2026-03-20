@@ -76,7 +76,7 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-3xl mx-auto px-5 sm:px-6 lg:px-8 py-8 sm:py-10">
+      <div className="max-w-3xl mx-auto px-6 sm:px-8 py-8 sm:py-10">
         <div className="mb-8">
           <p className="text-[11px] font-semibold text-[#0071e3] uppercase tracking-[0.15em] mb-1">Account</p>
           <h1 className="text-xl sm:text-2xl font-semibold text-[#1d1d1f] tracking-[-0.02em]">Profile & Settings</h1>

@@ -249,7 +249,7 @@ export default function ReviewsPage() {
   if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-white">
-        <div className="max-w-4xl mx-auto px-5 sm:px-6 lg:px-8 py-6 sm:py-12">
+        <div className="max-w-3xl mx-auto px-6 sm:px-8 py-6 sm:py-12">
           <div className="animate-pulse space-y-6">
             <div className="h-8 bg-slate-200 rounded w-48" />
             <div className="bg-white rounded-xl shadow-sm p-8">
@@ -283,7 +283,7 @@ export default function ReviewsPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-4xl mx-auto px-5 sm:px-6 lg:px-8 py-8 sm:py-12">
+      <div className="max-w-3xl mx-auto px-6 sm:px-8 py-8 sm:py-12">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
