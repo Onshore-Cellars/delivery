@@ -3,6 +3,35 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useAuth } from '../components/AuthProvider'
+import PortAutocomplete from '../components/PortAutocomplete'
+
+interface PackageItem {
+  id: string
+  type: string
+  quantity: number
+  weightKg: number
+  lengthCm: number
+  widthCm: number
+  heightCm: number
+  description: string
+}
+
+const PACKAGE_TYPES = [
+  { value: 'pallet', label: 'Full Pallet', defaultW: 120, defaultD: 80, defaultH: 150, defaultKg: 300 },
+  { value: 'half-pallet', label: 'Half Pallet', defaultW: 80, defaultD: 60, defaultH: 100, defaultKg: 150 },
+  { value: 'quarter-pallet', label: 'Quarter Pallet', defaultW: 60, defaultD: 40, defaultH: 80, defaultKg: 75 },
+  { value: 'euro-pallet', label: 'Euro Pallet (EUR)', defaultW: 120, defaultD: 80, defaultH: 144, defaultKg: 500 },
+  { value: 'box', label: 'Box / Carton', defaultW: 60, defaultD: 40, defaultH: 40, defaultKg: 25 },
+  { value: 'crate', label: 'Crate', defaultW: 100, defaultD: 60, defaultH: 60, defaultKg: 80 },
+  { value: 'wine-case', label: 'Wine Case (12 btl)', defaultW: 50, defaultD: 34, defaultH: 18, defaultKg: 18 },
+  { value: 'drum', label: 'Barrel / Drum', defaultW: 60, defaultD: 60, defaultH: 90, defaultKg: 200 },
+  { value: 'loose', label: 'Loose Item', defaultW: 0, defaultD: 0, defaultH: 0, defaultKg: 0 },
+  { value: 'oversized', label: 'Oversized / Custom', defaultW: 0, defaultD: 0, defaultH: 0, defaultKg: 0 },
+]
+
+function generateId() {
+  return Math.random().toString(36).substring(2, 9)
+}
 
 const CARGO_TYPES = [
   'Provisions & Food', 'Wine & Spirits', 'Marine Equipment', 'Spare Parts',
@@ -38,15 +67,42 @@ export default function GetQuotesPage() {
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState('')
 
+  const [packages, setPackages] = useState<PackageItem[]>([])
+
+  const addPackage = (type = 'box') => {
+    const def = PACKAGE_TYPES.find(t => t.value === type) || PACKAGE_TYPES[4]
+    setPackages(prev => [...prev, {
+      id: generateId(),
+      type: def.value,
+      quantity: 1,
+      weightKg: def.defaultKg,
+      lengthCm: def.defaultD,
+      widthCm: def.defaultW,
+      heightCm: def.defaultH,
+      description: '',
+    }])
+  }
+
+  const updatePackage = (id: string, field: keyof PackageItem, value: string | number) => {
+    setPackages(prev => prev.map(p => {
+      if (p.id !== id) return p
+      if (field === 'type') {
+        const def = PACKAGE_TYPES.find(t => t.value === value)
+        if (def) return { ...p, type: String(value), weightKg: def.defaultKg, lengthCm: def.defaultD, widthCm: def.defaultW, heightCm: def.defaultH }
+      }
+      return { ...p, [field]: value }
+    }))
+  }
+
+  const removePackage = (id: string) => setPackages(prev => prev.filter(p => p.id !== id))
+
+  const totalWeight = packages.reduce((s, p) => s + p.weightKg * p.quantity, 0)
+  const totalVolume = packages.reduce((s, p) => s + (p.lengthCm * p.widthCm * p.heightCm * p.quantity) / 1_000_000, 0)
+
   const [form, setForm] = useState({
     // Cargo
     cargoType: '',
     cargoDescription: '',
-    itemCount: '1',
-    weightKg: '',
-    lengthCm: '',
-    widthCm: '',
-    heightCm: '',
     isFragile: false,
     requiresRefrigeration: false,
     isDangerous: false,
@@ -98,8 +154,9 @@ export default function GetQuotesPage() {
           destinationPort: form.deliveryLocation,
           cargoDescription: form.cargoDescription || form.cargoType,
           cargoType: form.cargoType,
-          weightKg: parseFloat(form.weightKg) || 0,
-          volumeM3: ((parseFloat(form.lengthCm) || 0) * (parseFloat(form.widthCm) || 0) * (parseFloat(form.heightCm) || 0)) / 1000000,
+          weightKg: totalWeight,
+          volumeM3: totalVolume,
+          ...(packages.length > 0 ? { packages: JSON.stringify(packages) } : {}),
           preferredDate: form.preferredDate || null,
           specialRequirements: [
             form.specialHandling,
@@ -207,36 +264,125 @@ export default function GetQuotesPage() {
                 <label className={labelClass}>Description</label>
                 <textarea className={inputClass + " min-h-[80px] resize-none"} placeholder="e.g. 6 cases of wine for MY Ocean Dream, Antibes Marina" value={form.cargoDescription} onChange={(e) => updateForm('cargoDescription', e.target.value)} />
               </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className={labelClass}>Number of Items</label>
-                  <input type="number" min="1" className={inputClass} value={form.itemCount} onChange={(e) => updateForm('itemCount', e.target.value)} />
-                </div>
-                <div>
-                  <label className={labelClass}>Total Weight (kg)</label>
-                  <input type="number" step="0.1" min="0" className={inputClass} placeholder="e.g. 120" value={form.weightKg} onChange={(e) => updateForm('weightKg', e.target.value)} />
-                </div>
-              </div>
             </div>
           </div>
 
+          {/* Packages */}
           <div className="bg-white rounded-lg border border-[#e8e4de] p-6">
-            <h2 className="text-base font-semibold text-[#1a1a1a] mb-5">Dimensions (largest item)</h2>
-            <div className="grid grid-cols-3 gap-3">
-              <div>
-                <label className={labelClass}>Length (cm)</label>
-                <input type="number" min="0" className={inputClass} placeholder="cm" value={form.lengthCm} onChange={(e) => updateForm('lengthCm', e.target.value)} />
-              </div>
-              <div>
-                <label className={labelClass}>Width (cm)</label>
-                <input type="number" min="0" className={inputClass} placeholder="cm" value={form.widthCm} onChange={(e) => updateForm('widthCm', e.target.value)} />
-              </div>
-              <div>
-                <label className={labelClass}>Height (cm)</label>
-                <input type="number" min="0" className={inputClass} placeholder="cm" value={form.heightCm} onChange={(e) => updateForm('heightCm', e.target.value)} />
-              </div>
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-base font-semibold text-[#1a1a1a]">Packages & Items</h2>
+              <button type="button" onClick={() => addPackage('box')} className="text-sm font-semibold text-[#C6904D] hover:text-[#b07d3f] transition-colors">+ Add Package</button>
             </div>
+
+            {packages.length === 0 ? (
+              <div className="text-center py-6 border-2 border-dashed border-[#e8e4de] rounded-lg">
+                <p className="text-sm text-slate-500 mb-4">Add your packages to get accurate quotes</p>
+                <div className="flex flex-wrap justify-center gap-2">
+                  {[
+                    { type: 'box', label: '+ Box' },
+                    { type: 'pallet', label: '+ Pallet' },
+                    { type: 'half-pallet', label: '+ Half Pallet' },
+                    { type: 'wine-case', label: '+ Wine Case' },
+                    { type: 'crate', label: '+ Crate' },
+                    { type: 'euro-pallet', label: '+ Euro Pallet' },
+                  ].map(btn => (
+                    <button
+                      key={btn.type}
+                      type="button"
+                      onClick={() => addPackage(btn.type)}
+                      className="px-3 py-2 rounded border border-[#e8e4de] text-sm font-medium text-[#1a1a1a] hover:border-[#C6904D] hover:bg-amber-50 transition-all"
+                    >
+                      {btn.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {packages.map((pkg, idx) => {
+                  const typeInfo = PACKAGE_TYPES.find(t => t.value === pkg.type)
+                  const showDimensions = typeInfo?.defaultW === 0 || pkg.type === 'loose' || pkg.type === 'oversized'
+                  return (
+                    <div key={pkg.id} className="p-4 bg-[#faf9f7] rounded-lg border border-[#e8e4de]">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Package {idx + 1}</span>
+                        <button type="button" onClick={() => removePackage(pkg.id)} className="text-xs text-red-500 hover:text-red-700 font-medium transition-colors">Remove</button>
+                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <div className="col-span-2 sm:col-span-1">
+                          <label className="block text-xs font-medium text-slate-500 mb-1">Type</label>
+                          <select
+                            className={selectClass + " !py-2 !text-sm"}
+                            value={pkg.type}
+                            onChange={e => updatePackage(pkg.id, 'type', e.target.value)}
+                          >
+                            {PACKAGE_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-slate-500 mb-1">Quantity</label>
+                          <input type="number" min="1" className={inputClass + " !py-2 !text-sm"} value={pkg.quantity} onChange={e => updatePackage(pkg.id, 'quantity', parseInt(e.target.value) || 1)} />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-slate-500 mb-1">Weight (kg ea.)</label>
+                          <input type="number" min="0" step="0.1" className={inputClass + " !py-2 !text-sm"} value={pkg.weightKg} onChange={e => updatePackage(pkg.id, 'weightKg', parseFloat(e.target.value) || 0)} />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-slate-500 mb-1">Note</label>
+                          <input type="text" className={inputClass + " !py-2 !text-sm"} placeholder="Optional" value={pkg.description} onChange={e => updatePackage(pkg.id, 'description', e.target.value)} />
+                        </div>
+                      </div>
+                      {showDimensions && (
+                        <div className="grid grid-cols-3 gap-3 mt-3">
+                          <div>
+                            <label className="block text-xs font-medium text-slate-500 mb-1">Length (cm)</label>
+                            <input type="number" min="0" className={inputClass + " !py-2 !text-sm"} value={pkg.lengthCm} onChange={e => updatePackage(pkg.id, 'lengthCm', parseInt(e.target.value) || 0)} />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-slate-500 mb-1">Width (cm)</label>
+                            <input type="number" min="0" className={inputClass + " !py-2 !text-sm"} value={pkg.widthCm} onChange={e => updatePackage(pkg.id, 'widthCm', parseInt(e.target.value) || 0)} />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-slate-500 mb-1">Height (cm)</label>
+                            <input type="number" min="0" className={inputClass + " !py-2 !text-sm"} value={pkg.heightCm} onChange={e => updatePackage(pkg.id, 'heightCm', parseInt(e.target.value) || 0)} />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+
+                {/* Quick-add buttons */}
+                <div className="flex flex-wrap gap-2 pt-2">
+                  {[
+                    { type: 'box', label: '+ Box' },
+                    { type: 'pallet', label: '+ Pallet' },
+                    { type: 'half-pallet', label: '+ Half Pallet' },
+                    { type: 'quarter-pallet', label: '+ Quarter Pallet' },
+                    { type: 'euro-pallet', label: '+ Euro Pallet' },
+                    { type: 'wine-case', label: '+ Wine Case' },
+                    { type: 'crate', label: '+ Crate' },
+                    { type: 'drum', label: '+ Drum' },
+                  ].map(btn => (
+                    <button
+                      key={btn.type}
+                      type="button"
+                      onClick={() => addPackage(btn.type)}
+                      className="px-2.5 py-1.5 rounded border border-[#e8e4de] text-xs font-medium text-slate-600 hover:border-[#C6904D] hover:text-[#C6904D] transition-all"
+                    >
+                      {btn.label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Totals */}
+                <div className="flex gap-6 pt-3 border-t border-[#e8e4de] text-sm">
+                  <div><span className="text-slate-500">Total items:</span> <strong className="text-[#1a1a1a]">{packages.reduce((s, p) => s + p.quantity, 0)}</strong></div>
+                  <div><span className="text-slate-500">Total weight:</span> <strong className="text-[#1a1a1a]">{totalWeight.toFixed(1)} kg</strong></div>
+                  <div><span className="text-slate-500">Total volume:</span> <strong className="text-[#1a1a1a]">{totalVolume.toFixed(2)} m&sup3;</strong></div>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="bg-white rounded-lg border border-[#e8e4de] p-6">
@@ -278,7 +424,12 @@ export default function GetQuotesPage() {
             <div className="space-y-4">
               <div>
                 <label className={labelClass}>Pickup Location / Port</label>
-                <input type="text" className={inputClass} placeholder="City, port, or postcode" value={form.pickupLocation} onChange={(e) => updateForm('pickupLocation', e.target.value)} />
+                <PortAutocomplete
+                  value={form.pickupLocation}
+                  onChange={v => updateForm('pickupLocation', v)}
+                  placeholder="City, port, or postcode"
+                  className={inputClass}
+                />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
@@ -312,7 +463,12 @@ export default function GetQuotesPage() {
             <div className="space-y-4">
               <div>
                 <label className={labelClass}>Delivery Location / Port</label>
-                <input type="text" className={inputClass} placeholder="Marina, port, or address" value={form.deliveryLocation} onChange={(e) => updateForm('deliveryLocation', e.target.value)} />
+                <PortAutocomplete
+                  value={form.deliveryLocation}
+                  onChange={v => updateForm('deliveryLocation', v)}
+                  placeholder="Marina, port, or address"
+                  className={inputClass}
+                />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
@@ -440,7 +596,8 @@ export default function GetQuotesPage() {
             <h2 className="text-base font-semibold text-[#1a1a1a] mb-4">Summary</h2>
             <div className="space-y-2 text-sm">
               {form.cargoType && <div><span className="text-slate-500">Cargo:</span> <span className="font-medium text-[#1a1a1a]">{form.cargoType}</span></div>}
-              {form.weightKg && <div><span className="text-slate-500">Weight:</span> <span className="font-medium text-[#1a1a1a]">{form.weightKg} kg</span></div>}
+              {totalWeight > 0 && <div><span className="text-slate-500">Weight:</span> <span className="font-medium text-[#1a1a1a]">{totalWeight.toFixed(1)} kg</span></div>}
+              {packages.length > 0 && <div><span className="text-slate-500">Packages:</span> <span className="font-medium text-[#1a1a1a]">{packages.reduce((s, p) => s + p.quantity, 0)} items ({packages.length} types)</span></div>}
               {form.pickupLocation && <div><span className="text-slate-500">From:</span> <span className="font-medium text-[#1a1a1a]">{form.pickupLocation}</span></div>}
               {form.deliveryLocation && <div><span className="text-slate-500">To:</span> <span className="font-medium text-[#1a1a1a]">{form.deliveryLocation}</span></div>}
               {form.yachtName && <div><span className="text-slate-500">Yacht:</span> <span className="font-medium text-[#1a1a1a]">{form.yachtName}</span></div>}
