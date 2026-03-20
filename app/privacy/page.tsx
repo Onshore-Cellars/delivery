@@ -1,6 +1,6 @@
 export default function PrivacyPage() {
   return (
-    <div className="page-container max-w-4xl">
+    <div className="page-container max-w-3xl">
         <p className="text-[11px] font-semibold text-[#0071e3] uppercase tracking-[0.15em] mb-1.5">Legal</p>
         <h1 className="text-2xl sm:text-3xl font-semibold text-[#1d1d1f] tracking-[-0.02em] mb-2">Privacy Policy</h1>
         <p className="text-sm text-slate-400 mb-8">Last updated: March 2026</p>

@@ -418,7 +418,7 @@ export default function MarketplacePage() {
     <div>
       {/* Search header */}
       <div className="bg-white border-b border-slate-200">
-        <div className="max-w-[1120px] mx-auto px-5 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <div className="max-w-4xl mx-auto px-6 sm:px-8 py-8 sm:py-10">
           <div className="flex items-center justify-between mb-4 sm:mb-5">
             <div>
               <h1 className="text-xl sm:text-2xl font-bold text-[#0f172a] tracking-tight">Marketplace</h1>
@@ -479,7 +479,7 @@ export default function MarketplacePage() {
       )}
 
       {/* Main content */}
-      <div className="max-w-[1120px] mx-auto px-5 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <div className="max-w-4xl mx-auto px-6 sm:px-8 py-8 sm:py-10">
         {/* Featured */}
         {featuredListings.length > 0 && (
           <div className="mb-8 sm:mb-10">

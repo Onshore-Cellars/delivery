@@ -214,19 +214,25 @@ a:hover { text-decoration: underline; }
 
 .page-container {
   width: 100%;
-  max-width: 1120px;
+  max-width: 56rem;
   margin-left: auto;
   margin-right: auto;
-  padding: 1.5rem 1.25rem;
+  padding: 2rem 1.5rem;
 }
 .page-container.max-w-4xl {
   max-width: 56rem;
 }
+.page-container.max-w-3xl {
+  max-width: 48rem;
+}
+.page-container.max-w-5xl {
+  max-width: 64rem;
+}
 @media (min-width: 640px) {
-  .page-container { padding: 2.5rem 1.5rem; }
+  .page-container { padding: 2.5rem 2rem; }
 }
 @media (min-width: 1024px) {
-  .page-container { padding: 2.5rem 2rem; }
+  .page-container { padding: 2.5rem 2.5rem; }
 }
 
 /* ─── BADGE ───────────────────────────────────────────────────────────── */

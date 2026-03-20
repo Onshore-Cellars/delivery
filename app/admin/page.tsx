@@ -463,7 +463,7 @@ export default function AdminPage() {
         </div>
       )}
 
-      <div className="page-container">
+      <div className="page-container max-w-5xl">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>

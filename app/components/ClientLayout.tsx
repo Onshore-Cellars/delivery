@@ -9,7 +9,7 @@ import { ReactNode } from 'react'
 function Footer() {
   return (
     <footer className="border-t border-[#d2d2d7]/60 bg-white/60">
-      <div className="max-w-[1120px] mx-auto px-5 sm:px-6 lg:px-8 py-6">
+      <div className="max-w-4xl mx-auto px-6 sm:px-8 py-8">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#86868b]">
           <p>&copy; {new Date().getFullYear()} Onshore Deliver. All rights reserved.</p>
           <div className="flex gap-6">
