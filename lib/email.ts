@@ -245,6 +245,211 @@ export function bidReceivedEmail(data: {
   }
 }
 
+export function deliveryConfirmationEmail(data: {
+  shipperName: string
+  trackingCode: string
+  origin: string
+  destination: string
+  deliveredAt: string
+  recipientName?: string
+  hasSignature: boolean
+  hasPhoto: boolean
+}): EmailTemplate {
+  const html = wrapEmail(`
+    <h2 style="color:#0f1628;font-size:24px;margin:0 0 16px;">Delivery Confirmed!</h2>
+    <p style="color:#475569;font-size:16px;line-height:1.6;">
+      Hi ${data.shipperName}, your shipment has been delivered successfully.
+    </p>
+
+    <div style="background:#dcfce7;border-radius:12px;padding:20px;margin:24px 0;text-align:center;">
+      <div style="font-size:36px;margin-bottom:8px;">✓</div>
+      <div style="color:#166534;font-size:18px;font-weight:bold;">Delivered</div>
+      <div style="color:#166534;font-size:14px;margin-top:4px;">${data.deliveredAt}</div>
+    </div>
+
+    <div style="background:#f1f5f9;border-radius:12px;padding:20px;margin:24px 0;">
+      <div style="font-family:monospace;color:#64748b;margin-bottom:8px;">${data.trackingCode}</div>
+      <div style="margin-bottom:8px;">${data.origin} → ${data.destination}</div>
+      ${data.recipientName ? `<div style="color:#0f1628;font-weight:600;">Signed by: ${data.recipientName}</div>` : ''}
+      <div style="color:#64748b;font-size:13px;margin-top:8px;">
+        ${data.hasSignature ? '✓ Signature captured  ' : ''}
+        ${data.hasPhoto ? '✓ Photo attached' : ''}
+      </div>
+    </div>
+
+    <a href="${APP_URL}/dashboard" style="display:block;background:linear-gradient(135deg,#0f1628,#162040);color:white;text-align:center;padding:14px 24px;border-radius:8px;font-weight:600;text-decoration:none;margin:24px 0;">
+      View Proof of Delivery
+    </a>
+
+    <p style="color:#64748b;font-size:13px;text-align:center;">
+      Please leave a review to help other shippers.
+    </p>
+  `)
+
+  return {
+    subject: `Delivery Confirmed - ${data.trackingCode}`,
+    html,
+    text: `Delivery confirmed! ${data.trackingCode}. ${data.origin} → ${data.destination}. Delivered ${data.deliveredAt}.${data.recipientName ? ` Signed by ${data.recipientName}.` : ''}`,
+  }
+}
+
+export function paymentReceiptEmail(data: {
+  customerName: string
+  trackingCode: string
+  amount: string
+  description: string
+  paidAt: string
+  invoiceUrl: string
+}): EmailTemplate {
+  const html = wrapEmail(`
+    <h2 style="color:#0f1628;font-size:24px;margin:0 0 16px;">Payment Receipt</h2>
+    <p style="color:#475569;font-size:16px;line-height:1.6;">
+      Hi ${data.customerName}, here's your payment receipt.
+    </p>
+
+    <div style="background:#f1f5f9;border-radius:12px;padding:20px;margin:24px 0;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:12px;">
+        <span style="color:#64748b;font-size:14px;">Reference</span>
+        <span style="color:#0f1628;font-weight:600;font-family:monospace;">${data.trackingCode}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:12px;">
+        <span style="color:#64748b;font-size:14px;">Description</span>
+        <span style="color:#0f1628;font-weight:600;">${data.description}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:12px;">
+        <span style="color:#64748b;font-size:14px;">Date</span>
+        <span style="color:#0f1628;font-weight:600;">${data.paidAt}</span>
+      </div>
+      <div style="border-top:1px solid #e2e8f0;padding-top:12px;display:flex;justify-content:space-between;">
+        <span style="color:#0f1628;font-size:18px;font-weight:bold;">Total</span>
+        <span style="color:#0f1628;font-size:18px;font-weight:bold;">${data.amount}</span>
+      </div>
+    </div>
+
+    <a href="${data.invoiceUrl}" style="display:block;background:linear-gradient(135deg,#0f1628,#162040);color:white;text-align:center;padding:14px 24px;border-radius:8px;font-weight:600;text-decoration:none;margin:24px 0;">
+      View Invoice
+    </a>
+  `)
+
+  return {
+    subject: `Payment Receipt - ${data.trackingCode}`,
+    html,
+    text: `Payment receipt: ${data.amount} for ${data.description}. Reference: ${data.trackingCode}. Date: ${data.paidAt}.`,
+  }
+}
+
+export function carrierPayoutEmail(data: {
+  carrierName: string
+  trackingCode: string
+  payoutAmount: string
+  bookingTotal: string
+  platformFee: string
+  deliveredAt: string
+}): EmailTemplate {
+  const html = wrapEmail(`
+    <h2 style="color:#0f1628;font-size:24px;margin:0 0 16px;">Payout Processed</h2>
+    <p style="color:#475569;font-size:16px;line-height:1.6;">
+      Hi ${data.carrierName}, your payout for delivery ${data.trackingCode} has been processed.
+    </p>
+
+    <div style="background:#f1f5f9;border-radius:12px;padding:20px;margin:24px 0;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+        <span style="color:#64748b;font-size:14px;">Booking Total</span>
+        <span style="color:#0f1628;">${data.bookingTotal}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+        <span style="color:#64748b;font-size:14px;">Platform Fee</span>
+        <span style="color:#ef4444;">-${data.platformFee}</span>
+      </div>
+      <div style="border-top:1px solid #e2e8f0;padding-top:8px;display:flex;justify-content:space-between;">
+        <span style="color:#0f1628;font-size:18px;font-weight:bold;">Your Payout</span>
+        <span style="color:#10b981;font-size:18px;font-weight:bold;">${data.payoutAmount}</span>
+      </div>
+    </div>
+
+    <p style="color:#64748b;font-size:13px;text-align:center;">
+      Funds will arrive in your Stripe account within 2–3 business days.
+    </p>
+  `)
+
+  return {
+    subject: `Payout Processed - ${data.trackingCode}`,
+    html,
+    text: `Payout processed: ${data.payoutAmount} for delivery ${data.trackingCode}. Booking total: ${data.bookingTotal}, fee: ${data.platformFee}.`,
+  }
+}
+
+export function welcomeEmail(data: { name: string; role: string }): EmailTemplate {
+  const html = wrapEmail(`
+    <h2 style="color:#0f1628;font-size:24px;margin:0 0 16px;">Welcome to Onshore Deliver!</h2>
+    <p style="color:#475569;font-size:16px;line-height:1.6;">
+      Hi ${data.name}, thanks for joining the delivery logistics marketplace.
+    </p>
+
+    <div style="background:#f1f5f9;border-radius:12px;padding:20px;margin:24px 0;">
+      <h3 style="color:#0f1628;margin:0 0 12px;font-size:16px;">Get Started</h3>
+      ${data.role === 'CARRIER' ? `
+        <ul style="color:#475569;font-size:14px;line-height:2;padding-left:20px;">
+          <li>Add your vehicle details and documentation</li>
+          <li>List your available transport space</li>
+          <li>Start accepting bookings and earning</li>
+        </ul>
+      ` : `
+        <ul style="color:#475569;font-size:14px;line-height:2;padding-left:20px;">
+          <li>Browse available carrier routes</li>
+          <li>Book space for your provisions and equipment</li>
+          <li>Track your deliveries in real time</li>
+        </ul>
+      `}
+    </div>
+
+    <a href="${APP_URL}/dashboard" style="display:block;background:linear-gradient(135deg,#C6904D,#b07d3f);color:white;text-align:center;padding:14px 24px;border-radius:8px;font-weight:600;text-decoration:none;margin:24px 0;">
+      Go to Dashboard
+    </a>
+  `)
+
+  return {
+    subject: 'Welcome to Onshore Deliver',
+    html,
+    text: `Welcome to Onshore Deliver, ${data.name}! Visit your dashboard to get started.`,
+  }
+}
+
+export function documentStatusEmail(data: {
+  userName: string
+  documentName: string
+  status: 'VERIFIED' | 'REJECTED'
+  reviewNotes?: string
+}): EmailTemplate {
+  const isVerified = data.status === 'VERIFIED'
+  const html = wrapEmail(`
+    <h2 style="color:#0f1628;font-size:24px;margin:0 0 16px;">Document ${isVerified ? 'Verified' : 'Requires Attention'}</h2>
+    <p style="color:#475569;font-size:16px;line-height:1.6;">
+      Hi ${data.userName}, your document <strong>${data.documentName}</strong> has been ${isVerified ? 'verified' : 'reviewed'}.
+    </p>
+
+    <div style="background:${isVerified ? '#dcfce7' : '#fef2f2'};border-radius:12px;padding:20px;margin:24px 0;text-align:center;">
+      <div style="font-size:36px;margin-bottom:8px;">${isVerified ? '✓' : '!'}</div>
+      <div style="color:${isVerified ? '#166534' : '#991b1b'};font-size:18px;font-weight:bold;">
+        ${isVerified ? 'Verified' : 'Rejected'}
+      </div>
+      ${data.reviewNotes ? `<p style="color:${isVerified ? '#166534' : '#991b1b'};font-size:14px;margin-top:8px;">${data.reviewNotes}</p>` : ''}
+    </div>
+
+    ${!isVerified ? `
+    <a href="${APP_URL}/profile" style="display:block;background:linear-gradient(135deg,#0f1628,#162040);color:white;text-align:center;padding:14px 24px;border-radius:8px;font-weight:600;text-decoration:none;margin:24px 0;">
+      Re-upload Document
+    </a>
+    ` : ''}
+  `)
+
+  return {
+    subject: `Document ${isVerified ? 'Verified' : 'Requires Attention'}: ${data.documentName}`,
+    html,
+    text: `Your document ${data.documentName} has been ${data.status.toLowerCase()}.${data.reviewNotes ? ` Notes: ${data.reviewNotes}` : ''}`,
+  }
+}
+
 export function quoteRequestEmail(data: {
   carrierName: string
   requesterName: string
