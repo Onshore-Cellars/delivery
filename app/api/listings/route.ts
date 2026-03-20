@@ -147,8 +147,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }
 
-    if (decoded.role !== 'CARRIER' && decoded.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'Only carriers can create listings' }, { status: 403 })
+    const creator = await prisma.user.findUnique({ where: { id: decoded.userId }, select: { canCarry: true } })
+    if (!creator?.canCarry && decoded.role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Enable "I can carry / deliver" in your profile to create listings' }, { status: 403 })
     }
 
     const body = await request.json()

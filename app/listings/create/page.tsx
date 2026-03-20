@@ -102,13 +102,16 @@ export default function CreateListingPage() {
     }
   }
 
-  if (!user || (user.role !== 'CARRIER' && user.role !== 'ADMIN')) {
+  if (!user || (!user.canCarry && user.role !== 'ADMIN')) {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-[#1a1a1a] mb-2">Access Restricted</h2>
-          <p className="text-slate-500 mb-6">Only carriers can create listings.</p>
-          <Link href="/dashboard" className="btn-primary text-sm">Back to Dashboard</Link>
+          <p className="text-slate-500 mb-6">Enable &ldquo;I can carry / deliver&rdquo; in your profile to create listings.</p>
+          <div className="flex gap-3 justify-center">
+            <Link href="/profile" className="btn-primary text-sm">Update Profile</Link>
+            <Link href="/dashboard" className="btn-outline text-sm">Back to Dashboard</Link>
+          </div>
         </div>
       </div>
     )

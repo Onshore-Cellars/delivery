@@ -111,7 +111,7 @@ export default function Navbar() {
                   <Link href="/dashboard" className={`px-4 py-2 rounded text-xs font-medium uppercase tracking-wider transition-colors hover:no-underline ${isActive('/dashboard') ? 'bg-slate-100 text-[#1a1a1a]' : 'text-slate-600 hover:text-[#1a1a1a] hover:bg-slate-50'}`}>
                     Dashboard
                   </Link>
-                  {user.role === 'CARRIER' && (
+                  {user.canCarry && (
                     <Link href="/listings/create" className={`px-4 py-2 rounded text-xs font-medium uppercase tracking-wider transition-colors hover:no-underline ${isActive('/listings/create') ? 'bg-slate-100 text-[#1a1a1a]' : 'text-slate-600 hover:text-[#1a1a1a] hover:bg-slate-50'}`}>
                       List Space
                     </Link>
@@ -269,7 +269,7 @@ export default function Navbar() {
                     <TabIcon icon="user" className={isActive('/profile') ? 'text-[#C6904D]' : 'text-slate-400'} />
                     Profile
                   </Link>
-                  {user.role === 'CARRIER' && (
+                  {user.canCarry && (
                     <Link href="/listings/create" onClick={close} className={`flex items-center gap-3.5 px-4 py-3.5 rounded text-[15px] font-medium transition-colors hover:no-underline ${isActive('/listings/create') ? 'bg-amber-50 text-[#C6904D]' : 'text-[#1a1a1a] hover:bg-slate-50'}`}>
                       <svg className={`w-5 h-5 ${isActive('/listings/create') ? 'text-[#C6904D]' : 'text-slate-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 4v16m8-8H4" />

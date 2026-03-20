@@ -11,6 +11,8 @@ interface User {
   company?: string
   phone?: string
   avatarUrl?: string
+  canCarry: boolean
+  canShip: boolean
   verified: boolean
 }
 

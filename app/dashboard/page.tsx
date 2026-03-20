@@ -61,7 +61,7 @@ export default function DashboardPage() {
   const fetchData = useCallback(async () => {
     if (!token) return
     try {
-      if (user?.role === 'CARRIER') {
+      if (user?.canCarry) {
         const res = await fetch('/api/listings?limit=100', { headers: { Authorization: `Bearer ${token}` } })
         if (res.ok) {
           const data = await res.json()
@@ -96,7 +96,7 @@ export default function DashboardPage() {
     return `${symbols[currency] || currency}${amount.toFixed(2)}`
   }
 
-  const tabs = ['overview', ...(user.role === 'CARRIER' ? ['listings'] : []), 'bookings']
+  const tabs = ['overview', ...(user.canCarry ? ['listings'] : []), 'bookings']
 
   return (
     <div className="page-container">
@@ -106,15 +106,23 @@ export default function DashboardPage() {
           <h1 className="text-xl sm:text-2xl font-bold text-[#1a1a1a] tracking-tight">Welcome back, {user.name}</h1>
           <p className="text-sm text-slate-500 mt-1">
             {user.company && <span>{user.company} &middot; </span>}
-            {user.role === 'CARRIER' ? 'Manage your routes and bookings' : 'Track your deliveries'}
+            {user.canCarry ? 'Manage your routes and bookings' : 'Track your deliveries'}
           </p>
         </div>
-        {user.role === 'CARRIER' && (
-          <Link href="/listings/create" className="btn-primary !text-sm !py-3 !px-5 inline-flex items-center justify-center gap-2">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-            List Van Space
-          </Link>
-        )}
+        <div className="flex flex-wrap gap-3">
+          {user.canCarry && (
+            <Link href="/listings/create" className="btn-primary !text-sm !py-3 !px-5 inline-flex items-center justify-center gap-2">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+              List Van Space
+            </Link>
+          )}
+          {user.canShip && (
+            <Link href="/get-quotes" className="btn-outline !text-sm !py-3 !px-5 inline-flex items-center justify-center gap-2">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+              Send Goods
+            </Link>
+          )}
+        </div>
       </div>
 
       {/* Tabs */}
@@ -145,7 +153,7 @@ export default function DashboardPage() {
               <div className="space-y-6 sm:space-y-8">
                 {/* Stats */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                  {user.role === 'CARRIER' ? (
+                  {user.canCarry ? (
                     <>
                       <StatCard label="Active Listings" value={listings.filter(l => l.status === 'ACTIVE').length.toString()} accent />
                       <StatCard label="Total Bookings" value={bookings.length.toString()} />
@@ -208,7 +216,7 @@ export default function DashboardPage() {
             )}
 
             {/* Listings tab */}
-            {tab === 'listings' && user.role === 'CARRIER' && (
+            {tab === 'listings' && user.canCarry && (
               <div className="space-y-4">
                 {listings.length === 0 ? (
                   <div className="bg-white rounded-2xl border border-slate-200 p-10 sm:p-12 text-center">
