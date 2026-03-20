@@ -103,7 +103,7 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8 gap-3">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-[#0f172a] tracking-tight">Welcome back, {user.name}</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-[#1a1a1a] tracking-tight">Welcome back, {user.name}</h1>
           <p className="text-sm text-slate-500 mt-1">
             {user.company && <span>{user.company} &middot; </span>}
             {user.role === 'CARRIER' ? 'Manage your routes and bookings' : 'Track your deliveries'}
@@ -126,7 +126,7 @@ export default function DashboardPage() {
             className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all whitespace-nowrap ${
               tab === t
                 ? 'bg-[#C6904D] text-white'
-                : 'text-slate-500 hover:text-[#0f172a] hover:bg-slate-100'
+                : 'text-slate-500 hover:text-[#1a1a1a] hover:bg-slate-100'
             }`}
           >
             {t.charAt(0).toUpperCase() + t.slice(1)}
@@ -169,14 +169,14 @@ export default function DashboardPage() {
                 {/* Recent bookings */}
                 <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
                   <div className="px-5 sm:px-6 py-4 border-b border-slate-100">
-                    <h2 className="font-bold text-[#0f172a] text-base">Recent Bookings</h2>
+                    <h2 className="font-bold text-[#1a1a1a] text-base">Recent Bookings</h2>
                   </div>
                   {bookings.length === 0 ? (
                     <div className="p-10 sm:p-14 text-center">
                       <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto mb-4">
                         <svg className="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
                       </div>
-                      <p className="text-[#0f172a] font-semibold mb-1.5">No bookings yet</p>
+                      <p className="text-[#1a1a1a] font-semibold mb-1.5">No bookings yet</p>
                       <p className="text-sm text-slate-500 mb-5">Browse available listings to get started</p>
                       <Link href="/marketplace" className="btn-primary !text-sm !py-2.5 !px-6">Browse Marketplace</Link>
                     </div>
@@ -189,14 +189,14 @@ export default function DashboardPage() {
                               <span className={`badge border ${statusColors[b.status] || 'bg-slate-100 text-slate-600'}`}>
                                 {b.status.replace('_', ' ')}
                               </span>
-                              <span className="text-sm font-semibold text-[#0f172a] truncate">{b.cargoDescription}</span>
+                              <span className="text-sm font-semibold text-[#1a1a1a] truncate">{b.cargoDescription}</span>
                             </div>
                             <div className="mt-1.5 text-xs text-slate-500">
                               {b.listing.originPort} &rarr; {b.listing.destinationPort} &middot; {formatDate(b.listing.departureDate)}
                             </div>
                           </div>
                           <div className="text-left sm:text-right">
-                            <div className="text-sm font-bold text-[#0f172a]">{formatCurrency(b.totalPrice, b.currency)}</div>
+                            <div className="text-sm font-bold text-[#1a1a1a]">{formatCurrency(b.totalPrice, b.currency)}</div>
                             {b.trackingCode && <div className="text-xs text-slate-400 font-mono mt-0.5">{b.trackingCode}</div>}
                           </div>
                         </div>
@@ -221,7 +221,7 @@ export default function DashboardPage() {
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                         <div>
                           <div className="flex items-center gap-2.5 mb-2 flex-wrap">
-                            <h3 className="font-bold text-[#0f172a]">{l.title}</h3>
+                            <h3 className="font-bold text-[#1a1a1a]">{l.title}</h3>
                             <span className={`badge border ${statusColors[l.status]}`}>{l.status}</span>
                           </div>
                           <p className="text-sm text-slate-500">{l.originPort} &rarr; {l.destinationPort} &middot; {formatDate(l.departureDate)}</p>
@@ -254,7 +254,7 @@ export default function DashboardPage() {
                         <div>
                           <div className="flex items-center gap-2.5 mb-2 flex-wrap">
                             <span className={`badge border ${statusColors[b.status]}`}>{b.status.replace('_', ' ')}</span>
-                            <h3 className="font-bold text-[#0f172a]">{b.cargoDescription}</h3>
+                            <h3 className="font-bold text-[#1a1a1a]">{b.cargoDescription}</h3>
                           </div>
                           <p className="text-sm text-slate-500">{b.listing.originPort} &rarr; {b.listing.destinationPort} &middot; {formatDate(b.listing.departureDate)}</p>
                           <p className="text-xs text-slate-400 mt-1">
@@ -262,7 +262,7 @@ export default function DashboardPage() {
                           </p>
                         </div>
                         <div className="sm:text-right">
-                          <div className="text-lg font-bold text-[#0f172a]">{formatCurrency(b.totalPrice, b.currency)}</div>
+                          <div className="text-lg font-bold text-[#1a1a1a]">{formatCurrency(b.totalPrice, b.currency)}</div>
                           <div className="text-xs text-slate-400 mt-0.5">{b.weightKg} kg &middot; {b.volumeM3} m&sup3;</div>
                           {b.trackingCode && (
                             <div className="mt-1.5 inline-flex text-xs font-mono text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg">{b.trackingCode}</div>
@@ -284,7 +284,7 @@ function StatCard({ label, value, accent }: { label: string; value: string; acce
   return (
     <div className={`rounded-2xl border p-5 sm:p-6 transition-shadow hover:shadow-md ${accent ? 'bg-[#C6904D] border-[#C6904D]' : 'bg-white border-slate-200'}`}>
       <div className={`text-xs font-semibold uppercase tracking-wider ${accent ? 'text-[#e8c994]' : 'text-slate-400'}`}>{label}</div>
-      <div className={`mt-2 text-2xl sm:text-3xl font-bold tracking-tight ${accent ? 'text-white' : 'text-[#0f172a]'}`}>{value}</div>
+      <div className={`mt-2 text-2xl sm:text-3xl font-bold tracking-tight ${accent ? 'text-white' : 'text-[#1a1a1a]'}`}>{value}</div>
     </div>
   )
 }

@@ -24,6 +24,8 @@ export async function GET(request: NextRequest) {
         company: true,
         phone: true,
         avatarUrl: true,
+        canCarry: true,
+        canShip: true,
         verified: true,
         createdAt: true,
       },

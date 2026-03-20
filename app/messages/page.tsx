@@ -121,11 +121,11 @@ export default function MessagesPage() {
   return (
     <div className="page-container">
         <div className="mb-6">
-          <p className="text-[11px] font-semibold text-[#0071e3] uppercase tracking-[0.15em] mb-1">Communication</p>
-          <h1 className="text-xl sm:text-2xl font-semibold text-[#1d1d1f] tracking-[-0.02em]">Messages</h1>
+          <p className="text-[11px] font-semibold text-[#C6904D] uppercase tracking-[0.15em] mb-1">Communication</p>
+          <h1 className="text-xl sm:text-2xl font-semibold text-[#1a1a1a] tracking-[-0.02em]">Messages</h1>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-slate-100/80 overflow-hidden" style={{ height: 'calc(100vh - 220px)' }}>
+        <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] overflow-hidden" style={{ height: 'calc(100vh - 220px)' }}>
           <div className="flex h-full">
             {/* Conversation list */}
             <div className={`${activeConv ? 'hidden md:block' : ''} w-full md:w-80 border-r border-slate-100 overflow-y-auto`}>
@@ -145,11 +145,11 @@ export default function MessagesPage() {
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-[#f5f5f7] flex items-center justify-center flex-shrink-0">
-                          <span className="text-xs font-semibold text-[#1d1d1f]">{other.name.split(' ').map(n => n[0]).join('')}</span>
+                          <span className="text-xs font-semibold text-[#1a1a1a]">{other.name.split(' ').map(n => n[0]).join('')}</span>
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between">
-                            <span className="font-semibold text-[#1d1d1f] text-sm truncate">{other.name}</span>
+                            <span className="font-semibold text-[#1a1a1a] text-sm truncate">{other.name}</span>
                             {lastMsg && <span className="text-xs text-slate-400 flex-shrink-0">{formatTime(lastMsg.createdAt)}</span>}
                           </div>
                           <div className="flex items-center justify-between mt-0.5">
@@ -177,10 +177,10 @@ export default function MessagesPage() {
                         <svg className="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                       </button>
                       <div className="w-8 h-8 rounded-full bg-[#f5f5f7] flex items-center justify-center">
-                        <span className="text-xs font-semibold text-[#1d1d1f]">{otherUser.name.split(' ').map(n => n[0]).join('')}</span>
+                        <span className="text-xs font-semibold text-[#1a1a1a]">{otherUser.name.split(' ').map(n => n[0]).join('')}</span>
                       </div>
                       <div>
-                        <div className="font-semibold text-[#1d1d1f] text-sm">{otherUser.name}</div>
+                        <div className="font-semibold text-[#1a1a1a] text-sm">{otherUser.name}</div>
                         <div className="text-xs text-slate-400">{otherUser.role.replace('_', ' ')}{otherUser.company && ` at ${otherUser.company}`}</div>
                       </div>
                     </div>
@@ -205,7 +205,7 @@ export default function MessagesPage() {
                         <div className={`max-w-[70%] px-4 py-2.5 rounded-2xl text-sm ${
                           msg.senderId === user.id
                             ? 'bg-[#1d1d1f] text-white rounded-br-md'
-                            : 'bg-slate-100 text-[#1d1d1f] rounded-bl-md'
+                            : 'bg-slate-100 text-[#1a1a1a] rounded-bl-md'
                         }`}>
                           <p className="whitespace-pre-wrap">{msg.content}</p>
                           <div className={`text-[10px] mt-1 ${msg.senderId === user.id ? 'text-white/50' : 'text-slate-400'}`}>
@@ -222,7 +222,7 @@ export default function MessagesPage() {
                     <div className="flex gap-2">
                       <input
                         type="text"
-                        className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-[#1d1d1f] focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10 outline-none"
+                        className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-[#1a1a1a] focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 outline-none"
                         placeholder="Type a message..."
                         value={newMessage}
                         onChange={e => setNewMessage(e.target.value)}

@@ -82,16 +82,16 @@ export default function LoginPage() {
             )}
 
             <div>
-              <label htmlFor="email" className="block text-sm font-semibold text-[#0f172a] mb-2">Email</label>
+              <label htmlFor="email" className="block text-sm font-semibold text-[#1a1a1a] mb-2">Email</label>
               <input id="email" type="email" required autoComplete="email"
-                className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-white text-[#0f172a] text-[15px] placeholder:text-slate-400 focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 transition-all outline-none"
+                className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-white text-[#1a1a1a] text-[15px] placeholder:text-slate-400 focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 transition-all outline-none"
                 placeholder="you@company.com" value={email} onChange={(e) => setEmail(e.target.value)} />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-semibold text-[#0f172a] mb-2">Password</label>
+              <label htmlFor="password" className="block text-sm font-semibold text-[#1a1a1a] mb-2">Password</label>
               <input id="password" type="password" required autoComplete="current-password"
-                className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-white text-[#0f172a] text-[15px] placeholder:text-slate-400 focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 transition-all outline-none"
+                className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-white text-[#1a1a1a] text-[15px] placeholder:text-slate-400 focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 transition-all outline-none"
                 placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} />
             </div>
 

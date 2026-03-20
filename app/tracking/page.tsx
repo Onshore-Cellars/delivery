@@ -68,17 +68,17 @@ export default function TrackingPage() {
   return (
     <div className="page-container narrow">
         <div className="mb-8">
-          <p className="text-[11px] font-semibold text-[#0071e3] uppercase tracking-[0.15em] mb-1">Logistics</p>
+          <p className="text-[11px] font-semibold text-[#C6904D] uppercase tracking-[0.15em] mb-1">Logistics</p>
           <h1 className="text-xl sm:text-2xl font-semibold text-[#1d1d1f] tracking-[-0.02em]">Track Shipment</h1>
           <p className="text-slate-500 mt-1.5">Enter your tracking code to see real-time delivery status.</p>
         </div>
 
         {/* Search */}
-        <form onSubmit={handleTrack} className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-slate-100/80 p-6 mb-8">
+        <form onSubmit={handleTrack} className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-6 mb-8">
           <div className="flex gap-3">
             <input
               type="text"
-              className="flex-1 px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-sm text-[#1d1d1f] font-mono tracking-wider focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10 focus:bg-white transition-all outline-none uppercase"
+              className="flex-1 px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-sm text-[#1d1d1f] font-mono tracking-wider focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 focus:bg-white transition-all outline-none uppercase"
               placeholder="OD-XXXXXXXX"
               value={code}
               onChange={(e) => setCode(e.target.value.toUpperCase())}
@@ -94,7 +94,7 @@ export default function TrackingPage() {
         {data && (
           <div className="space-y-6 animate-fade-in">
             {/* Status Progress */}
-            <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-slate-100/80 p-6">
+            <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-6">
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <span className="text-xs font-mono text-slate-400">{data.booking.trackingCode}</span>
@@ -146,7 +146,7 @@ export default function TrackingPage() {
 
             {/* Route & Details */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-slate-100/80 p-6">
+              <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-6">
                 <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Route</h3>
                 <div className="flex items-center gap-3 mb-4">
                   <div>
@@ -169,7 +169,7 @@ export default function TrackingPage() {
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-slate-100/80 p-6">
+              <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-6">
                 <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Cargo</h3>
                 <dl className="space-y-2 text-sm">
                   {data.booking.cargoType && (
@@ -198,7 +198,7 @@ export default function TrackingPage() {
 
             {/* Timeline */}
             {data.events.length > 0 && (
-              <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-slate-100/80 p-6">
+              <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-6">
                 <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Timeline</h3>
                 <div className="space-y-0">
                   {data.events.map((event, i) => (

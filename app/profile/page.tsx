@@ -3,11 +3,12 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '../components/AuthProvider'
+import AvatarUpload from '../components/AvatarUpload'
 
 interface ProfileData {
   id: string; email: string; name: string; role: string
   phone?: string; company?: string; bio?: string; website?: string
-  address?: string; city?: string; country?: string
+  address?: string; city?: string; country?: string; avatarUrl?: string
   canCarry: boolean; canShip: boolean
   yachtName?: string; yachtMMSI?: string; yachtIMO?: string; yachtFlag?: string
   yachtLength?: number; yachtType?: string; homePort?: string
@@ -96,11 +97,14 @@ export default function ProfilePage() {
         )}
 
         {/* Profile Card */}
-        <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-slate-100/80 p-6 sm:p-8 mb-6">
+        <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-6 sm:p-8 mb-6">
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-16 h-16 rounded-2xl bg-[#f5f5f7] flex items-center justify-center shadow-sm">
-              <span className="text-xl font-bold text-[#1a1a1a]">{profile.name.split(' ').map(n => n[0]).join('')}</span>
-            </div>
+            <AvatarUpload
+              currentUrl={profile.avatarUrl || undefined}
+              name={profile.name}
+              token={token || ''}
+              onUpload={() => { fetchProfile(); refreshUser() }}
+            />
             <div>
               <h2 className="text-xl font-bold text-[#1a1a1a]">{profile.name}</h2>
               <p className="text-sm text-slate-500">{profile.role.replace('_', ' ')}{profile.company && ` at ${profile.company}`}</p>
