@@ -43,11 +43,18 @@ export async function POST(request: NextRequest) {
       originPort, destinationPort,
       cargoDescription, cargoType,
       weightKg, volumeM3,
+      packages,
       preferredDate, specialRequirements,
     } = body
 
-    if (!originPort || !destinationPort || !cargoDescription || !weightKg || !volumeM3) {
+    if (!originPort || !destinationPort || !cargoDescription) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+    }
+
+    // Validate packages JSON if provided
+    let packagesJson: string | null = null
+    if (packages && Array.isArray(packages) && packages.length > 0) {
+      packagesJson = JSON.stringify(packages)
     }
 
     const quote = await prisma.quote.create({
@@ -59,8 +66,9 @@ export async function POST(request: NextRequest) {
         destinationPort,
         cargoDescription,
         cargoType: cargoType || null,
-        weightKg: parseFloat(weightKg),
-        volumeM3: parseFloat(volumeM3),
+        weightKg: parseFloat(weightKg) || 0,
+        volumeM3: parseFloat(volumeM3) || 0,
+        packages: packagesJson,
         preferredDate: preferredDate ? new Date(preferredDate) : null,
         specialRequirements: specialRequirements || null,
       },

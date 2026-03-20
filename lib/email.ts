@@ -1,6 +1,6 @@
-// Email utility — uses a provider-agnostic interface
-// In production, swap in SendGrid, Resend, Postmark, etc.
-// For now, logs emails and provides the structure for real sending
+// Email utility — supports SMTP (nodemailer) and Resend API
+
+import nodemailer from 'nodemailer'
 
 interface EmailOptions {
   to: string
@@ -16,14 +16,44 @@ interface EmailTemplate {
 }
 
 const APP_NAME = 'Onshore Deliver'
-const FROM_EMAIL = process.env.EMAIL_FROM || 'noreply@onshore.delivery'
+const FROM_EMAIL = process.env.EMAIL_FROM || 'info@onshoredelivery.com'
 const APP_URL = process.env.NEXTAUTH_URL || 'http://localhost:3000'
+
+// Create a reusable SMTP transporter if configured
+function getSmtpTransporter() {
+  const host = process.env.SMTP_HOST
+  const port = parseInt(process.env.SMTP_PORT || '587', 10)
+  const user = process.env.SMTP_USER
+  const pass = process.env.SMTP_PASS
+
+  if (!host || !user || !pass) return null
+
+  return nodemailer.createTransport({
+    host,
+    port,
+    secure: port === 465,
+    auth: { user, pass },
+  })
+}
 
 // ─── SEND EMAIL ───────────────────────────────────────────────────────────────
 
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
   try {
-    // Check if we have a real email provider configured
+    // Priority 1: SMTP via nodemailer
+    const transporter = getSmtpTransporter()
+    if (transporter) {
+      await transporter.sendMail({
+        from: `${APP_NAME} <${FROM_EMAIL}>`,
+        to: options.to,
+        subject: options.subject,
+        html: options.html,
+        text: options.text,
+      })
+      return true
+    }
+
+    // Priority 2: Resend API
     if (process.env.RESEND_API_KEY) {
       const res = await fetch('https://api.resend.com/emails', {
         method: 'POST',

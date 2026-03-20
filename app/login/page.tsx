@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useAuth } from '../components/AuthProvider'
 
 declare global {
@@ -27,7 +28,12 @@ export default function LoginPage() {
   const handleGoogleResponse = useCallback(async (response: { credential: string }) => {
     setError('')
     setLoading(true)
-    try { await googleSignIn(response.credential) }
+    try {
+      const result = await googleSignIn(response.credential)
+      if (result.needsRole) {
+        setError('No account found. Please register first to select your account type.')
+      }
+    }
     catch (err) { setError(err instanceof Error ? err.message : 'Google sign-in failed') }
     finally { setLoading(false) }
   }, [googleSignIn])
@@ -65,9 +71,7 @@ export default function LoginPage() {
         <div className="w-full max-w-sm">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 mb-10 hover:no-underline">
-            <div className="w-8 h-8 rounded-sm bg-[#C6904D] flex items-center justify-center">
-              <span className="text-white text-sm font-bold" style={{ fontFamily: 'var(--font-display)' }}>O</span>
-            </div>
+            <Image src="/logo.png" alt="Onshore Deliver" width={32} height={32} className="rounded-sm" />
             <span className="text-lg font-semibold text-[#1a1a1a] tracking-wide" style={{ fontFamily: 'var(--font-display)' }}>Onshore</span>
           </Link>
 

@@ -59,6 +59,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 })
     }
 
+    if (user.suspended) {
+      return NextResponse.json({ error: 'Your account has been suspended. Please contact support.' }, { status: 403 })
+    }
+
     // Update last login timestamp
     await prisma.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } })
 

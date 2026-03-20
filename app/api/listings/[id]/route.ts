@@ -13,7 +13,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         carrier: {
           select: {
             id: true, name: true, company: true, avatarUrl: true,
-            phone: true, email: true, bio: true, city: true, country: true,
+            bio: true, city: true, country: true,
             createdAt: true,
             receivedReviews: {
               select: { rating: true },
@@ -88,10 +88,9 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       'originPort', 'originRegion', 'originCountry',
       'destinationPort', 'destinationRegion', 'destinationCountry',
       'departureDate', 'estimatedArrival',
-      'totalCapacityKg', 'totalCapacityM3', 'availableKg', 'availableM3',
+      'totalCapacityKg', 'totalCapacityM3',
       'pricePerKg', 'pricePerM3', 'flatRate', 'currency', 'minimumCharge',
       'biddingEnabled', 'minBidPrice', 'acceptedCargo', 'restrictedItems',
-      'status',
     ]
 
     const data: Record<string, unknown> = {}

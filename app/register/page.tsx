@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, Suspense } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useSearchParams } from 'next/navigation'
 import { useAuth } from '../components/AuthProvider'
 
@@ -112,9 +113,7 @@ function RegisterForm() {
         <div className="w-full max-w-md">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 mb-10 hover:no-underline">
-            <div className="w-8 h-8 rounded-sm bg-[#C6904D] flex items-center justify-center">
-              <span className="text-white text-sm font-bold" style={{ fontFamily: 'var(--font-display)' }}>O</span>
-            </div>
+            <Image src="/logo.png" alt="Onshore Deliver" width={32} height={32} className="rounded-sm" />
             <span className="text-lg font-semibold text-[#1a1a1a] tracking-wide" style={{ fontFamily: 'var(--font-display)' }}>Onshore</span>
           </Link>
 

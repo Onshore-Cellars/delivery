@@ -3,6 +3,18 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '../components/AuthProvider'
+import PortAutocomplete from '../components/PortAutocomplete'
+
+interface PackageItem {
+  id: string
+  type: string
+  quantity: number
+  weightKg: number
+  lengthCm: number
+  widthCm: number
+  heightCm: number
+  description: string
+}
 
 interface Quote {
   id: string
@@ -12,6 +24,7 @@ interface Quote {
   cargoType?: string
   weightKg: number
   volumeM3: number
+  packages?: string
   preferredDate?: string
   specialRequirements?: string
   quotedPrice?: number
@@ -32,8 +45,6 @@ interface QuoteForm {
   destinationPort: string
   cargoDescription: string
   cargoType: string
-  weightKg: string
-  volumeM3: string
   preferredDate: string
   specialRequirements: string
 }
@@ -44,13 +55,28 @@ interface RespondForm {
   responseMessage: string
 }
 
+const PACKAGE_TYPES = [
+  { value: 'pallet', label: 'Full Pallet', defaultW: 120, defaultD: 80, defaultH: 150, defaultKg: 300 },
+  { value: 'half-pallet', label: 'Half Pallet', defaultW: 80, defaultD: 60, defaultH: 100, defaultKg: 150 },
+  { value: 'quarter-pallet', label: 'Quarter Pallet', defaultW: 60, defaultD: 40, defaultH: 80, defaultKg: 75 },
+  { value: 'euro-pallet', label: 'Euro Pallet (EUR)', defaultW: 120, defaultD: 80, defaultH: 144, defaultKg: 500 },
+  { value: 'box', label: 'Box / Carton', defaultW: 60, defaultD: 40, defaultH: 40, defaultKg: 25 },
+  { value: 'crate', label: 'Crate', defaultW: 100, defaultD: 60, defaultH: 60, defaultKg: 80 },
+  { value: 'wine-case', label: 'Wine Case (12 btl)', defaultW: 50, defaultD: 34, defaultH: 18, defaultKg: 18 },
+  { value: 'drum', label: 'Barrel / Drum', defaultW: 60, defaultD: 60, defaultH: 90, defaultKg: 200 },
+  { value: 'loose', label: 'Loose Item', defaultW: 0, defaultD: 0, defaultH: 0, defaultKg: 0 },
+  { value: 'oversized', label: 'Oversized / Custom', defaultW: 0, defaultD: 0, defaultH: 0, defaultKg: 0 },
+]
+
+function generateId() {
+  return Math.random().toString(36).substring(2, 9)
+}
+
 const emptyQuoteForm: QuoteForm = {
   originPort: '',
   destinationPort: '',
   cargoDescription: '',
   cargoType: '',
-  weightKg: '',
-  volumeM3: '',
   preferredDate: '',
   specialRequirements: '',
 }
@@ -80,6 +106,7 @@ export default function QuotesPage() {
   const [quoteForm, setQuoteForm] = useState<QuoteForm>(emptyQuoteForm)
   const [creating, setCreating] = useState(false)
   const [createError, setCreateError] = useState('')
+  const [packages, setPackages] = useState<PackageItem[]>([])
   const [respondingTo, setRespondingTo] = useState<string | null>(null)
   const [respondForm, setRespondForm] = useState<RespondForm>(emptyRespondForm)
   const [responding, setResponding] = useState(false)
@@ -124,20 +151,59 @@ export default function QuotesPage() {
     return `${symbols[currency] || currency}${amount.toFixed(2)}`
   }
 
+  const addPackage = () => {
+    const def = PACKAGE_TYPES[0]
+    setPackages([...packages, {
+      id: generateId(),
+      type: def.value,
+      quantity: 1,
+      weightKg: def.defaultKg,
+      lengthCm: def.defaultD,
+      widthCm: def.defaultW,
+      heightCm: def.defaultH,
+      description: '',
+    }])
+  }
+
+  const updatePackage = (id: string, field: keyof PackageItem, value: string | number) => {
+    setPackages(packages.map(p => {
+      if (p.id !== id) return p
+      if (field === 'type') {
+        const def = PACKAGE_TYPES.find(t => t.value === value)
+        if (def) return { ...p, type: String(value), weightKg: def.defaultKg, lengthCm: def.defaultD, widthCm: def.defaultW, heightCm: def.defaultH }
+      }
+      return { ...p, [field]: value }
+    }))
+  }
+
+  const removePackage = (id: string) => setPackages(packages.filter(p => p.id !== id))
+
+  const totalWeight = packages.reduce((s, p) => s + p.weightKg * p.quantity, 0)
+  const totalVolume = packages.reduce((s, p) => s + (p.lengthCm * p.widthCm * p.heightCm * p.quantity) / 1_000_000, 0)
+
   const handleCreateQuote = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!token) return
     setCreating(true)
     setCreateError('')
     try {
+      const body: Record<string, unknown> = {
+        ...quoteForm,
+        weightKg: totalWeight,
+        volumeM3: totalVolume,
+      }
+      if (packages.length > 0) {
+        body.packages = JSON.stringify(packages)
+      }
       const res = await fetch('/api/quotes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify(quoteForm),
+        body: JSON.stringify(body),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed to create quote request')
       setQuoteForm(emptyQuoteForm)
+      setPackages([])
       setShowNewForm(false)
       fetchQuotes()
     } catch (err) {
@@ -248,24 +314,20 @@ export default function QuotesPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-[#1a1a1a] mb-1.5">Origin Port *</label>
-                  <input
-                    type="text"
-                    required
-                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-[#1a1a1a] focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 outline-none"
-                    placeholder="e.g. Antibes, France"
+                  <PortAutocomplete
                     value={quoteForm.originPort}
-                    onChange={e => setQuoteForm({ ...quoteForm, originPort: e.target.value })}
+                    onChange={v => setQuoteForm({ ...quoteForm, originPort: v })}
+                    placeholder="e.g. Antibes, France"
+                    required
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-[#1a1a1a] mb-1.5">Destination Port *</label>
-                  <input
-                    type="text"
-                    required
-                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-[#1a1a1a] focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 outline-none"
-                    placeholder="e.g. Palma de Mallorca, Spain"
+                  <PortAutocomplete
                     value={quoteForm.destinationPort}
-                    onChange={e => setQuoteForm({ ...quoteForm, destinationPort: e.target.value })}
+                    onChange={v => setQuoteForm({ ...quoteForm, destinationPort: v })}
+                    placeholder="e.g. Palma de Mallorca, Spain"
+                    required
                   />
                 </div>
               </div>
@@ -282,7 +344,7 @@ export default function QuotesPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-[#1a1a1a] mb-1.5">Cargo Type</label>
                   <select
@@ -300,35 +362,6 @@ export default function QuotesPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#1a1a1a] mb-1.5">Weight (kg) *</label>
-                  <input
-                    type="number"
-                    required
-                    step="0.1"
-                    min="0"
-                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-[#1a1a1a] focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 outline-none"
-                    placeholder="e.g. 250"
-                    value={quoteForm.weightKg}
-                    onChange={e => setQuoteForm({ ...quoteForm, weightKg: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-[#1a1a1a] mb-1.5">Volume (m&sup3;) *</label>
-                  <input
-                    type="number"
-                    required
-                    step="0.1"
-                    min="0"
-                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-[#1a1a1a] focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 outline-none"
-                    placeholder="e.g. 1.5"
-                    value={quoteForm.volumeM3}
-                    onChange={e => setQuoteForm({ ...quoteForm, volumeM3: e.target.value })}
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
                   <label className="block text-sm font-medium text-[#1a1a1a] mb-1.5">Preferred Date</label>
                   <input
                     type="date"
@@ -337,16 +370,82 @@ export default function QuotesPage() {
                     onChange={e => setQuoteForm({ ...quoteForm, preferredDate: e.target.value })}
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-[#1a1a1a] mb-1.5">Special Requirements</label>
-                  <input
-                    type="text"
-                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-[#1a1a1a] focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 outline-none"
-                    placeholder="e.g. Refrigerated, fragile, time-sensitive"
-                    value={quoteForm.specialRequirements}
-                    onChange={e => setQuoteForm({ ...quoteForm, specialRequirements: e.target.value })}
-                  />
+              </div>
+
+              {/* Packages */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-sm font-medium text-[#1a1a1a]">Packages</label>
+                  <button type="button" onClick={addPackage} className="text-xs font-semibold text-[#C6904D] hover:text-[#b07d3f]">+ Add Package</button>
                 </div>
+                {packages.length === 0 && (
+                  <p className="text-xs text-slate-400 mb-2">Add packages to specify cargo dimensions and weight, or leave empty for a general quote.</p>
+                )}
+                {packages.map(pkg => {
+                  const typeInfo = PACKAGE_TYPES.find(t => t.value === pkg.type)
+                  return (
+                    <div key={pkg.id} className="flex flex-wrap items-end gap-2 mb-2 p-3 bg-slate-50 rounded-lg border border-slate-100">
+                      <div className="w-36">
+                        <label className="block text-[10px] text-slate-500 mb-0.5">Type</label>
+                        <select
+                          className="w-full px-2 py-1.5 rounded border border-slate-200 text-xs bg-white"
+                          value={pkg.type}
+                          onChange={e => updatePackage(pkg.id, 'type', e.target.value)}
+                        >
+                          {PACKAGE_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+                        </select>
+                      </div>
+                      <div className="w-16">
+                        <label className="block text-[10px] text-slate-500 mb-0.5">Qty</label>
+                        <input type="number" min="1" className="w-full px-2 py-1.5 rounded border border-slate-200 text-xs" value={pkg.quantity} onChange={e => updatePackage(pkg.id, 'quantity', parseInt(e.target.value) || 1)} />
+                      </div>
+                      <div className="w-20">
+                        <label className="block text-[10px] text-slate-500 mb-0.5">Wt (kg)</label>
+                        <input type="number" min="0" step="0.1" className="w-full px-2 py-1.5 rounded border border-slate-200 text-xs" value={pkg.weightKg} onChange={e => updatePackage(pkg.id, 'weightKg', parseFloat(e.target.value) || 0)} />
+                      </div>
+                      {(typeInfo?.defaultW === 0 || pkg.type === 'loose' || pkg.type === 'oversized') && (
+                        <>
+                          <div className="w-16">
+                            <label className="block text-[10px] text-slate-500 mb-0.5">L cm</label>
+                            <input type="number" min="0" className="w-full px-2 py-1.5 rounded border border-slate-200 text-xs" value={pkg.lengthCm} onChange={e => updatePackage(pkg.id, 'lengthCm', parseInt(e.target.value) || 0)} />
+                          </div>
+                          <div className="w-16">
+                            <label className="block text-[10px] text-slate-500 mb-0.5">W cm</label>
+                            <input type="number" min="0" className="w-full px-2 py-1.5 rounded border border-slate-200 text-xs" value={pkg.widthCm} onChange={e => updatePackage(pkg.id, 'widthCm', parseInt(e.target.value) || 0)} />
+                          </div>
+                          <div className="w-16">
+                            <label className="block text-[10px] text-slate-500 mb-0.5">H cm</label>
+                            <input type="number" min="0" className="w-full px-2 py-1.5 rounded border border-slate-200 text-xs" value={pkg.heightCm} onChange={e => updatePackage(pkg.id, 'heightCm', parseInt(e.target.value) || 0)} />
+                          </div>
+                        </>
+                      )}
+                      <div className="flex-1 min-w-[100px]">
+                        <label className="block text-[10px] text-slate-500 mb-0.5">Note</label>
+                        <input type="text" className="w-full px-2 py-1.5 rounded border border-slate-200 text-xs" placeholder="Optional" value={pkg.description} onChange={e => updatePackage(pkg.id, 'description', e.target.value)} />
+                      </div>
+                      <button type="button" onClick={() => removePackage(pkg.id)} className="p-1.5 text-slate-400 hover:text-red-500 transition-colors">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                      </button>
+                    </div>
+                  )
+                })}
+                {packages.length > 0 && (
+                  <div className="flex gap-4 text-xs text-slate-500 mt-1">
+                    <span>Total weight: <strong className="text-[#1a1a1a]">{totalWeight.toFixed(1)} kg</strong></span>
+                    <span>Total volume: <strong className="text-[#1a1a1a]">{totalVolume.toFixed(2)} m&sup3;</strong></span>
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-[#1a1a1a] mb-1.5">Special Requirements</label>
+                <input
+                  type="text"
+                  className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-[#1a1a1a] focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 outline-none"
+                  placeholder="e.g. Refrigerated, fragile, time-sensitive"
+                  value={quoteForm.specialRequirements}
+                  onChange={e => setQuoteForm({ ...quoteForm, specialRequirements: e.target.value })}
+                />
               </div>
 
               <div className="flex justify-end gap-3 pt-2">
@@ -463,6 +562,26 @@ export default function QuotesPage() {
 
                     {/* Cargo details */}
                     <p className="text-sm text-slate-600 mb-3">{quote.cargoDescription}</p>
+
+                    {/* Packages display */}
+                    {quote.packages && (() => {
+                      try {
+                        const pkgs = JSON.parse(quote.packages) as PackageItem[]
+                        return (
+                          <div className="flex flex-wrap gap-1.5 mb-3">
+                            {pkgs.map((p, i) => {
+                              const typeLabel = PACKAGE_TYPES.find(t => t.value === p.type)?.label || p.type
+                              return (
+                                <span key={i} className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-slate-100 text-[11px] font-medium text-slate-600">
+                                  {p.quantity > 1 ? `${p.quantity}x ` : ''}{typeLabel}
+                                  {p.weightKg > 0 && <span className="text-slate-400">&middot; {(p.weightKg * p.quantity).toFixed(0)}kg</span>}
+                                </span>
+                              )
+                            })}
+                          </div>
+                        )
+                      } catch { return null }
+                    })()}
 
                     <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm mb-4">
                       <div>

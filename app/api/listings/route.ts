@@ -78,9 +78,9 @@ export async function GET(request: NextRequest) {
       }
       if (maxPrice) {
         priceConditions.push({
-          OR: [
-            { flatRate: { lte: parseFloat(maxPrice) } },
-            { pricePerKg: { lte: parseFloat(maxPrice) } },
+          AND: [
+            { OR: [{ flatRate: null }, { flatRate: { lte: parseFloat(maxPrice) } }] },
+            { OR: [{ pricePerKg: null }, { pricePerKg: { lte: parseFloat(maxPrice) } }] },
           ],
         })
       }

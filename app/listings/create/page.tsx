@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '../../components/AuthProvider'
+import PortAutocomplete from '../../components/PortAutocomplete'
 import { vehicleSpecs, vehicleTypes, getVehicleMakes, getModelsForMake, type VehicleSpec } from '@/lib/vehicles'
 
 export default function CreateListingPage() {
@@ -232,14 +233,12 @@ export default function CreateListingPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className={labelCls}>Origin Port *</label>
-                  <input
-                    name="originPort"
-                    type="text"
+                  <PortAutocomplete
+                    value={form.originPort}
+                    onChange={v => setForm({ ...form, originPort: v })}
+                    placeholder="e.g. Port Vauban, Antibes"
                     required
                     className={inputCls}
-                    placeholder="e.g. Port Vauban, Antibes"
-                    value={form.originPort}
-                    onChange={handleChange}
                   />
                 </div>
                 <div>
@@ -258,14 +257,12 @@ export default function CreateListingPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className={labelCls}>Destination Port *</label>
-                  <input
-                    name="destinationPort"
-                    type="text"
+                  <PortAutocomplete
+                    value={form.destinationPort}
+                    onChange={v => setForm({ ...form, destinationPort: v })}
+                    placeholder="e.g. Port Hercules, Monaco"
                     required
                     className={inputCls}
-                    placeholder="e.g. Port Hercules, Monaco"
-                    value={form.destinationPort}
-                    onChange={handleChange}
                   />
                 </div>
                 <div>

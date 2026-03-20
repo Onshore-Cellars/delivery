@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useAuth } from '../components/AuthProvider'
+import PortAutocomplete from '../components/PortAutocomplete'
 import Link from 'next/link'
 
 interface Listing {
@@ -439,16 +440,18 @@ export default function MarketplacePage() {
           {/* Search bar */}
           <div className="flex flex-col sm:flex-row gap-2.5">
             <div className="relative flex-1">
-              <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <input type="text" placeholder="Origin port..." className={inputClass + ' !pl-10'} value={filters.origin} onChange={(e) => setFilters({ ...filters, origin: e.target.value })} />
+              <PortAutocomplete
+                value={filters.origin}
+                onChange={v => setFilters({ ...filters, origin: v })}
+                placeholder="Origin port..."
+              />
             </div>
             <div className="relative flex-1">
-              <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              </svg>
-              <input type="text" placeholder="Destination port..." className={inputClass + ' !pl-10'} value={filters.destination} onChange={(e) => setFilters({ ...filters, destination: e.target.value })} />
+              <PortAutocomplete
+                value={filters.destination}
+                onChange={v => setFilters({ ...filters, destination: v })}
+                placeholder="Destination port..."
+              />
             </div>
             <input type="date" className={inputClass + ' sm:w-44'} value={filters.dateFrom} onChange={(e) => setFilters({ ...filters, dateFrom: e.target.value })} />
             <button onClick={handleSearch} className="btn-primary !text-sm !py-3 !px-6 whitespace-nowrap">

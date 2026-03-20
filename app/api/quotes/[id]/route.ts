@@ -19,9 +19,12 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const { action, quotedPrice, validUntil, responseMessage } = body
 
     if (action === 'respond') {
-      // Carrier responds with price
-      if (quote.providerId !== decoded.userId) {
+      // Carrier responds with price - allow provider or any carrier for open quotes
+      if (quote.providerId && quote.providerId !== decoded.userId) {
         return NextResponse.json({ error: 'Not authorized' }, { status: 403 })
+      }
+      if (quote.status !== 'PENDING') {
+        return NextResponse.json({ error: 'Quote is no longer pending' }, { status: 400 })
       }
 
       const updated = await prisma.quote.update({
@@ -31,6 +34,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
           validUntil: validUntil ? new Date(validUntil) : null,
           responseMessage: responseMessage || null,
           status: 'QUOTED',
+          providerId: quote.providerId || decoded.userId,
         },
       })
 
@@ -46,6 +50,9 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     } else if (action === 'accept') {
       if (quote.requesterId !== decoded.userId) {
         return NextResponse.json({ error: 'Not authorized' }, { status: 403 })
+      }
+      if (quote.status !== 'QUOTED') {
+        return NextResponse.json({ error: 'Quote must be in QUOTED status to accept' }, { status: 400 })
       }
 
       const updated = await prisma.quote.update({

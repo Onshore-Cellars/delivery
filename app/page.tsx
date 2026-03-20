@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useAuth } from './components/AuthProvider'
 import { useState, useEffect } from 'react'
 
@@ -32,9 +33,7 @@ export default function Home() {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2.5 hover:no-underline">
-              <div className={`w-8 h-8 rounded-sm flex items-center justify-center transition-colors duration-300 ${scrolled ? 'bg-[#C6904D]' : 'bg-white/20 border border-white/20'}`}>
-                <span className="text-white text-sm font-bold" style={{ fontFamily: 'var(--font-display)' }}>O</span>
-              </div>
+              <Image src="/logo.png" alt="Onshore Deliver" width={32} height={32} className="rounded-sm" />
               <span className={`text-lg font-semibold tracking-wide transition-colors duration-300 ${scrolled ? 'text-[#1a1a1a]' : 'text-white'}`} style={{ fontFamily: 'var(--font-display)' }}>
                 Onshore
               </span>
@@ -426,9 +425,7 @@ export default function Home() {
         <div className="site-container py-10 sm:py-12">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
             <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-sm bg-[#C6904D] flex items-center justify-center">
-                <span className="text-white text-xs font-bold" style={{ fontFamily: 'var(--font-display)' }}>O</span>
-              </div>
+              <Image src="/logo.png" alt="Onshore Deliver" width={28} height={28} className="rounded-sm" />
               <span className="text-sm font-semibold text-[#1a1a1a] tracking-wide" style={{ fontFamily: 'var(--font-display)' }}>Onshore Deliver</span>
             </div>
             <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-500">

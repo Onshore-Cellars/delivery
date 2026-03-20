@@ -12,10 +12,15 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const decoded = verifyToken(token)
     if (!decoded) return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
 
-    const body = await request.json()
+    let body
+    try {
+      body = await request.json()
+    } catch {
+      return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+    }
     const { status, location, description } = body
 
-    const validStatuses = ['CONFIRMED', 'PICKED_UP', 'IN_TRANSIT', 'DELIVERED', 'CANCELLED']
+    const validStatuses = ['CONFIRMED', 'PICKED_UP', 'IN_TRANSIT', 'CUSTOMS_HOLD', 'DELIVERED', 'CANCELLED']
     if (!validStatuses.includes(status)) {
       return NextResponse.json({ error: 'Invalid status' }, { status: 400 })
     }
@@ -26,6 +31,21 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     })
 
     if (!booking) return NextResponse.json({ error: 'Booking not found' }, { status: 404 })
+
+    // Validate status transitions
+    const validTransitions: Record<string, string[]> = {
+      PENDING: ['CONFIRMED', 'CANCELLED'],
+      CONFIRMED: ['PICKED_UP', 'CANCELLED'],
+      PICKED_UP: ['IN_TRANSIT', 'CANCELLED'],
+      IN_TRANSIT: ['CUSTOMS_HOLD', 'DELIVERED', 'CANCELLED'],
+      CUSTOMS_HOLD: ['IN_TRANSIT', 'DELIVERED', 'CANCELLED'],
+      DELIVERED: [],
+      CANCELLED: [],
+    }
+    const allowed = validTransitions[booking.status] || []
+    if (!allowed.includes(status)) {
+      return NextResponse.json({ error: `Cannot transition from ${booking.status} to ${status}` }, { status: 400 })
+    }
 
     // Only the carrier or the shipper (for cancellation) can update status
     const isCarrier = booking.listing.carrierId === decoded.userId
@@ -44,6 +64,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       CONFIRMED: 'Booking confirmed by carrier',
       PICKED_UP: 'Cargo picked up',
       IN_TRANSIT: 'Cargo in transit',
+      CUSTOMS_HOLD: 'Cargo held at customs',
       DELIVERED: 'Cargo delivered successfully',
       CANCELLED: `Booking cancelled by ${isCarrier ? 'carrier' : 'shipper'}`,
     }
@@ -65,13 +86,16 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
     // If cancelled, restore listing capacity
     if (status === 'CANCELLED') {
+      const updateData: Record<string, unknown> = {
+        availableKg: { increment: booking.weightKg },
+        availableM3: { increment: booking.volumeM3 },
+      }
+      if (booking.listing.status === 'FULL') {
+        updateData.status = 'ACTIVE'
+      }
       await prisma.listing.update({
         where: { id: booking.listingId },
-        data: {
-          availableKg: { increment: booking.weightKg },
-          availableM3: { increment: booking.volumeM3 },
-          status: 'ACTIVE',
-        },
+        data: updateData,
       })
     }
 

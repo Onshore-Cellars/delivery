@@ -64,6 +64,17 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         }),
       ])
 
+      // Notify bidder of acceptance
+      try {
+        await createNotification({
+          userId: bid.bidderId,
+          type: 'BID_ACCEPTED',
+          title: 'Bid Accepted',
+          message: `Your bid of ${bid.currency === 'GBP' ? '£' : '€'}${bid.amount.toFixed(2)} on ${bid.listing.title} was accepted! A booking has been created.`,
+          linkUrl: '/dashboard',
+        })
+      } catch {}
+
       return NextResponse.json({ bid: updatedBid, message: 'Bid accepted, booking created' })
     } else if (action === 'reject') {
       const updatedBid = await prisma.bid.update({
