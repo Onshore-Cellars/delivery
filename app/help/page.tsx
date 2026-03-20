@@ -51,7 +51,7 @@ export default function HelpPage() {
   }
 
   return (
-    <div className="page-container max-w-3xl">
+    <div className="page-container narrow">
         <div className="text-center mb-10 sm:mb-14">
           <p className="text-[11px] font-semibold text-[#0071e3] uppercase tracking-[0.15em] mb-1.5">Support</p>
           <h1 className="text-2xl sm:text-3xl font-semibold text-[#1d1d1f] tracking-[-0.02em]">Help Centre</h1>

@@ -1,26 +1,26 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-primary: #0f172a;
-  --color-primary-light: #334155;
-  --color-secondary: #64748b;
-  --color-accent: #2563eb;
-  --color-accent-hover: #1d4ed8;
+  --color-primary: #1a1a1a;
+  --color-primary-light: #4a4a4a;
+  --color-secondary: #6b6b6b;
+  --color-accent: #C6904D;
+  --color-accent-hover: #b07d3f;
   --color-surface: #ffffff;
-  --color-surface-secondary: #f8fafc;
-  --color-surface-tertiary: #f1f5f9;
-  --color-border: #e2e8f0;
-  --color-border-light: #f1f5f9;
+  --color-surface-secondary: #faf9f7;
+  --color-surface-tertiary: #f5f3f0;
+  --color-border: #e8e4de;
+  --color-border-light: #f5f3f0;
   --color-success: #16a34a;
   --color-warning: #d97706;
   --color-error: #dc2626;
   --color-info: #0284c7;
 
-  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-display: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-sans: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-display: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
+*, *::before, *::after { box-sizing: border-box; }
 
 html {
   scroll-behavior: smooth;
@@ -62,13 +62,13 @@ input::placeholder, textarea::placeholder {
 ::-webkit-scrollbar-thumb:hover { background: var(--color-secondary); }
 
 *:focus-visible {
-  outline: 3px solid rgba(37, 99, 235, 0.4);
+  outline: 3px solid rgba(198, 144, 77, 0.4);
   outline-offset: 2px;
   border-radius: 6px;
 }
 
 ::selection {
-  background: rgba(37, 99, 235, 0.15);
+  background: rgba(198, 144, 77, 0.15);
   color: var(--color-primary);
 }
 
@@ -84,19 +84,21 @@ a:hover { text-decoration: underline; }
   gap: 0.5rem;
   background: var(--color-accent);
   color: #fff;
-  padding: 14px 28px;
-  border-radius: 14px;
-  font-size: 15px;
+  padding: 11px 25px;
+  border-radius: 3px;
+  font-family: var(--font-display);
+  font-size: 14px;
   font-weight: 600;
   line-height: 1.2;
-  letter-spacing: -0.01em;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
-  min-height: 52px;
+  min-height: 44px;
   white-space: nowrap;
 }
-.btn-primary:hover { background: var(--color-accent-hover); text-decoration: none; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
+.btn-primary:hover { background: var(--color-accent-hover); text-decoration: none; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(198, 144, 77, 0.3); }
 .btn-primary:active { transform: translateY(0); box-shadow: none; }
 .btn-primary:disabled { opacity: 0.5; cursor: default; transform: none; box-shadow: none; }
 
@@ -107,16 +109,17 @@ a:hover { text-decoration: underline; }
   gap: 0.5rem;
   background: var(--color-surface-tertiary);
   color: var(--color-primary);
-  padding: 14px 28px;
-  border-radius: 14px;
-  font-size: 15px;
+  padding: 11px 25px;
+  border-radius: 3px;
+  font-family: var(--font-display);
+  font-size: 14px;
   font-weight: 600;
   line-height: 1.2;
-  letter-spacing: -0.01em;
+  letter-spacing: 0.02em;
   border: 1px solid var(--color-border);
   cursor: pointer;
   transition: all 0.2s ease;
-  min-height: 52px;
+  min-height: 44px;
   white-space: nowrap;
 }
 .btn-secondary:hover { background: var(--color-border); text-decoration: none; }
@@ -129,16 +132,17 @@ a:hover { text-decoration: underline; }
   gap: 0.5rem;
   background: rgba(255,255,255,0.1);
   color: #fff;
-  padding: 14px 28px;
-  border-radius: 14px;
-  font-size: 15px;
+  padding: 11px 25px;
+  border-radius: 3px;
+  font-family: var(--font-display);
+  font-size: 14px;
   font-weight: 600;
   line-height: 1.2;
-  letter-spacing: -0.01em;
+  letter-spacing: 0.02em;
   border: 1.5px solid rgba(255,255,255,0.3);
   cursor: pointer;
   transition: all 0.2s ease;
-  min-height: 52px;
+  min-height: 44px;
   white-space: nowrap;
 }
 .btn-outline:hover { background: rgba(255,255,255,0.2); text-decoration: none; }
@@ -151,15 +155,16 @@ a:hover { text-decoration: underline; }
   gap: 0.5rem;
   background: transparent;
   color: var(--color-accent);
-  padding: 14px 28px;
-  border-radius: 14px;
-  font-size: 15px;
+  padding: 11px 25px;
+  border-radius: 3px;
+  font-family: var(--font-display);
+  font-size: 14px;
   font-weight: 600;
   line-height: 1.2;
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
-  min-height: 52px;
+  min-height: 44px;
   white-space: nowrap;
 }
 .btn-ghost:hover { background: var(--color-surface-tertiary); text-decoration: none; }
@@ -214,25 +219,37 @@ a:hover { text-decoration: underline; }
 
 .page-container {
   width: 100%;
-  max-width: 56rem;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 2rem 1.5rem;
+  max-width: 680px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding: 2.5rem 2rem !important;
 }
-.page-container.max-w-4xl {
-  max-width: 56rem;
+.page-container.narrow {
+  max-width: 560px !important;
 }
-.page-container.max-w-3xl {
-  max-width: 48rem;
-}
-.page-container.max-w-5xl {
-  max-width: 64rem;
+.page-container.wide {
+  max-width: 900px !important;
 }
 @media (min-width: 640px) {
-  .page-container { padding: 2.5rem 2rem; }
+  .page-container { padding: 2.5rem 2.5rem !important; }
 }
 @media (min-width: 1024px) {
-  .page-container { padding: 2.5rem 2.5rem; }
+  .page-container { padding: 3rem 3rem !important; }
+}
+
+.site-container {
+  width: 100%;
+  max-width: 680px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding-left: 2rem !important;
+  padding-right: 2rem !important;
+}
+@media (min-width: 640px) {
+  .site-container { padding-left: 2.5rem !important; padding-right: 2.5rem !important; }
+}
+@media (min-width: 1024px) {
+  .site-container { padding-left: 3rem !important; padding-right: 3rem !important; }
 }
 
 /* ─── BADGE ───────────────────────────────────────────────────────────── */
@@ -241,7 +258,7 @@ a:hover { text-decoration: underline; }
   display: inline-flex;
   align-items: center;
   padding: 4px 12px;
-  border-radius: 8px;
+  border-radius: 3px;
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.01em;
@@ -280,7 +297,7 @@ a:hover { text-decoration: underline; }
 /* ---- GRADIENT TEXT ---- */
 
 .gradient-text {
-  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  background: linear-gradient(135deg, #C6904D, #d4a76a);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

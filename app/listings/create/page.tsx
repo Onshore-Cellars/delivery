@@ -118,7 +118,7 @@ export default function CreateListingPage() {
   const labelCls = "block text-sm font-medium text-[#1d1d1f] mb-1.5"
 
   return (
-    <div className="page-container max-w-3xl">
+    <div className="page-container narrow">
         <div className="mb-8 sm:mb-10">
           <Link href="/dashboard" className="text-sm text-slate-500 hover:text-[#1d1d1f] transition-colors">
             &larr; Back to Dashboard
