@@ -14,6 +14,7 @@ enum UserRole {
   CARRIER
   SUPPLIER
   YACHT_OWNER
+  CREW
   ADMIN
 }
 
@@ -70,6 +71,8 @@ enum NotificationType {
   PAYMENT_FAILED
   REVIEW_RECEIVED
   LISTING_EXPIRING
+  DOCUMENT_VERIFIED
+  DOCUMENT_REJECTED
   SYSTEM
 }
 
@@ -78,6 +81,26 @@ enum MessageType {
   SYSTEM
   QUOTE
   FILE
+  LOCATION
+}
+
+enum DocumentType {
+  DRIVERS_LICENSE
+  PASSPORT
+  NATIONAL_ID
+  VEHICLE_REGISTRATION
+  VEHICLE_INSURANCE
+  GOODS_IN_TRANSIT_INSURANCE
+  PORT_ACCESS_PERMIT
+  DANGEROUS_GOODS_CERT
+  OTHER
+}
+
+enum DocumentStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+  EXPIRED
 }
 
 // ─── MODELS ───────────────────────────────────────────────────────────────────
@@ -97,6 +120,20 @@ model User {
   address         String?
   city            String?
   country         String?
+
+  // Dual-role: users can both ship AND carry
+  canCarry        Boolean   @default(false)
+  canShip         Boolean   @default(true)
+
+  // Yacht / vessel details (for YACHT_OWNER / CREW)
+  yachtName       String?
+  yachtMMSI       String?           // Maritime Mobile Service Identity
+  yachtIMO        String?           // IMO number
+  yachtFlag       String?           // Flag state
+  yachtLength     Float?            // LOA in metres
+  yachtType       String?           // Motor yacht, Sailing yacht, etc.
+  homePort        String?
+  homePortId      String?
 
   // Stripe
   stripeCustomerId  String?
@@ -123,9 +160,12 @@ model User {
   conversations2   Conversation[]  @relation("conversationUser2")
   quotes           Quote[]         @relation("quoteRequester")
   quotesReceived   Quote[]         @relation("quoteProvider")
+  documents        Document[]
+  vehicles         Vehicle[]
 
   @@index([email])
   @@index([role])
+  @@index([yachtMMSI])
 }
 
 model Listing {
@@ -137,8 +177,11 @@ model Listing {
   description        String?
 
   // Vehicle
+  vehicleId          String?
+  vehicle            Vehicle?      @relation(fields: [vehicleId], references: [id])
   vehicleType        String
   vehicleName        String?
+  vehicleReg         String?       // Number plate
   hasRefrigeration   Boolean       @default(false)
   hasTailLift        Boolean       @default(false)
   hasGPS             Boolean       @default(true)
@@ -201,6 +244,7 @@ model Listing {
   quotes             Quote[]
 
   @@index([carrierId])
+  @@index([vehicleId])
   @@index([status])
   @@index([departureDate])
   @@index([originPort])
@@ -280,6 +324,7 @@ model Booking {
 
   review            Review?
   trackingEvents    TrackingEvent[]
+  liveTracking      LiveTracking[]
 
   @@index([listingId])
   @@index([shipperId])
@@ -457,4 +502,164 @@ model Message {
   @@index([conversationId])
   @@index([senderId])
   @@index([createdAt])
+}
+
+// ─── VEHICLE REGISTRY ────────────────────────────────────────────────────────
+
+model Vehicle {
+  id              String   @id @default(cuid())
+  ownerId         String
+  owner           User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  // Registration
+  registrationPlate String?
+  registrationCountry String?
+  vinNumber       String?
+
+  // Vehicle specs
+  make            String          // e.g. Ford
+  model           String          // e.g. Transit Custom
+  year            Int?
+  vehicleType     String          // Van, Truck, Refrigerated Van, etc.
+  colour          String?
+
+  // Capacity (verified from vehicle lookup or manual)
+  maxPayloadKg    Float?
+  cargoVolumeM3   Float?
+  cargoLengthCm   Float?
+  cargoWidthCm    Float?
+  cargoHeightCm   Float?
+
+  // Features
+  hasRefrigeration Boolean  @default(false)
+  hasTailLift      Boolean  @default(false)
+  hasGPS           Boolean  @default(true)
+  hasRacking       Boolean  @default(false)
+
+  // Insurance
+  insuranceProvider String?
+  insuranceExpiry   DateTime?
+  goodsInTransitInsurance Boolean @default(false)
+  goodsInTransitMax Float?       // Max cover amount
+
+  // MOT / roadworthiness
+  motExpiry       DateTime?
+  roadTaxExpiry   DateTime?
+
+  verified        Boolean  @default(false)
+  active          Boolean  @default(true)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  listings        Listing[]
+
+  @@index([ownerId])
+  @@index([registrationPlate])
+}
+
+// ─── DOCUMENTS (Driver ID, Permits, Insurance) ──────────────────────────────
+
+model Document {
+  id              String         @id @default(cuid())
+  userId          String
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  type            DocumentType
+  name            String         // Display name, e.g. "UK Driving License"
+  fileUrl         String?        // URL to uploaded file
+  fileKey         String?        // Storage key for deletion
+  documentNumber  String?        // License number, passport number, etc.
+  issuingCountry  String?
+  issueDate       DateTime?
+  expiryDate      DateTime?
+
+  status          DocumentStatus @default(PENDING)
+  reviewNotes     String?        // Admin notes on rejection etc.
+  reviewedAt      DateTime?
+  reviewedBy      String?        // Admin user ID
+
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([userId])
+  @@index([type])
+  @@index([status])
+  @@index([userId, type])
+}
+
+// ─── PORTS DATABASE ─────────────────────────────────────────────────────────
+
+model Port {
+  id              String   @id @default(cuid())
+  name            String
+  code            String?  @unique    // UN/LOCODE or custom code
+  type            String              // marina, commercial_port, shipyard, anchorage
+  country         String
+  countryCode     String?             // ISO 3166-1 alpha-2
+  region          String?
+  city            String?
+  lat             Float
+  lng             Float
+
+  // Facilities
+  maxDraft        Float?              // Max draft in metres
+  maxLOA          Float?              // Max vessel length
+  hasCustoms      Boolean  @default(false)
+  hasFuel         Boolean  @default(false)
+  hasProvisions   Boolean  @default(false)
+  hasCrane        Boolean  @default(false)
+  hasStorage      Boolean  @default(false)
+  vhfChannel      String?
+
+  // Access requirements
+  requiresPortPass Boolean @default(false)
+  requiresDriverID Boolean @default(false)
+  accessNotes     String?
+
+  // Meta
+  website         String?
+  phone           String?
+  timezone        String?
+  popular         Boolean  @default(false)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([country])
+  @@index([type])
+  @@index([popular])
+  @@index([lat, lng])
+  @@index([name])
+}
+
+// ─── LIVE DRIVER TRACKING ───────────────────────────────────────────────────
+
+model LiveTracking {
+  id              String   @id @default(cuid())
+  bookingId       String
+  booking         Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  // Driver shares a tracking session
+  shareToken      String   @unique @default(cuid())  // Public token for tracking URL
+  isActive        Boolean  @default(true)
+  startedAt       DateTime @default(now())
+  endedAt         DateTime?
+
+  // Latest position
+  lat             Float?
+  lng             Float?
+  heading         Float?           // Degrees
+  speed           Float?           // km/h
+  lastUpdated     DateTime?
+
+  // Route info
+  stopsTotal      Int      @default(0)
+  stopsCompleted  Int      @default(0)
+  etaMinutes      Int?             // Estimated minutes to delivery
+  routePolyline   String?          // Encoded polyline for route display
+
+  @@index([bookingId])
+  @@index([shareToken])
+  @@index([isActive])
 }

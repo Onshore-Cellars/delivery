@@ -125,7 +125,7 @@ export default function DashboardPage() {
             onClick={() => setTab(t as typeof tab)}
             className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all whitespace-nowrap ${
               tab === t
-                ? 'bg-blue-600 text-white'
+                ? 'bg-[#C6904D] text-white'
                 : 'text-slate-500 hover:text-[#0f172a] hover:bg-slate-100'
             }`}
           >
@@ -282,8 +282,8 @@ export default function DashboardPage() {
 
 function StatCard({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
-    <div className={`rounded-2xl border p-5 sm:p-6 transition-shadow hover:shadow-md ${accent ? 'bg-blue-600 border-blue-600' : 'bg-white border-slate-200'}`}>
-      <div className={`text-xs font-semibold uppercase tracking-wider ${accent ? 'text-blue-200' : 'text-slate-400'}`}>{label}</div>
+    <div className={`rounded-2xl border p-5 sm:p-6 transition-shadow hover:shadow-md ${accent ? 'bg-[#C6904D] border-[#C6904D]' : 'bg-white border-slate-200'}`}>
+      <div className={`text-xs font-semibold uppercase tracking-wider ${accent ? 'text-[#e8c994]' : 'text-slate-400'}`}>{label}</div>
       <div className={`mt-2 text-2xl sm:text-3xl font-bold tracking-tight ${accent ? 'text-white' : 'text-[#0f172a]'}`}>{value}</div>
     </div>
   )
