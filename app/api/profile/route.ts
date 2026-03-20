@@ -16,10 +16,13 @@ export async function GET(request: NextRequest) {
         id: true, email: true, name: true, role: true,
         phone: true, company: true, bio: true, website: true,
         address: true, city: true, country: true, avatarUrl: true,
+        canCarry: true, canShip: true,
+        yachtName: true, yachtMMSI: true, yachtIMO: true, yachtFlag: true,
+        yachtLength: true, yachtType: true, homePort: true,
         emailNotifications: true, smsNotifications: true,
         verified: true, createdAt: true,
         stripeAccountId: true,
-        _count: { select: { listings: true, bookings: true, receivedReviews: true } },
+        _count: { select: { listings: true, bookings: true, receivedReviews: true, documents: true, vehicles: true } },
       },
     })
 
@@ -54,7 +57,12 @@ export async function PATCH(request: NextRequest) {
     if (!decoded) return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
 
     const body = await request.json()
-    const allowedFields = ['name', 'phone', 'company', 'bio', 'website', 'address', 'city', 'country', 'emailNotifications', 'smsNotifications']
+    const allowedFields = [
+      'name', 'phone', 'company', 'bio', 'website', 'address', 'city', 'country',
+      'emailNotifications', 'smsNotifications',
+      'canCarry', 'canShip',
+      'yachtName', 'yachtMMSI', 'yachtIMO', 'yachtFlag', 'yachtLength', 'yachtType', 'homePort',
+    ]
 
     const data: Record<string, unknown> = {}
     for (const field of allowedFields) {
@@ -70,6 +78,9 @@ export async function PATCH(request: NextRequest) {
         id: true, email: true, name: true, role: true,
         phone: true, company: true, bio: true, website: true,
         address: true, city: true, country: true, avatarUrl: true,
+        canCarry: true, canShip: true,
+        yachtName: true, yachtMMSI: true, yachtIMO: true, yachtFlag: true,
+        yachtLength: true, yachtType: true, homePort: true,
         emailNotifications: true, smsNotifications: true,
         verified: true,
       },
