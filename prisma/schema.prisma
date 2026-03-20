@@ -325,6 +325,7 @@ model Booking {
   review            Review?
   trackingEvents    TrackingEvent[]
   liveTracking      LiveTracking[]
+  documents         BookingDocument[]
 
   @@index([listingId])
   @@index([shipperId])
@@ -662,4 +663,69 @@ model LiveTracking {
   @@index([bookingId])
   @@index([shareToken])
   @@index([isActive])
+}
+
+// ─── BOOKING DOCUMENTS (invoices, customs, delivery notes) ──────────────────
+
+model BookingDocument {
+  id              String   @id @default(cuid())
+  bookingId       String
+  booking         Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  uploadedById    String   // User who uploaded
+
+  name            String              // Display name
+  type            String              // invoice, customs_declaration, packing_list, delivery_note, photo, certificate, other
+  fileUrl         String?             // URL to uploaded file
+  fileKey         String?             // Storage key
+  fileSize        Int?                // Bytes
+  mimeType        String?             // e.g. application/pdf
+
+  notes           String?             // Additional context
+  visibleToDriver Boolean @default(true)  // Can the carrier/driver see this?
+  visibleToShipper Boolean @default(true) // Can the shipper see this?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([bookingId])
+  @@index([type])
+}
+
+// ─── COMMUNITY BOARD ────────────────────────────────────────────────────────
+
+model CommunityPost {
+  id              String   @id @default(cuid())
+  authorId        String
+  title           String
+  content         String
+  category        String   @default("general")  // general, routes, tips, wanted, services, news
+  tags            String?  // JSON array of tags
+
+  likes           Int      @default(0)
+  views           Int      @default(0)
+  pinned          Boolean  @default(false)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  replies         CommunityReply[]
+
+  @@index([category])
+  @@index([authorId])
+  @@index([pinned])
+  @@index([createdAt])
+}
+
+model CommunityReply {
+  id              String        @id @default(cuid())
+  postId          String
+  post            CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  authorId        String
+  content         String
+  likes           Int           @default(0)
+
+  createdAt       DateTime      @default(now())
+
+  @@index([postId])
+  @@index([authorId])
 }
