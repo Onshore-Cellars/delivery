@@ -1,76 +1,92 @@
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Terms of Service — Onshore Deliver',
+}
+
 export default function TermsPage() {
   return (
-    <div className="page-container narrow">
-        <p className="text-[11px] font-semibold text-[#0071e3] uppercase tracking-[0.15em] mb-1.5">Legal</p>
-        <h1 className="text-2xl sm:text-3xl font-semibold text-[#1d1d1f] tracking-[-0.02em] mb-2">Terms of Service</h1>
-        <p className="text-sm text-slate-400 mb-8">Last updated: March 2026</p>
+    <div className="page-container page-container-narrow py-10">
+      <p className="text-[11px] font-semibold text-[#C6904D] uppercase tracking-[0.15em] mb-1.5">Legal</p>
+      <h1 className="text-2xl sm:text-3xl font-semibold text-[#1a1a1a] tracking-[-0.02em] mb-2" style={{ fontFamily: 'var(--font-display)' }}>Terms of Service</h1>
+      <p className="text-xs text-slate-400 mb-8">Last updated: 20 March 2026</p>
 
-        <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-slate-100/80 p-6 sm:p-10 prose prose-slate max-w-none">
-          <h2 className="text-lg font-bold text-[#1d1d1f] mt-0">1. Acceptance of Terms</h2>
-          <p className="text-slate-600 text-sm leading-relaxed">
-            By accessing or using Onshore Deliver (&quot;the Platform&quot;), you agree to be bound by these Terms of Service.
-            If you do not agree, do not use the Platform. Onshore Deliver reserves the right to modify these terms at any time.
-          </p>
+      <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-6 sm:p-10 space-y-6 text-sm text-[#4a4a4a] leading-relaxed">
+        <section>
+          <h2 className="text-base font-semibold text-[#1a1a1a] mb-2 mt-0">1. About Onshore Deliver</h2>
+          <p>Onshore Deliver (&ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;the Platform&rdquo;) is a marketplace connecting carriers with available transport capacity to shippers who need to send goods to ports, marinas, and yachts. We act as an intermediary — we do not own vehicles, employ drivers, or take physical possession of any cargo.</p>
+        </section>
 
-          <h2 className="text-lg font-bold text-[#1d1d1f]">2. User Accounts</h2>
-          <p className="text-slate-600 text-sm leading-relaxed">
-            You must create an account to use certain features. You are responsible for maintaining the confidentiality
-            of your account credentials and for all activity under your account. You must provide accurate and complete
-            information during registration.
-          </p>
+        <section>
+          <h2 className="text-base font-semibold text-[#1a1a1a] mb-2">2. User Accounts</h2>
+          <p>You must be at least 18 years old to create an account. You are responsible for maintaining the confidentiality of your login credentials and for all activity under your account. Users may register as carriers, shippers, or both. Carriers must provide valid identification and vehicle documentation before accepting bookings.</p>
+        </section>
 
-          <h2 className="text-lg font-bold text-[#1d1d1f]">3. Marketplace Services</h2>
-          <p className="text-slate-600 text-sm leading-relaxed">
-            Onshore Deliver is a marketplace that connects carriers with available transport capacity to shippers who require
-            delivery services. Onshore Deliver does not itself provide transport services. All transport agreements are between
-            the carrier and shipper directly. Onshore Deliver facilitates the connection and provides payment processing.
-          </p>
+        <section>
+          <h2 className="text-base font-semibold text-[#1a1a1a] mb-2">3. Carrier Obligations</h2>
+          <p>Carriers must hold valid vehicle insurance, goods-in-transit insurance where applicable, and any required licences for the goods being transported. Carriers are responsible for the safe handling and timely delivery of cargo. All vehicles must be roadworthy and appropriately maintained. Carriers warrant that all information provided (capacity, availability, certifications) is accurate.</p>
+        </section>
 
-          <h2 className="text-lg font-bold text-[#1d1d1f]">4. Carrier Responsibilities</h2>
-          <p className="text-slate-600 text-sm leading-relaxed">
-            Carriers must maintain appropriate insurance, licenses, and permits for their transport operations.
-            Carriers are responsible for the safe transport and timely delivery of goods. Carriers must accurately
-            represent available capacity, pricing, and vehicle capabilities.
-          </p>
+        <section>
+          <h2 className="text-base font-semibold text-[#1a1a1a] mb-2">4. Shipper Obligations</h2>
+          <p>Shippers must accurately describe their cargo, including weight, dimensions, and any special handling requirements. Dangerous goods must be declared and accompanied by appropriate documentation. Shippers are responsible for ensuring goods are properly packaged for transport and for providing accurate delivery details including marina access information.</p>
+        </section>
 
-          <h2 className="text-lg font-bold text-[#1d1d1f]">5. Shipper Responsibilities</h2>
-          <p className="text-slate-600 text-sm leading-relaxed">
-            Shippers must accurately describe cargo including weight, volume, and any special handling requirements.
-            Shippers must not ship prohibited, dangerous, or illegal items. Shippers must ensure cargo is properly
-            packed and labelled.
-          </p>
+        <section>
+          <h2 className="text-base font-semibold text-[#1a1a1a] mb-2">5. Bookings & Payments</h2>
+          <p>All payments are processed securely through Stripe. Prices are listed in EUR unless otherwise stated. A platform fee is charged on each transaction. Carriers receive payouts after delivery confirmation, subject to a holding period. Refunds are available for cancellations made within the terms of our cancellation policy.</p>
+        </section>
 
-          <h2 className="text-lg font-bold text-[#1d1d1f]">6. Payments & Fees</h2>
-          <p className="text-slate-600 text-sm leading-relaxed">
-            All payments are processed through Stripe. Onshore Deliver charges a platform fee of 10% on each transaction.
-            Carriers receive payment minus the platform fee. Refunds are subject to our cancellation policy.
-          </p>
+        <section>
+          <h2 className="text-base font-semibold text-[#1a1a1a] mb-2">6. Cancellation Policy</h2>
+          <ul className="list-disc pl-5 space-y-1 mt-2">
+            <li><strong>More than 48 hours before departure:</strong> Full refund minus a 5% administrative fee.</li>
+            <li><strong>24–48 hours before departure:</strong> 50% refund.</li>
+            <li><strong>Less than 24 hours:</strong> No refund, unless the carrier cancels, in which case a full refund is issued.</li>
+            <li><strong>Carrier cancellation:</strong> Full refund to shipper. Repeated cancellations may result in account suspension.</li>
+          </ul>
+        </section>
 
-          <h2 className="text-lg font-bold text-[#1d1d1f]">7. Cancellations & Refunds</h2>
-          <p className="text-slate-600 text-sm leading-relaxed">
-            Cancellations made more than 48 hours before departure are eligible for a full refund. Cancellations
-            within 48 hours may incur a cancellation fee. Carriers who cancel confirmed bookings may face account
-            restrictions.
-          </p>
+        <section>
+          <h2 className="text-base font-semibold text-[#1a1a1a] mb-2">7. Liability</h2>
+          <p>Onshore Deliver is a marketplace platform and does not assume liability for loss, damage, or delay of cargo during transit. Carriers are independently responsible for their insurance coverage. We strongly recommend that shippers declare the value of their goods and ensure adequate coverage. Our liability is limited to the platform fees paid for the relevant booking.</p>
+        </section>
 
-          <h2 className="text-lg font-bold text-[#1d1d1f]">8. Limitation of Liability</h2>
-          <p className="text-slate-600 text-sm leading-relaxed">
-            Onshore Deliver is not liable for any damages, losses, or delays arising from transport services arranged through
-            the Platform. Our liability is limited to the platform fees paid. Carriers maintain their own insurance
-            for cargo in transit.
-          </p>
+        <section>
+          <h2 className="text-base font-semibold text-[#1a1a1a] mb-2">8. Prohibited Items</h2>
+          <p>The following may not be shipped through the Platform: illegal substances, weapons, explosives, live animals, human remains, and any goods prohibited by the laws of the origin or destination country. Dangerous goods (ADR) may only be shipped by carriers with appropriate certifications.</p>
+        </section>
 
-          <h2 className="text-lg font-bold text-[#1d1d1f]">9. Intellectual Property</h2>
-          <p className="text-slate-600 text-sm leading-relaxed">
-            All content, branding, and software on the Platform are owned by Onshore Deliver or its licensors. Users may
-            not copy, modify, or distribute Platform content without permission.
-          </p>
+        <section>
+          <h2 className="text-base font-semibold text-[#1a1a1a] mb-2">9. Proof of Delivery</h2>
+          <p>Carriers are required to obtain proof of delivery, which may include a digital signature, photograph, and recipient name. Proof of delivery serves as confirmation that the goods were received and releases the carrier payout. Disputes must be raised within 48 hours of delivery.</p>
+        </section>
 
-          <h2 className="text-lg font-bold text-[#1d1d1f]">10. Contact</h2>
-          <p className="text-slate-600 text-sm leading-relaxed">
-            For questions about these Terms, contact us at legal@onshore.delivery.
-          </p>
-        </div>
+        <section>
+          <h2 className="text-base font-semibold text-[#1a1a1a] mb-2">10. Reviews & Ratings</h2>
+          <p>Users may leave honest reviews after completed deliveries. Reviews must be factual and not defamatory. We reserve the right to remove reviews that violate these guidelines. Carriers may respond to reviews publicly.</p>
+        </section>
+
+        <section>
+          <h2 className="text-base font-semibold text-[#1a1a1a] mb-2">11. Intellectual Property</h2>
+          <p>All content, branding, and software on the Platform is owned by Onshore Deliver. Users retain ownership of content they upload but grant us a licence to display it on the Platform.</p>
+        </section>
+
+        <section>
+          <h2 className="text-base font-semibold text-[#1a1a1a] mb-2">12. Termination</h2>
+          <p>We may suspend or terminate accounts that violate these terms, engage in fraudulent activity, or receive persistent poor reviews. Users may delete their accounts at any time; outstanding payments will be settled before account closure.</p>
+        </section>
+
+        <section>
+          <h2 className="text-base font-semibold text-[#1a1a1a] mb-2">13. Governing Law</h2>
+          <p>These terms are governed by the laws of France. Any disputes shall be subject to the exclusive jurisdiction of the courts of Antibes, France.</p>
+        </section>
+
+        <section>
+          <h2 className="text-base font-semibold text-[#1a1a1a] mb-2">14. Contact</h2>
+          <p>For questions about these terms, contact us at <a href="mailto:legal@onshore.delivery" className="text-[#C6904D] hover:underline">legal@onshore.delivery</a>.</p>
+        </section>
       </div>
+    </div>
   )
 }

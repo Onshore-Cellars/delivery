@@ -162,6 +162,8 @@ model User {
   quotesReceived   Quote[]         @relation("quoteProvider")
   documents        Document[]
   vehicles         Vehicle[]
+  savedAddresses   SavedAddress[]
+  pushSubscriptions PushSubscription[]
 
   @@index([email])
   @@index([role])
@@ -313,6 +315,9 @@ model Booking {
   trackingCode      String?       @unique
   estimatedDelivery DateTime?
   actualDelivery    DateTime?
+
+  // Delivery time window
+  deliveryTimeWindow String?      // "morning" (8-12), "afternoon" (12-17), "evening" (17-21), "any"
 
   // Proof of delivery
   podSignature      String?
@@ -728,4 +733,63 @@ model CommunityReply {
 
   @@index([postId])
   @@index([authorId])
+}
+
+// ─── SAVED ADDRESSES ────────────────────────────────────────────────────────
+
+model SavedAddress {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  label           String              // e.g. "Home", "Office", "Port Antibes"
+  type            String   @default("other") // pickup, delivery, other
+  address         String
+  city            String?
+  region          String?
+  country         String?
+  postcode        String?
+  lat             Float?
+  lng             Float?
+
+  contactName     String?
+  contactPhone    String?
+  contactEmail    String?
+  notes           String?             // e.g. "Gate code: 1234"
+
+  // Marina/port specifics
+  marinaName      String?
+  berthNumber     String?
+  yachtName       String?
+  portAccessNotes String?
+
+  isDefault       Boolean  @default(false)
+  usageCount      Int      @default(0)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId])
+  @@index([userId, type])
+}
+
+// ─── PUSH SUBSCRIPTIONS ─────────────────────────────────────────────────────
+
+model PushSubscription {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  endpoint        String
+  p256dh          String              // Public key
+  auth            String              // Auth secret
+  userAgent       String?
+
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([userId, endpoint])
+  @@index([userId])
+  @@index([active])
 }

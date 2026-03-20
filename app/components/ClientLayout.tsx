@@ -3,6 +3,8 @@
 import Link from 'next/link'
 import { AuthProvider } from './AuthProvider'
 import Navbar from './Navbar'
+import CookieConsent from './CookieConsent'
+import { I18nProvider } from '@/lib/i18n'
 import { usePathname } from 'next/navigation'
 import { ReactNode } from 'react'
 
@@ -31,21 +33,24 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
   const showChrome = !isLandingPage
 
   return (
-    <AuthProvider>
-      {showChrome && <Navbar />}
-      <main
-        id="main-content"
-        className={
-          showChrome
-            ? isAuthPage
-              ? 'pt-16 pb-20 md:pb-0 min-h-screen'
-              : 'pt-16 pb-20 md:pb-0 min-h-screen bg-[#f5f5f7]'
-            : ''
-        }
-      >
-        {children}
-      </main>
-      {showChrome && !isAuthPage && <Footer />}
-    </AuthProvider>
+    <I18nProvider>
+      <AuthProvider>
+        {showChrome && <Navbar />}
+        <main
+          id="main-content"
+          className={
+            showChrome
+              ? isAuthPage
+                ? 'pt-16 pb-20 md:pb-0 min-h-screen'
+                : 'pt-16 pb-20 md:pb-0 min-h-screen bg-[#f5f5f7]'
+              : ''
+          }
+        >
+          {children}
+        </main>
+        {showChrome && !isAuthPage && <Footer />}
+        <CookieConsent />
+      </AuthProvider>
+    </I18nProvider>
   )
 }
