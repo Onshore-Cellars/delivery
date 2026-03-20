@@ -219,37 +219,44 @@ a:hover { text-decoration: underline; }
 
 .page-container {
   width: 100%;
-  max-width: 680px !important;
+  max-width: 960px !important;
   margin-left: auto !important;
   margin-right: auto !important;
-  padding: 2.5rem 2rem !important;
+  padding: 1.5rem 1.25rem !important;
 }
+.page-container-narrow {
+  max-width: 680px !important;
+}
+.page-container-wide {
+  max-width: 1100px !important;
+}
+/* Legacy class compat */
 .page-container.narrow {
-  max-width: 560px !important;
+  max-width: 680px !important;
 }
 .page-container.wide {
-  max-width: 900px !important;
+  max-width: 1100px !important;
 }
 @media (min-width: 640px) {
-  .page-container { padding: 2.5rem 2.5rem !important; }
+  .page-container { padding: 2rem 2rem !important; }
 }
 @media (min-width: 1024px) {
-  .page-container { padding: 3rem 3rem !important; }
+  .page-container { padding: 2.5rem 2.5rem !important; }
 }
 
 .site-container {
   width: 100%;
-  max-width: 680px !important;
+  max-width: 960px !important;
   margin-left: auto !important;
   margin-right: auto !important;
-  padding-left: 2rem !important;
-  padding-right: 2rem !important;
+  padding-left: 1.25rem !important;
+  padding-right: 1.25rem !important;
 }
 @media (min-width: 640px) {
-  .site-container { padding-left: 2.5rem !important; padding-right: 2.5rem !important; }
+  .site-container { padding-left: 2rem !important; padding-right: 2rem !important; }
 }
 @media (min-width: 1024px) {
-  .site-container { padding-left: 3rem !important; padding-right: 3rem !important; }
+  .site-container { padding-left: 2.5rem !important; padding-right: 2.5rem !important; }
 }
 
 /* ─── BADGE ───────────────────────────────────────────────────────────── */

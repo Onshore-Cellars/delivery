@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     } catch {
       return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
     }
-    const { email, password, name, role, phone, company } = body
+    const { email, password, name, role, phone, company, canCarry, canShip } = body
 
     if (!email || !password || !name || !role) {
       return NextResponse.json({ error: 'Email, password, name, and role are required' }, { status: 400 })
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Input exceeds maximum length' }, { status: 400 })
     }
 
-    const validRoles = ['CARRIER', 'SUPPLIER', 'YACHT_OWNER']
+    const validRoles = ['CARRIER', 'SUPPLIER', 'YACHT_OWNER', 'CREW']
     if (!validRoles.includes(role)) {
       return NextResponse.json({ error: 'Invalid role' }, { status: 400 })
     }
@@ -77,6 +77,8 @@ export async function POST(request: NextRequest) {
         role,
         phone: phone || null,
         company: company || null,
+        canCarry: canCarry === true,
+        canShip: canShip !== false, // default true
       },
       select: {
         id: true,
@@ -85,6 +87,8 @@ export async function POST(request: NextRequest) {
         role: true,
         company: true,
         phone: true,
+        canCarry: true,
+        canShip: true,
         verified: true,
         createdAt: true,
       },

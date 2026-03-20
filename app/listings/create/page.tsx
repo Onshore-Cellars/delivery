@@ -105,7 +105,7 @@ export default function CreateListingPage() {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-[#1d1d1f] mb-2">Access Restricted</h2>
+          <h2 className="text-2xl font-bold text-[#1a1a1a] mb-2">Access Restricted</h2>
           <p className="text-slate-500 mb-6">Only carriers can create listings.</p>
           <Link href="/dashboard" className="btn-primary text-sm">Back to Dashboard</Link>
         </div>
@@ -113,18 +113,18 @@ export default function CreateListingPage() {
     )
   }
 
-  const inputCls = "w-full px-4 py-3 sm:py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-base sm:text-sm text-[#1d1d1f] focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10 focus:bg-white transition-all outline-none"
+  const inputCls = "w-full px-4 py-3 sm:py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-base sm:text-sm text-[#1a1a1a] focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 focus:bg-white transition-all outline-none"
   const selectCls = `${inputCls} bg-slate-50/50`
-  const labelCls = "block text-sm font-medium text-[#1d1d1f] mb-1.5"
+  const labelCls = "block text-sm font-medium text-[#1a1a1a] mb-1.5"
 
   return (
     <div className="page-container narrow">
         <div className="mb-8 sm:mb-10">
-          <Link href="/dashboard" className="text-sm text-slate-500 hover:text-[#1d1d1f] transition-colors">
+          <Link href="/dashboard" className="text-sm text-slate-500 hover:text-[#1a1a1a] transition-colors">
             &larr; Back to Dashboard
           </Link>
-          <p className="text-[11px] font-semibold text-[#0071e3] uppercase tracking-[0.15em] mt-4 sm:mt-5 mb-1">New Listing</p>
-          <h1 className="text-xl sm:text-2xl font-semibold text-[#1d1d1f] tracking-[-0.02em]">List Your Van Space</h1>
+          <p className="text-[11px] font-semibold text-[#C6904D] uppercase tracking-[0.15em] mt-4 sm:mt-5 mb-1">New Listing</p>
+          <h1 className="text-xl sm:text-2xl font-semibold text-[#1a1a1a] tracking-[-0.02em]">List Your Van Space</h1>
           <p className="text-sm text-slate-500 mt-1.5">Share spare capacity on your next delivery run.</p>
         </div>
 
@@ -136,8 +136,8 @@ export default function CreateListingPage() {
           )}
 
           {/* Vehicle Selection */}
-          <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-slate-100/80 p-5 sm:p-6">
-            <h2 className="text-lg font-bold text-[#1d1d1f] mb-1">Vehicle Selection</h2>
+          <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-5 sm:p-6">
+            <h2 className="text-lg font-bold text-[#1a1a1a] mb-1">Vehicle Selection</h2>
             <p className="text-xs text-slate-400 mb-4">Select your vehicle to auto-fill capacity specs, or enter manually below.</p>
             <div className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -174,24 +174,24 @@ export default function CreateListingPage() {
                 <div className="rounded-lg bg-[#f5f5f7] border border-[#d2d2d7] p-4">
                   <div className="flex items-center gap-2 mb-3">
                     <span className="text-lg">&#128666;</span>
-                    <span className="font-semibold text-[#1d1d1f] text-sm">{selectedSpec.make} {selectedSpec.model}</span>
-                    <span className="ml-auto text-xs font-medium px-2 py-0.5 rounded-full bg-[#f5f5f7] text-[#1d1d1f]">{selectedSpec.type}</span>
+                    <span className="font-semibold text-[#1a1a1a] text-sm">{selectedSpec.make} {selectedSpec.model}</span>
+                    <span className="ml-auto text-xs font-medium px-2 py-0.5 rounded-full bg-[#f5f5f7] text-[#1a1a1a]">{selectedSpec.type}</span>
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
                     <div className="bg-white rounded-lg p-2.5 text-center">
-                      <div className="font-bold text-[#1d1d1f] text-base">{selectedSpec.maxPayloadKg}</div>
+                      <div className="font-bold text-[#1a1a1a] text-base">{selectedSpec.maxPayloadKg}</div>
                       <div className="text-slate-400 mt-0.5">kg payload</div>
                     </div>
                     <div className="bg-white rounded-lg p-2.5 text-center">
-                      <div className="font-bold text-[#1d1d1f] text-base">{selectedSpec.cargoVolumeM3}</div>
+                      <div className="font-bold text-[#1a1a1a] text-base">{selectedSpec.cargoVolumeM3}</div>
                       <div className="text-slate-400 mt-0.5">m&sup3; volume</div>
                     </div>
                     <div className="bg-white rounded-lg p-2.5 text-center">
-                      <div className="font-bold text-[#1d1d1f] text-base">{selectedSpec.cargoLengthCm}</div>
+                      <div className="font-bold text-[#1a1a1a] text-base">{selectedSpec.cargoLengthCm}</div>
                       <div className="text-slate-400 mt-0.5">cm length</div>
                     </div>
                     <div className="bg-white rounded-lg p-2.5 text-center">
-                      <div className="font-bold text-[#1d1d1f] text-base">{selectedSpec.cargoWidthCm}x{selectedSpec.cargoHeightCm}</div>
+                      <div className="font-bold text-[#1a1a1a] text-base">{selectedSpec.cargoWidthCm}x{selectedSpec.cargoHeightCm}</div>
                       <div className="text-slate-400 mt-0.5">cm W&times;H</div>
                     </div>
                   </div>
@@ -201,8 +201,8 @@ export default function CreateListingPage() {
           </div>
 
           {/* Route Details */}
-          <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-slate-100/80 p-5 sm:p-6">
-            <h2 className="text-lg font-bold text-[#1d1d1f] mb-4">Route Details</h2>
+          <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-5 sm:p-6">
+            <h2 className="text-lg font-bold text-[#1a1a1a] mb-4">Route Details</h2>
             <div className="space-y-4">
               <div>
                 <label className={labelCls}>Listing Title *</label>
@@ -308,8 +308,8 @@ export default function CreateListingPage() {
           </div>
 
           {/* Vehicle & Capacity */}
-          <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-slate-100/80 p-5 sm:p-6">
-            <h2 className="text-lg font-bold text-[#1d1d1f] mb-1">Vehicle & Capacity</h2>
+          <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-5 sm:p-6">
+            <h2 className="text-lg font-bold text-[#1a1a1a] mb-1">Vehicle & Capacity</h2>
             {selectedSpec && <p className="text-xs text-emerald-500 font-medium mb-4">Auto-filled from {selectedSpec.make} {selectedSpec.model} specs. You can override any value.</p>}
             {!selectedSpec && <p className="text-xs text-slate-400 mb-4">Enter capacity manually, or select a vehicle above to auto-fill.</p>}
             <div className="space-y-4">
@@ -411,24 +411,24 @@ export default function CreateListingPage() {
               {/* Vehicle Features */}
               <div className="pt-4 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" name="hasRefrigeration" checked={form.hasRefrigeration} onChange={handleChange} className="w-4 h-4 rounded border-slate-300 text-[#1d1d1f] focus:ring-[#0071e3]" />
-                  <span className="text-sm text-[#1d1d1f]">Refrigeration</span>
+                  <input type="checkbox" name="hasRefrigeration" checked={form.hasRefrigeration} onChange={handleChange} className="w-4 h-4 rounded border-slate-300 text-[#1a1a1a] focus:ring-[#C6904D]" />
+                  <span className="text-sm text-[#1a1a1a]">Refrigeration</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" name="hasTailLift" checked={form.hasTailLift} onChange={handleChange} className="w-4 h-4 rounded border-slate-300 text-[#1d1d1f] focus:ring-[#0071e3]" />
-                  <span className="text-sm text-[#1d1d1f]">Tail Lift</span>
+                  <input type="checkbox" name="hasTailLift" checked={form.hasTailLift} onChange={handleChange} className="w-4 h-4 rounded border-slate-300 text-[#1a1a1a] focus:ring-[#C6904D]" />
+                  <span className="text-sm text-[#1a1a1a]">Tail Lift</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" name="hasGPS" checked={form.hasGPS} onChange={handleChange} className="w-4 h-4 rounded border-slate-300 text-[#1d1d1f] focus:ring-[#0071e3]" />
-                  <span className="text-sm text-[#1d1d1f]">GPS Tracking</span>
+                  <input type="checkbox" name="hasGPS" checked={form.hasGPS} onChange={handleChange} className="w-4 h-4 rounded border-slate-300 text-[#1a1a1a] focus:ring-[#C6904D]" />
+                  <span className="text-sm text-[#1a1a1a]">GPS Tracking</span>
                 </label>
               </div>
             </div>
           </div>
 
           {/* Cargo Restrictions */}
-          <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-slate-100/80 p-5 sm:p-6">
-            <h2 className="text-lg font-bold text-[#1d1d1f] mb-4">Cargo Details</h2>
+          <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-5 sm:p-6">
+            <h2 className="text-lg font-bold text-[#1a1a1a] mb-4">Cargo Details</h2>
             <div className="space-y-4">
               <div>
                 <label className={labelCls}>Accepted Cargo Types</label>
@@ -456,8 +456,8 @@ export default function CreateListingPage() {
           </div>
 
           {/* Pricing */}
-          <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-slate-100/80 p-5 sm:p-6">
-            <h2 className="text-lg font-bold text-[#1d1d1f] mb-4">Pricing</h2>
+          <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-5 sm:p-6">
+            <h2 className="text-lg font-bold text-[#1a1a1a] mb-4">Pricing</h2>
             <div className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
@@ -530,7 +530,7 @@ export default function CreateListingPage() {
               <div className="pt-4 border-t border-slate-100">
                 <div className="flex items-center justify-between">
                   <div>
-                    <label className="text-sm font-medium text-[#1d1d1f]">Enable Bidding</label>
+                    <label className="text-sm font-medium text-[#1a1a1a]">Enable Bidding</label>
                     <p className="text-xs text-slate-400 mt-0.5">Allow shippers to bid on your space</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
@@ -569,7 +569,7 @@ export default function CreateListingPage() {
               className="btn-primary !py-3 sm:!px-8 text-sm disabled:opacity-50 w-full sm:w-auto">
               {loading ? 'Creating...' : 'Publish Listing'}
             </button>
-            <Link href="/dashboard" className="text-sm text-slate-500 hover:text-[#1d1d1f] transition-colors text-center">
+            <Link href="/dashboard" className="text-sm text-slate-500 hover:text-[#1a1a1a] transition-colors text-center">
               Cancel
             </Link>
           </div>

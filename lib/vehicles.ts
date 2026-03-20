@@ -19,12 +19,55 @@ export const vehicleTypes = [
   'Large Van',
   'Luton Van',
   'Refrigerated Van',
+  'Refrigerated Truck',
   'Pickup Truck',
   'Box Truck',
   'Flatbed',
+  'Curtain-side',
+  'Tail Lift Van',
+  'Chassis Cab',
   'Sprinter',
   'Other',
 ] as const
+
+// ─── CARGO PACKAGING TYPES ──────────────────────────────────────────────────
+
+export interface PackagingType {
+  id: string
+  label: string
+  description: string
+  defaultWeightKg?: number
+  defaultVolumeM3?: number
+  lengthCm?: number
+  widthCm?: number
+  heightCm?: number
+}
+
+export const packagingTypes: PackagingType[] = [
+  // Boxes
+  { id: 'box_small', label: 'Small Box', description: 'Up to 30x30x30 cm', defaultWeightKg: 5, defaultVolumeM3: 0.027, lengthCm: 30, widthCm: 30, heightCm: 30 },
+  { id: 'box_medium', label: 'Medium Box', description: 'Up to 50x40x40 cm', defaultWeightKg: 15, defaultVolumeM3: 0.08, lengthCm: 50, widthCm: 40, heightCm: 40 },
+  { id: 'box_large', label: 'Large Box', description: 'Up to 60x50x50 cm', defaultWeightKg: 25, defaultVolumeM3: 0.15, lengthCm: 60, widthCm: 50, heightCm: 50 },
+  { id: 'box_custom', label: 'Custom Box', description: 'Specify dimensions', defaultWeightKg: 10, defaultVolumeM3: 0.1 },
+  // Pallets — Euro standard
+  { id: 'pallet_quarter', label: 'Quarter Pallet', description: '60 x 40 cm — fits in a van', defaultWeightKg: 150, defaultVolumeM3: 0.36, lengthCm: 60, widthCm: 40, heightCm: 150 },
+  { id: 'pallet_half', label: 'Half Euro Pallet', description: '80 x 60 cm', defaultWeightKg: 300, defaultVolumeM3: 0.72, lengthCm: 80, widthCm: 60, heightCm: 150 },
+  { id: 'pallet_euro', label: 'Euro Pallet', description: '120 x 80 cm (EUR 1) — standard', defaultWeightKg: 500, defaultVolumeM3: 1.44, lengthCm: 120, widthCm: 80, heightCm: 150 },
+  { id: 'pallet_full', label: 'Full Pallet (UK)', description: '120 x 100 cm — UK standard', defaultWeightKg: 600, defaultVolumeM3: 1.8, lengthCm: 120, widthCm: 100, heightCm: 150 },
+  { id: 'pallet_industrial', label: 'Industrial Pallet', description: '120 x 120 cm (EUR 6)', defaultWeightKg: 800, defaultVolumeM3: 2.16, lengthCm: 120, widthCm: 120, heightCm: 150 },
+  // Multi-package
+  { id: 'multi_boxes', label: 'Multiple Boxes', description: 'Several boxes, specify quantity', defaultWeightKg: 50, defaultVolumeM3: 0.5 },
+  { id: 'multi_pallets', label: 'Multiple Pallets', description: 'Several pallets, specify quantity', defaultWeightKg: 1000, defaultVolumeM3: 3.0 },
+  // Other
+  { id: 'crate', label: 'Crate / Case', description: 'Wooden crate or shipping case', defaultWeightKg: 50, defaultVolumeM3: 0.3 },
+  { id: 'drum', label: 'Drum / Barrel', description: 'Barrel, drum, or keg', defaultWeightKg: 100, defaultVolumeM3: 0.2 },
+  { id: 'loose', label: 'Loose / Unpackaged', description: 'Furniture, equipment, oversized items', defaultWeightKg: 30, defaultVolumeM3: 0.5 },
+  { id: 'wine_case', label: 'Wine Case (12 bottles)', description: 'Standard 12-bottle wine case', defaultWeightKg: 18, defaultVolumeM3: 0.03, lengthCm: 50, widthCm: 33, heightCm: 18 },
+]
+
+export function getPackagingById(id: string): PackagingType | undefined {
+  return packagingTypes.find(p => p.id === id)
+}
 
 export const vehicleSpecs: VehicleSpec[] = [
   // ─── SMALL VANS ────────────────────────────────────────────────────────────
@@ -97,6 +140,32 @@ export const vehicleSpecs: VehicleSpec[] = [
   { make: 'Mercedes-Benz', model: 'Atego 7.5t Box', type: 'Box Truck', maxPayloadKg: 3800, cargoVolumeM3: 30.0, cargoLengthCm: 500, cargoWidthCm: 240, cargoHeightCm: 240, fuelType: 'Diesel' },
   { make: 'MAN', model: 'TGL 7.5t Box', type: 'Box Truck', maxPayloadKg: 3700, cargoVolumeM3: 28.0, cargoLengthCm: 490, cargoWidthCm: 240, cargoHeightCm: 235, fuelType: 'Diesel' },
   { make: 'DAF', model: 'LF 7.5t Box', type: 'Box Truck', maxPayloadKg: 3600, cargoVolumeM3: 28.0, cargoLengthCm: 490, cargoWidthCm: 240, cargoHeightCm: 235, fuelType: 'Diesel' },
+
+  // ─── FLATBED TRUCKS ───────────────────────────────────────────────────────
+  { make: 'Ford', model: 'Transit Flatbed', type: 'Flatbed', maxPayloadKg: 1600, cargoVolumeM3: 8.0, cargoLengthCm: 400, cargoWidthCm: 210, cargoHeightCm: 0, fuelType: 'Diesel' },
+  { make: 'Iveco', model: 'Daily Flatbed 3.5t', type: 'Flatbed', maxPayloadKg: 1800, cargoVolumeM3: 10.0, cargoLengthCm: 420, cargoWidthCm: 215, cargoHeightCm: 0, fuelType: 'Diesel' },
+  { make: 'Mercedes-Benz', model: 'Sprinter Flatbed', type: 'Flatbed', maxPayloadKg: 1500, cargoVolumeM3: 9.0, cargoLengthCm: 430, cargoWidthCm: 210, cargoHeightCm: 0, fuelType: 'Diesel' },
+  { make: 'Renault', model: 'Master Flatbed', type: 'Flatbed', maxPayloadKg: 1600, cargoVolumeM3: 9.0, cargoLengthCm: 410, cargoWidthCm: 210, cargoHeightCm: 0, fuelType: 'Diesel' },
+
+  // ─── CURTAIN-SIDE ─────────────────────────────────────────────────────────
+  { make: 'Iveco', model: 'Daily Curtain-side 3.5t', type: 'Curtain-side', maxPayloadKg: 1500, cargoVolumeM3: 20.0, cargoLengthCm: 420, cargoWidthCm: 215, cargoHeightCm: 220, fuelType: 'Diesel' },
+  { make: 'Mercedes-Benz', model: 'Atego Curtain-side 7.5t', type: 'Curtain-side', maxPayloadKg: 3500, cargoVolumeM3: 30.0, cargoLengthCm: 500, cargoWidthCm: 240, cargoHeightCm: 240, fuelType: 'Diesel' },
+  { make: 'MAN', model: 'TGL Curtain-side 7.5t', type: 'Curtain-side', maxPayloadKg: 3400, cargoVolumeM3: 28.0, cargoLengthCm: 490, cargoWidthCm: 240, cargoHeightCm: 235, fuelType: 'Diesel' },
+
+  // ─── TAIL LIFT VANS ───────────────────────────────────────────────────────
+  { make: 'Ford', model: 'Transit L3H2 Tail Lift', type: 'Tail Lift Van', maxPayloadKg: 1300, cargoVolumeM3: 11.0, cargoLengthCm: 340, cargoWidthCm: 178, cargoHeightCm: 185, fuelType: 'Diesel' },
+  { make: 'Mercedes-Benz', model: 'Sprinter 316 Tail Lift', type: 'Tail Lift Van', maxPayloadKg: 1100, cargoVolumeM3: 13.0, cargoLengthCm: 430, cargoWidthCm: 183, cargoHeightCm: 193, fuelType: 'Diesel' },
+  { make: 'Iveco', model: 'Daily 35S Tail Lift', type: 'Tail Lift Van', maxPayloadKg: 1500, cargoVolumeM3: 12.0, cargoLengthCm: 350, cargoWidthCm: 180, cargoHeightCm: 190, fuelType: 'Diesel' },
+
+  // ─── REFRIGERATED TRUCKS ──────────────────────────────────────────────────
+  { make: 'Iveco', model: 'Daily Fridge 3.5t', type: 'Refrigerated Truck', maxPayloadKg: 1200, cargoVolumeM3: 14.0, cargoLengthCm: 380, cargoWidthCm: 190, cargoHeightCm: 195, fuelType: 'Diesel' },
+  { make: 'Mercedes-Benz', model: 'Atego Fridge 7.5t', type: 'Refrigerated Truck', maxPayloadKg: 3000, cargoVolumeM3: 24.0, cargoLengthCm: 480, cargoWidthCm: 220, cargoHeightCm: 220, fuelType: 'Diesel' },
+  { make: 'DAF', model: 'LF Fridge 7.5t', type: 'Refrigerated Truck', maxPayloadKg: 2800, cargoVolumeM3: 22.0, cargoLengthCm: 470, cargoWidthCm: 220, cargoHeightCm: 215, fuelType: 'Diesel' },
+
+  // ─── CHASSIS CAB ──────────────────────────────────────────────────────────
+  { make: 'Ford', model: 'Transit Chassis Cab', type: 'Chassis Cab', maxPayloadKg: 1700, cargoVolumeM3: 0, cargoLengthCm: 400, cargoWidthCm: 210, cargoHeightCm: 0, fuelType: 'Diesel' },
+  { make: 'Iveco', model: 'Daily Chassis Cab 3.5t', type: 'Chassis Cab', maxPayloadKg: 1900, cargoVolumeM3: 0, cargoLengthCm: 430, cargoWidthCm: 215, cargoHeightCm: 0, fuelType: 'Diesel' },
+  { make: 'Mercedes-Benz', model: 'Sprinter Chassis Cab', type: 'Chassis Cab', maxPayloadKg: 1600, cargoVolumeM3: 0, cargoLengthCm: 440, cargoWidthCm: 210, cargoHeightCm: 0, fuelType: 'Diesel' },
 ]
 
 // Helper: Get unique makes

@@ -24,7 +24,9 @@ function RegisterForm() {
   const defaultRole = searchParams.get('role') || ''
 
   const [formData, setFormData] = useState({
-    name: '', email: '', password: '', role: defaultRole || '', company: '', phone: '',
+    name: '', email: '', password: '', role: defaultRole || 'SUPPLIER', company: '', phone: '',
+    canCarry: defaultRole === 'CARRIER',
+    canShip: defaultRole !== 'CARRIER' || !defaultRole,
   })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -86,22 +88,23 @@ function RegisterForm() {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
-  const roles = [
-    { value: 'CARRIER', label: 'Carrier / Driver', desc: 'I deliver goods to ports & marinas',
+  const capabilities = [
+    { key: 'canCarry', label: 'I deliver goods', desc: 'Drive & deliver to ports, marinas, yachts',
       icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
     },
-    { value: 'SUPPLIER', label: 'Provisioner', desc: 'I supply goods & provisions',
+    { key: 'canShip', label: 'I need deliveries', desc: 'Send provisions, equipment, supplies',
       icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
-    },
-    { value: 'YACHT_OWNER', label: 'Owner / Mgmt', desc: 'I manage yachts & need deliveries',
-      icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" /></svg>
-    },
-    { value: 'CREW', label: 'Crew', desc: 'I work on yachts & order supplies',
-      icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
     },
   ]
 
-  const inputClass = "w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-white text-[#0f172a] text-[15px] placeholder:text-slate-400 focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 transition-all outline-none"
+  const roles = [
+    { value: 'CARRIER', label: 'Carrier / Driver', desc: 'Transport company or freelance driver' },
+    { value: 'SUPPLIER', label: 'Provisioner / Vendor', desc: 'Supply goods, food, wine, equipment' },
+    { value: 'YACHT_OWNER', label: 'Owner / Mgmt', desc: 'Yacht owner or management company' },
+    { value: 'CREW', label: 'Crew', desc: 'Work on yachts, order supplies' },
+  ]
+
+  const inputClass = "w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-white text-[#1a1a1a] text-[15px] placeholder:text-slate-400 focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 transition-all outline-none"
 
   return (
     <div className="flex flex-col bg-white">
@@ -125,24 +128,59 @@ function RegisterForm() {
               </div>
             )}
 
-            {/* Role selection */}
+            {/* What do you need? */}
             <div>
-              <label className="block text-sm font-semibold text-[#0f172a] mb-3">I am a...</label>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+              <label className="block text-sm font-semibold text-[#1a1a1a] mb-3">What do you need?</label>
+              <div className="grid grid-cols-2 gap-2.5">
+                {capabilities.map((cap) => {
+                  const active = formData[cap.key as 'canCarry' | 'canShip']
+                  return (
+                    <button
+                      key={cap.key}
+                      type="button"
+                      onClick={() => {
+                        const updated = { ...formData, [cap.key]: !active }
+                        // Auto-set role based on capabilities
+                        if (updated.canCarry && !updated.canShip) updated.role = 'CARRIER'
+                        else if (!updated.canCarry && updated.canShip) updated.role = formData.role === 'CARRIER' ? 'SUPPLIER' : formData.role
+                        setFormData(updated)
+                      }}
+                      className={`relative flex items-center gap-3 p-4 rounded-xl border-2 transition-all text-left ${
+                        active ? 'border-[#C6904D] bg-amber-50' : 'border-slate-200 hover:border-slate-300 bg-white'
+                      }`}
+                    >
+                      <div className={`flex-shrink-0 ${active ? 'text-[#C6904D]' : 'text-slate-400'}`}>{cap.icon}</div>
+                      <div>
+                        <span className={`text-sm font-bold block ${active ? 'text-[#9a7039]' : 'text-slate-700'}`}>{cap.label}</span>
+                        <span className="text-[11px] text-slate-500 leading-tight">{cap.desc}</span>
+                      </div>
+                      {active && (
+                        <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-[#C6904D] flex items-center justify-center">
+                          <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                        </div>
+                      )}
+                    </button>
+                  )
+                })}
+              </div>
+              <p className="text-[11px] text-slate-400 mt-2">Select both if you deliver AND need deliveries. You can change this later.</p>
+            </div>
+
+            {/* Role / account type */}
+            <div>
+              <label className="block text-sm font-semibold text-[#1a1a1a] mb-3">Account type</label>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {roles.map((role) => (
                   <button
                     key={role.value}
                     type="button"
                     onClick={() => setFormData({ ...formData, role: role.value })}
-                    className={`relative flex flex-col items-center text-center p-3.5 rounded-xl border-2 transition-all ${
+                    className={`relative flex flex-col text-center p-3 rounded-xl border-2 transition-all ${
                       formData.role === role.value
                         ? 'border-[#C6904D] bg-amber-50'
                         : 'border-slate-200 hover:border-slate-300 bg-white'
                     }`}
                   >
-                    <div className={`mb-2 ${formData.role === role.value ? 'text-[#C6904D]' : 'text-slate-400'}`}>
-                      {role.icon}
-                    </div>
                     <span className={`text-xs font-bold block leading-tight ${formData.role === role.value ? 'text-[#9a7039]' : 'text-slate-700'}`}>
                       {role.label}
                     </span>
@@ -153,27 +191,27 @@ function RegisterForm() {
             </div>
 
             <div>
-              <label htmlFor="name" className="block text-sm font-semibold text-[#0f172a] mb-2">Full Name</label>
+              <label htmlFor="name" className="block text-sm font-semibold text-[#1a1a1a] mb-2">Full Name</label>
               <input id="name" name="name" type="text" required className={inputClass} placeholder="John Smith" value={formData.name} onChange={handleChange} />
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-semibold text-[#0f172a] mb-2">Email</label>
+              <label htmlFor="email" className="block text-sm font-semibold text-[#1a1a1a] mb-2">Email</label>
               <input id="email" name="email" type="email" required autoComplete="email" className={inputClass} placeholder="you@company.com" value={formData.email} onChange={handleChange} />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-semibold text-[#0f172a] mb-2">Password</label>
+              <label htmlFor="password" className="block text-sm font-semibold text-[#1a1a1a] mb-2">Password</label>
               <input id="password" name="password" type="password" required autoComplete="new-password" minLength={8} className={inputClass} placeholder="Min 8 characters" value={formData.password} onChange={handleChange} />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label htmlFor="company" className="block text-sm font-semibold text-[#0f172a] mb-2">Company</label>
+                <label htmlFor="company" className="block text-sm font-semibold text-[#1a1a1a] mb-2">Company</label>
                 <input id="company" name="company" type="text" className={inputClass} placeholder="Optional" value={formData.company} onChange={handleChange} />
               </div>
               <div>
-                <label htmlFor="phone" className="block text-sm font-semibold text-[#0f172a] mb-2">Phone</label>
+                <label htmlFor="phone" className="block text-sm font-semibold text-[#1a1a1a] mb-2">Phone</label>
                 <input id="phone" name="phone" type="tel" className={inputClass} placeholder="Optional" value={formData.phone} onChange={handleChange} />
               </div>
             </div>

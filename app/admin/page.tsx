@@ -467,7 +467,7 @@ export default function AdminPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <p className="text-[11px] font-semibold text-[#0071e3] uppercase tracking-[0.15em] mb-1">Administration</p>
+            <p className="text-[11px] font-semibold text-[#C6904D] uppercase tracking-[0.15em] mb-1">Administration</p>
             <h1 className="text-xl sm:text-2xl font-semibold text-[#1d1d1f] tracking-[-0.02em]">Admin Panel</h1>
             <p className="text-sm text-slate-500 mt-1">Platform management and analytics</p>
           </div>
@@ -479,7 +479,7 @@ export default function AdminPage() {
                 placeholder="Search users, bookings, listings..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                className="pl-9 pr-4 py-2.5 w-full sm:w-72 rounded-xl border border-slate-200 bg-white text-sm focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10 outline-none"
+                className="pl-9 pr-4 py-2.5 w-full sm:w-72 rounded-xl border border-slate-200 bg-white text-sm focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 outline-none"
               />
               <svg className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />

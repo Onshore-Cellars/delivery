@@ -88,9 +88,9 @@ const SORT_OPTIONS = [
 ]
 
 const inputClass =
-  'w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-[15px] text-[#0f172a] placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all outline-none'
+  'w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-[15px] text-[#1a1a1a] placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all outline-none'
 const selectClass =
-  'w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-[15px] text-[#0f172a] focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all outline-none appearance-none'
+  'w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-[15px] text-[#1a1a1a] focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all outline-none appearance-none'
 
 export default function MarketplacePage() {
   const { user, token } = useAuth()
@@ -261,14 +261,14 @@ export default function MarketplacePage() {
   const FilterContent = ({ onApply }: { onApply?: () => void }) => (
     <div className="space-y-5">
       <div>
-        <label className="block text-sm font-semibold text-[#0f172a] mb-2">Vehicle Type</label>
+        <label className="block text-sm font-semibold text-[#1a1a1a] mb-2">Vehicle Type</label>
         <select className={selectClass} value={filters.vehicleType} onChange={(e) => setFilters({ ...filters, vehicleType: e.target.value })}>
           {VEHICLE_TYPES.map(vt => <option key={vt.value} value={vt.value}>{vt.label}</option>)}
         </select>
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-[#0f172a] mb-2">Price Range</label>
+        <label className="block text-sm font-semibold text-[#1a1a1a] mb-2">Price Range</label>
         <div className="grid grid-cols-2 gap-2">
           <input type="number" placeholder="Min" min="0" className={inputClass} value={filters.minPrice} onChange={(e) => setFilters({ ...filters, minPrice: e.target.value })} />
           <input type="number" placeholder="Max" min="0" className={inputClass} value={filters.maxPrice} onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })} />
@@ -276,7 +276,7 @@ export default function MarketplacePage() {
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-[#0f172a] mb-2">Min Capacity</label>
+        <label className="block text-sm font-semibold text-[#1a1a1a] mb-2">Min Capacity</label>
         <div className="grid grid-cols-2 gap-2">
           <div className="relative">
             <input type="number" placeholder="Weight" min="0" className={inputClass + ' pr-10'} value={filters.minWeight} onChange={(e) => setFilters({ ...filters, minWeight: e.target.value })} />
@@ -290,7 +290,7 @@ export default function MarketplacePage() {
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-[#0f172a] mb-2">Features</label>
+        <label className="block text-sm font-semibold text-[#1a1a1a] mb-2">Features</label>
         <div className="flex flex-wrap gap-2">
           {([
             { key: 'refrigerated' as const, label: 'Refrigerated' },
@@ -314,7 +314,7 @@ export default function MarketplacePage() {
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-[#0f172a] mb-2">Sort By</label>
+        <label className="block text-sm font-semibold text-[#1a1a1a] mb-2">Sort By</label>
         <select className={selectClass} value={filters.sort} onChange={(e) => setFilters({ ...filters, sort: e.target.value })}>
           {SORT_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
         </select>
@@ -342,7 +342,7 @@ export default function MarketplacePage() {
 
       <div className="flex items-start justify-between gap-3 mb-4">
         <div className="min-w-0 flex-1">
-          <h3 className="font-bold text-[#0f172a] text-base sm:text-lg truncate">{listing.title}</h3>
+          <h3 className="font-bold text-[#1a1a1a] text-base sm:text-lg truncate">{listing.title}</h3>
           <p className="text-sm text-slate-500 mt-0.5">
             {listing.carrier.name}
             {listing.carrier.company && <span className="text-slate-400"> &middot; {listing.carrier.company}</span>}
@@ -357,7 +357,7 @@ export default function MarketplacePage() {
       <div className="flex items-center gap-3 mb-4 bg-slate-50 rounded-xl p-3">
         <div className="flex-1 min-w-0">
           <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">From</div>
-          <div className="font-bold text-[#0f172a] text-sm truncate">{listing.originPort}</div>
+          <div className="font-bold text-[#1a1a1a] text-sm truncate">{listing.originPort}</div>
           {listing.originRegion && <div className="text-xs text-slate-400 truncate">{listing.originRegion}</div>}
         </div>
         <div className="flex-shrink-0 text-slate-300">
@@ -367,12 +367,12 @@ export default function MarketplacePage() {
         </div>
         <div className="flex-1 min-w-0">
           <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">To</div>
-          <div className="font-bold text-[#0f172a] text-sm truncate">{listing.destinationPort}</div>
+          <div className="font-bold text-[#1a1a1a] text-sm truncate">{listing.destinationPort}</div>
           {listing.destinationRegion && <div className="text-xs text-slate-400 truncate">{listing.destinationRegion}</div>}
         </div>
         <div className="text-right flex-shrink-0 border-l border-slate-200 pl-3">
           <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Departs</div>
-          <div className="font-bold text-[#0f172a] text-sm">{formatDate(listing.departureDate)}</div>
+          <div className="font-bold text-[#1a1a1a] text-sm">{formatDate(listing.departureDate)}</div>
         </div>
       </div>
 
@@ -381,19 +381,19 @@ export default function MarketplacePage() {
         <div className="flex gap-4">
           <div>
             <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Weight</div>
-            <div className="text-sm font-bold text-[#0f172a]">{listing.availableKg.toFixed(0)} kg</div>
+            <div className="text-sm font-bold text-[#1a1a1a]">{listing.availableKg.toFixed(0)} kg</div>
           </div>
           <div>
             <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Volume</div>
-            <div className="text-sm font-bold text-[#0f172a]">{listing.availableM3.toFixed(1)} m&sup3;</div>
+            <div className="text-sm font-bold text-[#1a1a1a]">{listing.availableM3.toFixed(1)} m&sup3;</div>
           </div>
         </div>
         <div className="flex items-center gap-3">
           <div className="text-right">
             {listing.flatRate ? (
-              <div className="text-lg font-bold text-[#0f172a]">{formatCurrency(listing.flatRate, listing.currency)}</div>
+              <div className="text-lg font-bold text-[#1a1a1a]">{formatCurrency(listing.flatRate, listing.currency)}</div>
             ) : (
-              <div className="text-sm font-semibold text-[#0f172a]">
+              <div className="text-sm font-semibold text-[#1a1a1a]">
                 {listing.pricePerKg && <span>{formatCurrency(listing.pricePerKg, listing.currency)}/kg</span>}
                 {listing.pricePerKg && listing.pricePerM3 && <span className="text-slate-300 mx-1">&middot;</span>}
                 {listing.pricePerM3 && <span>{formatCurrency(listing.pricePerM3, listing.currency)}/m&sup3;</span>}
@@ -421,12 +421,12 @@ export default function MarketplacePage() {
         <div className="site-container py-8 sm:py-10">
           <div className="flex items-center justify-between mb-4 sm:mb-5">
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-[#0f172a] tracking-tight">Marketplace</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-[#1a1a1a] tracking-tight">Marketplace</h1>
               <p className="text-sm text-slate-500 mt-1">Find van space to any destination</p>
             </div>
             <button
               onClick={() => setFiltersOpen(true)}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-semibold text-[#0f172a] hover:bg-slate-50 active:bg-slate-100 transition-colors"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-semibold text-[#1a1a1a] hover:bg-slate-50 active:bg-slate-100 transition-colors"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
@@ -464,7 +464,7 @@ export default function MarketplacePage() {
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setFiltersOpen(false)} />
           <div ref={mobileFilterRef} className="absolute right-0 top-0 bottom-0 w-full max-w-md bg-white shadow-2xl overflow-y-auto animate-slide-in-right">
             <div className="sticky top-0 bg-white border-b border-slate-100 px-5 py-4 flex items-center justify-between z-10">
-              <h2 className="text-lg font-bold text-[#0f172a]">Filters</h2>
+              <h2 className="text-lg font-bold text-[#1a1a1a]">Filters</h2>
               <button onClick={() => setFiltersOpen(false)} className="p-2 rounded-xl hover:bg-slate-100 text-slate-400 transition-colors">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -487,7 +487,7 @@ export default function MarketplacePage() {
               <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
               </svg>
-              <h2 className="text-lg font-bold text-[#0f172a]">Featured Routes</h2>
+              <h2 className="text-lg font-bold text-[#1a1a1a]">Featured Routes</h2>
             </div>
             {featuredLoading ? (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -509,7 +509,7 @@ export default function MarketplacePage() {
             </p>
             <div className="flex items-center gap-2">
               <select
-                className="px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm text-[#0f172a] focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 outline-none"
+                className="px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm text-[#1a1a1a] focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 outline-none"
                 value={filters.sort}
                 onChange={(e) => { setFilters({ ...filters, sort: e.target.value }); setCurrentPage(1) }}
               >
@@ -531,7 +531,7 @@ export default function MarketplacePage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
-            <p className="text-[#0f172a] font-semibold text-lg mb-2">No routes found</p>
+            <p className="text-[#1a1a1a] font-semibold text-lg mb-2">No routes found</p>
             <p className="text-sm text-slate-500 mb-6">Try adjusting your search or filters</p>
             {hasActiveFilters && (
               <button onClick={resetFilters} className="btn-primary !text-sm !py-2.5 !px-6">Clear All Filters</button>
@@ -559,7 +559,7 @@ export default function MarketplacePage() {
                     <span key={`e-${i}`} className="px-2 text-slate-400 text-sm">...</span>
                   ) : (
                     <button key={p} onClick={() => goToPage(p)} className={`min-w-[40px] h-10 rounded-xl text-sm font-semibold transition-colors ${
-                      p === pagination.page ? 'bg-[#0f172a] text-white' : 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                      p === pagination.page ? 'bg-[#1a1a1a] text-white' : 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
                     }`}>{p}</button>
                   )
                 )}
@@ -586,7 +586,7 @@ export default function MarketplacePage() {
             <div className="sticky top-0 bg-white border-b border-slate-100 px-5 sm:px-6 py-4 rounded-t-2xl z-10">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-lg font-bold text-[#0f172a]">Book Space</h2>
+                  <h2 className="text-lg font-bold text-[#1a1a1a]">Book Space</h2>
                   <p className="text-sm text-slate-500 mt-0.5">
                     {bookingModal.originPort} &rarr; {bookingModal.destinationPort} &middot; {formatDate(bookingModal.departureDate)}
                   </p>
@@ -604,7 +604,7 @@ export default function MarketplacePage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold text-[#0f172a] mb-2">Booking Confirmed!</h3>
+                <h3 className="text-xl font-bold text-[#1a1a1a] mb-2">Booking Confirmed!</h3>
                 <p className="text-slate-500 mb-6">Your space has been reserved. Check your dashboard for details.</p>
                 <div className="flex gap-3 justify-center">
                   <Link href="/dashboard" className="btn-primary !text-sm !py-2.5">View Dashboard</Link>
@@ -620,12 +620,12 @@ export default function MarketplacePage() {
                 )}
 
                 <div>
-                  <label className="block text-sm font-semibold text-[#0f172a] mb-2">Cargo Description *</label>
+                  <label className="block text-sm font-semibold text-[#1a1a1a] mb-2">Cargo Description *</label>
                   <input type="text" required className={inputClass} placeholder="e.g. Wine cases for MY Ocean Dream" value={bookingForm.cargoDescription} onChange={(e) => setBookingForm({ ...bookingForm, cargoDescription: e.target.value })} />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-[#0f172a] mb-2">Cargo Type</label>
+                  <label className="block text-sm font-semibold text-[#1a1a1a] mb-2">Cargo Type</label>
                   <select className={selectClass} value={bookingForm.cargoType} onChange={(e) => setBookingForm({ ...bookingForm, cargoType: e.target.value })}>
                     <option value="">Select type...</option>
                     <option value="Provisions">Provisions & Food</option>
@@ -641,22 +641,22 @@ export default function MarketplacePage() {
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-sm font-semibold text-[#0f172a] mb-2">Weight (kg) *</label>
+                    <label className="block text-sm font-semibold text-[#1a1a1a] mb-2">Weight (kg) *</label>
                     <input type="number" required step="0.1" max={bookingModal.availableKg} className={inputClass} placeholder={`Max ${bookingModal.availableKg}kg`} value={bookingForm.weightKg} onChange={(e) => setBookingForm({ ...bookingForm, weightKg: e.target.value })} />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-[#0f172a] mb-2">Volume (m&sup3;) *</label>
+                    <label className="block text-sm font-semibold text-[#1a1a1a] mb-2">Volume (m&sup3;) *</label>
                     <input type="number" required step="0.1" max={bookingModal.availableM3} className={inputClass} placeholder={`Max ${bookingModal.availableM3}m\u00B3`} value={bookingForm.volumeM3} onChange={(e) => setBookingForm({ ...bookingForm, volumeM3: e.target.value })} />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-[#0f172a] mb-2">Delivery Address</label>
+                  <label className="block text-sm font-semibold text-[#1a1a1a] mb-2">Delivery Address</label>
                   <input type="text" className={inputClass} placeholder="Marina berth or port address" value={bookingForm.deliveryAddress} onChange={(e) => setBookingForm({ ...bookingForm, deliveryAddress: e.target.value })} />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-[#0f172a] mb-2">Special Handling</label>
+                  <label className="block text-sm font-semibold text-[#1a1a1a] mb-2">Special Handling</label>
                   <input type="text" className={inputClass} placeholder="e.g. Refrigerated, fragile" value={bookingForm.specialHandling} onChange={(e) => setBookingForm({ ...bookingForm, specialHandling: e.target.value })} />
                 </div>
 
@@ -664,7 +664,7 @@ export default function MarketplacePage() {
                 {bookingForm.weightKg && bookingForm.volumeM3 && (
                   <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
                     <div className="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-1">Estimated Price</div>
-                    <div className="text-2xl font-bold text-[#0f172a]">
+                    <div className="text-2xl font-bold text-[#1a1a1a]">
                       {bookingModal.flatRate
                         ? formatCurrency(bookingModal.flatRate, bookingModal.currency)
                         : formatCurrency(
