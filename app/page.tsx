@@ -29,7 +29,7 @@ export default function Home() {
           : 'bg-transparent'
       }`}>
         <div className="max-w-4xl mx-auto px-6 sm:px-8">
-          <div className="flex items-center justify-between h-16 sm:h-[72px]">
+          <div className="flex items-center justify-between h-14">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2.5 hover:no-underline">
               <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center border border-white/20">
@@ -118,7 +118,7 @@ export default function Home() {
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setMenuOpen(false)} />
           <div className="absolute top-0 right-0 w-full max-w-[300px] h-full bg-white shadow-2xl animate-slide-in-right">
             {/* Header */}
-            <div className="flex items-center justify-between h-16 px-5 border-b border-slate-100">
+            <div className="flex items-center justify-between h-14 px-5 border-b border-slate-100">
               <span className="text-base font-bold text-slate-900">Menu</span>
               <button onClick={() => setMenuOpen(false)} className="p-2 -mr-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-50">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -222,7 +222,7 @@ export default function Home() {
             <h2 className="text-[1.5rem] sm:text-[2.25rem] font-bold text-slate-900 tracking-tight leading-tight">
               What do you need?
             </h2>
-            <p className="mt-3 text-[15px] sm:text-lg text-slate-500">
+            <p className="mt-2 text-[15px] sm:text-lg text-slate-500">
               Whether you&apos;re shipping or filling spare capacity.
             </p>
           </div>
@@ -270,7 +270,7 @@ export default function Home() {
             <h2 className="text-[1.5rem] sm:text-[2.25rem] font-bold text-slate-900 tracking-tight">
               How it works
             </h2>
-            <p className="mt-3 text-[15px] sm:text-lg text-slate-500">
+            <p className="mt-2 text-[15px] sm:text-lg text-slate-500">
               Book cargo space in three simple steps.
             </p>
           </div>
@@ -350,7 +350,7 @@ export default function Home() {
       <section className="bg-slate-50 border-y border-slate-200/60">
         <div className="max-w-4xl mx-auto px-6 sm:px-10 py-20 sm:py-28">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-            <div className="rounded-2xl bg-white border-2 border-slate-200 p-7 sm:p-9">
+            <div className="rounded-2xl bg-white border-2 border-slate-200 p-6 sm:p-8">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-xl text-xs font-bold mb-5 uppercase tracking-wide">
                 Carriers
               </div>
@@ -373,7 +373,7 @@ export default function Home() {
               </Link>
             </div>
 
-            <div className="rounded-2xl bg-white border-2 border-slate-200 p-7 sm:p-9">
+            <div className="rounded-2xl bg-white border-2 border-slate-200 p-6 sm:p-8">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-purple-50 text-purple-700 rounded-xl text-xs font-bold mb-5 uppercase tracking-wide">
                 Shippers
               </div>
@@ -401,7 +401,7 @@ export default function Home() {
 
       {/* ─── CTA ─── */}
       <section className="bg-gradient-to-br from-slate-950 to-slate-900">
-        <div className="max-w-3xl mx-auto px-6 sm:px-8 py-20 sm:py-28 text-center">
+        <div className="max-w-3xl mx-auto px-6 sm:px-10 py-20 sm:py-28 text-center">
           <h2 className="text-[1.5rem] sm:text-[2.25rem] lg:text-[2.75rem] font-bold text-white tracking-tight leading-tight">
             Ready to simplify your delivery logistics?
           </h2>

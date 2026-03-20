@@ -83,7 +83,7 @@ export default function Navbar() {
       {/* ---- TOP NAVBAR (Desktop: full nav, Mobile: logo + actions) ---- */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-slate-200 shadow-sm">
         <div className="max-w-4xl mx-auto px-6 sm:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-14">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2.5 hover:no-underline">
               <div className="w-8 h-8 rounded-lg bg-[#2563eb] flex items-center justify-center">
@@ -212,7 +212,7 @@ export default function Navbar() {
           <div className="mobile-menu-overlay absolute inset-0" onClick={close} />
           <div className="absolute top-0 right-0 w-full max-w-[320px] h-full bg-white shadow-2xl animate-slide-in-right flex flex-col">
             {/* Header */}
-            <div className="flex items-center justify-between h-16 px-5 border-b border-slate-100">
+            <div className="flex items-center justify-between h-14 px-5 border-b border-slate-100">
               <span className="text-base font-bold text-[#0f172a]">Menu</span>
               <button onClick={close} className="p-2 -mr-2 rounded-xl text-slate-400 hover:text-[#0f172a] hover:bg-slate-50 transition-colors" aria-label="Close menu">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

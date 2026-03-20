@@ -152,15 +152,14 @@ export default function ListingDetailPage() {
     finally { setFormLoading(false) }
   }
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="loading-shimmer w-64 h-8 rounded-lg" /></div>
-  if (!listing) return <div className="min-h-screen flex items-center justify-center"><p className="text-slate-500">Listing not found</p></div>
+  if (loading) return <div className="flex items-center justify-center py-20"><div className="loading-shimmer w-64 h-8 rounded-lg" /></div>
+  if (!listing) return <div className="flex items-center justify-center py-20"><p className="text-slate-500">Listing not found</p></div>
 
   const fillPercent = Math.round(((listing.totalCapacityKg - listing.availableKg) / listing.totalCapacityKg) * 100)
   const acceptedCargo = listing.acceptedCargo ? JSON.parse(listing.acceptedCargo) : []
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-4xl mx-auto px-6 sm:px-8 py-8 sm:py-10">
+    <div className="page-container">
         <Link href="/marketplace" className="text-sm text-slate-500 hover:text-[#1d1d1f] transition-colors">&larr; Back to Marketplace</Link>
 
         {formSuccess && (
@@ -413,6 +412,5 @@ export default function ListingDetailPage() {
           </div>
         )}
       </div>
-    </div>
   )
 }

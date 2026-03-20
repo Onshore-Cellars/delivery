@@ -103,7 +103,7 @@ export default function CreateListingPage() {
 
   if (!user || (user.role !== 'CARRIER' && user.role !== 'ADMIN')) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="flex items-center justify-center py-20">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-[#1d1d1f] mb-2">Access Restricted</h2>
           <p className="text-slate-500 mb-6">Only carriers can create listings.</p>
@@ -118,8 +118,7 @@ export default function CreateListingPage() {
   const labelCls = "block text-sm font-medium text-[#1d1d1f] mb-1.5"
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-3xl mx-auto px-6 sm:px-8 py-8 sm:py-10">
+    <div className="page-container max-w-3xl">
         <div className="mb-8 sm:mb-10">
           <Link href="/dashboard" className="text-sm text-slate-500 hover:text-[#1d1d1f] transition-colors">
             &larr; Back to Dashboard
@@ -576,6 +575,5 @@ export default function CreateListingPage() {
           </div>
         </form>
       </div>
-    </div>
   )
 }
