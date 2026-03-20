@@ -97,6 +97,9 @@ export default function Navbar() {
               <Link href="/marketplace" className={`px-4 py-2 rounded text-xs font-medium uppercase tracking-wider transition-colors hover:no-underline ${isActive('/marketplace') ? 'bg-slate-100 text-[#0f172a]' : 'text-slate-600 hover:text-[#0f172a] hover:bg-slate-50'}`}>
                 Marketplace
               </Link>
+              <Link href="/get-quotes" className={`px-4 py-2 rounded text-xs font-medium uppercase tracking-wider transition-colors hover:no-underline ${isActive('/get-quotes') ? 'bg-slate-100 text-[#0f172a]' : 'text-slate-600 hover:text-[#0f172a] hover:bg-slate-50'}`}>
+                Get Quotes
+              </Link>
               <Link href="/tracking" className={`px-4 py-2 rounded text-xs font-medium uppercase tracking-wider transition-colors hover:no-underline ${isActive('/tracking') ? 'bg-slate-100 text-[#0f172a]' : 'text-slate-600 hover:text-[#0f172a] hover:bg-slate-50'}`}>
                 Track
               </Link>
@@ -226,6 +229,10 @@ export default function Navbar() {
               <Link href="/marketplace" onClick={close} className={`flex items-center gap-3.5 px-4 py-3.5 rounded text-[15px] font-medium transition-colors hover:no-underline ${isActive('/marketplace') ? 'bg-amber-50 text-[#C6904D]' : 'text-[#0f172a] hover:bg-slate-50'}`}>
                 <TabIcon icon="search" className={isActive('/marketplace') ? 'text-[#C6904D]' : 'text-slate-400'} />
                 Marketplace
+              </Link>
+              <Link href="/get-quotes" onClick={close} className={`flex items-center gap-3.5 px-4 py-3.5 rounded text-[15px] font-medium transition-colors hover:no-underline ${isActive('/get-quotes') ? 'bg-amber-50 text-[#C6904D]' : 'text-[#0f172a] hover:bg-slate-50'}`}>
+                <svg className={`w-5 h-5 ${isActive('/get-quotes') ? 'text-[#C6904D]' : 'text-slate-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+                Get Quotes
               </Link>
               <Link href="/tracking" onClick={close} className={`flex items-center gap-3.5 px-4 py-3.5 rounded text-[15px] font-medium transition-colors hover:no-underline ${isActive('/tracking') ? 'bg-amber-50 text-[#C6904D]' : 'text-[#0f172a] hover:bg-slate-50'}`}>
                 <TabIcon icon="location" className={isActive('/tracking') ? 'text-[#C6904D]' : 'text-slate-400'} />

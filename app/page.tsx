@@ -44,6 +44,7 @@ export default function Home() {
             <div className="hidden md:flex items-center gap-1">
               {[
                 { href: '/marketplace', label: 'Marketplace' },
+                { href: '/get-quotes', label: 'Get Quotes' },
                 { href: '/tracking', label: 'Tracking' },
                 { href: '/about', label: 'About' },
                 { href: '/help', label: 'Support' },
@@ -131,6 +132,7 @@ export default function Home() {
             <div className="p-3 space-y-0.5">
               {[
                 { href: '/marketplace', label: 'Marketplace' },
+                { href: '/get-quotes', label: 'Get Quotes' },
                 { href: '/tracking', label: 'Tracking' },
                 { href: '/about', label: 'About' },
                 { href: '/help', label: 'Support' },
