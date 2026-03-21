@@ -19,13 +19,17 @@ export default function CreateListingPage() {
     description: '',
     vehicleType: '',
     vehicleName: '',
+    vehicleReg: '',
+    insuranceValue: '',
     hasRefrigeration: false,
     hasTailLift: false,
     hasGPS: true,
     originPort: '',
     originRegion: '',
+    originCountry: '',
     destinationPort: '',
     destinationRegion: '',
+    destinationCountry: '',
     departureDate: '',
     estimatedArrival: '',
     totalCapacityKg: '',
@@ -244,11 +248,21 @@ export default function CreateListingPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className={labelCls}>Origin Port *</label>
+                  <label className={labelCls}>Origin (Port, Address or Company) *</label>
                   <PortAutocomplete
                     value={form.originPort}
-                    onChange={v => setForm({ ...form, originPort: v })}
-                    placeholder="e.g. Port Vauban, Antibes"
+                    onChange={v => setForm(prev => ({ ...prev, originPort: v }))}
+                    onSelect={entry => {
+                      if (entry) {
+                        setForm(prev => ({
+                          ...prev,
+                          originPort: `${entry.name}, ${entry.city}`,
+                          originRegion: entry.region || prev.originRegion,
+                          originCountry: entry.country || prev.originCountry,
+                        }))
+                      }
+                    }}
+                    placeholder="e.g. Port Vauban, Antibes or a company address"
                     required
                     className={inputCls}
                   />
@@ -259,7 +273,7 @@ export default function CreateListingPage() {
                     name="originRegion"
                     type="text"
                     className={inputCls}
-                    placeholder="e.g. French Riviera"
+                    placeholder="Auto-filled from port, or type manually"
                     value={form.originRegion}
                     onChange={handleChange}
                   />
@@ -268,11 +282,21 @@ export default function CreateListingPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className={labelCls}>Destination Port *</label>
+                  <label className={labelCls}>Destination (Port, Address or Company) *</label>
                   <PortAutocomplete
                     value={form.destinationPort}
-                    onChange={v => setForm({ ...form, destinationPort: v })}
-                    placeholder="e.g. Port Hercules, Monaco"
+                    onChange={v => setForm(prev => ({ ...prev, destinationPort: v }))}
+                    onSelect={entry => {
+                      if (entry) {
+                        setForm(prev => ({
+                          ...prev,
+                          destinationPort: `${entry.name}, ${entry.city}`,
+                          destinationRegion: entry.region || prev.destinationRegion,
+                          destinationCountry: entry.country || prev.destinationCountry,
+                        }))
+                      }
+                    }}
+                    placeholder="e.g. Port Hercules, Monaco or a company address"
                     required
                     className={inputCls}
                   />
@@ -283,7 +307,7 @@ export default function CreateListingPage() {
                     name="destinationRegion"
                     type="text"
                     className={inputCls}
-                    placeholder="e.g. Monaco"
+                    placeholder="Auto-filled from port, or type manually"
                     value={form.destinationRegion}
                     onChange={handleChange}
                   />
@@ -423,6 +447,31 @@ export default function CreateListingPage() {
                     className={inputCls}
                     placeholder="e.g. Mercedes Sprinter 316"
                     value={form.vehicleName}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className={labelCls}>Vehicle Registration</label>
+                  <input
+                    name="vehicleReg"
+                    type="text"
+                    className={inputCls}
+                    placeholder="e.g. AB12 CDE"
+                    value={form.vehicleReg}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div>
+                  <label className={labelCls}>Insurance Value (&euro;)</label>
+                  <input
+                    name="insuranceValue"
+                    type="number"
+                    step="0.01"
+                    className={inputCls}
+                    placeholder="e.g. 50000"
+                    value={form.insuranceValue}
                     onChange={handleChange}
                   />
                 </div>

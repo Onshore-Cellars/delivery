@@ -188,7 +188,7 @@ export default function AdminPage() {
       const [statsRes, usersRes, listingsRes, docsRes] = await Promise.all([
         fetch('/api/admin/stats', { headers: { Authorization: `Bearer ${token}` } }),
         fetch('/api/admin/users', { headers: { Authorization: `Bearer ${token}` } }),
-        fetch('/api/listings?limit=100', { headers: { Authorization: `Bearer ${token}` } }),
+        fetch('/api/listings?all=true&limit=100', { headers: { Authorization: `Bearer ${token}` } }),
         fetch('/api/admin/documents', { headers: { Authorization: `Bearer ${token}` } }),
       ])
 

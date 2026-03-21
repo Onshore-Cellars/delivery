@@ -59,6 +59,7 @@ export async function PATCH(request: NextRequest) {
     const body = await request.json()
     const allowedFields = [
       'name', 'phone', 'company', 'bio', 'website', 'address', 'city', 'country',
+      'avatarUrl',
       'emailNotifications', 'smsNotifications',
       'canCarry', 'canShip',
       'yachtName', 'yachtMMSI', 'yachtIMO', 'yachtFlag', 'yachtLength', 'yachtType', 'homePort',

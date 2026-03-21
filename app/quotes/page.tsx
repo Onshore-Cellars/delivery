@@ -313,20 +313,20 @@ export default function QuotesPage() {
             <form onSubmit={handleCreateQuote} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-[#1a1a1a] mb-1.5">Origin Port *</label>
+                  <label className="block text-sm font-medium text-[#1a1a1a] mb-1.5">Origin (Port, Address or Company) *</label>
                   <PortAutocomplete
                     value={quoteForm.originPort}
                     onChange={v => setQuoteForm({ ...quoteForm, originPort: v })}
-                    placeholder="e.g. Antibes, France"
+                    placeholder="e.g. Antibes, France or company address"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#1a1a1a] mb-1.5">Destination Port *</label>
+                  <label className="block text-sm font-medium text-[#1a1a1a] mb-1.5">Destination (Port, Address or Company) *</label>
                   <PortAutocomplete
                     value={quoteForm.destinationPort}
                     onChange={v => setQuoteForm({ ...quoteForm, destinationPort: v })}
-                    placeholder="e.g. Palma de Mallorca, Spain"
+                    placeholder="e.g. Palma de Mallorca, Spain or company address"
                     required
                   />
                 </div>

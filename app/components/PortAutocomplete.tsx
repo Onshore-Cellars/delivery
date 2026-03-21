@@ -6,6 +6,7 @@ import { searchPorts, formatPortDisplay, type PortEntry } from '@/lib/ports'
 interface PortAutocompleteProps {
   value: string
   onChange: (value: string) => void
+  onSelect?: (entry: PortEntry | null) => void
   placeholder?: string
   required?: boolean
   className?: string
@@ -21,7 +22,8 @@ const typeLabels: Record<string, { label: string; color: string }> = {
 export default function PortAutocomplete({
   value,
   onChange,
-  placeholder = 'Search ports, marinas, shipyards...',
+  onSelect,
+  placeholder = 'Search ports, marinas, companies, addresses...',
   required = false,
   className = '',
   name,
@@ -55,6 +57,7 @@ export default function PortAutocomplete({
     const val = e.target.value
     setQuery(val)
     onChange(val)
+    onSelect?.(null) // Clear selection when typing freely
     doSearch(val)
   }
 
@@ -62,6 +65,7 @@ export default function PortAutocomplete({
     const display = formatPortDisplay(entry)
     setQuery(display)
     onChange(display)
+    onSelect?.(entry)
     setIsOpen(false)
     setResults([])
     inputRef.current?.blur()
