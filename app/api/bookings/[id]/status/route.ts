@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { verifyToken, getTokenFromHeader } from '@/lib/auth'
 import { notifyStatusUpdate } from '@/lib/notifications'
+import { sendEmail, deliveryConfirmationEmail } from '@/lib/email'
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -18,7 +19,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     } catch {
       return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
     }
-    const { status, location, description } = body
+    const { status, location, description, signature, photoUrl, recipientName, notes } = body
 
     const validStatuses = ['ACCEPTED', 'REJECTED', 'CONFIRMED', 'PICKED_UP', 'IN_TRANSIT', 'CUSTOMS_HOLD', 'DELIVERED', 'CANCELLED', 'DISPUTED']
     if (!validStatuses.includes(status)) {
@@ -83,10 +84,26 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       DISPUTED: `Dispute raised by ${isShipper ? 'shipper' : isCarrier ? 'carrier' : 'admin'}`,
     }
 
+    // Build additional data for proof-of-pickup / proof-of-delivery
+    const additionalData: Record<string, unknown> = {}
+    if (status === 'PICKED_UP') {
+      additionalData.pickupDate = new Date()
+      additionalData.pickupConfirmedAt = new Date()
+      if (signature) additionalData.pickupSignature = signature
+      if (photoUrl) additionalData.pickupPhotoUrl = photoUrl
+    }
+    if (status === 'DELIVERED') {
+      additionalData.actualDelivery = new Date()
+      if (signature) additionalData.podSignature = signature
+      if (photoUrl) additionalData.podPhotoUrl = photoUrl
+      if (notes) additionalData.podNotes = notes
+      if (recipientName) additionalData.podRecipientName = recipientName
+    }
+
     const [updatedBooking] = await prisma.$transaction([
       prisma.booking.update({
         where: { id },
-        data: { status },
+        data: { status, ...additionalData },
       }),
       prisma.trackingEvent.create({
         data: {
@@ -221,8 +238,48 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       }
     }
 
-    // If delivered, complete the listing if all bookings delivered
+    // If picked up, notify shipper with collection confirmation
+    if (status === 'PICKED_UP') {
+      try {
+        await prisma.notification.create({
+          data: {
+            userId: booking.shipperId,
+            type: 'BOOKING_STATUS_UPDATE',
+            title: 'Cargo Collected',
+            message: `Your cargo for #${booking.trackingCode} has been collected${signature ? ' (signature captured)' : ''}${photoUrl ? ' (photo taken)' : ''}.`,
+            metadata: JSON.stringify({ bookingId: id, pickupConfirmedAt: new Date().toISOString() }),
+          },
+        })
+      } catch (notifErr) {
+        console.error('Pickup notification error:', notifErr)
+      }
+    }
+
+    // If delivered, send confirmation email and complete listing if all done
     if (status === 'DELIVERED') {
+      // Send delivery confirmation email to shipper
+      try {
+        const shipper = await prisma.user.findUnique({
+          where: { id: booking.shipperId },
+          select: { name: true, email: true },
+        })
+        if (shipper?.email) {
+          const emailData = deliveryConfirmationEmail({
+            shipperName: shipper.name || 'there',
+            trackingCode: booking.trackingCode || id,
+            origin: booking.listing.originPort,
+            destination: booking.listing.destinationPort,
+            deliveredAt: new Date().toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' }),
+            recipientName: recipientName || undefined,
+            hasSignature: !!signature,
+            hasPhoto: !!photoUrl,
+          })
+          await sendEmail({ to: shipper.email, ...emailData })
+        }
+      } catch (emailErr) {
+        console.error('Delivery confirmation email error:', emailErr)
+      }
+
       const remaining = await prisma.booking.count({
         where: {
           listingId: booking.listingId,

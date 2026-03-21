@@ -205,6 +205,7 @@ model User {
   communityReplies CommunityReply[]
   apiKeys          ApiKey[]
   integrationOrders IntegrationOrder[]
+  uploadedDocuments BookingDocument[]  @relation("documentUploader")
 
   @@index([email])
   @@index([role])
@@ -347,26 +348,27 @@ model Booking {
   customsRequired   Boolean       @default(false)
   declaredValue     Float?
 
-  // Pickup
-  pickupAddress     String?
+  // ─── Collection / Pickup ─────────────────────────────────────────────────
+  pickupAddress     String?           // Full street address for collection
   pickupCity        String?
   pickupCountry     String?
-  pickupContact     String?
-  pickupPhone       String?
+  pickupContact     String?           // Contact person name at collection point
+  pickupPhone       String?           // Phone number for collection contact
   pickupEmail       String?
-  pickupDate        DateTime?
-  pickupNotes       String?
+  pickupDate        DateTime?         // Actual recorded pickup time (set by driver)
+  pickupNotes       String?           // Gate codes, dock numbers, access instructions
+  pickupTimeWindow  String?           // "morning" (8-12), "afternoon" (12-17), "evening" (17-21), "any"
 
-  // Delivery
-  deliveryAddress   String?
+  // ─── Delivery ──────────────────────────────────────────────────────────
+  deliveryAddress   String?           // Full street address for delivery
   deliveryCity      String?
   deliveryCountry   String?
-  deliveryContact   String?
-  deliveryPhone     String?
+  deliveryContact   String?           // Recipient name at delivery point
+  deliveryPhone     String?           // Phone number for delivery recipient
   deliveryEmail     String?
-  deliveryNotes     String?
+  deliveryNotes     String?           // Berth number, access codes, special instructions
   yachtName         String?
-  yachtMMSI         String?       // MMSI for vessel tracking
+  yachtMMSI         String?           // MMSI for vessel tracking
   berthNumber       String?
   marinaName        String?
 
@@ -397,10 +399,16 @@ model Booking {
   // Checkout expiry — pending bookings expire after 30 minutes
   checkoutExpiresAt   DateTime?
 
-  // Proof of delivery
-  podSignature      String?
-  podPhotoUrl       String?
+  // Proof of collection (set by driver at pickup)
+  pickupSignature   String?           // Base64 signature from collection contact
+  pickupPhotoUrl    String?           // Photo of cargo at collection
+  pickupConfirmedAt DateTime?         // When driver confirmed pickup
+
+  // Proof of delivery (set by driver at drop-off)
+  podSignature      String?           // Base64 signature from delivery recipient
+  podPhotoUrl       String?           // Photo of cargo at delivery
   podNotes          String?
+  podRecipientName  String?           // Name of person who signed for delivery
 
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
@@ -767,7 +775,8 @@ model BookingDocument {
   id              String   @id @default(cuid())
   bookingId       String
   booking         Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-  uploadedById    String   // User who uploaded
+  uploadedById    String
+  uploadedBy      User     @relation("documentUploader", fields: [uploadedById], references: [id], onDelete: Cascade)
 
   name            String              // Display name
   type            String              // invoice, customs_declaration, packing_list, delivery_note, photo, certificate, other
@@ -1065,6 +1074,8 @@ model ApiKey {
   expiresAt     DateTime?
   revokedAt     DateTime?
 
+  integrationOrders IntegrationOrder[]
+
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -1079,6 +1090,7 @@ model ApiKey {
 model IntegrationOrder {
   id                String   @id @default(cuid())
   apiKeyId          String
+  apiKey            ApiKey   @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
   userId            String   // The company user who owns this order
   user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
