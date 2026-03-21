@@ -203,6 +203,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
+    if (isNaN(parseFloat(totalCapacityKg)) || parseFloat(totalCapacityKg) <= 0) {
+      return NextResponse.json({ error: 'Max payload must be a positive number' }, { status: 400 })
+    }
+    if (isNaN(parseFloat(totalCapacityM3)) || parseFloat(totalCapacityM3) <= 0) {
+      return NextResponse.json({ error: 'Cargo volume must be a positive number' }, { status: 400 })
+    }
+
     const listing = await prisma.listing.create({
       data: {
         carrierId: decoded.userId,

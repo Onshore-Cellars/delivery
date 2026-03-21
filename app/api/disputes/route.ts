@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
         type,
         description,
         evidence: evidence || [],
-        claimAmount: claimAmount ? parseFloat(claimAmount) : null,
+        claimAmount: claimAmount && !isNaN(parseFloat(claimAmount)) ? parseFloat(claimAmount) : null,
       },
     })
 

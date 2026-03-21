@@ -93,11 +93,27 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       'biddingEnabled', 'minBidPrice', 'acceptedCargo', 'restrictedItems',
     ]
 
+    const numericFields = [
+      'totalCapacityKg', 'totalCapacityM3', 'pricePerKg', 'pricePerM3',
+      'flatRate', 'insuranceValue', 'minimumCharge', 'minBidPrice',
+    ]
+
     const data: Record<string, unknown> = {}
     for (const field of allowedFields) {
       if (body[field] !== undefined) {
         if (field === 'departureDate' || field === 'estimatedArrival') {
           data[field] = new Date(body[field])
+        } else if (numericFields.includes(field)) {
+          const val = body[field]
+          if (val === null || val === '') {
+            data[field] = null
+          } else {
+            const parsed = parseFloat(val)
+            if (isNaN(parsed)) {
+              return NextResponse.json({ error: `Invalid value for ${field}` }, { status: 400 })
+            }
+            data[field] = parsed
+          }
         } else {
           data[field] = body[field]
         }

@@ -65,6 +65,16 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       return NextResponse.json({ error: 'Amount, weight, and volume are required' }, { status: 400 })
     }
 
+    if (isNaN(parseFloat(amount)) || parseFloat(amount) <= 0) {
+      return NextResponse.json({ error: 'Bid amount must be a positive number' }, { status: 400 })
+    }
+    if (isNaN(parseFloat(weightKg)) || parseFloat(weightKg) <= 0) {
+      return NextResponse.json({ error: 'Weight must be a positive number' }, { status: 400 })
+    }
+    if (isNaN(parseFloat(volumeM3)) || parseFloat(volumeM3) <= 0) {
+      return NextResponse.json({ error: 'Volume must be a positive number' }, { status: 400 })
+    }
+
     // Prevent duplicate pending bids
     const existingBid = await prisma.bid.findFirst({
       where: { listingId: id, bidderId: decoded.userId, status: 'PENDING' },
