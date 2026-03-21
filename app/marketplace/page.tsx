@@ -226,6 +226,11 @@ export default function MarketplacePage() {
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error)
+      // Redirect to Stripe checkout if available, otherwise show success
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl
+        return
+      }
       setBookingSuccess(true)
       fetchListings(currentPage)
     } catch (err) {
