@@ -208,7 +208,15 @@ export default function MarketplacePage() {
 
   const openBooking = (listing: Listing) => {
     setBookingModal(listing)
-    setBookingForm({ ...bookingForm, listingId: listing.id })
+    setBookingForm({
+      listingId: listing.id, cargoDescription: '', cargoType: '', weightKg: '', volumeM3: '',
+      itemCount: '1', declaredValue: '',
+      cargoLengthCm: '', cargoWidthCm: '', cargoHeightCm: '',
+      cargoImages: [],
+      specialHandling: '', pickupAddress: '', pickupContact: '', pickupPhone: '',
+      deliveryAddress: '', deliveryContact: '', deliveryPhone: '', deliveryNotes: '', deliveryTimeWindow: '',
+      yachtName: '', yachtMMSI: '', berthNumber: '', marinaName: '', routeDirection: 'outbound',
+    })
     setBookingSuccess(false)
     setBookingError('')
   }
