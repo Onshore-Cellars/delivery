@@ -85,6 +85,11 @@ interface Filters {
   minVolume: string
   sort: string
   features: { refrigerated: boolean; gps: boolean; tailLift: boolean }
+  originLat: number | null
+  originLng: number | null
+  destLat: number | null
+  destLng: number | null
+  radiusKm: string
 }
 
 interface Package {
@@ -147,6 +152,7 @@ export default function MarketplacePage() {
     origin: '', destination: '', dateFrom: '', vehicleType: '', direction: '',
     minPrice: '', maxPrice: '', minWeight: '', minVolume: '', sort: '',
     features: { refrigerated: false, gps: false, tailLift: false },
+    originLat: null, originLng: null, destLat: null, destLng: null, radiusKm: '50',
   })
   const [activeTab, setActiveTab] = useState<'SPACE_AVAILABLE' | 'SPACE_NEEDED'>('SPACE_AVAILABLE')
   const [filtersOpen, setFiltersOpen] = useState(false)
@@ -213,6 +219,16 @@ export default function MarketplacePage() {
       if (filters.features.refrigerated) params.append('hasRefrigeration', 'true')
       if (filters.features.gps) params.append('hasGPS', 'true')
       if (filters.features.tailLift) params.append('hasTailLift', 'true')
+      if (filters.originLat && filters.originLng) {
+        params.append('originLat', String(filters.originLat))
+        params.append('originLng', String(filters.originLng))
+        params.append('radiusKm', filters.radiusKm || '50')
+      }
+      if (filters.destLat && filters.destLng) {
+        params.append('destLat', String(filters.destLat))
+        params.append('destLng', String(filters.destLng))
+        params.append('radiusKm', filters.radiusKm || '50')
+      }
       params.append('listingType', activeTab)
       params.append('limit', String(ITEMS_PER_PAGE))
       params.append('page', String(page))
@@ -286,7 +302,7 @@ export default function MarketplacePage() {
   const handleSearch = () => { setCurrentPage(1); fetchListings(1) }
 
   const resetFilters = () => {
-    setFilters({ origin: '', destination: '', dateFrom: '', vehicleType: '', direction: '', minPrice: '', maxPrice: '', minWeight: '', minVolume: '', sort: '', features: { refrigerated: false, gps: false, tailLift: false } })
+    setFilters({ origin: '', destination: '', dateFrom: '', vehicleType: '', direction: '', minPrice: '', maxPrice: '', minWeight: '', minVolume: '', sort: '', features: { refrigerated: false, gps: false, tailLift: false }, originLat: null, originLng: null, destLat: null, destLng: null, radiusKm: '50' })
     setCurrentPage(1)
   }
 
@@ -330,6 +346,26 @@ export default function MarketplacePage() {
 
   const FilterContent = ({ onApply }: { onApply?: () => void }) => (
     <div className="space-y-5">
+      {/* Radius filter — only show when a location with coordinates is selected */}
+      {(filters.originLat || filters.destLat) && (
+        <div>
+          <label className="block text-sm font-semibold text-[#1a1a1a] mb-2">Search Radius</label>
+          <div className="flex items-center gap-3">
+            <input
+              type="range"
+              min="10"
+              max="200"
+              step="10"
+              className="flex-1 accent-[#C6904D]"
+              value={filters.radiusKm || '50'}
+              onChange={(e) => setFilters({ ...filters, radiusKm: e.target.value })}
+            />
+            <span className="text-sm font-semibold text-[#1a1a1a] min-w-[52px] text-right">{filters.radiusKm || '50'} km</span>
+          </div>
+          <p className="text-xs text-slate-400 mt-1">Includes nearby ports within this distance</p>
+        </div>
+      )}
+
       <div>
         <label className="block text-sm font-semibold text-[#1a1a1a] mb-2">Route Direction</label>
         <select className={selectClass} value={filters.direction} onChange={(e) => setFilters({ ...filters, direction: e.target.value })}>
@@ -591,14 +627,16 @@ export default function MarketplacePage() {
             <div className="relative flex-1">
               <PortAutocomplete
                 value={filters.origin}
-                onChange={v => setFilters({ ...filters, origin: v })}
+                onChange={v => setFilters(f => ({ ...f, origin: v, originLat: null, originLng: null }))}
+                onSelect={data => data && setFilters(f => ({ ...f, originLat: data.lat || null, originLng: data.lng || null }))}
                 placeholder="Origin port..."
               />
             </div>
             <div className="relative flex-1">
               <PortAutocomplete
                 value={filters.destination}
-                onChange={v => setFilters({ ...filters, destination: v })}
+                onChange={v => setFilters(f => ({ ...f, destination: v, destLat: null, destLng: null }))}
+                onSelect={data => data && setFilters(f => ({ ...f, destLat: data.lat || null, destLng: data.lng || null }))}
                 placeholder="Destination port..."
               />
             </div>
@@ -607,6 +645,15 @@ export default function MarketplacePage() {
               Search
             </button>
           </div>
+          {(filters.originLat || filters.destLat) && (
+            <div className="flex items-center gap-2 mt-2">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#C6904D]/10 text-[#C6904D] rounded-full text-xs font-medium">
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /></svg>
+                {filters.radiusKm || '50'} km radius
+              </span>
+              <button onClick={() => setFilters(f => ({ ...f, originLat: null, originLng: null, destLat: null, destLng: null }))} className="text-xs text-slate-400 hover:text-slate-600">Clear radius</button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -986,7 +1033,7 @@ export default function MarketplacePage() {
 
                 {/* Yacht / Vessel Details */}
                 <div className="pt-3 border-t border-slate-100">
-                  <p className="text-xs font-semibold text-[#C6904D] uppercase tracking-wider mb-3">Yacht / Vessel Details</p>
+                  <p className="text-xs font-semibold text-[#C6904D] uppercase tracking-wider mb-3">Delivery Location</p>
                   <div className="space-y-3">
                     <div className="grid grid-cols-2 gap-3">
                       <div>
@@ -994,26 +1041,27 @@ export default function MarketplacePage() {
                         <input type="text" className={inputClass} placeholder="e.g. MY Serenity" value={bookingForm.yachtName} onChange={(e) => setBookingForm({ ...bookingForm, yachtName: e.target.value })} />
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-[#1a1a1a] mb-1">MMSI Number</label>
-                        <input type="text" className={inputClass} placeholder="9 digits" maxLength={9} pattern="\d{9}" value={bookingForm.yachtMMSI} onChange={(e) => setBookingForm({ ...bookingForm, yachtMMSI: e.target.value.replace(/\D/g, '').slice(0, 9) })} />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-xs font-medium text-[#1a1a1a] mb-1">Marina</label>
-                        <input type="text" className={inputClass} placeholder="e.g. Port Vauban" value={bookingForm.marinaName} onChange={(e) => setBookingForm({ ...bookingForm, marinaName: e.target.value })} />
-                      </div>
-                      <div>
                         <label className="block text-xs font-medium text-[#1a1a1a] mb-1">Berth Number</label>
                         <input type="text" className={inputClass} placeholder="e.g. B-24" value={bookingForm.berthNumber} onChange={(e) => setBookingForm({ ...bookingForm, berthNumber: e.target.value })} />
                       </div>
                     </div>
-                    {bookingForm.yachtMMSI && bookingForm.yachtMMSI.length === 9 && (
-                      <div className="flex items-center gap-2 text-xs text-blue-600">
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
-                        <a href={`https://www.marinetraffic.com/en/ais/details/ships/mmsi:${bookingForm.yachtMMSI}`} target="_blank" rel="noopener noreferrer" className="hover:underline">
-                          Track vessel on MarineTraffic
-                        </a>
+                    <div>
+                      <label className="block text-xs font-medium text-[#1a1a1a] mb-1">Marina</label>
+                      <input type="text" className={inputClass} placeholder="e.g. Port Vauban" value={bookingForm.marinaName} onChange={(e) => setBookingForm({ ...bookingForm, marinaName: e.target.value })} />
+                    </div>
+                    {/* MMSI — only shown for yacht accounts */}
+                    {user && (user.role === 'YACHT_OWNER' || user.role === 'CREW') && (
+                      <div>
+                        <label className="block text-xs font-medium text-[#1a1a1a] mb-1">MMSI Number</label>
+                        <input type="text" className={inputClass} placeholder="9-digit MMSI for vessel tracking" maxLength={9} pattern="\d{9}" value={bookingForm.yachtMMSI} onChange={(e) => setBookingForm({ ...bookingForm, yachtMMSI: e.target.value.replace(/\D/g, '').slice(0, 9) })} />
+                        {bookingForm.yachtMMSI && bookingForm.yachtMMSI.length === 9 && (
+                          <div className="flex items-center gap-2 text-xs text-blue-600 mt-1.5">
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
+                            <a href={`https://www.marinetraffic.com/en/ais/details/ships/mmsi:${bookingForm.yachtMMSI}`} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                              Track vessel on MarineTraffic
+                            </a>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>

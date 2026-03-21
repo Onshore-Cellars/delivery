@@ -264,8 +264,6 @@ export default function ProfilePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {[
                 ['yachtName', 'Vessel Name', 'text', 'e.g. MY Ocean Dream'],
-                ['yachtMMSI', 'MMSI Number', 'text', '9-digit MMSI'],
-                ['yachtIMO', 'IMO Number', 'text', 'IMO number'],
                 ['yachtType', 'Vessel Type', 'text', 'e.g. Motor Yacht'],
                 ['yachtFlag', 'Flag State', 'text', 'e.g. Cayman Islands'],
                 ['yachtLength', 'Length (m)', 'number', 'LOA in metres'],
@@ -276,6 +274,19 @@ export default function ProfilePage() {
                   <input type={type} className="w-full px-4 py-2.5 rounded border border-[#e8e4de] text-sm text-[#1a1a1a] focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 outline-none" placeholder={placeholder as string} value={(form[key] as string) || ''} onChange={e => setForm({...form, [key]: e.target.value})} />
                 </div>
               ))}
+              {/* MMSI & IMO — only shown for yacht accounts */}
+              {(profile.role === 'YACHT_OWNER' || profile.role === 'CREW') && (
+                <>
+                  <div>
+                    <label className="block text-xs font-semibold text-[#1a1a1a] mb-1.5 uppercase tracking-wider">MMSI Number</label>
+                    <input type="text" className="w-full px-4 py-2.5 rounded border border-[#e8e4de] text-sm text-[#1a1a1a] focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 outline-none" placeholder="9-digit MMSI" maxLength={9} value={(form.yachtMMSI as string) || ''} onChange={e => setForm({...form, yachtMMSI: e.target.value.replace(/\D/g, '').slice(0, 9)})} />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-[#1a1a1a] mb-1.5 uppercase tracking-wider">IMO Number</label>
+                    <input type="text" className="w-full px-4 py-2.5 rounded border border-[#e8e4de] text-sm text-[#1a1a1a] focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 outline-none" placeholder="IMO number" value={(form.yachtIMO as string) || ''} onChange={e => setForm({...form, yachtIMO: e.target.value})} />
+                  </div>
+                </>
+              )}
             </div>
             <button onClick={async () => {
               if (!token) return
