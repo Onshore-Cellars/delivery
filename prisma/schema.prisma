@@ -201,6 +201,8 @@ model User {
   disputesAgainst  Dispute[]       @relation("disputeAgainst")
   savedAlerts      SavedAlert[]
   favouriteListings FavouriteListing[] @relation("favouriteListingUser")
+  communityPosts   CommunityPost[]
+  communityReplies CommunityReply[]
 
   @@index([email])
   @@index([role])
@@ -787,6 +789,7 @@ model BookingDocument {
 model CommunityPost {
   id              String   @id @default(cuid())
   authorId        String
+  author          User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
   title           String
   content         String
   category        String   @default("general")  // general, routes, tips, wanted, services, news
@@ -812,6 +815,7 @@ model CommunityReply {
   postId          String
   post            CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
   authorId        String
+  author          User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
   content         String
   likes           Int           @default(0)
 
@@ -910,10 +914,10 @@ model Dispute {
   booking     Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
 
   raisedById  String
-  raisedBy    User     @relation("disputeRaiser", fields: [raisedById], references: [id])
+  raisedBy    User     @relation("disputeRaiser", fields: [raisedById], references: [id], onDelete: Cascade)
 
   againstId   String
-  against     User     @relation("disputeAgainst", fields: [againstId], references: [id])
+  against     User     @relation("disputeAgainst", fields: [againstId], references: [id], onDelete: Cascade)
 
   type        String              // DAMAGE, LOSS, LATE_DELIVERY, OVERCHARGE, MISSING_ITEMS, OTHER
   status      String   @default("OPEN") // OPEN, UNDER_REVIEW, RESOLVED, ESCALATED, CLOSED

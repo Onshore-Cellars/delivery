@@ -4,7 +4,7 @@ export async function GET() {
   const status: Record<string, string> = { status: 'ok' }
 
   try {
-    const { prisma } = await import('@/lib/prisma')
+    const prisma = (await import('@/lib/prisma')).default
     await prisma.$queryRaw`SELECT 1`
     status.database = 'connected'
   } catch {

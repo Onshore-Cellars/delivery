@@ -157,11 +157,11 @@ export async function createRefund(paymentIntentId: string, amount?: number) {
 // ─── WEBHOOK VERIFICATION ─────────────────────────────────────────────────────
 
 export function constructWebhookEvent(payload: string, signature: string): Stripe.Event {
-  return stripe.webhooks.constructEvent(
-    payload,
-    signature,
-    process.env.STRIPE_WEBHOOK_SECRET || ''
-  )
+  const secret = process.env.STRIPE_WEBHOOK_SECRET
+  if (!secret) {
+    throw new Error('STRIPE_WEBHOOK_SECRET is not configured')
+  }
+  return stripe.webhooks.constructEvent(payload, signature, secret)
 }
 
 export function calculatePlatformFee(amount: number): number {
