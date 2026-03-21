@@ -7,19 +7,23 @@ CREATE TYPE "DocumentStatus" AS ENUM ('PENDING', 'VERIFIED', 'REJECTED', 'EXPIRE
 -- CreateEnum
 CREATE TYPE "RouteDirection" AS ENUM ('OUTBOUND', 'RETURN', 'BOTH');
 
--- AlterEnum: Add CREW to UserRole
-ALTER TYPE "UserRole" ADD VALUE IF NOT EXISTS 'CREW';
+-- AlterEnum: Recreate UserRole with CREW value
+CREATE TYPE "UserRole_new" AS ENUM ('CARRIER', 'SUPPLIER', 'YACHT_OWNER', 'CREW', 'ADMIN');
+ALTER TABLE "User" ALTER COLUMN "role" TYPE "UserRole_new" USING ("role"::text::"UserRole_new");
+DROP TYPE "UserRole";
+ALTER TYPE "UserRole_new" RENAME TO "UserRole";
 
--- AlterEnum: Add LOCATION to MessageType
-ALTER TYPE "MessageType" ADD VALUE IF NOT EXISTS 'LOCATION';
+-- AlterEnum: Recreate MessageType with LOCATION value
+CREATE TYPE "MessageType_new" AS ENUM ('TEXT', 'SYSTEM', 'QUOTE', 'FILE', 'LOCATION');
+ALTER TABLE "Message" ALTER COLUMN "type" TYPE "MessageType_new" USING ("type"::text::"MessageType_new");
+DROP TYPE "MessageType";
+ALTER TYPE "MessageType_new" RENAME TO "MessageType";
 
--- AlterEnum: Add missing NotificationType values
-ALTER TYPE "NotificationType" ADD VALUE IF NOT EXISTS 'DOCUMENT_VERIFIED';
-ALTER TYPE "NotificationType" ADD VALUE IF NOT EXISTS 'DOCUMENT_REJECTED';
-ALTER TYPE "NotificationType" ADD VALUE IF NOT EXISTS 'ROUTE_STARTED';
-ALTER TYPE "NotificationType" ADD VALUE IF NOT EXISTS 'ROUTE_ETA_UPDATE';
-ALTER TYPE "NotificationType" ADD VALUE IF NOT EXISTS 'DRIVER_ARRIVED';
-ALTER TYPE "NotificationType" ADD VALUE IF NOT EXISTS 'RETURN_ROUTE_AVAILABLE';
+-- AlterEnum: Recreate NotificationType with all new values
+CREATE TYPE "NotificationType_new" AS ENUM ('BOOKING_CREATED', 'BOOKING_CONFIRMED', 'BOOKING_STATUS_UPDATE', 'BOOKING_CANCELLED', 'BID_RECEIVED', 'BID_ACCEPTED', 'BID_REJECTED', 'QUOTE_REQUESTED', 'QUOTE_RECEIVED', 'MESSAGE_RECEIVED', 'PAYMENT_RECEIVED', 'PAYMENT_FAILED', 'REVIEW_RECEIVED', 'LISTING_EXPIRING', 'DOCUMENT_VERIFIED', 'DOCUMENT_REJECTED', 'ROUTE_STARTED', 'ROUTE_ETA_UPDATE', 'DRIVER_ARRIVED', 'RETURN_ROUTE_AVAILABLE', 'SYSTEM');
+ALTER TABLE "Notification" ALTER COLUMN "type" TYPE "NotificationType_new" USING ("type"::text::"NotificationType_new");
+DROP TYPE "NotificationType";
+ALTER TYPE "NotificationType_new" RENAME TO "NotificationType";
 
 -- ─── User: add missing columns ─────────────────────────────────────────────
 

@@ -14,15 +14,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
     }
 
+    // Core stats — these use only columns from the init migration
     const [
       totalUsers,
       carriers,
       suppliers,
       yachtOwners,
-      crew,
       totalListings,
       activeListings,
-      twoWayListings,
       totalBookings,
       pendingBookings,
       confirmedBookings,
@@ -31,21 +30,15 @@ export async function GET(request: NextRequest) {
       cancelledBookings,
       revenueResult,
       platformFeeResult,
-      pendingDocs,
-      totalVehicles,
       recentBookings,
       recentUsers,
-      mmsiBookings,
-      returnBookings,
     ] = await Promise.all([
       prisma.user.count(),
       prisma.user.count({ where: { role: 'CARRIER' } }),
       prisma.user.count({ where: { role: 'SUPPLIER' } }),
       prisma.user.count({ where: { role: 'YACHT_OWNER' } }),
-      prisma.user.count({ where: { role: 'CREW' } }),
       prisma.listing.count(),
       prisma.listing.count({ where: { status: 'ACTIVE' } }),
-      prisma.listing.count({ where: { routeDirection: 'BOTH' } }),
       prisma.booking.count(),
       prisma.booking.count({ where: { status: 'PENDING' } }),
       prisma.booking.count({ where: { status: 'CONFIRMED' } }),
@@ -54,8 +47,6 @@ export async function GET(request: NextRequest) {
       prisma.booking.count({ where: { status: 'CANCELLED' } }),
       prisma.booking.aggregate({ _sum: { totalPrice: true } }),
       prisma.booking.aggregate({ _sum: { platformFee: true } }),
-      prisma.document.count({ where: { status: 'PENDING' } }),
-      prisma.vehicle.count(),
       prisma.booking.findMany({
         take: 20,
         orderBy: { createdAt: 'desc' },
@@ -66,7 +57,6 @@ export async function GET(request: NextRequest) {
               title: true,
               originPort: true,
               destinationPort: true,
-              routeDirection: true,
               carrier: { select: { name: true, company: true } },
             },
           },
@@ -77,9 +67,35 @@ export async function GET(request: NextRequest) {
         orderBy: { createdAt: 'desc' },
         select: { id: true, name: true, email: true, role: true, company: true, verified: true, createdAt: true },
       }),
-      prisma.booking.count({ where: { yachtMMSI: { not: null } } }),
-      prisma.booking.count({ where: { routeDirection: 'return' } }),
     ])
+
+    // Extended stats — these use columns/tables from the second migration
+    // Wrapped in try/catch so the admin page still loads if migration hasn't run
+    let crew = 0
+    let twoWayListings = 0
+    let pendingDocs = 0
+    let totalVehicles = 0
+    let mmsiBookings = 0
+    let returnBookings = 0
+
+    try {
+      const extendedResults = await Promise.all([
+        prisma.user.count({ where: { role: 'CREW' } }),
+        prisma.listing.count({ where: { routeDirection: 'BOTH' } }),
+        prisma.document.count({ where: { status: 'PENDING' } }),
+        prisma.vehicle.count(),
+        prisma.booking.count({ where: { yachtMMSI: { not: null } } }),
+        prisma.booking.count({ where: { routeDirection: 'return' } }),
+      ])
+      crew = extendedResults[0]
+      twoWayListings = extendedResults[1]
+      pendingDocs = extendedResults[2]
+      totalVehicles = extendedResults[3]
+      mmsiBookings = extendedResults[4]
+      returnBookings = extendedResults[5]
+    } catch {
+      // Migration hasn't run yet — extended stats will be 0
+    }
 
     return NextResponse.json({
       stats: {
