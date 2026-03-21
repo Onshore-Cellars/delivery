@@ -122,6 +122,12 @@ export default function ListingDetailPage() {
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error)
+      // Redirect to Stripe checkout if payment URL is provided
+      if (data.checkoutUrl) {
+        setFormSuccess('Redirecting to payment...')
+        window.location.href = data.checkoutUrl
+        return
+      }
       setFormSuccess(`Booking confirmed! Tracking: ${data.booking.trackingCode}`)
       fetchListing()
     } catch (err) { setFormError(err instanceof Error ? err.message : 'Failed') }

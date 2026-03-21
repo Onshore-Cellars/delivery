@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
-import { constructWebhookEvent } from '@/lib/stripe'
+import { constructWebhookEvent, calculatePlatformFee, calculateCarrierPayout } from '@/lib/stripe'
 import { createNotification } from '@/lib/notifications'
+import { sendEmail, paymentReceiptEmail, carrierPayoutEmail } from '@/lib/email'
 
 export async function POST(request: NextRequest) {
   try {
@@ -32,14 +33,27 @@ export async function POST(request: NextRequest) {
               paidAt: new Date(),
               status: 'CONFIRMED',
               stripePaymentIntentId: session.payment_intent as string,
+              platformFee: calculatePlatformFee((await prisma.booking.findUnique({ where: { id: bookingId } }))?.totalPrice ?? 0),
+              carrierPayout: calculateCarrierPayout((await prisma.booking.findUnique({ where: { id: bookingId } }))?.totalPrice ?? 0),
             },
             include: {
-              shipper: { select: { id: true, name: true } },
-              listing: { select: { carrierId: true, title: true } },
+              shipper: { select: { id: true, name: true, email: true } },
+              listing: {
+                select: {
+                  carrierId: true,
+                  title: true,
+                  originPort: true,
+                  destinationPort: true,
+                  carrier: { select: { id: true, name: true, email: true } },
+                },
+              },
             },
           })
 
-          // Notify both parties
+          const appUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
+          const fmtMoney = (n: number) => `€${n.toFixed(2)}`
+
+          // Notify both parties (in-app)
           await createNotification({
             userId: booking.shipperId,
             type: 'PAYMENT_RECEIVED',
@@ -64,6 +78,32 @@ export async function POST(request: NextRequest) {
               description: 'Payment received and booking confirmed',
             },
           })
+
+          // Send payment receipt email to shipper
+          try {
+            const receiptEmail = paymentReceiptEmail({
+              customerName: booking.shipper.name,
+              trackingCode: booking.trackingCode || bookingId,
+              amount: fmtMoney(booking.totalPrice),
+              description: `${booking.listing.originPort} → ${booking.listing.destinationPort}`,
+              paidAt: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+              invoiceUrl: `${appUrl}/api/bookings/${booking.id}/invoice/pdf`,
+            })
+            await sendEmail({ to: booking.shipper.email, ...receiptEmail })
+          } catch (e) { console.error('Receipt email error:', e) }
+
+          // Send carrier payout notification email
+          try {
+            const payoutEmail = carrierPayoutEmail({
+              carrierName: booking.listing.carrier.name,
+              trackingCode: booking.trackingCode || bookingId,
+              bookingTotal: fmtMoney(booking.totalPrice),
+              platformFee: fmtMoney(booking.platformFee),
+              payoutAmount: fmtMoney(booking.carrierPayout),
+              deliveredAt: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+            })
+            await sendEmail({ to: booking.listing.carrier.email, ...payoutEmail })
+          } catch (e) { console.error('Payout email error:', e) }
         }
         break
       }
