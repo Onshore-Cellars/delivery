@@ -63,8 +63,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Your account has been suspended. Please contact support.' }, { status: 403 })
     }
 
-    // Update last login timestamp
-    await prisma.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } })
+    // Auto-promote admin emails
+    const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || 'edward@onshorecellars.com,info@onshoredelivery.com')
+      .toLowerCase().split(',').map(e => e.trim())
+
+    if (ADMIN_EMAILS.includes(user.email.toLowerCase()) && user.role !== 'ADMIN') {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { role: 'ADMIN', verified: true, canCarry: true, canShip: true, lastLoginAt: new Date() },
+      })
+      user.role = 'ADMIN'
+      user.verified = true
+    } else {
+      await prisma.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } })
+    }
 
     const token = generateToken({ userId: user.id, email: user.email, role: user.role })
 
