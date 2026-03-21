@@ -74,7 +74,7 @@ interface ActivityItem {
   meta?: string
 }
 
-type TabKey = 'overview' | 'users' | 'bookings' | 'listings' | 'documents' | 'notifications' | 'activity'
+type TabKey = 'overview' | 'users' | 'bookings' | 'listings' | 'documents' | 'notifications' | 'activity' | 'settings'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -116,6 +116,7 @@ const TAB_CONFIG: { key: TabKey; label: string; icon: string }[] = [
   { key: 'documents', label: 'Documents', icon: 'documents' },
   { key: 'notifications', label: 'Broadcast', icon: 'notifications' },
   { key: 'activity', label: 'Activity', icon: 'activity' },
+  { key: 'settings', label: 'Settings', icon: 'settings' },
 ]
 
 function TabIcon({ name, className }: { name: string; className?: string }) {
@@ -135,6 +136,8 @@ function TabIcon({ name, className }: { name: string; className?: string }) {
       return <svg className={cls} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 110-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 01-1.44-4.282m3.102.069a18.03 18.03 0 01-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 018.835 2.535M10.34 6.66a23.847 23.847 0 008.835-2.535m0 0A23.74 23.74 0 0018.795 3m.38 1.125a23.91 23.91 0 011.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 001.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 010 3.46" /></svg>
     case 'activity':
       return <svg className={cls} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+    case 'settings':
+      return <svg className={cls} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
     default:
       return null
   }
@@ -188,7 +191,7 @@ export default function AdminPage() {
       const [statsRes, usersRes, listingsRes, docsRes] = await Promise.all([
         fetch('/api/admin/stats', { headers: { Authorization: `Bearer ${token}` } }),
         fetch('/api/admin/users', { headers: { Authorization: `Bearer ${token}` } }),
-        fetch('/api/listings?limit=100', { headers: { Authorization: `Bearer ${token}` } }),
+        fetch('/api/listings?all=true&limit=100', { headers: { Authorization: `Bearer ${token}` } }),
         fetch('/api/admin/documents', { headers: { Authorization: `Bearer ${token}` } }),
       ])
 
@@ -1227,6 +1230,123 @@ export default function AdminPage() {
               </div>
             )}
           </>
+        )}
+
+        {/* ─── SETTINGS TAB ─── */}
+        {tab === 'settings' && (
+          <div className="space-y-6">
+            {/* Platform Settings */}
+            <div className="bg-white rounded-2xl border border-[#e8e4de] shadow-sm p-6">
+              <h3 className="text-lg font-bold text-[#1a1a1a] mb-1">Platform Settings</h3>
+              <p className="text-xs text-slate-400 mb-6">Manage platform configuration and email templates.</p>
+
+              <div className="space-y-6">
+                {/* Company Info */}
+                <div>
+                  <h4 className="text-sm font-semibold text-[#1a1a1a] mb-3">Company Information</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-medium text-slate-500 mb-1">Company Name</label>
+                      <input type="text" defaultValue="Onshore Deliver" className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm" readOnly />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-slate-500 mb-1">Support Email</label>
+                      <input type="text" defaultValue="info@onshoredelivery.com" className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm" readOnly />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-slate-500 mb-1">Platform Fee (%)</label>
+                      <input type="text" defaultValue="10%" className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm" readOnly />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-slate-500 mb-1">Default Currency</label>
+                      <input type="text" defaultValue="EUR" className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm" readOnly />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Cancellation Policy */}
+                <div className="border-t border-slate-100 pt-6">
+                  <h4 className="text-sm font-semibold text-[#1a1a1a] mb-3">Cancellation Policy</h4>
+                  <div className="bg-slate-50 rounded-xl p-4 text-sm text-slate-600 space-y-1.5">
+                    <div className="flex justify-between"><span>More than 7 days before departure</span><span className="font-semibold text-green-700">No fee</span></div>
+                    <div className="flex justify-between"><span>3-7 days before departure</span><span className="font-semibold text-amber-700">10% fee</span></div>
+                    <div className="flex justify-between"><span>1-3 days before departure</span><span className="font-semibold text-orange-700">25% fee</span></div>
+                    <div className="flex justify-between"><span>Less than 24 hours</span><span className="font-semibold text-red-700">50% fee</span></div>
+                  </div>
+                </div>
+
+                {/* Email Templates */}
+                <div className="border-t border-slate-100 pt-6">
+                  <h4 className="text-sm font-semibold text-[#1a1a1a] mb-3">Email Templates</h4>
+                  <p className="text-xs text-slate-400 mb-4">These templates are sent automatically for platform events.</p>
+                  <div className="space-y-2">
+                    {[
+                      { name: 'Welcome Email', trigger: 'On user registration', status: 'Active' },
+                      { name: 'Email Verification', trigger: 'On registration (non-admin)', status: 'Active' },
+                      { name: 'Password Reset', trigger: 'On forgot password request', status: 'Active' },
+                      { name: 'Booking Confirmation', trigger: 'On new booking creation', status: 'Active' },
+                      { name: 'Status Update', trigger: 'On booking status change', status: 'Active' },
+                      { name: 'New Message', trigger: 'On new message received', status: 'Active' },
+                      { name: 'Bid Received', trigger: 'On bid placed on listing', status: 'Active' },
+                      { name: 'Quote Request', trigger: 'On quote request received', status: 'Active' },
+                      { name: 'Quote Response', trigger: 'On quote responded to', status: 'Active' },
+                      { name: 'Delivery Confirmation', trigger: 'On booking delivered', status: 'Active' },
+                      { name: 'Payment Receipt', trigger: 'On payment processed', status: 'Active' },
+                      { name: 'Carrier Payout', trigger: 'On payout sent to carrier', status: 'Active' },
+                      { name: 'Document Status', trigger: 'On document verified/rejected', status: 'Active' },
+                    ].map(t => (
+                      <div key={t.name} className="flex items-center justify-between px-4 py-3 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors">
+                        <div>
+                          <span className="text-sm font-medium text-[#1a1a1a]">{t.name}</span>
+                          <span className="text-xs text-slate-400 ml-2">{t.trigger}</span>
+                        </div>
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-green-50 text-green-700 border border-green-200">{t.status}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Notification Types */}
+                <div className="border-t border-slate-100 pt-6">
+                  <h4 className="text-sm font-semibold text-[#1a1a1a] mb-3">Notification Events</h4>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {[
+                      'Booking Created', 'Booking Confirmed', 'Status Update', 'Booking Cancelled',
+                      'Bid Received', 'Bid Accepted', 'Bid Rejected',
+                      'Quote Requested', 'Quote Received',
+                      'Message Received', 'Payment Received', 'Payment Failed',
+                      'Review Received', 'Listing Expiring',
+                      'Document Verified', 'Document Rejected',
+                      'Route Started', 'ETA Update', 'Driver Arrived', 'Return Route Available',
+                    ].map(n => (
+                      <div key={n} className="px-3 py-2 rounded-lg bg-slate-50 text-xs font-medium text-slate-600">{n}</div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Admin Accounts */}
+                <div className="border-t border-slate-100 pt-6">
+                  <h4 className="text-sm font-semibold text-[#1a1a1a] mb-3">Admin Access</h4>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between px-4 py-3 rounded-lg bg-slate-50">
+                      <div>
+                        <span className="text-sm font-medium text-[#1a1a1a]">edward@onshorecellars.com</span>
+                        <span className="text-xs text-slate-400 ml-2">Primary Admin</span>
+                      </div>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">ADMIN</span>
+                    </div>
+                    <div className="flex items-center justify-between px-4 py-3 rounded-lg bg-slate-50">
+                      <div>
+                        <span className="text-sm font-medium text-[#1a1a1a]">info@onshoredelivery.com</span>
+                        <span className="text-xs text-slate-400 ml-2">Support Admin</span>
+                      </div>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">ADMIN</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </>

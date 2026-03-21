@@ -18,9 +18,26 @@ export async function GET(request: NextRequest) {
     const sort = searchParams.get('sort')
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '20')
+    const carrierId = searchParams.get('carrierId')
+    const showAll = searchParams.get('all')
 
-    const where: Prisma.ListingWhereInput = {
-      status: 'ACTIVE',
+    const where: Prisma.ListingWhereInput = {}
+
+    // If filtering by carrier (dashboard), show all their listings regardless of status
+    if (carrierId) {
+      where.carrierId = carrierId
+    } else if (showAll === 'true') {
+      // Admin view: check token for admin role
+      const token = getTokenFromHeader(request.headers.get('authorization'))
+      const decoded = token ? verifyToken(token) : null
+      if (decoded?.role === 'ADMIN') {
+        // No status filter — admin sees everything
+      } else {
+        where.status = 'ACTIVE'
+      }
+    } else {
+      // Public marketplace: only active listings
+      where.status = 'ACTIVE'
     }
 
     if (origin) {
@@ -163,7 +180,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json()
     const {
-      title, description, vehicleType, vehicleName,
+      title, description, vehicleType, vehicleName, vehicleReg,
       hasRefrigeration, hasTailLift, hasGPS, insuranceValue,
       originPort, originRegion, originCountry, destinationPort, destinationRegion, destinationCountry,
       departureDate, estimatedArrival, isRecurring, recurringSchedule,
@@ -186,6 +203,7 @@ export async function POST(request: NextRequest) {
         description: description || null,
         vehicleType,
         vehicleName: vehicleName || null,
+        vehicleReg: vehicleReg || null,
         hasRefrigeration: hasRefrigeration || false,
         hasTailLift: hasTailLift || false,
         hasGPS: hasGPS !== false,
@@ -238,6 +256,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ listing }, { status: 201 })
   } catch (error) {
     console.error('Listing creation error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    const message = error instanceof Error ? error.message : 'Internal server error'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }

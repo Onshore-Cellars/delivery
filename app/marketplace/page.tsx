@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useAuth } from '../components/AuthProvider'
 import PortAutocomplete from '../components/PortAutocomplete'
+import CargoImageUpload from '../components/CargoImageUpload'
 import Link from 'next/link'
 
 interface Listing {
@@ -44,10 +45,21 @@ interface BookingForm {
   cargoType: string
   weightKg: string
   volumeM3: string
+  itemCount: string
+  declaredValue: string
+  cargoLengthCm: string
+  cargoWidthCm: string
+  cargoHeightCm: string
+  cargoImages: string[]
   specialHandling: string
   pickupAddress: string
+  pickupContact: string
+  pickupPhone: string
   deliveryAddress: string
+  deliveryContact: string
+  deliveryPhone: string
   deliveryNotes: string
+  deliveryTimeWindow: string
   yachtName: string
   yachtMMSI: string
   berthNumber: string
@@ -123,7 +135,11 @@ export default function MarketplacePage() {
   const [bookingModal, setBookingModal] = useState<Listing | null>(null)
   const [bookingForm, setBookingForm] = useState<BookingForm>({
     listingId: '', cargoDescription: '', cargoType: '', weightKg: '', volumeM3: '',
-    specialHandling: '', pickupAddress: '', deliveryAddress: '', deliveryNotes: '',
+    itemCount: '1', declaredValue: '',
+    cargoLengthCm: '', cargoWidthCm: '', cargoHeightCm: '',
+    cargoImages: [],
+    specialHandling: '', pickupAddress: '', pickupContact: '', pickupPhone: '',
+    deliveryAddress: '', deliveryContact: '', deliveryPhone: '', deliveryNotes: '', deliveryTimeWindow: '',
     yachtName: '', yachtMMSI: '', berthNumber: '', marinaName: '', routeDirection: 'outbound',
   })
   const [bookingLoading, setBookingLoading] = useState(false)
@@ -166,25 +182,16 @@ export default function MarketplacePage() {
       if (filters.minWeight) params.append('minWeight', filters.minWeight)
       if (filters.minVolume) params.append('minVolume', filters.minVolume)
       if (filters.sort) params.append('sort', filters.sort)
+      if (filters.features.refrigerated) params.append('hasRefrigeration', 'true')
+      if (filters.features.gps) params.append('hasGPS', 'true')
+      if (filters.features.tailLift) params.append('hasTailLift', 'true')
       params.append('limit', String(ITEMS_PER_PAGE))
       params.append('page', String(page))
 
       const res = await fetch(`/api/listings?${params.toString()}`)
       if (res.ok) {
         const data = await res.json()
-        let results: Listing[] = data.listings || []
-
-        if (filters.features.refrigerated) {
-          results = results.filter(l => l.vehicleType.toLowerCase().includes('refrigerat') || l.description?.toLowerCase().includes('refrigerat'))
-        }
-        if (filters.features.gps) {
-          results = results.filter(l => l.description?.toLowerCase().includes('gps') || l.title.toLowerCase().includes('gps'))
-        }
-        if (filters.features.tailLift) {
-          results = results.filter(l => l.description?.toLowerCase().includes('tail lift') || l.vehicleType.toLowerCase().includes('tail lift') || l.title.toLowerCase().includes('tail lift'))
-        }
-
-        setListings(results)
+        setListings(data.listings || [])
         setPagination(data.pagination || { page, limit: ITEMS_PER_PAGE, total: 0, pages: 0 })
       }
     } catch (err) { console.error('Error:', err) }
@@ -679,17 +686,89 @@ export default function MarketplacePage() {
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-sm font-semibold text-[#1a1a1a] mb-2">Weight (kg) *</label>
-                    <input type="number" required step="0.1" max={bookingModal.availableKg} className={inputClass} placeholder={`Max ${bookingModal.availableKg}kg`} value={bookingForm.weightKg} onChange={(e) => setBookingForm({ ...bookingForm, weightKg: e.target.value })} />
+                    <input type="number" required step="0.1" min="0.1" max={bookingModal.availableKg} className={inputClass} placeholder={`Max ${bookingModal.availableKg}kg`} value={bookingForm.weightKg} onChange={(e) => setBookingForm({ ...bookingForm, weightKg: e.target.value })} />
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-[#1a1a1a] mb-2">Volume (m&sup3;) *</label>
-                    <input type="number" required step="0.1" max={bookingModal.availableM3} className={inputClass} placeholder={`Max ${bookingModal.availableM3}m\u00B3`} value={bookingForm.volumeM3} onChange={(e) => setBookingForm({ ...bookingForm, volumeM3: e.target.value })} />
+                    <input type="number" required step="0.1" min="0.1" max={bookingModal.availableM3} className={inputClass} placeholder={`Max ${bookingModal.availableM3}m\u00B3`} value={bookingForm.volumeM3} onChange={(e) => setBookingForm({ ...bookingForm, volumeM3: e.target.value })} />
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-semibold text-[#1a1a1a] mb-2">Delivery Address</label>
-                  <input type="text" className={inputClass} placeholder="Marina berth or port address" value={bookingForm.deliveryAddress} onChange={(e) => setBookingForm({ ...bookingForm, deliveryAddress: e.target.value })} />
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-semibold text-[#1a1a1a] mb-2">Items</label>
+                    <input type="number" min="1" step="1" className={inputClass} placeholder="1" value={bookingForm.itemCount} onChange={(e) => setBookingForm({ ...bookingForm, itemCount: e.target.value })} />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-[#1a1a1a] mb-2">Declared Value</label>
+                    <input type="number" min="0" step="0.01" className={inputClass} placeholder="e.g. 5000" value={bookingForm.declaredValue} onChange={(e) => setBookingForm({ ...bookingForm, declaredValue: e.target.value })} />
+                  </div>
+                </div>
+
+                {/* Cargo Dimensions */}
+                <div className="pt-3 border-t border-slate-100">
+                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Cargo Size (optional)</p>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div>
+                      <label className="block text-[11px] text-slate-400 mb-1">Length (cm)</label>
+                      <input type="number" min="0" step="1" className={inputClass} placeholder="cm" value={bookingForm.cargoLengthCm} onChange={(e) => setBookingForm({ ...bookingForm, cargoLengthCm: e.target.value })} />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] text-slate-400 mb-1">Width (cm)</label>
+                      <input type="number" min="0" step="1" className={inputClass} placeholder="cm" value={bookingForm.cargoWidthCm} onChange={(e) => setBookingForm({ ...bookingForm, cargoWidthCm: e.target.value })} />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] text-slate-400 mb-1">Height (cm)</label>
+                      <input type="number" min="0" step="1" className={inputClass} placeholder="cm" value={bookingForm.cargoHeightCm} onChange={(e) => setBookingForm({ ...bookingForm, cargoHeightCm: e.target.value })} />
+                    </div>
+                  </div>
+                  {bookingForm.cargoLengthCm && bookingForm.cargoWidthCm && bookingForm.cargoHeightCm && (
+                    <p className="text-[11px] text-slate-400 mt-1.5">
+                      {(parseFloat(bookingForm.cargoLengthCm) * parseFloat(bookingForm.cargoWidthCm) / 10000).toFixed(2)} m&sup2; floor area &middot;{' '}
+                      {(parseFloat(bookingForm.cargoLengthCm) * parseFloat(bookingForm.cargoWidthCm) * parseFloat(bookingForm.cargoHeightCm) / 1000000).toFixed(3)} m&sup3; volume
+                    </p>
+                  )}
+                </div>
+
+                {/* Cargo Photos */}
+                <div className="pt-3 border-t border-slate-100">
+                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Cargo Photos (optional)</p>
+                  <CargoImageUpload
+                    images={bookingForm.cargoImages}
+                    onChange={(imgs) => setBookingForm({ ...bookingForm, cargoImages: imgs })}
+                    maxImages={5}
+                  />
+                </div>
+
+                {/* Pickup Details */}
+                <div className="pt-3 border-t border-slate-100">
+                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Pickup Details</p>
+                  <div className="space-y-3">
+                    <input type="text" className={inputClass} placeholder="Pickup address" value={bookingForm.pickupAddress} onChange={(e) => setBookingForm({ ...bookingForm, pickupAddress: e.target.value })} />
+                    <div className="grid grid-cols-2 gap-3">
+                      <input type="text" className={inputClass} placeholder="Contact name" value={bookingForm.pickupContact} onChange={(e) => setBookingForm({ ...bookingForm, pickupContact: e.target.value })} />
+                      <input type="tel" className={inputClass} placeholder="Phone" value={bookingForm.pickupPhone} onChange={(e) => setBookingForm({ ...bookingForm, pickupPhone: e.target.value })} />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Delivery Details */}
+                <div className="pt-3 border-t border-slate-100">
+                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Delivery Details</p>
+                  <div className="space-y-3">
+                    <input type="text" className={inputClass} placeholder="Delivery address (marina, port, etc.)" value={bookingForm.deliveryAddress} onChange={(e) => setBookingForm({ ...bookingForm, deliveryAddress: e.target.value })} />
+                    <div className="grid grid-cols-2 gap-3">
+                      <input type="text" className={inputClass} placeholder="Contact name" value={bookingForm.deliveryContact} onChange={(e) => setBookingForm({ ...bookingForm, deliveryContact: e.target.value })} />
+                      <input type="tel" className={inputClass} placeholder="Phone" value={bookingForm.deliveryPhone} onChange={(e) => setBookingForm({ ...bookingForm, deliveryPhone: e.target.value })} />
+                    </div>
+                    <input type="text" className={inputClass} placeholder="Delivery notes" value={bookingForm.deliveryNotes} onChange={(e) => setBookingForm({ ...bookingForm, deliveryNotes: e.target.value })} />
+                    <select className={selectClass} value={bookingForm.deliveryTimeWindow} onChange={(e) => setBookingForm({ ...bookingForm, deliveryTimeWindow: e.target.value })}>
+                      <option value="">Delivery time window (any)</option>
+                      <option value="morning">Morning (08:00-12:00)</option>
+                      <option value="afternoon">Afternoon (12:00-17:00)</option>
+                      <option value="evening">Evening (17:00-21:00)</option>
+                    </select>
+                  </div>
                 </div>
 
                 <div>

@@ -509,3 +509,43 @@ export function quoteRequestEmail(data: {
     text: `Quote request from ${data.requesterName}: ${data.origin} → ${data.destination}, ${data.cargoDescription}, ${data.weightKg}kg`,
   }
 }
+
+export function passwordResetEmail(data: { name: string; resetLink: string }): EmailTemplate {
+  const html = wrapEmail(`
+    <h2 style="color:#0f1628;font-size:24px;margin:0 0 16px;">Reset Your Password</h2>
+    <p style="color:#475569;font-size:16px;line-height:1.6;">
+      Hi ${data.name}, we received a request to reset your password. Click the button below to choose a new one.
+    </p>
+    <a href="${data.resetLink}" style="display:block;background:linear-gradient(135deg,#C6904D,#b07d3f);color:white;text-align:center;padding:14px 24px;border-radius:8px;font-weight:600;text-decoration:none;margin:24px 0;">
+      Reset Password
+    </a>
+    <p style="color:#94a3b8;font-size:13px;line-height:1.5;">
+      This link expires in 1 hour. If you didn't request this, you can safely ignore this email.
+    </p>
+  `)
+  return {
+    subject: 'Reset your Onshore Deliver password',
+    html,
+    text: `Hi ${data.name}, reset your password here: ${data.resetLink}. This link expires in 1 hour.`,
+  }
+}
+
+export function emailVerificationEmail(data: { name: string; verifyLink: string }): EmailTemplate {
+  const html = wrapEmail(`
+    <h2 style="color:#0f1628;font-size:24px;margin:0 0 16px;">Verify Your Email</h2>
+    <p style="color:#475569;font-size:16px;line-height:1.6;">
+      Hi ${data.name}, please verify your email address to complete your registration.
+    </p>
+    <a href="${data.verifyLink}" style="display:block;background:linear-gradient(135deg,#C6904D,#b07d3f);color:white;text-align:center;padding:14px 24px;border-radius:8px;font-weight:600;text-decoration:none;margin:24px 0;">
+      Verify Email
+    </a>
+    <p style="color:#94a3b8;font-size:13px;line-height:1.5;">
+      This link expires in 24 hours.
+    </p>
+  `)
+  return {
+    subject: 'Verify your Onshore Deliver email',
+    html,
+    text: `Hi ${data.name}, verify your email here: ${data.verifyLink}. This link expires in 24 hours.`,
+  }
+}

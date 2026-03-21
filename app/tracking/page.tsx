@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { useAuth } from '../components/AuthProvider'
 
 interface TrackingEvent {
   id: string
@@ -34,11 +35,44 @@ interface TrackingData {
 
 const statusSteps = ['PENDING', 'CONFIRMED', 'PICKED_UP', 'IN_TRANSIT', 'DELIVERED']
 
+interface UserBooking {
+  id: string
+  trackingCode: string
+  status: string
+  cargoDescription: string
+  createdAt: string
+  listing: {
+    title: string
+    originPort: string
+    destinationPort: string
+    departureDate: string
+    carrier: { name: string; company?: string }
+  }
+}
+
 export default function TrackingPage() {
+  const { user, token } = useAuth()
   const [code, setCode] = useState('')
   const [data, setData] = useState<TrackingData | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [userBookings, setUserBookings] = useState<UserBooking[]>([])
+  const [bookingsLoading, setBookingsLoading] = useState(false)
+
+  const fetchUserBookings = useCallback(async () => {
+    if (!token) return
+    setBookingsLoading(true)
+    try {
+      const res = await fetch('/api/bookings', { headers: { Authorization: `Bearer ${token}` } })
+      if (res.ok) {
+        const d = await res.json()
+        setUserBookings((d.bookings || []).filter((b: UserBooking) => b.trackingCode))
+      }
+    } catch { /* ignore */ }
+    finally { setBookingsLoading(false) }
+  }, [token])
+
+  useEffect(() => { fetchUserBookings() }, [fetchUserBookings])
 
   const handleTrack = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -89,6 +123,43 @@ export default function TrackingPage() {
           </div>
           {error && <p className="text-sm text-red-600 mt-3">{error}</p>}
         </form>
+
+        {/* User's Active Bookings */}
+        {user && !data && userBookings.length > 0 && (
+          <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-6 mb-8">
+            <h2 className="text-sm font-bold text-[#1a1a1a] mb-4">Your Shipments</h2>
+            <div className="space-y-2">
+              {userBookings.slice(0, 10).map(b => (
+                <button
+                  key={b.id}
+                  onClick={() => { setCode(b.trackingCode); setTimeout(() => { const form = document.querySelector('form'); if (form) form.requestSubmit() }, 50) }}
+                  className="w-full text-left flex items-center justify-between px-4 py-3 rounded-xl hover:bg-slate-50 transition-colors group"
+                >
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-mono text-[#C6904D] font-semibold">{b.trackingCode}</span>
+                      <span className={`px-1.5 py-0.5 rounded text-[9px] font-semibold uppercase ${
+                        b.status === 'DELIVERED' ? 'bg-green-50 text-green-700' :
+                        b.status === 'IN_TRANSIT' ? 'bg-blue-50 text-blue-700' :
+                        b.status === 'CANCELLED' ? 'bg-red-50 text-red-700' :
+                        'bg-amber-50 text-amber-700'
+                      }`}>{b.status.replace('_', ' ')}</span>
+                    </div>
+                    <div className="text-xs text-slate-500 mt-0.5 truncate">
+                      {b.listing.originPort} &rarr; {b.listing.destinationPort}
+                    </div>
+                  </div>
+                  <svg className="w-4 h-4 text-slate-300 group-hover:text-[#C6904D] transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        {user && !data && bookingsLoading && (
+          <div className="mb-8"><div className="loading-shimmer w-full h-32 rounded-2xl" /></div>
+        )}
 
         {/* Results */}
         {data && (

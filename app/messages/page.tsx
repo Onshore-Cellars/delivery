@@ -9,8 +9,8 @@ interface Conversation {
   subject?: string
   bookingRef?: string
   lastMessageAt: string
-  user1: { id: string; name: string; company?: string; role: string }
-  user2: { id: string; name: string; company?: string; role: string }
+  user1: { id: string; name: string; company?: string; avatarUrl?: string; role: string }
+  user2: { id: string; name: string; company?: string; avatarUrl?: string; role: string }
   messages: { content: string; createdAt: string; senderId: string; read: boolean }[]
   unreadCount: number
 }

@@ -86,9 +86,8 @@ export default function Navbar() {
         <div className="site-container">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2.5 hover:no-underline">
-              <Image src="/logo.png" alt="Onshore Deliver" width={32} height={32} className="rounded-sm" />
-              <span className="text-lg font-semibold text-[#1a1a1a] tracking-wide" style={{ fontFamily: 'var(--font-display)' }}>Onshore</span>
+            <Link href="/" className="flex items-center hover:no-underline">
+              <Image src="/logo.png" alt="Onshore Deliver" width={36} height={36} className="rounded-sm" />
             </Link>
 
             {/* Desktop nav */}
@@ -339,15 +338,15 @@ export default function Navbar() {
                   active ? 'text-[#C6904D]' : 'text-slate-400'
                 }`}
               >
-                <div className="relative">
+                <div className="relative w-5 h-5 flex items-center justify-center">
                   <TabIcon icon={tab.icon} className={active ? 'text-[#C6904D]' : 'text-slate-400'} />
                   {'badge' in tab && tab.badge && tab.badge > 0 && (
-                    <span className="absolute -top-1.5 -right-2 min-w-[16px] h-[16px] rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center px-1">
+                    <span className="absolute -top-1 -right-2.5 min-w-[14px] h-[14px] rounded-full bg-red-500 text-white text-[8px] font-bold flex items-center justify-center leading-none">
                       {tab.badge > 9 ? '9+' : tab.badge}
                     </span>
                   )}
                 </div>
-                <span className={`text-[10px] font-medium ${active ? 'text-[#C6904D]' : 'text-slate-400'}`}>
+                <span className={`text-[10px] font-medium leading-none ${active ? 'text-[#C6904D]' : 'text-slate-400'}`}>
                   {tab.label}
                 </span>
               </Link>

@@ -61,11 +61,11 @@ export default function DashboardPage() {
   const fetchData = useCallback(async () => {
     if (!token) return
     try {
-      if (user?.canCarry) {
-        const res = await fetch('/api/listings?limit=100', { headers: { Authorization: `Bearer ${token}` } })
+      if (user?.canCarry || user?.role === 'ADMIN') {
+        const res = await fetch(`/api/listings?carrierId=${user.id}&limit=100`, { headers: { Authorization: `Bearer ${token}` } })
         if (res.ok) {
           const data = await res.json()
-          setListings(data.listings?.filter((l: Listing & { carrier: { id: string } }) => l.carrier?.id === user.id) || [])
+          setListings(data.listings || [])
         }
       }
       const bookRes = await fetch('/api/bookings', { headers: { Authorization: `Bearer ${token}` } })

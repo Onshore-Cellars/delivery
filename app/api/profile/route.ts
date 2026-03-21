@@ -56,9 +56,22 @@ export async function PATCH(request: NextRequest) {
     const decoded = verifyToken(token)
     if (!decoded) return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
 
+    // Check if user is suspended
+    const currentUser = await prisma.user.findUnique({ where: { id: decoded.userId }, select: { suspended: true } })
+    if (currentUser?.suspended) {
+      return NextResponse.json({ error: 'Your account is suspended' }, { status: 403 })
+    }
+
     const body = await request.json()
+
+    // Validate name length if provided
+    if (body.name !== undefined && (typeof body.name !== 'string' || body.name.trim().length === 0 || body.name.length > 100)) {
+      return NextResponse.json({ error: 'Name must be between 1 and 100 characters' }, { status: 400 })
+    }
+
     const allowedFields = [
       'name', 'phone', 'company', 'bio', 'website', 'address', 'city', 'country',
+      'avatarUrl',
       'emailNotifications', 'smsNotifications',
       'canCarry', 'canShip',
       'yachtName', 'yachtMMSI', 'yachtIMO', 'yachtFlag', 'yachtLength', 'yachtType', 'homePort',

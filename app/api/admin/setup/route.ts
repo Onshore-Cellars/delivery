@@ -4,7 +4,8 @@ import prisma from '@/lib/prisma'
 // POST /api/admin/setup
 // Promotes Edward@onshorecellars.com to ADMIN role
 // This is a one-time setup endpoint secured by checking the email
-const ADMIN_EMAIL = 'edward@onshorecellars.com'
+const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || 'edward@onshorecellars.com,info@onshoredelivery.com')
+  .toLowerCase().split(',').map(e => e.trim())
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,8 +16,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 })
     }
 
-    // Only allow promotion of the designated admin email
-    if (email.toLowerCase() !== ADMIN_EMAIL) {
+    // Only allow promotion of designated admin emails
+    if (!ADMIN_EMAILS.includes(email.toLowerCase())) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
 
@@ -53,15 +54,15 @@ export async function POST(request: NextRequest) {
 // GET: Check if admin account exists
 export async function GET() {
   try {
-    const admin = await prisma.user.findFirst({
-      where: { email: ADMIN_EMAIL },
+    const admins = await prisma.user.findMany({
+      where: { email: { in: ADMIN_EMAILS } },
       select: { id: true, email: true, role: true, verified: true },
     })
 
     return NextResponse.json({
-      adminExists: !!admin,
-      isAdmin: admin?.role === 'ADMIN',
-      email: ADMIN_EMAIL,
+      adminExists: admins.length > 0,
+      admins: admins.map(a => ({ email: a.email, isAdmin: a.role === 'ADMIN' })),
+      adminEmails: ADMIN_EMAILS,
     })
   } catch (error) {
     console.error('Admin check error:', error)

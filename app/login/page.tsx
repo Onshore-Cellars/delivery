@@ -99,6 +99,10 @@ export default function LoginPage() {
                 placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} />
             </div>
 
+            <div className="flex justify-end">
+              <Link href="/forgot-password" className="text-sm text-[#C6904D] hover:underline">Forgot password?</Link>
+            </div>
+
             <button type="submit" disabled={loading} className="w-full btn-primary !py-3.5 !text-[15px] disabled:opacity-50">
               {loading ? (
                 <span className="flex items-center justify-center gap-2">

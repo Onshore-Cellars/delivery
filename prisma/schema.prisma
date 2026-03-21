@@ -294,6 +294,10 @@ model Booking {
   weightKg          Float
   volumeM3          Float
   itemCount         Int           @default(1)
+  cargoLengthCm     Float?        // Length of cargo in cm
+  cargoWidthCm      Float?        // Width of cargo in cm
+  cargoHeightCm     Float?        // Height of cargo in cm
+  cargoImages       String?       // JSON array of image URLs
   specialHandling   String?
   temperatureReq    String?       // e.g. "2-8°C"
   isFragile         Boolean       @default(false)

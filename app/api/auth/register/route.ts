@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
-import { hashPassword, generateToken } from '@/lib/auth'
+import { hashPassword, generateToken, generateSecureToken } from '@/lib/auth'
+import { sendEmail, welcomeEmail, emailVerificationEmail } from '@/lib/email'
 
 // Simple in-memory rate limiter for registration
 const registerAttempts = new Map<string, { count: number; resetAt: number }>()
@@ -69,9 +70,10 @@ export async function POST(request: NextRequest) {
 
     const hashedPassword = await hashPassword(password)
 
-    // Auto-promote designated admin email
-    const ADMIN_EMAIL = 'edward@onshorecellars.com'
-    const isAdminEmail = email.toLowerCase() === ADMIN_EMAIL
+    // Auto-promote designated admin emails (configurable via env)
+    const adminEmails = (process.env.ADMIN_EMAILS || 'edward@onshorecellars.com,info@onshoredelivery.com')
+      .toLowerCase().split(',').map(e => e.trim())
+    const isAdminEmail = adminEmails.includes(email.toLowerCase())
     const finalRole = isAdminEmail ? 'ADMIN' : role
 
     const user = await prisma.user.create({
@@ -101,6 +103,39 @@ export async function POST(request: NextRequest) {
     })
 
     const token = generateToken({ userId: user.id, email: user.email, role: user.role })
+
+    // Send welcome email (async, don't block registration)
+    try {
+      const template = welcomeEmail({ name: user.name, role: user.role })
+      await sendEmail({ to: email, ...template })
+    } catch (emailErr) {
+      console.error('Welcome email error:', emailErr)
+    }
+
+    // Send email verification for non-admin users
+    if (!isAdminEmail) {
+      try {
+        const verifyToken = generateSecureToken()
+        const appUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
+        const verifyLink = `${appUrl}/verify-email?token=${verifyToken}&email=${encodeURIComponent(email)}`
+
+        // Store verification token
+        await prisma.notification.create({
+          data: {
+            userId: user.id,
+            type: 'SYSTEM',
+            title: 'EMAIL_VERIFY',
+            message: verifyToken,
+            metadata: JSON.stringify({ expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() }),
+          },
+        })
+
+        const template = emailVerificationEmail({ name: user.name, verifyLink })
+        await sendEmail({ to: email, ...template })
+      } catch (verifyErr) {
+        console.error('Verification email error:', verifyErr)
+      }
+    }
 
     return NextResponse.json({ user, token }, { status: 201 })
   } catch (error) {
