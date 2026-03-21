@@ -172,7 +172,7 @@ export default function ListingDetailPage() {
   if (loading) return <div className="flex items-center justify-center py-20"><div className="loading-shimmer w-64 h-8 rounded-lg" /></div>
   if (!listing) return <div className="flex items-center justify-center py-20"><p className="text-slate-500">Listing not found</p></div>
 
-  const fillPercent = Math.round(((listing.totalCapacityKg - listing.availableKg) / listing.totalCapacityKg) * 100)
+  const fillPercent = listing.totalCapacityKg > 0 ? Math.round(((listing.totalCapacityKg - listing.availableKg) / listing.totalCapacityKg) * 100) : 0
   let acceptedCargo: string[] = []
   if (listing.acceptedCargo) {
     try {
