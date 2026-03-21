@@ -34,7 +34,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       const updated = await prisma.quote.update({
         where: { id },
         data: {
-          quotedPrice: quotedPrice ? parseFloat(quotedPrice) : null,
+          quotedPrice: quotedPrice && !isNaN(parseFloat(quotedPrice)) ? parseFloat(quotedPrice) : null,
           validUntil: validUntil ? new Date(validUntil) : null,
           responseMessage: responseMessage || null,
           status: 'QUOTED',
