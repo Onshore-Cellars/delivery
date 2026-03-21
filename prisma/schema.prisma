@@ -203,6 +203,8 @@ model User {
   favouriteListings FavouriteListing[] @relation("favouriteListingUser")
   communityPosts   CommunityPost[]
   communityReplies CommunityReply[]
+  apiKeys          ApiKey[]
+  integrationOrders IntegrationOrder[]
 
   @@index([email])
   @@index([role])
@@ -306,6 +308,7 @@ model Listing {
   quotes             Quote[]
   routeStops         RouteStop[]
   favouritedBy       FavouriteListing[]
+  integrationOrders  IntegrationOrder[]
 
   @@index([carrierId])
   @@index([vehicleId])
@@ -1042,5 +1045,78 @@ model AuditLog {
   @@index([userId])
   @@index([targetId])
   @@index([action])
+  @@index([createdAt])
+}
+
+// ─── API KEYS (B2B INTEGRATIONS) ──────────────────────────────────────────────
+// Allow companies to integrate with the platform via API keys
+
+model ApiKey {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name          String                // e.g. "Onshore Cellars Production"
+  keyHash       String   @unique      // SHA-256 hash of the API key (never store raw)
+  keyPrefix     String                // First 8 chars for identification (e.g. "oc_live_")
+  scopes        String[] @default(["orders:write", "orders:read"])  // Permission scopes
+
+  lastUsedAt    DateTime?
+  expiresAt     DateTime?
+  revokedAt     DateTime?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([userId])
+  @@index([keyHash])
+  @@index([keyPrefix])
+}
+
+// ─── INTEGRATION ORDERS ───────────────────────────────────────────────────────
+// Sales orders submitted via B2B API, linked to auto-created listings
+
+model IntegrationOrder {
+  id                String   @id @default(cuid())
+  apiKeyId          String
+  userId            String   // The company user who owns this order
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  orderReference    String               // Company's own order/invoice number
+  listingId         String?              // The listing created from this order
+  listing           Listing? @relation(fields: [listingId], references: [id], onDelete: SetNull)
+
+  // Customer delivery details
+  customerName      String
+  customerEmail     String?
+  customerPhone     String?
+  deliveryAddress   String               // Full delivery address
+  deliveryCity      String?
+  deliveryCountry   String?
+  deliveryLat       Float?
+  deliveryLng       Float?
+  deliveryNotes     String?
+
+  // Cargo details
+  cargoDescription  String
+  cargoWeightKg     Float
+  cargoVolumeM3     Float?
+  cargoValue        Float?               // Declared value for insurance
+  cargoCurrency     String   @default("EUR")
+
+  // Timing
+  preferredDate     DateTime?
+  urgency           String   @default("standard")  // standard, express, flexible
+
+  status            String   @default("pending")    // pending, listed, matched, in_transit, delivered, cancelled
+  metadata          String?                          // JSON blob for extra company-specific data
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([userId, orderReference])  // Prevent duplicate orders per company
+  @@index([userId])
+  @@index([status])
+  @@index([apiKeyId])
   @@index([createdAt])
 }
