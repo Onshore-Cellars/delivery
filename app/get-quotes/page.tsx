@@ -141,6 +141,21 @@ export default function GetQuotesPage() {
     setForm(prev => ({ ...prev, [field]: value }))
   }
 
+  const validateStep1 = () => {
+    if (!form.cargoType) { setError('Please select a cargo type.'); return false }
+    if (!form.cargoDescription.trim()) { setError('Please describe your cargo.'); return false }
+    if (packages.length === 0) { setError('Please add at least one package.'); return false }
+    setError('')
+    return true
+  }
+
+  const validateStep2 = () => {
+    if (!form.pickupLocation.trim()) { setError('Please enter a pickup location.'); return false }
+    if (!form.deliveryLocation.trim()) { setError('Please enter a delivery location.'); return false }
+    setError('')
+    return true
+  }
+
   const handleSubmit = async () => {
     if (!token) { setError('Please sign in to request quotes'); return }
     setSubmitting(true)
@@ -410,7 +425,7 @@ export default function GetQuotesPage() {
             </div>
           </div>
 
-          <button onClick={() => setStep(2)} className="btn-primary w-full">
+          <button onClick={() => { if (validateStep1()) setStep(2) }} className="btn-primary w-full">
             Continue — Pickup & Delivery
           </button>
         </div>
@@ -531,7 +546,7 @@ export default function GetQuotesPage() {
 
           <div className="flex gap-3">
             <button onClick={() => setStep(1)} className="btn-secondary flex-1">Back</button>
-            <button onClick={() => setStep(3)} className="btn-primary flex-1">Continue — Preferences</button>
+            <button onClick={() => { if (validateStep2()) setStep(3) }} className="btn-primary flex-1">Continue — Preferences</button>
           </div>
         </div>
       )}

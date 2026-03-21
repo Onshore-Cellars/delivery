@@ -126,7 +126,7 @@ export default function DriverPage() {
       if (stop.liveTracking.length > 0) {
         const session = stop.liveTracking[0]
         try {
-          await fetch('/api/tracking/live', {
+          const res = await fetch('/api/tracking/live', {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
             body: JSON.stringify({
@@ -137,8 +137,12 @@ export default function DriverPage() {
               heading: heading || undefined,
             }),
           })
+          if (!res.ok) {
+            setError('Failed to update tracking position. Retrying on next update.')
+          }
         } catch (err) {
           console.error('Tracking update error:', err)
+          setError('Failed to update tracking position. Retrying on next update.')
         }
       }
     }
@@ -182,8 +186,11 @@ export default function DriverPage() {
       </div>
 
       {error && (
-        <div className="px-4 py-3 rounded-lg bg-red-50 border border-red-100 mb-4">
+        <div className="px-4 py-3 rounded-lg bg-red-50 border border-red-100 mb-4 flex items-center justify-between">
           <p className="text-sm text-red-700">{error}</p>
+          <button onClick={() => setError('')} className="text-red-400 hover:text-red-600 ml-3 flex-shrink-0">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
         </div>
       )}
 

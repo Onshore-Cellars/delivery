@@ -80,24 +80,33 @@ export default function DashboardPage() {
   const [listings, setListings] = useState<Listing[]>([])
   const [bookings, setBookings] = useState<Booking[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
   const [tab, setTab] = useState<'overview' | 'listings' | 'bookings'>('overview')
 
   const fetchData = useCallback(async () => {
     if (!token) return
+    setError('')
     try {
       if (user?.canCarry || user?.role === 'ADMIN') {
         const res = await fetch(`/api/listings?carrierId=${user.id}&limit=100`, { headers: { Authorization: `Bearer ${token}` } })
         if (res.ok) {
           const data = await res.json()
           setListings(data.listings || [])
+        } else {
+          setError('Failed to load listings. Please try again.')
         }
       }
       const bookRes = await fetch('/api/bookings', { headers: { Authorization: `Bearer ${token}` } })
       if (bookRes.ok) {
         const data = await bookRes.json()
         setBookings(data.bookings || [])
+      } else {
+        setError('Failed to load bookings. Please try again.')
       }
-    } catch (err) { console.error('Error fetching data:', err) }
+    } catch (err) {
+      console.error('Error fetching data:', err)
+      setError('Something went wrong loading your data. Please try again.')
+    }
     finally { setLoading(false) }
   }, [token, user])
 
@@ -125,6 +134,12 @@ export default function DashboardPage() {
   return (
     <div className="page-container">
       <Suspense><PaymentBanner /></Suspense>
+
+      {error && (
+        <div className="mb-6 px-4 py-3 rounded-xl bg-red-50 border border-red-200">
+          <p className="text-sm font-medium text-red-800">{error}</p>
+        </div>
+      )}
 
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8 gap-3">
