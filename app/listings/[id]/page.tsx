@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
+import CargoCalculator from '@/app/components/CargoCalculator'
 import { useAuth } from '../../components/AuthProvider'
 
 interface ListingDetail {
@@ -460,6 +461,7 @@ export default function ListingDetailPage() {
                       <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Weight (kg) *</label><input type="number" required step="0.1" max={listing.availableKg} className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]" value={bookingForm.weightKg} onChange={e => setBookingForm({...bookingForm, weightKg: e.target.value})} /></div>
                       <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Volume (m&sup3;) *</label><input type="number" required step="0.1" max={listing.availableM3} className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]" value={bookingForm.volumeM3} onChange={e => setBookingForm({...bookingForm, volumeM3: e.target.value})} /></div>
                     </div>
+                    <CargoCalculator onCalculated={(wt, vol) => setBookingForm(prev => ({ ...prev, weightKg: String(wt), volumeM3: String(vol) }))} />
                     <div className="grid grid-cols-2 gap-3">
                       <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Declared Value</label><input type="number" step="0.01" className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]" placeholder="e.g. 5000" value={bookingForm.declaredValue} onChange={e => setBookingForm({...bookingForm, declaredValue: e.target.value})} /></div>
                       <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Special Handling</label><input className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]" placeholder="e.g. Refrigerated" value={bookingForm.specialHandling} onChange={e => setBookingForm({...bookingForm, specialHandling: e.target.value})} /></div>

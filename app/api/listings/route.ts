@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { verifyToken, getTokenFromHeader } from '@/lib/auth'
 import { Prisma } from '@prisma/client'
+import { checkListingForCircumvention } from '@/lib/pii-filter'
+import { logAudit } from '@/lib/audit'
 
 export async function GET(request: NextRequest) {
   try {
@@ -351,6 +353,21 @@ export async function POST(request: NextRequest) {
     }
     if (isNaN(parseFloat(totalCapacityM3)) || parseFloat(totalCapacityM3) <= 0) {
       return NextResponse.json({ error: 'Cargo volume must be a positive number' }, { status: 400 })
+    }
+
+    // Check listing text for circumvention attempts
+    const textToCheck = [title, description, restrictedItems].filter(Boolean).join(' ')
+    const circumventionCheck = checkListingForCircumvention(textToCheck)
+    if (circumventionCheck.flagged) {
+      logAudit({
+        userId: decoded.userId,
+        action: 'LISTING_CIRCUMVENTION_FLAG',
+        details: { reason: circumventionCheck.reason, title },
+      }).catch(() => {})
+      return NextResponse.json(
+        { error: 'Your listing contains language that suggests off-platform transactions. All deliveries must be booked and paid through Onshore Delivery to ensure insurance coverage and payment protection.' },
+        { status: 400 },
+      )
     }
 
     const listing = await prisma.listing.create({

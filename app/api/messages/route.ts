@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma'
 import { verifyToken, getTokenFromHeader } from '@/lib/auth'
 import { notifyNewMessage } from '@/lib/notifications'
 import { checkMessageForPII } from '@/lib/pii-filter'
+import { logAudit } from '@/lib/audit'
 import { translateText, type LanguageCode } from '@/lib/ai'
 
 // GET conversations list
@@ -65,9 +66,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Recipient and content are required' }, { status: 400 })
     }
 
-    // Check for PII (contact info)
+    // Check for PII (contact info) and circumvention attempts
     const piiCheck = checkMessageForPII(content)
     if (piiCheck.blocked) {
+      // Log circumvention attempts for admin review
+      if (piiCheck.flagged) {
+        logAudit({
+          userId: decoded.userId,
+          action: 'CIRCUMVENTION_ATTEMPT',
+          targetId: recipientId,
+          details: { flagReason: piiCheck.flagReason, messageSnippet: content.slice(0, 100) },
+          ipAddress: request.headers.get('x-client-ip') || undefined,
+        }).catch(() => {})
+      }
       return NextResponse.json({ error: piiCheck.reason }, { status: 400 })
     }
 
