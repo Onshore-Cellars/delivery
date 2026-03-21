@@ -335,7 +335,33 @@ Keep each item to 1 sentence. Be specific with numbers.`,
   )
 }
 
-// ─── 11. SMART ALERT MATCHING WITH RETURN LEG LOGIC ─────────────────────────
+// ─── 11. ALERT EMAIL GENERATOR ──────────────────────────────────────────────
+
+export async function generateAlertEmail(data: {
+  userName: string
+  listingTitle: string
+  originPort: string
+  destinationPort: string
+  departureDate: string
+  vehicleType: string
+  capacityKg: number
+  capacityM3: number
+  pricePerKg: number | null
+  flatRate: number | null
+  currency: string
+  hasRefrigeration: boolean
+  listingType: string
+  alertName: string | null
+}): Promise<{ subject: string; body: string } | null> {
+  return await askJSON<{ subject: string; body: string }>(
+    JSON.stringify(data),
+    `You are the Onshore Delivery platform email assistant. Write a SHORT, professional email notifying a user about a new listing that matches their saved alert. Be concise (3-4 sentences max). Include the key details: route, date, capacity, price. End with a call to action to view the listing. Do NOT use emojis. Return JSON with 'subject' and 'body' fields.`,
+    FAST_MODEL,
+    512
+  )
+}
+
+// ─── 12. SMART ALERT MATCHING WITH RETURN LEG LOGIC ─────────────────────────
 
 export interface SmartAlertMatch {
   matchScore: number

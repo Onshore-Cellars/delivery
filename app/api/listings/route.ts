@@ -4,6 +4,7 @@ import { verifyToken, getTokenFromHeader } from '@/lib/auth'
 import { Prisma } from '@prisma/client'
 import { checkListingForCircumvention } from '@/lib/pii-filter'
 import { logAudit } from '@/lib/audit'
+import { triggerListingAlerts } from '@/lib/notifications'
 
 export async function GET(request: NextRequest) {
   try {
@@ -355,6 +356,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Cargo volume must be a positive number' }, { status: 400 })
     }
 
+    if (new Date(departureDate) < new Date()) {
+      return NextResponse.json({ error: 'Departure date must be in the future' }, { status: 400 })
+    }
+
+    const numericFields = { pricePerKg, pricePerM3, flatRate, minimumCharge, minBidPrice, insuranceValue }
+    for (const [field, value] of Object.entries(numericFields)) {
+      if (value !== undefined && value !== null && value !== '' && parseFloat(value) < 0) {
+        return NextResponse.json({ error: `${field} cannot be negative` }, { status: 400 })
+      }
+    }
+
+    const VALID_CURRENCIES = ['EUR', 'GBP', 'USD']
+    if (currency && !VALID_CURRENCIES.includes(currency)) {
+      return NextResponse.json({ error: 'Currency must be EUR, GBP, or USD' }, { status: 400 })
+    }
+
     // Check listing text for circumvention attempts
     const textToCheck = [title, description, restrictedItems].filter(Boolean).join(' ')
     const circumventionCheck = checkListingForCircumvention(textToCheck)
@@ -436,7 +453,7 @@ export async function POST(request: NextRequest) {
     })
 
     // Fire-and-forget: check saved alerts for matching users
-    triggerAlerts(listing).catch(err => console.error('Alert trigger error:', err))
+    triggerListingAlerts(listing).catch(err => console.error('Alert trigger error:', err))
 
     return NextResponse.json({ listing }, { status: 201 })
   } catch (error) {
@@ -445,90 +462,3 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// ─── Alert Triggering ──────────────────────────────────────────────────────
-async function triggerAlerts(listing: { id: string; originPort: string; destinationPort: string; originLat?: number | null; originLng?: number | null; destinationLat?: number | null; destinationLng?: number | null; listingType: string; vehicleType: string; departureDate: Date; carrier: { id: string } }) {
-  try {
-    const { sendPushToUser } = await import('@/lib/push')
-
-    const alerts = await prisma.savedAlert.findMany({
-      where: { active: true },
-      include: { user: { select: { id: true, name: true, emailNotifications: true } } },
-    })
-
-    const haversine = (lat1: number, lng1: number, lat2: number, lng2: number) => {
-      const R = 6371
-      const dLat = (lat2 - lat1) * Math.PI / 180
-      const dLng = (lng2 - lng1) * Math.PI / 180
-      const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) ** 2
-      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-    }
-
-    for (const alert of alerts) {
-      // Don't alert the listing creator
-      if (alert.userId === listing.carrier.id) continue
-
-      let match = true
-
-      // Check listing type
-      if (alert.listingType && alert.listingType !== listing.listingType) { match = false; continue }
-
-      // Check vehicle type
-      if (alert.vehicleType && alert.vehicleType !== listing.vehicleType) { match = false; continue }
-
-      // Check date range
-      if (alert.dateFrom && listing.departureDate < alert.dateFrom) { match = false; continue }
-      if (alert.dateTo && listing.departureDate > alert.dateTo) { match = false; continue }
-
-      // Check origin proximity
-      if (alert.originPort) {
-        if (alert.originLat && alert.originLng && listing.originLat && listing.originLng) {
-          const dist = haversine(alert.originLat, alert.originLng, listing.originLat, listing.originLng)
-          if (dist > alert.radiusKm) { match = false; continue }
-        } else if (!listing.originPort.toLowerCase().includes(alert.originPort.toLowerCase())) {
-          match = false; continue
-        }
-      }
-
-      // Check destination proximity
-      if (alert.destinationPort) {
-        if (alert.destLat && alert.destLng && listing.destinationLat && listing.destinationLng) {
-          const dist = haversine(alert.destLat, alert.destLng, listing.destinationLat, listing.destinationLng)
-          if (dist > alert.radiusKm) { match = false; continue }
-        } else if (!listing.destinationPort.toLowerCase().includes(alert.destinationPort.toLowerCase())) {
-          match = false; continue
-        }
-      }
-
-      if (!match) continue
-
-      // Create notification
-      await prisma.notification.create({
-        data: {
-          userId: alert.userId,
-          type: 'RETURN_ROUTE_AVAILABLE',
-          title: 'New listing matches your alert',
-          message: `${listing.originPort} → ${listing.destinationPort} · ${alert.name || 'Your saved search'}`,
-          linkUrl: `/listings/${listing.id}`,
-        },
-      })
-
-      // Send push notification
-      if (alert.pushEnabled) {
-        await sendPushToUser(alert.userId, {
-          title: 'Route Alert Match',
-          body: `New listing: ${listing.originPort} → ${listing.destinationPort}`,
-          url: `/listings/${listing.id}`,
-          tag: `alert-${alert.id}`,
-        })
-      }
-
-      // Update alert stats
-      await prisma.savedAlert.update({
-        where: { id: alert.id },
-        data: { lastTriggeredAt: new Date(), triggerCount: { increment: 1 } },
-      })
-    }
-  } catch (err) {
-    console.error('Alert trigger failed:', err)
-  }
-}

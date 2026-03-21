@@ -530,6 +530,37 @@ export function passwordResetEmail(data: { name: string; resetLink: string }): E
   }
 }
 
+export function alertMatchEmail(data: {
+  userName: string
+  subject: string
+  body: string
+  listingId: string
+  alertName: string | null
+}): EmailTemplate {
+  const APP_URL_RESOLVED = process.env.NEXTAUTH_URL || 'http://localhost:3000'
+  const html = wrapEmail(`
+    <h2 style="color:#0f1628;font-size:24px;margin:0 0 16px;">New Listing Match${data.alertName ? `: ${data.alertName}` : ''}</h2>
+    <p style="color:#475569;font-size:16px;line-height:1.6;">
+      Hi ${data.userName},
+    </p>
+    <div style="background:#f1f5f9;border-radius:12px;padding:20px;margin:24px 0;">
+      <p style="color:#0f1628;font-size:16px;line-height:1.6;white-space:pre-line;">${data.body}</p>
+    </div>
+    <a href="${APP_URL_RESOLVED}/listings/${data.listingId}" style="display:block;background:linear-gradient(135deg,#0f1628,#162040);color:white;text-align:center;padding:14px 24px;border-radius:8px;font-weight:600;text-decoration:none;margin:24px 0;">
+      View Listing
+    </a>
+    <p style="color:#64748b;font-size:13px;text-align:center;">
+      <a href="${APP_URL_RESOLVED}/marketplace" style="color:#0071e3;text-decoration:none;">Manage Alerts</a>
+    </p>
+  `)
+
+  return {
+    subject: data.subject,
+    html,
+    text: `${data.body}\n\nView listing: ${APP_URL_RESOLVED}/listings/${data.listingId}\nManage alerts: ${APP_URL_RESOLVED}/marketplace`,
+  }
+}
+
 export function emailVerificationEmail(data: { name: string; verifyLink: string }): EmailTemplate {
   const html = wrapEmail(`
     <h2 style="color:#0f1628;font-size:24px;margin:0 0 16px;">Verify Your Email</h2>
