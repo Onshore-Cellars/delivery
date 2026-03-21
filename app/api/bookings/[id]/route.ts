@@ -18,7 +18,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
           include: { carrier: { select: { id: true, name: true, company: true, avatarUrl: true, phone: true, email: true } } },
         },
         shipper: { select: { id: true, name: true, company: true, avatarUrl: true, phone: true, email: true } },
-        trackingEvents: { orderBy: { createdAt: 'asc' } },
+        trackingEvents: { orderBy: { timestamp: 'asc' } },
       },
     })
 

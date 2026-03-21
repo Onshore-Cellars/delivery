@@ -153,6 +153,14 @@ model User {
   emailNotifications  Boolean  @default(true)
   smsNotifications    Boolean  @default(false)
 
+  // Transporter specializations & verification
+  specializations     String[]  @default([])    // e.g. ["wine", "refrigerated", "hazmat", "oversized", "fine_art"]
+  marineCertified     Boolean   @default(false) // Vetted for yacht/marine deliveries
+  backgroundChecked   Boolean   @default(false) // Background/DBS check completed
+  yearsExperience     Int?                       // Years in marine/yacht logistics
+  operatingRegions    String[]  @default([])    // e.g. ["French Riviera", "South Coast UK", "Balearics"]
+  languagesSpoken     String[]  @default([])    // e.g. ["en", "fr", "es"]
+
   verified        Boolean   @default(false)
   suspended       Boolean   @default(false)
   lastLoginAt     DateTime?
@@ -175,10 +183,15 @@ model User {
   vehicles         Vehicle[]
   savedAddresses   SavedAddress[]
   pushSubscriptions PushSubscription[]
+  favouritedBy     FavouriteCarrier[] @relation("favouriteCarrier")
+  favourites       FavouriteCarrier[] @relation("favouriteUser")
+  disputesRaised   Dispute[]       @relation("disputeRaiser")
+  disputesAgainst  Dispute[]       @relation("disputeAgainst")
 
   @@index([email])
   @@index([role])
   @@index([yachtMMSI])
+  @@index([marineCertified])
 }
 
 model Listing {
@@ -268,6 +281,7 @@ model Listing {
   bookings           Booking[]
   bids               Bid[]
   quotes             Quote[]
+  routeStops         RouteStop[]
 
   @@index([carrierId])
   @@index([vehicleId])
@@ -364,6 +378,12 @@ model Booking {
   trackingEvents    TrackingEvent[]
   liveTracking      LiveTracking[]
   documents         BookingDocument[]
+  disputes          Dispute[]
+
+  // Insurance
+  insuranceTier     String?           // basic, standard, premium
+  insurancePremium  Float?            // Premium paid
+  insuredValue      Float?            // Declared value for insurance
 
   @@index([listingId])
   @@index([shipperId])
@@ -827,4 +847,86 @@ model PushSubscription {
   @@unique([userId, endpoint])
   @@index([userId])
   @@index([active])
+}
+
+// ─── FAVOURITE CARRIERS ──────────────────────────────────────────────────────
+// Users can save preferred/trusted transporters for easy rebooking
+
+model FavouriteCarrier {
+  id          String   @id @default(cuid())
+
+  userId      String
+  user        User     @relation("favouriteUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  carrierId   String
+  carrier     User     @relation("favouriteCarrier", fields: [carrierId], references: [id], onDelete: Cascade)
+
+  notes       String?             // e.g. "Great for wine deliveries to Monaco"
+  createdAt   DateTime @default(now())
+
+  @@unique([userId, carrierId])
+  @@index([userId])
+  @@index([carrierId])
+}
+
+// ─── DISPUTES & CLAIMS ────────────────────────────────────────────────────────
+// Formal dispute resolution for damaged/lost/late deliveries
+
+model Dispute {
+  id          String   @id @default(cuid())
+
+  bookingId   String
+  booking     Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  raisedById  String
+  raisedBy    User     @relation("disputeRaiser", fields: [raisedById], references: [id])
+
+  againstId   String
+  against     User     @relation("disputeAgainst", fields: [againstId], references: [id])
+
+  type        String              // DAMAGE, LOSS, LATE_DELIVERY, OVERCHARGE, MISSING_ITEMS, OTHER
+  status      String   @default("OPEN") // OPEN, UNDER_REVIEW, RESOLVED, ESCALATED, CLOSED
+  priority    String   @default("MEDIUM") // LOW, MEDIUM, HIGH, URGENT
+
+  description String              // What happened
+  evidence    String[]  @default([]) // URLs to photos/documents
+  claimAmount Float?              // Amount claimed in GBP
+  resolution  String?             // How it was resolved
+  resolvedAt  DateTime?
+  adminNotes  String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([bookingId])
+  @@index([raisedById])
+  @@index([status])
+}
+
+// ─── ROUTE STOPS (MULTI-STOP) ────────────────────────────────────────────────
+// Support for multi-stop routes — pickup from multiple marinas/suppliers on one trip
+
+model RouteStop {
+  id          String   @id @default(cuid())
+
+  listingId   String
+  listing     Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  stopOrder   Int               // 1, 2, 3... sequence
+  portName    String
+  region      String?
+  country     String?
+  lat         Float?
+  lng         Float?
+  address     String?
+
+  estimatedArrival   DateTime?
+  estimatedDeparture DateTime?
+  stopDurationMins   Int?       // How long at this stop
+  notes       String?           // e.g. "Collect wine from Majestic warehouse"
+
+  createdAt   DateTime @default(now())
+
+  @@index([listingId])
+  @@index([listingId, stopOrder])
 }
