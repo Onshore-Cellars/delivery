@@ -136,6 +136,51 @@ export async function POST(request: NextRequest) {
     const trackingCode = generateTrackingCode()
 
     const result = await prisma.$transaction(async (tx) => {
+      // Expire stale pending checkouts and restore their capacity
+      const expiredBookings = await tx.booking.findMany({
+        where: {
+          status: 'PENDING',
+          paymentStatus: 'PENDING',
+          checkoutExpiresAt: { lt: new Date() },
+        },
+        include: { listing: true },
+      })
+
+      for (const expired of expiredBookings) {
+        await tx.booking.update({
+          where: { id: expired.id },
+          data: { status: 'CANCELLED' },
+        })
+
+        // Restore capacity on the listing
+        if (expired.routeDirection === 'return') {
+          await tx.listing.update({
+            where: { id: expired.listingId },
+            data: {
+              returnAvailableKg: { increment: expired.weightKg },
+              returnAvailableM3: { increment: expired.volumeM3 },
+            },
+          })
+        } else {
+          await tx.listing.update({
+            where: { id: expired.listingId },
+            data: {
+              availableKg: { increment: expired.weightKg },
+              availableM3: { increment: expired.volumeM3 },
+            },
+          })
+        }
+
+        // If listing was FULL, reactivate it now that capacity is restored
+        const restoredListing = await tx.listing.findUnique({ where: { id: expired.listingId } })
+        if (restoredListing && restoredListing.status === 'FULL') {
+          await tx.listing.update({
+            where: { id: expired.listingId },
+            data: { status: 'ACTIVE' },
+          })
+        }
+      }
+
       // Lock and fetch listing inside transaction
       const listing = await tx.listing.findUnique({ where: { id: listingId } })
       if (!listing || listing.status !== 'ACTIVE') {
@@ -161,6 +206,10 @@ export async function POST(request: NextRequest) {
       // Check capacity based on route direction
       const isReturnLeg = routeDirection === 'return'
       if (isReturnLeg) {
+        // Verify listing supports return leg
+        if (listing.routeDirection === 'OUTBOUND') {
+          throw new Error('VALIDATION:This listing does not offer return leg capacity')
+        }
         const returnKg = listing.returnAvailableKg ?? 0
         const returnM3 = listing.returnAvailableM3 ?? 0
         if (weight > returnKg || volume > returnM3) {
@@ -236,6 +285,7 @@ export async function POST(request: NextRequest) {
           carrierPayout,
           trackingCode,
           currency: listing.currency,
+          checkoutExpiresAt: new Date(Date.now() + 30 * 60 * 1000),
         },
         include: {
           listing: {

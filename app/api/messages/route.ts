@@ -88,11 +88,24 @@ export async function POST(request: NextRequest) {
     })
 
     if (!conversation) {
+      let autoSubject = subject || null
+
+      // Auto-generate subject from booking reference if not provided
+      if (!autoSubject && bookingRef) {
+        const refBooking = await prisma.booking.findFirst({
+          where: { trackingCode: bookingRef },
+          select: { listing: { select: { originPort: true, destinationPort: true } } },
+        })
+        if (refBooking) {
+          autoSubject = `${refBooking.listing.originPort} → ${refBooking.listing.destinationPort}`
+        }
+      }
+
       conversation = await prisma.conversation.create({
         data: {
           user1Id: u1,
           user2Id: u2,
-          subject: subject || null,
+          subject: autoSubject,
           bookingRef: bookingRef || null,
         },
       })

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { verifyPassword, generateToken } from '@/lib/auth'
 
-// Simple in-memory rate limiter for login attempts
+// Simple in-memory rate limiter for login attempts (per IP)
 const loginAttempts = new Map<string, { count: number; resetAt: number }>()
 const MAX_ATTEMPTS = 5
 const WINDOW_MS = 15 * 60 * 1000 // 15 minutes
@@ -16,6 +16,39 @@ function isRateLimited(ip: string): boolean {
   }
   entry.count++
   return entry.count > MAX_ATTEMPTS
+}
+
+// Per-account lockout tracking
+const accountAttempts = new Map<string, { count: number; lockedUntil?: number }>()
+const MAX_ACCOUNT_ATTEMPTS = 5
+const LOCKOUT_MS = 15 * 60 * 1000 // 15 minutes
+
+function getAccountLockStatus(userId: string): { locked: boolean; minutesLeft?: number } {
+  const now = Date.now()
+  const entry = accountAttempts.get(userId)
+  if (!entry) return { locked: false }
+  if (entry.lockedUntil && now < entry.lockedUntil) {
+    const minutesLeft = Math.ceil((entry.lockedUntil - now) / 60000)
+    return { locked: true, minutesLeft }
+  }
+  if (entry.lockedUntil && now >= entry.lockedUntil) {
+    accountAttempts.delete(userId)
+    return { locked: false }
+  }
+  return { locked: false }
+}
+
+function recordFailedAttempt(userId: string): void {
+  const entry = accountAttempts.get(userId) || { count: 0 }
+  entry.count++
+  if (entry.count >= MAX_ACCOUNT_ATTEMPTS) {
+    entry.lockedUntil = Date.now() + LOCKOUT_MS
+  }
+  accountAttempts.set(userId, entry)
+}
+
+function resetAccountAttempts(userId: string): void {
+  accountAttempts.delete(userId)
 }
 
 export async function POST(request: NextRequest) {
@@ -51,18 +84,31 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 })
     }
 
+    if (user.suspended) {
+      return NextResponse.json({ error: 'Account is suspended' }, { status: 403 })
+    }
+
     if (!user.password) {
       return NextResponse.json({ error: 'This account uses Google sign-in. Please sign in with Google.' }, { status: 400 })
     }
 
+    // Check account lockout
+    const lockStatus = getAccountLockStatus(user.id)
+    if (lockStatus.locked) {
+      return NextResponse.json(
+        { error: `Account temporarily locked. Try again in ${lockStatus.minutesLeft} minutes.` },
+        { status: 429 }
+      )
+    }
+
     const valid = await verifyPassword(password, user.password)
     if (!valid) {
+      recordFailedAttempt(user.id)
       return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 })
     }
 
-    if (user.suspended) {
-      return NextResponse.json({ error: 'Your account has been suspended. Please contact support.' }, { status: 403 })
-    }
+    // Successful login — reset account attempts
+    resetAccountAttempts(user.id)
 
     // Auto-promote admin emails
     const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || 'edward@onshorecellars.com,info@onshoredelivery.com')
@@ -97,9 +143,7 @@ export async function POST(request: NextRequest) {
       token,
     })
   } catch (error) {
-    const errMsg = error instanceof Error ? error.message : String(error)
-    const errStack = error instanceof Error ? error.stack : undefined
-    console.error('Login error:', errMsg, errStack)
-    return NextResponse.json({ error: 'Internal server error', detail: process.env.NODE_ENV !== 'production' ? errMsg : undefined }, { status: 500 })
+    console.error('Login error:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

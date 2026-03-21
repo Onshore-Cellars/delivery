@@ -69,6 +69,7 @@ export default function SavedAddresses({ token, onSelect, type = 'all', selectab
   }
 
   const deleteAddress = async (id: string) => {
+    if (!confirm('Delete this address? This cannot be undone.')) return
     try {
       await fetch(`/api/addresses/${id}`, {
         method: 'DELETE',

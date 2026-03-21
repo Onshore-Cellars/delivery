@@ -34,6 +34,9 @@ interface RegisterData {
   role: string
   phone?: string
   company?: string
+  acceptedTerms?: boolean
+  canCarry?: boolean
+  canShip?: boolean
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)

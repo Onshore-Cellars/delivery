@@ -992,9 +992,11 @@ export default function MarketplacePage() {
         )}
 
         {/* Listings */}
+        <div aria-live="polite" role="status">
         {loading ? (
           <div className="space-y-4">
-            {[1, 2, 3].map(i => <div key={i} className="loading-shimmer h-52 rounded-2xl" />)}
+            {[1, 2, 3].map(i => <div key={i} className="loading-shimmer h-52 rounded-2xl" aria-hidden="true" />)}
+            <span className="sr-only">Loading listings...</span>
           </div>
         ) : listings.length === 0 ? (
           <div className="bg-white rounded-2xl border border-slate-200 p-12 sm:p-16 text-center">
@@ -1047,6 +1049,7 @@ export default function MarketplacePage() {
             )}
           </>
         )}
+        </div>
       </div>
 
       {/* ---- BOOKING MODAL ---- */}

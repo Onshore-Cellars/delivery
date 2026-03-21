@@ -166,6 +166,13 @@ model User {
   // Language / i18n preference
   preferredLanguage   String    @default("en")  // ISO 639-1: en, fr, es, it, el, nl, de, pt, tr, hr, ar
 
+  // GDPR & Terms
+  termsAcceptedAt     DateTime?
+  termsVersion        String?             // e.g. "2024-03-01"
+  privacyAcceptedAt   DateTime?
+  deletedAt           DateTime?           // Soft delete
+  dataExportRequestedAt DateTime?
+
   verified        Boolean   @default(false)
   suspended       Boolean   @default(false)
   lastLoginAt     DateTime?
@@ -382,6 +389,9 @@ model Booking {
   // Delivery time window
   deliveryTimeWindow String?      // "morning" (8-12), "afternoon" (12-17), "evening" (17-21), "any"
 
+  // Checkout expiry — pending bookings expire after 30 minutes
+  checkoutExpiresAt   DateTime?
+
   // Proof of delivery
   podSignature      String?
   podPhotoUrl       String?
@@ -408,6 +418,8 @@ model Booking {
   @@index([paymentStatus])
   @@index([listingId, status])
   @@index([shipperId, status])
+  @@index([stripePaymentIntentId])
+  @@index([checkoutExpiresAt])
 }
 
 model Bid {
@@ -1012,4 +1024,19 @@ model FavouriteListing {
   @@unique([userId, listingId])
   @@index([userId])
   @@index([listingId])
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  userId      String?            // Who performed the action
+  targetId    String?            // Who/what was affected
+  action      String             // e.g. "USER_SUSPENDED", "BOOKING_CANCELLED", "PROFILE_UPDATED"
+  details     String?            // JSON of what changed
+  ipAddress   String?
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([targetId])
+  @@index([action])
+  @@index([createdAt])
 }

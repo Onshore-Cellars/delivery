@@ -82,6 +82,8 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [tab, setTab] = useState<'overview' | 'listings' | 'bookings'>('overview')
+  const [bookingPage, setBookingPage] = useState(1)
+  const BOOKINGS_PER_PAGE = 10
 
   const fetchData = useCallback(async () => {
     if (!token) return
@@ -248,7 +250,7 @@ export default function DashboardPage() {
                     </div>
                   ) : (
                     <div>
-                      {bookings.slice(0, 5).map(b => (
+                      {bookings.slice((bookingPage - 1) * BOOKINGS_PER_PAGE, bookingPage * BOOKINGS_PER_PAGE).map(b => (
                         <div key={b.id} className="px-5 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between hover:bg-slate-50 transition-colors gap-2 border-b border-slate-50 last:border-0">
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2.5 flex-wrap">
@@ -267,6 +269,27 @@ export default function DashboardPage() {
                           </div>
                         </div>
                       ))}
+                      {bookings.length > BOOKINGS_PER_PAGE && (
+                        <div className="flex items-center justify-between px-5 sm:px-6 py-3 border-t border-slate-100">
+                          <button
+                            onClick={() => setBookingPage(p => Math.max(1, p - 1))}
+                            disabled={bookingPage === 1}
+                            className="px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                          >
+                            Previous
+                          </button>
+                          <span className="text-xs text-slate-500">
+                            Page {bookingPage} of {Math.ceil(bookings.length / BOOKINGS_PER_PAGE)}
+                          </span>
+                          <button
+                            onClick={() => setBookingPage(p => Math.min(Math.ceil(bookings.length / BOOKINGS_PER_PAGE), p + 1))}
+                            disabled={bookingPage >= Math.ceil(bookings.length / BOOKINGS_PER_PAGE)}
+                            className="px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                          >
+                            Next
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>

@@ -23,6 +23,7 @@ interface PortAutocompleteProps {
   required?: boolean
   className?: string
   name?: string
+  id?: string
 }
 
 interface GooglePrediction {
@@ -58,6 +59,7 @@ export default function PortAutocomplete({
   required = false,
   className = '',
   name,
+  id,
 }: PortAutocompleteProps) {
   const [query, setQuery] = useState(value)
   const [results, setResults] = useState<CombinedResult[]>([])
@@ -248,6 +250,7 @@ export default function PortAutocomplete({
       <input
         ref={inputRef}
         type="text"
+        id={id}
         name={name}
         value={query}
         onChange={handleInputChange}

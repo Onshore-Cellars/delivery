@@ -17,6 +17,7 @@ export async function GET(request: NextRequest) {
         phone: true, company: true, bio: true, website: true,
         address: true, city: true, country: true, avatarUrl: true,
         canCarry: true, canShip: true,
+        termsAcceptedAt: true, termsVersion: true, privacyAcceptedAt: true,
         yachtName: true, yachtMMSI: true, yachtIMO: true, yachtFlag: true,
         yachtLength: true, yachtType: true, homePort: true,
         preferredLanguage: true,
@@ -76,6 +77,7 @@ export async function PATCH(request: NextRequest) {
       'preferredLanguage',
       'emailNotifications', 'smsNotifications',
       'canCarry', 'canShip',
+      'termsAcceptedAt', 'termsVersion', 'privacyAcceptedAt',
       'yachtName', 'yachtMMSI', 'yachtIMO', 'yachtFlag', 'yachtLength', 'yachtType', 'homePort',
     ]
 

@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { Prisma } from '@prisma/client'
 
+let cachedPorts: unknown[] | null = null
+let cacheExpiry = 0
+const CACHE_TTL = 60 * 60 * 1000 // 1 hour
+
 /**
  * GET /api/ports - Smart port search with prioritized results
  *
@@ -25,6 +29,10 @@ export async function GET(request: NextRequest) {
     const popularParam = searchParams.get('popular')
     const limit = Math.min(parseInt(searchParams.get('limit') || '20'), 100)
 
+    if (cachedPorts && Date.now() < cacheExpiry) {
+      return NextResponse.json({ ports: cachedPorts })
+    }
+
     if (!q && !country && !type && !popularParam) {
       // No filters — return popular ports
       const ports = await prisma.port.findMany({
@@ -32,6 +40,8 @@ export async function GET(request: NextRequest) {
         orderBy: { name: 'asc' },
         take: limit,
       })
+      cachedPorts = ports
+      cacheExpiry = Date.now() + CACHE_TTL
       return NextResponse.json({ ports })
     }
 
@@ -99,6 +109,9 @@ export async function GET(request: NextRequest) {
 
     // Strip score and limit
     const results = ranked.slice(0, limit).map(({ _score, ...port }) => port)
+
+    cachedPorts = results
+    cacheExpiry = Date.now() + CACHE_TTL
 
     return NextResponse.json({ ports: results })
   } catch (error) {

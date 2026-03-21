@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { hashPassword, generateToken, generateSecureToken } from '@/lib/auth'
+import { isCommonPassword } from '@/lib/password-check'
 import { sendEmail, welcomeEmail, emailVerificationEmail } from '@/lib/email'
 
 // Simple in-memory rate limiter for registration
@@ -35,7 +36,11 @@ export async function POST(request: NextRequest) {
     } catch {
       return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
     }
-    const { email: rawEmail, password, name, role, phone, company, canCarry, canShip } = body
+    const { email: rawEmail, password, name, role, phone, company, canCarry, canShip, acceptedTerms } = body
+
+    if (!acceptedTerms) {
+      return NextResponse.json({ error: 'You must accept the terms of service' }, { status: 400 })
+    }
 
     if (!rawEmail || !password || !name || !role) {
       return NextResponse.json({ error: 'Email, password, name, and role are required' }, { status: 400 })
@@ -53,6 +58,10 @@ export async function POST(request: NextRequest) {
 
     if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password)) {
       return NextResponse.json({ error: 'Password must include uppercase, lowercase, and a number' }, { status: 400 })
+    }
+
+    if (isCommonPassword(password)) {
+      return NextResponse.json({ error: 'Password is too common. Please choose a stronger password.' }, { status: 400 })
     }
 
     if (name.length > 100 || email.length > 255) {
@@ -88,6 +97,9 @@ export async function POST(request: NextRequest) {
         canCarry: isAdminEmail ? true : canCarry === true,
         canShip: isAdminEmail ? true : canShip !== false,
         verified: isAdminEmail ? true : false,
+        termsAcceptedAt: new Date(),
+        termsVersion: '2026-03-01',
+        privacyAcceptedAt: new Date(),
       },
       select: {
         id: true,

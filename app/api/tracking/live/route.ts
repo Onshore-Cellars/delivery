@@ -174,17 +174,47 @@ export async function PATCH(request: NextRequest) {
       )
     }
 
+    const updateData: Record<string, unknown> = {
+      lat: parseFloat(String(lat)),
+      lng: parseFloat(String(lng)),
+      heading: heading !== undefined ? parseFloat(String(heading)) : undefined,
+      speed: speed !== undefined ? parseFloat(String(speed)) : undefined,
+      stopsCompleted: stopsCompleted !== undefined ? parseInt(String(stopsCompleted)) : undefined,
+      etaMinutes: etaMinutes !== undefined ? parseInt(String(etaMinutes)) : undefined,
+      lastUpdated: new Date(),
+    }
+
+    // Recalculate ETA based on current position and destination
+    // Simple formula: remaining distance / current speed
+    if (body.lat && body.lng && body.speed && body.speed > 0) {
+      const destBooking = await prisma.booking.findUnique({
+        where: { id: activeTracking.bookingId },
+        select: {
+          deliveryAddress: true,
+          listing: { select: { destinationLat: true, destinationLng: true } },
+        },
+      })
+
+      if (destBooking?.listing?.destinationLat && destBooking?.listing?.destinationLng) {
+        const R = 6371 // Earth radius km
+        const dLat = (destBooking.listing.destinationLat - body.lat) * Math.PI / 180
+        const dLng = (destBooking.listing.destinationLng - body.lng) * Math.PI / 180
+        const a =
+          Math.sin(dLat / 2) ** 2 +
+          Math.cos(body.lat * Math.PI / 180) *
+            Math.cos(destBooking.listing.destinationLat * Math.PI / 180) *
+            Math.sin(dLng / 2) ** 2
+        const remainingKm = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+
+        // ETA in minutes (distance / speed * 60, with 1.3x factor for road vs straight line)
+        const calculatedEta = Math.round((remainingKm / body.speed) * 60 * 1.3)
+        updateData.etaMinutes = calculatedEta
+      }
+    }
+
     const tracking = await prisma.liveTracking.update({
       where: { id: activeTracking.id },
-      data: {
-        lat: parseFloat(String(lat)),
-        lng: parseFloat(String(lng)),
-        heading: heading !== undefined ? parseFloat(String(heading)) : undefined,
-        speed: speed !== undefined ? parseFloat(String(speed)) : undefined,
-        stopsCompleted: stopsCompleted !== undefined ? parseInt(String(stopsCompleted)) : undefined,
-        etaMinutes: etaMinutes !== undefined ? parseInt(String(etaMinutes)) : undefined,
-        lastUpdated: new Date(),
-      },
+      data: updateData,
     })
 
     return NextResponse.json({ tracking })

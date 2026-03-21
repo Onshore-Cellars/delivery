@@ -3,6 +3,20 @@
 //   STORAGE_BUCKET, STORAGE_REGION, STORAGE_ACCESS_KEY, STORAGE_SECRET_KEY
 //   STORAGE_ENDPOINT (for R2/MinIO), STORAGE_PUBLIC_URL (for CDN)
 
+const ALLOWED_MIME_TYPES = new Set([
+  'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml',
+  'application/pdf',
+  'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'text/plain', 'text/csv',
+])
+
+const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50MB
+
+const BLOCKED_EXTENSIONS = new Set([
+  'exe', 'bat', 'cmd', 'sh', 'ps1', 'vbs', 'js', 'mjs', 'php', 'py', 'rb',
+  'jar', 'war', 'com', 'scr', 'pif', 'dll', 'sys',
+])
+
 interface UploadOptions {
   key: string
   body: Buffer | Uint8Array | string
@@ -51,6 +65,17 @@ async function getSignatureKey(dateStamp: string): Promise<Uint8Array> {
 // ─── S3 PUT (Signature V4) ─────────────────────────────────────────────────
 
 export async function uploadFile(options: UploadOptions): Promise<UploadResult> {
+  // Validate MIME type
+  if (!ALLOWED_MIME_TYPES.has(options.contentType)) {
+    throw new Error(`File type not allowed: ${options.contentType}`)
+  }
+
+  // Validate file size
+  const size = typeof options.body === 'string' ? options.body.length : options.body.length
+  if (size > MAX_FILE_SIZE) {
+    throw new Error(`File too large: ${size} bytes (max ${MAX_FILE_SIZE})`)
+  }
+
   if (!isConfigured()) {
     // Dev fallback — store as base64 data URL (works for small files)
     console.warn('[Storage] Not configured — returning data as base64')
@@ -175,7 +200,10 @@ export async function deleteFile(key: string): Promise<void> {
 export function generateKey(folder: string, filename: string): string {
   const timestamp = Date.now()
   const rand = Math.random().toString(36).slice(2, 8)
-  const ext = filename.split('.').pop() || 'bin'
+  const ext = filename.split('.').pop()?.toLowerCase() || 'bin'
+  if (BLOCKED_EXTENSIONS.has(ext)) {
+    throw new Error(`File extension not allowed: .${ext}`)
+  }
   const nameWithoutExt = filename.replace(/\.[^.]+$/, '').replace(/[^a-zA-Z0-9.-]/g, '_').slice(0, 50)
   return `${folder}/${timestamp}-${rand}-${nameWithoutExt}.${ext}`
 }

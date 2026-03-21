@@ -256,6 +256,7 @@ export default function QuotesPage() {
   }
 
   const handleCancel = async (quoteId: string) => {
+    if (!confirm('Cancel this quote request?')) return
     if (!token) return
     setActionLoading(quoteId)
     try {

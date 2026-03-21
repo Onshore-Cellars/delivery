@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { hashPassword } from '@/lib/auth'
+import { logAudit } from '@/lib/audit'
 
 export async function POST(request: NextRequest) {
   try {
@@ -51,6 +52,16 @@ export async function POST(request: NextRequest) {
 
     // Delete the reset token
     await prisma.notification.delete({ where: { id: resetNotif.id } })
+
+    // Audit log for password reset
+    // Note: Stateless JWTs cannot be retroactively invalidated. Previously issued tokens
+    // remain valid until they expire. For immediate session invalidation, a session store
+    // or token blocklist would be required.
+    await logAudit({
+      targetId: user.id,
+      action: 'PASSWORD_RESET',
+      details: { method: 'email_token' },
+    })
 
     return NextResponse.json({ message: 'Password reset successfully. You can now log in.' })
   } catch (error) {

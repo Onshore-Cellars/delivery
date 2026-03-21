@@ -220,7 +220,7 @@ export default function CreateListingPage() {
 
         <form onSubmit={handleSubmit} className="space-y-8">
           {error && (
-            <div className="px-4 py-3 rounded-lg bg-red-50 border border-red-100">
+            <div className="px-4 py-3 rounded-lg bg-red-50 border border-red-100" role="alert">
               <p className="text-sm text-red-700">{error}</p>
             </div>
           )}
@@ -385,8 +385,9 @@ export default function CreateListingPage() {
             <h2 className="text-lg font-bold text-[#1a1a1a] mb-4">Route Details</h2>
             <div className="space-y-4">
               <div>
-                <label className={labelCls}>Listing Title *</label>
+                <label htmlFor="listing-title" className={labelCls}>Listing Title *</label>
                 <input
+                  id="listing-title"
                   name="title"
                   type="text"
                   required
@@ -399,7 +400,7 @@ export default function CreateListingPage() {
 
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-sm font-medium text-[#1a1a1a]">Description</label>
+                  <label htmlFor="listing-description" className="text-sm font-medium text-[#1a1a1a]">Description</label>
                   <button
                     type="button"
                     onClick={handleGenerateDescription}
@@ -420,6 +421,7 @@ export default function CreateListingPage() {
                   </button>
                 </div>
                 <textarea
+                  id="listing-description"
                   name="description"
                   rows={3}
                   className={`${inputCls} resize-none`}
@@ -431,8 +433,9 @@ export default function CreateListingPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className={labelCls}>Origin (Port, Address or Company) *</label>
+                  <label htmlFor="listing-origin" className={labelCls}>Origin (Port, Address or Company) *</label>
                   <PortAutocomplete
+                    id="listing-origin"
                     value={form.originPort}
                     onChange={v => setForm(prev => ({ ...prev, originPort: v }))}
                     onSelect={(data: AddressData | null) => {
@@ -465,8 +468,9 @@ export default function CreateListingPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className={labelCls}>Destination (Port, Address or Company) *</label>
+                  <label htmlFor="listing-destination" className={labelCls}>Destination (Port, Address or Company) *</label>
                   <PortAutocomplete
+                    id="listing-destination"
                     value={form.destinationPort}
                     onChange={v => setForm(prev => ({ ...prev, destinationPort: v }))}
                     onSelect={(data: AddressData | null) => {
@@ -499,8 +503,9 @@ export default function CreateListingPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className={labelCls}>Departure Date *</label>
+                  <label htmlFor="listing-departure-date" className={labelCls}>Departure Date *</label>
                   <input
+                    id="listing-departure-date"
                     name="departureDate"
                     type="datetime-local"
                     required
@@ -788,8 +793,9 @@ export default function CreateListingPage() {
             <div className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                  <label className={labelCls}>{isSpaceNeeded ? 'Budget per kg' : 'Price per kg'}</label>
+                  <label htmlFor="listing-price-per-kg" className={labelCls}>{isSpaceNeeded ? 'Budget per kg' : 'Price per kg'}</label>
                   <input
+                    id="listing-price-per-kg"
                     name="pricePerKg"
                     type="number"
                     step="0.01"
@@ -800,8 +806,9 @@ export default function CreateListingPage() {
                   />
                 </div>
                 <div>
-                  <label className={labelCls}>Price per m&sup3;</label>
+                  <label htmlFor="listing-price-per-m3" className={labelCls}>Price per m&sup3;</label>
                   <input
+                    id="listing-price-per-m3"
                     name="pricePerM3"
                     type="number"
                     step="0.01"
@@ -812,8 +819,9 @@ export default function CreateListingPage() {
                   />
                 </div>
                 <div>
-                  <label className={labelCls}>{isSpaceNeeded ? 'Budget (flat rate)' : 'Or Flat Rate'}</label>
+                  <label htmlFor="listing-flat-rate" className={labelCls}>{isSpaceNeeded ? 'Budget (flat rate)' : 'Or Flat Rate'}</label>
                   <input
+                    id="listing-flat-rate"
                     name="flatRate"
                     type="number"
                     step="0.01"

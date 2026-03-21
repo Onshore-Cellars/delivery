@@ -10,6 +10,7 @@ interface ProfileData {
   phone?: string; company?: string; bio?: string; website?: string
   address?: string; city?: string; country?: string; avatarUrl?: string
   canCarry: boolean; canShip: boolean
+  termsAcceptedAt?: string; termsVersion?: string
   yachtName?: string; yachtMMSI?: string; yachtIMO?: string; yachtFlag?: string
   yachtLength?: number; yachtType?: string; homePort?: string
   preferredLanguage?: string
@@ -31,6 +32,7 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false)
   const [success, setSuccess] = useState('')
   const [error, setError] = useState('')
+  const [acceptingTerms, setAcceptingTerms] = useState(false)
 
   const fetchProfile = useCallback(async () => {
     if (!token) return
@@ -99,14 +101,46 @@ export default function ProfilePage() {
         </div>
 
         {success && (
-          <div className="mb-6 px-4 py-3 rounded-lg bg-emerald-50 border border-emerald-200">
+          <div className="mb-6 px-4 py-3 rounded-lg bg-emerald-50 border border-emerald-200" role="status">
             <p className="text-sm text-emerald-700 font-medium">{success}</p>
           </div>
         )}
 
         {error && (
-          <div className="mb-6 px-4 py-3 rounded-lg bg-red-50 border border-red-200">
+          <div className="mb-6 px-4 py-3 rounded-lg bg-red-50 border border-red-200" role="alert">
             <p className="text-sm text-red-700 font-medium">{error}</p>
+          </div>
+        )}
+
+        {!profile.termsAcceptedAt && (
+          <div className="mb-6 px-4 py-4 rounded-lg bg-amber-50 border border-amber-200">
+            <p className="text-sm text-amber-800 font-medium mb-3">Please review and accept our updated Terms of Service and Privacy Policy to continue using Onshore Deliver.</p>
+            <button
+              disabled={acceptingTerms}
+              onClick={async () => {
+                if (!token) return
+                setAcceptingTerms(true); setError('')
+                try {
+                  const res = await fetch('/api/profile', {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                    body: JSON.stringify({ termsAcceptedAt: new Date().toISOString(), termsVersion: '2026-03-01', privacyAcceptedAt: new Date().toISOString() }),
+                  })
+                  if (res.ok) {
+                    setSuccess('Terms accepted successfully')
+                    fetchProfile()
+                  } else {
+                    setError('Failed to accept terms. Please try again.')
+                  }
+                } catch {
+                  setError('Failed to accept terms. Please try again.')
+                }
+                finally { setAcceptingTerms(false) }
+              }}
+              className="btn-primary text-sm !py-2 !px-5 disabled:opacity-50"
+            >
+              {acceptingTerms ? 'Accepting...' : 'Accept Terms'}
+            </button>
           </div>
         )}
 
