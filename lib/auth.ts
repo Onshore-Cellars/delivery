@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
+import crypto from 'crypto'
 
 const SALT_ROUNDS = 12
 
@@ -49,9 +50,15 @@ export function getTokenFromHeader(authHeader: string | null): string | null {
 
 export function generateTrackingCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+  const bytes = crypto.randomBytes(8)
   let code = 'OD-'
   for (let i = 0; i < 8; i++) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length))
+    code += chars.charAt(bytes[i] % chars.length)
   }
   return code
+}
+
+// Generate a secure random token for password reset / email verification
+export function generateSecureToken(): string {
+  return crypto.randomBytes(32).toString('hex')
 }

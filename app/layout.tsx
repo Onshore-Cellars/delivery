@@ -3,9 +3,24 @@ import "./globals.css"
 import ClientLayout from "./components/ClientLayout"
 
 export const metadata: Metadata = {
-  title: "Onshore Deliver — Delivery Logistics Marketplace",
+  title: {
+    default: "Onshore Deliver — Delivery Logistics Marketplace",
+    template: "%s | Onshore Deliver",
+  },
   description: "The marketplace for delivery logistics. Carriers share van space to ports and marinas. Book space for provisions, equipment, and supplies. Simple, premium, reliable.",
-  keywords: ["delivery logistics", "marine delivery", "port delivery", "maritime transport", "van space sharing"],
+  keywords: ["delivery logistics", "marine delivery", "port delivery", "maritime transport", "van space sharing", "yacht provisions", "marine supplies"],
+  openGraph: {
+    type: "website",
+    siteName: "Onshore Deliver",
+    title: "Onshore Deliver — Delivery Logistics Marketplace",
+    description: "Share van space. Book deliveries to ports and marinas. Simple, premium, reliable.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Onshore Deliver",
+    description: "Delivery logistics marketplace for marine and yacht supplies.",
+  },
+  robots: { index: true, follow: true },
 }
 
 export default function RootLayout({

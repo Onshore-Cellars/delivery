@@ -20,7 +20,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     }
     const { status, location, description } = body
 
-    const validStatuses = ['CONFIRMED', 'PICKED_UP', 'IN_TRANSIT', 'CUSTOMS_HOLD', 'DELIVERED', 'CANCELLED']
+    const validStatuses = ['CONFIRMED', 'PICKED_UP', 'IN_TRANSIT', 'CUSTOMS_HOLD', 'DELIVERED', 'CANCELLED', 'DISPUTED']
     if (!validStatuses.includes(status)) {
       return NextResponse.json({ error: 'Invalid status' }, { status: 400 })
     }
@@ -35,19 +35,22 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     // Validate status transitions
     const validTransitions: Record<string, string[]> = {
       PENDING: ['CONFIRMED', 'CANCELLED'],
-      CONFIRMED: ['PICKED_UP', 'CANCELLED'],
-      PICKED_UP: ['IN_TRANSIT', 'CANCELLED'],
-      IN_TRANSIT: ['CUSTOMS_HOLD', 'DELIVERED', 'CANCELLED'],
-      CUSTOMS_HOLD: ['IN_TRANSIT', 'DELIVERED', 'CANCELLED'],
-      DELIVERED: [],
+      QUOTE_REQUESTED: ['QUOTED', 'CANCELLED'],
+      QUOTED: ['PENDING', 'CANCELLED'],
+      CONFIRMED: ['PICKED_UP', 'CANCELLED', 'DISPUTED'],
+      PICKED_UP: ['IN_TRANSIT', 'CANCELLED', 'DISPUTED'],
+      IN_TRANSIT: ['CUSTOMS_HOLD', 'DELIVERED', 'CANCELLED', 'DISPUTED'],
+      CUSTOMS_HOLD: ['IN_TRANSIT', 'DELIVERED', 'CANCELLED', 'DISPUTED'],
+      DELIVERED: ['DISPUTED'],
       CANCELLED: [],
+      DISPUTED: ['CANCELLED', 'DELIVERED'], // Resolve dispute by cancelling or confirming delivery
     }
     const allowed = validTransitions[booking.status] || []
     if (!allowed.includes(status)) {
       return NextResponse.json({ error: `Cannot transition from ${booking.status} to ${status}` }, { status: 400 })
     }
 
-    // Only the carrier or the shipper (for cancellation) can update status
+    // Only the carrier or the shipper (for cancellation/dispute) can update status
     const isCarrier = booking.listing.carrierId === decoded.userId
     const isShipper = booking.shipperId === decoded.userId
     const isAdmin = decoded.role === 'ADMIN'
@@ -56,8 +59,14 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       return NextResponse.json({ error: 'Not authorized to update this booking' }, { status: 403 })
     }
 
-    if (isShipper && status !== 'CANCELLED') {
-      return NextResponse.json({ error: 'Shippers can only cancel bookings' }, { status: 403 })
+    // Shippers can only cancel or dispute
+    if (isShipper && !['CANCELLED', 'DISPUTED'].includes(status)) {
+      return NextResponse.json({ error: 'Shippers can only cancel or dispute bookings' }, { status: 403 })
+    }
+
+    // Require payment before confirmation (unless admin overrides)
+    if (status === 'CONFIRMED' && booking.paymentStatus !== 'PAID' && !isAdmin) {
+      return NextResponse.json({ error: 'Payment required before confirming booking' }, { status: 400 })
     }
 
     const statusDescriptions: Record<string, string> = {
@@ -66,7 +75,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       IN_TRANSIT: 'Cargo in transit',
       CUSTOMS_HOLD: 'Cargo held at customs',
       DELIVERED: 'Cargo delivered successfully',
-      CANCELLED: `Booking cancelled by ${isCarrier ? 'carrier' : 'shipper'}`,
+      CANCELLED: `Booking cancelled by ${isCarrier ? 'carrier' : isAdmin ? 'admin' : 'shipper'}`,
+      DISPUTED: `Dispute raised by ${isShipper ? 'shipper' : isCarrier ? 'carrier' : 'admin'}`,
     }
 
     const [updatedBooking] = await prisma.$transaction([
@@ -84,19 +94,59 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       }),
     ])
 
-    // If cancelled, restore listing capacity
+    // If cancelled, restore listing capacity with cancellation fee logic
     if (status === 'CANCELLED') {
-      const updateData: Record<string, unknown> = {
-        availableKg: { increment: booking.weightKg },
-        availableM3: { increment: booking.volumeM3 },
+      const isReturnLeg = booking.routeDirection === 'return'
+
+      // Calculate cancellation fee based on time until departure
+      let cancellationFee = 0
+      if (booking.paymentStatus === 'PAID' && booking.totalPrice > 0) {
+        const departure = booking.listing.departureDate
+        const hoursUntilDeparture = (departure.getTime() - Date.now()) / (1000 * 60 * 60)
+        if (hoursUntilDeparture < 24) {
+          cancellationFee = booking.totalPrice * 0.5 // 50% within 24hrs
+        } else if (hoursUntilDeparture < 72) {
+          cancellationFee = booking.totalPrice * 0.25 // 25% within 3 days
+        } else if (hoursUntilDeparture < 168) {
+          cancellationFee = booking.totalPrice * 0.1 // 10% within 7 days
+        }
+        // More than 7 days: no fee
       }
-      if (booking.listing.status === 'FULL') {
-        updateData.status = 'ACTIVE'
+
+      // Restore capacity
+      if (isReturnLeg) {
+        const updateData: Record<string, unknown> = {
+          returnAvailableKg: { increment: booking.weightKg },
+          returnAvailableM3: { increment: booking.volumeM3 },
+        }
+        if (booking.listing.status === 'FULL') {
+          updateData.status = 'ACTIVE'
+        }
+        await prisma.listing.update({
+          where: { id: booking.listingId },
+          data: updateData,
+        })
+      } else {
+        const updateData: Record<string, unknown> = {
+          availableKg: { increment: booking.weightKg },
+          availableM3: { increment: booking.volumeM3 },
+        }
+        if (booking.listing.status === 'FULL') {
+          updateData.status = 'ACTIVE'
+        }
+        await prisma.listing.update({
+          where: { id: booking.listingId },
+          data: updateData,
+        })
       }
-      await prisma.listing.update({
-        where: { id: booking.listingId },
-        data: updateData,
-      })
+
+      // Store cancellation fee if applicable
+      if (cancellationFee > 0) {
+        await prisma.booking.update({
+          where: { id },
+          data: { platformFee: cancellationFee },
+        })
+      }
     }
 
     // If delivered, complete the listing if all bookings delivered
@@ -104,7 +154,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       const remaining = await prisma.booking.count({
         where: {
           listingId: booking.listingId,
-          status: { notIn: ['DELIVERED', 'CANCELLED'] },
+          status: { notIn: ['DELIVERED', 'CANCELLED', 'QUOTE_REQUESTED', 'QUOTED'] },
         },
       })
       if (remaining === 0) {

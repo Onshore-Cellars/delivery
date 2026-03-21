@@ -20,7 +20,9 @@ export async function GET(request: NextRequest) {
 
     const where: Record<string, unknown> = {}
 
-    if (decoded.role === 'CARRIER') {
+    if (decoded.role === 'ADMIN') {
+      // Admin sees all bookings
+    } else if (decoded.role === 'CARRIER') {
       where.listing = { carrierId: decoded.userId }
     } else {
       where.shipperId = decoded.userId
@@ -60,7 +62,6 @@ export async function GET(request: NextRequest) {
           ...b.listing,
           carrier: {
             ...b.listing.carrier,
-            // Only show name and company on unconfirmed bookings
           },
         },
       }
@@ -85,6 +86,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }
 
+    // Check suspended status
+    const currentUser = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+      select: { suspended: true, canShip: true },
+    })
+    if (currentUser?.suspended) {
+      return NextResponse.json({ error: 'Your account is suspended' }, { status: 403 })
+    }
+
     let body
     try {
       body = await request.json()
@@ -93,34 +103,15 @@ export async function POST(request: NextRequest) {
     }
     const {
       listingId, cargoDescription, cargoType, weightKg, volumeM3,
-      specialHandling, pickupAddress, pickupContact,
-      deliveryAddress, deliveryContact, deliveryNotes,
+      specialHandling, pickupAddress, pickupContact, pickupPhone, pickupEmail,
+      deliveryAddress, deliveryContact, deliveryPhone, deliveryEmail,
+      deliveryNotes, deliveryTimeWindow,
       yachtName, yachtMMSI, berthNumber, marinaName, routeDirection,
+      itemCount, declaredValue,
     } = body
 
     if (!listingId || !cargoDescription || !weightKg || !volumeM3) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
-    }
-
-    const listing = await prisma.listing.findUnique({ where: { id: listingId } })
-    if (!listing || listing.status !== 'ACTIVE') {
-      return NextResponse.json({ error: 'Listing not found or no longer available' }, { status: 404 })
-    }
-
-    if (listing.carrierId === decoded.userId) {
-      return NextResponse.json({ error: 'You cannot book your own listing' }, { status: 400 })
-    }
-
-    // Prevent duplicate active bookings
-    const existingBooking = await prisma.booking.findFirst({
-      where: {
-        listingId,
-        shipperId: decoded.userId,
-        status: { in: ['PENDING', 'CONFIRMED', 'PICKED_UP', 'IN_TRANSIT'] },
-      },
-    })
-    if (existingBooking) {
-      return NextResponse.json({ error: 'You already have an active booking on this listing' }, { status: 409 })
     }
 
     const weight = parseFloat(weightKg)
@@ -130,22 +121,79 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Weight and volume must be positive numbers' }, { status: 400 })
     }
 
-    if (weight > listing.availableKg || volume > listing.availableM3) {
-      return NextResponse.json({ error: 'Requested capacity exceeds available space' }, { status: 400 })
+    if (weight > 50000 || volume > 200) {
+      return NextResponse.json({ error: 'Weight or volume exceeds maximum allowed' }, { status: 400 })
     }
 
-    let totalPrice = 0
-    if (listing.flatRate) {
-      totalPrice = listing.flatRate
-    } else {
-      if (listing.pricePerKg) totalPrice += weight * listing.pricePerKg
-      if (listing.pricePerM3) totalPrice += volume * listing.pricePerM3
+    // Validate MMSI format if provided
+    if (yachtMMSI && !/^\d{9}$/.test(yachtMMSI)) {
+      return NextResponse.json({ error: 'MMSI must be exactly 9 digits' }, { status: 400 })
     }
 
+    // Use a transaction for the entire booking to prevent race conditions
     const trackingCode = generateTrackingCode()
 
-    const [booking] = await prisma.$transaction([
-      prisma.booking.create({
+    const result = await prisma.$transaction(async (tx) => {
+      // Lock and fetch listing inside transaction
+      const listing = await tx.listing.findUnique({ where: { id: listingId } })
+      if (!listing || listing.status !== 'ACTIVE') {
+        throw new Error('VALIDATION:Listing not found or no longer available')
+      }
+
+      if (listing.carrierId === decoded.userId) {
+        throw new Error('VALIDATION:You cannot book your own listing')
+      }
+
+      // Prevent duplicate active bookings
+      const existingBooking = await tx.booking.findFirst({
+        where: {
+          listingId,
+          shipperId: decoded.userId,
+          status: { in: ['PENDING', 'CONFIRMED', 'PICKED_UP', 'IN_TRANSIT'] },
+        },
+      })
+      if (existingBooking) {
+        throw new Error('VALIDATION:You already have an active booking on this listing')
+      }
+
+      // Check capacity based on route direction
+      const isReturnLeg = routeDirection === 'return'
+      if (isReturnLeg) {
+        const returnKg = listing.returnAvailableKg ?? 0
+        const returnM3 = listing.returnAvailableM3 ?? 0
+        if (weight > returnKg || volume > returnM3) {
+          throw new Error('VALIDATION:Requested capacity exceeds available return leg space')
+        }
+      } else {
+        if (weight > listing.availableKg || volume > listing.availableM3) {
+          throw new Error('VALIDATION:Requested capacity exceeds available space')
+        }
+      }
+
+      // Calculate price with minimum charge enforcement
+      let totalPrice = 0
+      if (isReturnLeg) {
+        if (listing.returnFlatRate) {
+          totalPrice = listing.returnFlatRate
+        } else {
+          if (listing.returnPricePerKg) totalPrice += weight * listing.returnPricePerKg
+          if (listing.returnPricePerM3) totalPrice += volume * listing.returnPricePerM3
+        }
+      } else {
+        if (listing.flatRate) {
+          totalPrice = listing.flatRate
+        } else {
+          if (listing.pricePerKg) totalPrice += weight * listing.pricePerKg
+          if (listing.pricePerM3) totalPrice += volume * listing.pricePerM3
+        }
+      }
+      // Enforce minimum charge
+      if (listing.minimumCharge && totalPrice < listing.minimumCharge) {
+        totalPrice = listing.minimumCharge
+      }
+
+      // Create booking
+      const booking = await tx.booking.create({
         data: {
           listingId,
           shipperId: decoded.userId,
@@ -153,12 +201,19 @@ export async function POST(request: NextRequest) {
           cargoType: cargoType || null,
           weightKg: weight,
           volumeM3: volume,
+          itemCount: itemCount ? parseInt(itemCount) : 1,
+          declaredValue: declaredValue ? parseFloat(declaredValue) : null,
           specialHandling: specialHandling || null,
           pickupAddress: pickupAddress || null,
           pickupContact: pickupContact || null,
+          pickupPhone: pickupPhone || null,
+          pickupEmail: pickupEmail || null,
           deliveryAddress: deliveryAddress || null,
           deliveryContact: deliveryContact || null,
+          deliveryPhone: deliveryPhone || null,
+          deliveryEmail: deliveryEmail || null,
           deliveryNotes: deliveryNotes || null,
+          deliveryTimeWindow: deliveryTimeWindow || null,
           yachtName: yachtName || null,
           yachtMMSI: yachtMMSI || null,
           berthNumber: berthNumber || null,
@@ -175,28 +230,51 @@ export async function POST(request: NextRequest) {
             },
           },
         },
-      }),
-      prisma.listing.update({
-        where: { id: listingId },
-        data: {
-          availableKg: { decrement: weight },
-          availableM3: { decrement: volume },
-        },
-      }),
-    ])
-
-    const updatedListing = await prisma.listing.findUnique({ where: { id: listingId } })
-    if (updatedListing && (updatedListing.availableKg <= 0 || updatedListing.availableM3 <= 0)) {
-      await prisma.listing.update({
-        where: { id: listingId },
-        data: { status: 'FULL' },
       })
-    }
 
-    // Send notifications
+      // Decrement capacity based on route direction
+      if (isReturnLeg) {
+        await tx.listing.update({
+          where: { id: listingId },
+          data: {
+            returnAvailableKg: { decrement: weight },
+            returnAvailableM3: { decrement: volume },
+          },
+        })
+      } else {
+        await tx.listing.update({
+          where: { id: listingId },
+          data: {
+            availableKg: { decrement: weight },
+            availableM3: { decrement: volume },
+          },
+        })
+      }
+
+      // Check if listing should be marked FULL
+      const updated = await tx.listing.findUnique({ where: { id: listingId } })
+      if (updated) {
+        const outboundFull = updated.availableKg <= 0 || updated.availableM3 <= 0
+        const hasReturn = updated.routeDirection === 'BOTH' || updated.routeDirection === 'RETURN'
+        const returnFull = hasReturn
+          ? (updated.returnAvailableKg ?? 0) <= 0 || (updated.returnAvailableM3 ?? 0) <= 0
+          : true // No return leg means consider it "full"
+
+        if (outboundFull && returnFull) {
+          await tx.listing.update({
+            where: { id: listingId },
+            data: { status: 'FULL' },
+          })
+        }
+      }
+
+      return booking
+    })
+
+    // Send notifications (outside transaction)
     try {
       const fullBooking = await prisma.booking.findUnique({
-        where: { id: booking.id },
+        where: { id: result.id },
         include: {
           shipper: { select: { id: true, name: true, email: true, emailNotifications: true } },
           listing: {
@@ -229,9 +307,15 @@ export async function POST(request: NextRequest) {
       console.error('Notification error:', notifErr)
     }
 
-    return NextResponse.json({ booking }, { status: 201 })
+    return NextResponse.json({ booking: result }, { status: 201 })
   } catch (error) {
+    // Handle validation errors thrown from transaction
+    if (error instanceof Error && error.message.startsWith('VALIDATION:')) {
+      const msg = error.message.replace('VALIDATION:', '')
+      return NextResponse.json({ error: msg }, { status: 400 })
+    }
     console.error('Booking creation error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    const message = error instanceof Error ? error.message : 'Internal server error'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }

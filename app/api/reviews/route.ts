@@ -48,6 +48,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Booking ID and valid rating (1-5) required' }, { status: 400 })
     }
 
+    // Validate sub-ratings if provided
+    const subRatings = [communicationRating, timelinessRating, conditionRating].filter(r => r !== undefined && r !== null)
+    if (subRatings.some(r => r < 1 || r > 5)) {
+      return NextResponse.json({ error: 'Sub-ratings must be between 1 and 5' }, { status: 400 })
+    }
+
     const booking = await prisma.booking.findUnique({
       where: { id: bookingId },
       include: { listing: { select: { carrierId: true } } },

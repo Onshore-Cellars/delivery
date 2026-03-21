@@ -44,6 +44,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Already paid' }, { status: 400 })
     }
 
+    if (['CANCELLED', 'DISPUTED'].includes(booking.status)) {
+      return NextResponse.json({ error: 'Cannot pay for a cancelled or disputed booking' }, { status: 400 })
+    }
+
     const appUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
 
     const session = await createCheckoutSession({

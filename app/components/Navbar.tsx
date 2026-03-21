@@ -86,9 +86,8 @@ export default function Navbar() {
         <div className="site-container">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2.5 hover:no-underline">
-              <Image src="/logo.png" alt="Onshore Deliver" width={32} height={32} className="rounded-sm" />
-              <span className="text-lg font-semibold text-[#1a1a1a] tracking-wide" style={{ fontFamily: 'var(--font-display)' }}>Onshore</span>
+            <Link href="/" className="flex items-center hover:no-underline">
+              <Image src="/logo.png" alt="Onshore Deliver" width={36} height={36} className="rounded-sm" />
             </Link>
 
             {/* Desktop nav */}
