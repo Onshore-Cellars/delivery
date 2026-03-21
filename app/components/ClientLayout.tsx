@@ -5,6 +5,7 @@ import { AuthProvider, useAuth } from './AuthProvider'
 import Navbar from './Navbar'
 import CookieConsent from './CookieConsent'
 import PushNotificationPrompt from './PushNotificationPrompt'
+import AIChatWidget from './AIChatWidget'
 import { I18nProvider } from '@/lib/i18n'
 import { usePathname } from 'next/navigation'
 import { ReactNode } from 'react'
@@ -57,6 +58,7 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
         {!isLandingPage && !isAuthPage && <Footer />}
         <CookieConsent />
         <PushPromptWrapper />
+        <AIChatWidget />
       </AuthProvider>
     </I18nProvider>
   )

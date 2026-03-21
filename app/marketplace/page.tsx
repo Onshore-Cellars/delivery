@@ -170,6 +170,12 @@ export default function MarketplacePage() {
   const [alertSuccess, setAlertSuccess] = useState(false)
   const [shareToast, setShareToast] = useState(false)
 
+  // AI search state
+  const [aiQuery, setAiQuery] = useState('')
+  const [aiSearching, setAiSearching] = useState(false)
+  const [aiParsedSummary, setAiParsedSummary] = useState('')
+  const [aiError, setAiError] = useState('')
+
   const [bookingModal, setBookingModal] = useState<Listing | null>(null)
   const [bookingForm, setBookingForm] = useState<BookingForm>({
     listingId: '', cargoDescription: '', cargoType: '', weightKg: '', volumeM3: '',
@@ -312,6 +318,60 @@ export default function MarketplacePage() {
   }
 
   const handleSearch = () => { setCurrentPage(1); fetchListings(1) }
+
+  const handleAiSearch = async () => {
+    if (!aiQuery.trim() || !token) return
+    setAiSearching(true)
+    setAiError('')
+    setAiParsedSummary('')
+    try {
+      const res = await fetch('/api/ai/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ query: aiQuery.trim() }),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error || 'Failed to parse search')
+      }
+      const parsed = await res.json()
+
+      // Map parsed AI response to existing filter state
+      setFilters(f => ({
+        ...f,
+        origin: parsed.originPort || f.origin,
+        destination: parsed.destinationPort || f.destination,
+        dateFrom: parsed.dateFrom || f.dateFrom,
+        vehicleType: parsed.vehicleType || f.vehicleType,
+        maxPrice: parsed.maxPrice ? String(parsed.maxPrice) : f.maxPrice,
+        direction: parsed.direction && parsed.direction !== 'both' ? parsed.direction : f.direction,
+        features: {
+          ...f.features,
+          refrigerated: parsed.needsRefrigeration || f.features.refrigerated,
+        },
+        // Reset geo coords since AI gives port names, not coords
+        originLat: null, originLng: null, destLat: null, destLng: null,
+      }))
+
+      // Build summary string
+      const parts: string[] = []
+      if (parsed.originPort && parsed.destinationPort) parts.push(`${parsed.originPort} → ${parsed.destinationPort}`)
+      else if (parsed.originPort) parts.push(`from ${parsed.originPort}`)
+      else if (parsed.destinationPort) parts.push(`to ${parsed.destinationPort}`)
+      if (parsed.cargoType) parts.push(parsed.cargoType)
+      if (parsed.vehicleType) parts.push(parsed.vehicleType)
+      if (parsed.maxPrice) parts.push(`max €${parsed.maxPrice}`)
+      if (parsed.dateFrom) parts.push(parsed.dateFrom)
+      if (parsed.needsRefrigeration) parts.push('refrigerated')
+      setAiParsedSummary(parts.length > 0 ? `AI parsed: ${parts.join(', ')}` : 'AI parsed your query')
+
+      setCurrentPage(1)
+    } catch (err) {
+      setAiError(err instanceof Error ? err.message : 'AI search failed')
+    } finally {
+      setAiSearching(false)
+    }
+  }
 
   const resetFilters = () => {
     setFilters({ origin: '', destination: '', dateFrom: '', vehicleType: '', direction: '', minPrice: '', maxPrice: '', minWeight: '', minVolume: '', sort: '', features: { refrigerated: false, gps: false, tailLift: false }, originLat: null, originLng: null, destLat: null, destLng: null, radiusKm: '50' })
@@ -735,6 +795,58 @@ export default function MarketplacePage() {
             >
               Loads Needing Drivers
             </button>
+          </div>
+
+          {/* AI Search bar */}
+          <div className="mb-4">
+            <form
+              onSubmit={(e) => { e.preventDefault(); handleAiSearch() }}
+              className="flex gap-2"
+            >
+              <div className="relative flex-1">
+                <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#C6904D]">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
+                  </svg>
+                </div>
+                <input
+                  type="text"
+                  value={aiQuery}
+                  onChange={(e) => setAiQuery(e.target.value)}
+                  placeholder="Try: 'wine delivery from Antibes to Palma next week under €200'"
+                  className="w-full pl-11 pr-4 py-3 rounded-xl border border-[#C6904D]/30 bg-[#C6904D]/[0.03] text-[15px] text-[#1a1a1a] placeholder:text-slate-400 focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 transition-all outline-none"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={aiSearching || !aiQuery.trim()}
+                className="flex items-center gap-2 px-5 py-3 rounded-xl bg-[#C6904D] text-white text-sm font-semibold hover:bg-[#b5803f] disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
+              >
+                {aiSearching ? (
+                  <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+                ) : (
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                )}
+                <span className="hidden sm:inline">Search with AI</span>
+              </button>
+            </form>
+            {aiParsedSummary && (
+              <div className="flex items-center gap-2 mt-2">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#C6904D]/10 text-[#C6904D] rounded-full text-xs font-medium">
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" /></svg>
+                  {aiParsedSummary}
+                </span>
+                <button
+                  onClick={() => { setAiParsedSummary(''); setAiQuery(''); resetFilters() }}
+                  className="text-xs text-slate-400 hover:text-slate-600 transition-colors"
+                >
+                  Clear
+                </button>
+              </div>
+            )}
+            {aiError && (
+              <p className="mt-2 text-xs text-red-500">{aiError}</p>
+            )}
           </div>
 
           {/* Search bar */}

@@ -12,6 +12,7 @@ interface ProfileData {
   canCarry: boolean; canShip: boolean
   yachtName?: string; yachtMMSI?: string; yachtIMO?: string; yachtFlag?: string
   yachtLength?: number; yachtType?: string; homePort?: string
+  preferredLanguage?: string
   emailNotifications: boolean; smsNotifications: boolean
   verified: boolean; createdAt: string; stripeAccountId?: string
   _count: { listings: number; bookings: number; receivedReviews: number; documents: number; vehicles: number }
@@ -48,6 +49,7 @@ export default function ProfilePage() {
           yachtIMO: data.user.yachtIMO || '', yachtFlag: data.user.yachtFlag || '',
           yachtLength: data.user.yachtLength || '', yachtType: data.user.yachtType || '',
           homePort: data.user.homePort || '',
+          preferredLanguage: data.user.preferredLanguage || 'en',
           emailNotifications: data.user.emailNotifications, smsNotifications: data.user.smsNotifications,
         })
       }
@@ -327,6 +329,42 @@ export default function ProfilePage() {
                 List Van Space
               </a>
             )}
+          </div>
+        </div>
+
+        {/* Language & Region */}
+        <div className="bg-white rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-6 sm:p-8 mb-6">
+          <h2 className="font-semibold text-[#1a1a1a] mb-2" style={{ fontFamily: 'var(--font-display)' }}>Language & Region</h2>
+          <p className="text-xs text-slate-500 mb-5">Choose your preferred language for the platform.</p>
+          <div>
+            <label className="block text-sm font-medium text-[#1a1a1a] mb-1">Preferred Language</label>
+            <select
+              className="w-full px-4 py-3 sm:py-2.5 rounded-lg border border-slate-200 text-base sm:text-sm text-[#1a1a1a] focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 outline-none"
+              value={(form.preferredLanguage as string) || 'en'}
+              onChange={async (e) => {
+                const val = e.target.value
+                setForm({...form, preferredLanguage: val})
+                setError('')
+                if (token) {
+                  try {
+                    const res = await fetch('/api/profile', { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ preferredLanguage: val }) })
+                    if (res.ok) {
+                      setSuccess('Language preference saved')
+                    } else {
+                      setForm({...form, preferredLanguage: form.preferredLanguage})
+                      setError('Failed to update language preference.')
+                    }
+                  } catch {
+                    setForm({...form, preferredLanguage: form.preferredLanguage})
+                    setError('Failed to update language preference.')
+                  }
+                }
+              }}
+            >
+              {Object.entries({ en: 'English', fr: 'Fran\u00e7ais', es: 'Espa\u00f1ol', it: 'Italiano', el: '\u0395\u03bb\u03bb\u03b7\u03bd\u03b9\u03ba\u03ac', nl: 'Nederlands', de: 'Deutsch', pt: 'Portugu\u00eas', tr: 'T\u00fcrk\u00e7e', hr: 'Hrvatski', ar: '\u0627\u0644\u0639\u0631\u0628\u064a\u0629' }).map(([code, label]) => (
+                <option key={code} value={code}>{label}</option>
+              ))}
+            </select>
           </div>
         </div>
 

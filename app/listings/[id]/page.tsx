@@ -80,9 +80,12 @@ export default function ListingDetailPage() {
   const [bookingForm, setBookingForm] = useState({
     cargoDescription: '', cargoType: '', weightKg: '', volumeM3: '',
     specialHandling: '', deliveryAddress: '', vesselName: '', marinaName: '', deliveryNotes: '',
+    insuranceTier: '', temperatureReq: '', isFragile: false, isDangerous: false,
   })
   const [bidForm, setBidForm] = useState({ amount: '', weightKg: '', volumeM3: '', message: '' })
   const [messageContent, setMessageContent] = useState('')
+  const [classifying, setClassifying] = useState(false)
+  const [cargoWarnings, setCargoWarnings] = useState<string[]>([])
 
   const fetchListing = useCallback(async () => {
     setFetchError('')
@@ -165,6 +168,39 @@ export default function ListingDetailPage() {
       setShowContact(false)
     } catch (err) { setFormError(err instanceof Error ? err.message : 'Failed') }
     finally { setFormLoading(false) }
+  }
+
+  const classifyCargo = async () => {
+    if (!bookingForm.cargoDescription.trim()) return
+    setClassifying(true)
+    setCargoWarnings([])
+    try {
+      const res = await fetch('/api/ai/classify-cargo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ description: bookingForm.cargoDescription }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Classification failed')
+      const result = data.result || data
+      setBookingForm(prev => ({
+        ...prev,
+        cargoType: result.cargoType || prev.cargoType,
+        weightKg: (!prev.weightKg || prev.weightKg === '0') && result.estimatedWeightKg ? String(result.estimatedWeightKg) : prev.weightKg,
+        volumeM3: (!prev.volumeM3 || prev.volumeM3 === '0') && result.estimatedVolumeM3 ? String(result.estimatedVolumeM3) : prev.volumeM3,
+        insuranceTier: result.suggestedInsuranceTier || prev.insuranceTier,
+        temperatureReq: result.temperatureRequired || prev.temperatureReq,
+        isFragile: result.isFragile ?? prev.isFragile,
+        isDangerous: result.isDangerous ?? prev.isDangerous,
+        specialHandling: result.specialHandling || prev.specialHandling,
+      }))
+      if (result.warnings?.length) setCargoWarnings(result.warnings)
+    } catch (err) {
+      console.error(err)
+      setCargoWarnings([err instanceof Error ? err.message : 'Failed to classify cargo'])
+    } finally {
+      setClassifying(false)
+    }
   }
 
   if (loading) return <div className="flex items-center justify-center py-20"><div className="loading-shimmer w-64 h-8 rounded-lg" /></div>
@@ -398,7 +434,18 @@ export default function ListingDetailPage() {
                 <button onClick={() => setShowBooking(false)} className="p-2 hover:bg-slate-100 rounded-lg"><svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
               </div>
               <form onSubmit={submitBooking} className="p-6 space-y-4">
-                <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Cargo *</label><input required className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]" placeholder="e.g. Provisions for MY Serenity" value={bookingForm.cargoDescription} onChange={e => setBookingForm({...bookingForm, cargoDescription: e.target.value})} /></div>
+                <div>
+                  <label className="block text-sm font-medium text-[#1a1a1a] mb-1">Cargo *</label>
+                  <input required className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]" placeholder="e.g. Provisions for MY Serenity" value={bookingForm.cargoDescription} onChange={e => setBookingForm({...bookingForm, cargoDescription: e.target.value})} />
+                  <button type="button" onClick={classifyCargo} disabled={classifying || !bookingForm.cargoDescription.trim()} className="mt-1.5 text-xs font-medium text-[#C6904D] hover:text-[#b07e3a] disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                    {classifying ? 'Analyzing...' : 'Analyze with AI \u2726'}
+                  </button>
+                  {cargoWarnings.length > 0 && (
+                    <div className="mt-2 px-3 py-2 rounded-lg bg-amber-50 border border-amber-200">
+                      {cargoWarnings.map((w, i) => <p key={i} className="text-xs text-amber-700">{w}</p>)}
+                    </div>
+                  )}
+                </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Weight (kg) *</label><input type="number" required step="0.1" max={listing.availableKg} className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]" value={bookingForm.weightKg} onChange={e => setBookingForm({...bookingForm, weightKg: e.target.value})} /></div>
                   <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Volume (m&sup3;) *</label><input type="number" required step="0.1" max={listing.availableM3} className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]" value={bookingForm.volumeM3} onChange={e => setBookingForm({...bookingForm, volumeM3: e.target.value})} /></div>

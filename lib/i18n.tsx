@@ -4,9 +4,9 @@ import { createContext, useContext, useState, useCallback, ReactNode, useEffect 
 
 // ─── TRANSLATIONS ─────────────────────────────────────────────────────────────
 
-export type Locale = 'en' | 'fr'
+export type Locale = 'en' | 'fr' | 'es' | 'it' | 'el' | 'nl' | 'de' | 'pt' | 'tr' | 'hr' | 'ar'
 
-const translations: Record<Locale, Record<string, string>> = {
+const translations: Partial<Record<Locale, Record<string, string>>> & { en: Record<string, string> } = {
   en: {
     // Navigation
     'nav.search': 'Search Routes',

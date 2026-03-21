@@ -69,6 +69,7 @@ export default function CreateListingPage() {
   const [estimateDistance, setEstimateDistance] = useState('')
   const [estimateLoading, setEstimateLoading] = useState(false)
   const [estimateOpen, setEstimateOpen] = useState(false)
+  const [generatingDescription, setGeneratingDescription] = useState(false)
 
   const makes = useMemo(() => getVehicleMakes(), [])
   const modelsForMake = useMemo(() => selectedMake ? getModelsForMake(selectedMake) : [], [selectedMake])
@@ -128,6 +129,40 @@ export default function CreateListingPage() {
       setCostEstimate(null)
     } finally {
       setEstimateLoading(false)
+    }
+  }
+
+  const handleGenerateDescription = async () => {
+    setGeneratingDescription(true)
+    try {
+      const features = [
+        form.hasRefrigeration && 'Refrigeration',
+        form.hasTailLift && 'Tail Lift',
+        form.hasGPS && 'GPS Tracking',
+      ].filter(Boolean)
+      const res = await fetch('/api/ai/listing-description', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          origin: form.originPort,
+          destination: form.destinationPort,
+          vehicleType: form.vehicleType,
+          vehicleName: form.vehicleName,
+          departureDate: form.departureDate,
+          capacity: form.totalCapacityKg ? `${form.totalCapacityKg}kg / ${form.totalCapacityM3}m³` : '',
+          features,
+          routeDirection: form.routeDirection,
+          acceptedCargo: form.acceptedCargo,
+          returnNotes: form.returnNotes,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to generate description')
+      setForm(prev => ({ ...prev, description: data.description }))
+    } catch {
+      // silently fail – user can still type manually
+    } finally {
+      setGeneratingDescription(false)
     }
   }
 
@@ -363,7 +398,27 @@ export default function CreateListingPage() {
               </div>
 
               <div>
-                <label className={labelCls}>Description</label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-sm font-medium text-[#1a1a1a]">Description</label>
+                  <button
+                    type="button"
+                    onClick={handleGenerateDescription}
+                    disabled={generatingDescription}
+                    className="inline-flex items-center gap-1 text-xs font-medium text-[#C6904D] hover:text-[#b07e3a] disabled:opacity-50 transition-colors"
+                  >
+                    {generatingDescription ? (
+                      <>
+                        <span className="animate-spin inline-block w-3 h-3 border border-current border-t-transparent rounded-full" />
+                        Generating…
+                      </>
+                    ) : (
+                      <>
+                        <span className="text-sm leading-none">&#10022;</span>
+                        Generate with AI
+                      </>
+                    )}
+                  </button>
+                </div>
                 <textarea
                   name="description"
                   rows={3}

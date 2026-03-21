@@ -163,6 +163,9 @@ model User {
   operatingRegions    String[]  @default([])    // e.g. ["French Riviera", "South Coast UK", "Balearics"]
   languagesSpoken     String[]  @default([])    // e.g. ["en", "fr", "es"]
 
+  // Language / i18n preference
+  preferredLanguage   String    @default("en")  // ISO 639-1: en, fr, es, it, el, nl, de, pt, tr, hr, ar
+
   verified        Boolean   @default(false)
   suspended       Boolean   @default(false)
   lastLoginAt     DateTime?
@@ -567,6 +570,9 @@ model Message {
   content         String
   type            MessageType  @default(TEXT)
   attachmentUrl   String?
+
+  // AI translation cache: JSON map of { "fr": "translated text", "es": "..." }
+  translations    String?
 
   read            Boolean      @default(false)
   readAt          DateTime?

@@ -29,7 +29,15 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     const messages = await prisma.message.findMany({
       where: { conversationId: id },
-      include: {
+      select: {
+        id: true,
+        conversationId: true,
+        senderId: true,
+        content: true,
+        translations: true,
+        read: true,
+        readAt: true,
+        createdAt: true,
         sender: { select: { id: true, name: true, avatarUrl: true } },
       },
       orderBy: { createdAt: 'asc' },
@@ -47,7 +55,13 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     const otherUser = conversation.user1Id === decoded.userId ? conversation.user2 : conversation.user1
 
-    return NextResponse.json({ conversation, messages, otherUser })
+    const viewer = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+      select: { preferredLanguage: true },
+    })
+    const viewerLanguage = viewer?.preferredLanguage || null
+
+    return NextResponse.json({ conversation, messages, otherUser, viewerLanguage })
   } catch (error) {
     console.error('Messages fetch error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
