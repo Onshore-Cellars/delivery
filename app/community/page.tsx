@@ -44,6 +44,7 @@ export default function CommunityPage() {
   const [showNewPost, setShowNewPost] = useState(false)
   const [newPost, setNewPost] = useState({ title: '', content: '', category: 'general' })
   const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
 
   const fetchPosts = useCallback(async () => {
     setLoading(true)
@@ -55,8 +56,13 @@ export default function CommunityPage() {
       if (res.ok) {
         const data = await res.json()
         setPosts(data.posts || [])
+        setError('')
+      } else {
+        setError('Failed to load posts.')
       }
-    } catch { /* ignore */ }
+    } catch {
+      setError('Failed to load posts.')
+    }
     finally { setLoading(false) }
   }, [category])
 
@@ -75,9 +81,14 @@ export default function CommunityPage() {
       if (res.ok) {
         setNewPost({ title: '', content: '', category: 'general' })
         setShowNewPost(false)
+        setError('')
         fetchPosts()
+      } else {
+        setError('Failed to create post. Please try again.')
       }
-    } catch { /* ignore */ }
+    } catch {
+      setError('Failed to create post. Please try again.')
+    }
     finally { setSubmitting(false) }
   }
 
@@ -111,6 +122,12 @@ export default function CommunityPage() {
           </button>
         )}
       </div>
+
+      {error && (
+        <div className="mb-6 px-4 py-3 rounded-lg bg-red-50 border border-red-200">
+          <p className="text-sm text-red-700 font-medium">{error}</p>
+        </div>
+      )}
 
       {/* New post form */}
       {showNewPost && (

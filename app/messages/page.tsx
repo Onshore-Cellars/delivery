@@ -44,6 +44,7 @@ export default function MessagesPage() {
   const [newMessage, setNewMessage] = useState('')
   const [loading, setLoading] = useState(true)
   const [sending, setSending] = useState(false)
+  const [error, setError] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const fetchConversations = useCallback(async () => {
@@ -53,8 +54,14 @@ export default function MessagesPage() {
       if (res.ok) {
         const data = await res.json()
         setConversations(data.conversations || [])
+        setError('')
+      } else {
+        setError('Failed to load conversations.')
       }
-    } catch (err) { console.error(err) }
+    } catch (err) {
+      console.error(err)
+      setError('Failed to load conversations.')
+    }
     finally { setLoading(false) }
   }, [token])
 
@@ -67,8 +74,13 @@ export default function MessagesPage() {
         setMessages(data.messages || [])
         setOtherUser(data.otherUser)
         setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100)
+      } else {
+        setError('Failed to load messages.')
       }
-    } catch (err) { console.error(err) }
+    } catch (err) {
+      console.error(err)
+      setError('Failed to load messages.')
+    }
   }, [token])
 
   useEffect(() => {
@@ -101,8 +113,13 @@ export default function MessagesPage() {
         setNewMessage('')
         if (activeConv) fetchMessages(activeConv)
         fetchConversations()
+      } else {
+        setError('Failed to send message. Please try again.')
       }
-    } catch (err) { console.error(err) }
+    } catch (err) {
+      console.error(err)
+      setError('Failed to send message. Please try again.')
+    }
     finally { setSending(false) }
   }
 
@@ -124,6 +141,12 @@ export default function MessagesPage() {
           <p className="text-[11px] font-semibold text-[#C6904D] uppercase tracking-[0.15em] mb-1">Communication</p>
           <h1 className="text-xl sm:text-2xl font-semibold text-[#1a1a1a] tracking-[-0.02em]">Messages</h1>
         </div>
+
+        {error && (
+          <div className="mb-4 px-4 py-3 rounded-lg bg-red-50 border border-red-200">
+            <p className="text-sm text-red-700 font-medium">{error}</p>
+          </div>
+        )}
 
         <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] overflow-hidden" style={{ height: 'calc(100vh - 220px)' }}>
           <div className="flex h-full">

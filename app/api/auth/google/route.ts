@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
       }
     } else {
       // New user — role is required for registration
-      const validRoles = ['CARRIER', 'SUPPLIER', 'YACHT_OWNER']
+      const validRoles = ['CARRIER', 'SUPPLIER', 'YACHT_OWNER', 'CREW']
       if (!role || !validRoles.includes(role)) {
         return NextResponse.json(
           { error: 'ROLE_REQUIRED', message: 'Please select your account type' },

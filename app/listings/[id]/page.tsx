@@ -78,6 +78,7 @@ export default function ListingDetailPage() {
   const { user, token } = useAuth()
   const [listing, setListing] = useState<ListingDetail | null>(null)
   const [loading, setLoading] = useState(true)
+  const [fetchError, setFetchError] = useState('')
   const [showBooking, setShowBooking] = useState(false)
   const [showBid, setShowBid] = useState(false)
   const [showContact, setShowContact] = useState(false)
@@ -93,13 +94,19 @@ export default function ListingDetailPage() {
   const [messageContent, setMessageContent] = useState('')
 
   const fetchListing = useCallback(async () => {
+    setFetchError('')
     try {
       const res = await fetch(`/api/listings/${params.id}`)
       if (res.ok) {
         const data = await res.json()
         setListing(data.listing)
+      } else {
+        setFetchError('Failed to load listing. It may have been removed.')
       }
-    } catch (err) { console.error(err) }
+    } catch (err) {
+      console.error(err)
+      setFetchError('Failed to load listing. Please try again.')
+    }
     finally { setLoading(false) }
   }, [params.id])
 
@@ -170,7 +177,7 @@ export default function ListingDetailPage() {
   }
 
   if (loading) return <div className="flex items-center justify-center py-20"><div className="loading-shimmer w-64 h-8 rounded-lg" /></div>
-  if (!listing) return <div className="flex items-center justify-center py-20"><p className="text-slate-500">Listing not found</p></div>
+  if (!listing) return <div className="flex items-center justify-center py-20"><p className="text-slate-500">{fetchError || 'Listing not found'}</p></div>
 
   const fillPercent = listing.totalCapacityKg > 0 ? Math.round(((listing.totalCapacityKg - listing.availableKg) / listing.totalCapacityKg) * 100) : 0
   let acceptedCargo: string[] = []

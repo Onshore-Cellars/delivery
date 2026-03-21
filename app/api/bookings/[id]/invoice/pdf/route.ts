@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
-import { verifyToken } from '@/lib/auth'
+import { getTokenFromHeader, verifyToken } from '@/lib/auth'
 
 // GET /api/bookings/[id]/invoice/pdf — Generate PDF invoice/receipt
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
-    const token = req.headers.get('authorization')?.replace('Bearer ', '')
+    const token = getTokenFromHeader(req.headers.get('authorization'))
       || req.nextUrl.searchParams.get('token')
     if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 

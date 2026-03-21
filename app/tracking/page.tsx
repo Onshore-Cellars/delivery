@@ -68,7 +68,7 @@ export default function TrackingPage() {
         const d = await res.json()
         setUserBookings((d.bookings || []).filter((b: UserBooking) => b.trackingCode))
       }
-    } catch { /* ignore */ }
+    } catch (err) { console.error('Failed to fetch bookings:', err) }
     finally { setBookingsLoading(false) }
   }, [token])
 
@@ -83,11 +83,10 @@ export default function TrackingPage() {
 
     try {
       const res = await fetch(`/api/bookings/${encodeURIComponent(code.trim())}/tracking`)
+      const d = await res.json()
       if (!res.ok) {
-        const d = await res.json()
         throw new Error(d.error || 'Not found')
       }
-      const d = await res.json()
       setData(d)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to track')
