@@ -5,11 +5,13 @@ import { hashPassword } from '@/lib/auth'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { email, token, password } = body
+    const { email: rawEmail, token, password } = body
 
-    if (!email || !token || !password) {
+    if (!rawEmail || !token || !password) {
       return NextResponse.json({ error: 'Email, token, and new password are required' }, { status: 400 })
     }
+
+    const email = typeof rawEmail === 'string' ? rawEmail.toLowerCase().trim() : rawEmail
 
     if (password.length < 8) {
       return NextResponse.json({ error: 'Password must be at least 8 characters' }, { status: 400 })

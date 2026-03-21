@@ -201,7 +201,7 @@ function RegisterForm() {
 
             <div>
               <label htmlFor="password" className="block text-sm font-semibold text-[#1a1a1a] mb-2">Password</label>
-              <input id="password" name="password" type="password" required autoComplete="new-password" minLength={8} className={inputClass} placeholder="Min 8 characters" value={formData.password} onChange={handleChange} />
+              <input id="password" name="password" type="password" required autoComplete="new-password" minLength={8} className={inputClass} placeholder="Min 8 chars, upper + lower + number" value={formData.password} onChange={handleChange} />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
