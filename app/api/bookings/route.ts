@@ -106,14 +106,24 @@ export async function POST(request: NextRequest) {
       listingId, cargoDescription, cargoType, weightKg, volumeM3,
       cargoLengthCm, cargoWidthCm, cargoHeightCm, cargoImages,
       specialHandling, pickupAddress, pickupContact, pickupPhone, pickupEmail,
-      deliveryAddress, deliveryContact, deliveryPhone, deliveryEmail,
+      pickupNotes, pickupTimeWindow,
+      deliveryAddress, deliveryCity, deliveryCountry,
+      deliveryContact, deliveryPhone, deliveryEmail,
       deliveryNotes, deliveryTimeWindow,
       yachtName, yachtMMSI, berthNumber, marinaName, routeDirection,
       itemCount, declaredValue,
     } = body
 
     if (!listingId || !cargoDescription || !weightKg || !volumeM3) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+      return NextResponse.json({ error: 'Missing required fields: listingId, cargoDescription, weightKg, volumeM3' }, { status: 400 })
+    }
+
+    if (!pickupAddress || !pickupContact || !pickupPhone) {
+      return NextResponse.json({ error: 'Collection details required: pickupAddress, pickupContact, pickupPhone' }, { status: 400 })
+    }
+
+    if (!deliveryAddress || !deliveryContact || !deliveryPhone) {
+      return NextResponse.json({ error: 'Delivery details required: deliveryAddress, deliveryContact, deliveryPhone' }, { status: 400 })
     }
 
     const weight = parseFloat(weightKg)
@@ -269,7 +279,11 @@ export async function POST(request: NextRequest) {
           pickupContact: pickupContact || null,
           pickupPhone: pickupPhone || null,
           pickupEmail: pickupEmail || null,
+          pickupNotes: pickupNotes || null,
+          pickupTimeWindow: pickupTimeWindow || null,
           deliveryAddress: deliveryAddress || null,
+          deliveryCity: deliveryCity || null,
+          deliveryCountry: deliveryCountry || null,
           deliveryContact: deliveryContact || null,
           deliveryPhone: deliveryPhone || null,
           deliveryEmail: deliveryEmail || null,
@@ -356,6 +370,13 @@ export async function POST(request: NextRequest) {
           totalPrice: fullBooking.totalPrice,
           currency: fullBooking.currency,
           shipperId: fullBooking.shipperId,
+          pickupAddress: fullBooking.pickupAddress,
+          pickupContact: fullBooking.pickupContact,
+          pickupPhone: fullBooking.pickupPhone,
+          pickupTimeWindow: fullBooking.pickupTimeWindow,
+          deliveryAddress: fullBooking.deliveryAddress,
+          deliveryContact: fullBooking.deliveryContact,
+          deliveryPhone: fullBooking.deliveryPhone,
           listing: {
             title: fullBooking.listing.title,
             originPort: fullBooking.listing.originPort,

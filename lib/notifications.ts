@@ -87,6 +87,13 @@ export async function notifyBookingCreated(booking: {
   totalPrice: number
   currency: string
   shipperId: string
+  pickupAddress?: string | null
+  pickupContact?: string | null
+  pickupPhone?: string | null
+  pickupTimeWindow?: string | null
+  deliveryAddress?: string | null
+  deliveryContact?: string | null
+  deliveryPhone?: string | null
   listing: {
     title: string
     originPort: string
@@ -123,12 +130,19 @@ export async function notifyBookingCreated(booking: {
     await sendEmail({ to: booking.shipper.email, ...template })
   }
 
-  // Notify carrier
+  // Notify carrier with collection & delivery details
+  const pickupInfo = booking.pickupAddress
+    ? `\nCollection: ${booking.pickupAddress}${booking.pickupContact ? ` (${booking.pickupContact})` : ''}${booking.pickupPhone ? ` Tel: ${booking.pickupPhone}` : ''}${booking.pickupTimeWindow ? ` — ${booking.pickupTimeWindow}` : ''}`
+    : ''
+  const deliveryInfo = booking.deliveryAddress
+    ? `\nDelivery: ${booking.deliveryAddress}${booking.deliveryContact ? ` (${booking.deliveryContact})` : ''}${booking.deliveryPhone ? ` Tel: ${booking.deliveryPhone}` : ''}`
+    : ''
+
   await createNotification({
     userId: booking.listing.carrierId,
     type: 'BOOKING_CREATED',
     title: 'New Booking Received',
-    message: `${booking.shipper.name} booked space on ${booking.listing.title} (${priceStr})`,
+    message: `${booking.shipper.name} booked space on ${booking.listing.title} (${priceStr})${pickupInfo}${deliveryInfo}`,
     linkUrl: '/dashboard',
   })
 }

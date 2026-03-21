@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
+import CargoCalculator from '@/app/components/CargoCalculator'
 import { useAuth } from '../../components/AuthProvider'
 
 interface ListingDetail {
@@ -81,6 +82,12 @@ export default function ListingDetailPage() {
     cargoDescription: '', cargoType: '', weightKg: '', volumeM3: '',
     specialHandling: '', deliveryAddress: '', vesselName: '', marinaName: '', deliveryNotes: '',
     insuranceTier: '', temperatureReq: '', isFragile: false, isDangerous: false,
+    // Collection details
+    pickupAddress: '', pickupContact: '', pickupPhone: '', pickupNotes: '', pickupTimeWindow: '',
+    // Delivery details
+    deliveryCity: '', deliveryCountry: '', deliveryContact: '', deliveryPhone: '', deliveryTimeWindow: '',
+    // Value
+    declaredValue: '',
   })
   const [bidForm, setBidForm] = useState({ amount: '', weightKg: '', volumeM3: '', message: '' })
   const [messageContent, setMessageContent] = useState('')
@@ -433,26 +440,87 @@ export default function ListingDetailPage() {
                 <h2 className="text-xl font-bold text-[#1a1a1a]">Book Space</h2>
                 <button onClick={() => setShowBooking(false)} className="p-2 hover:bg-slate-100 rounded-lg"><svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
               </div>
-              <form onSubmit={submitBooking} className="p-6 space-y-4">
+              <form onSubmit={submitBooking} className="p-6 space-y-5">
+                {/* Cargo Details */}
                 <div>
-                  <label className="block text-sm font-medium text-[#1a1a1a] mb-1">Cargo *</label>
-                  <input required className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]" placeholder="e.g. Provisions for MY Serenity" value={bookingForm.cargoDescription} onChange={e => setBookingForm({...bookingForm, cargoDescription: e.target.value})} />
-                  <button type="button" onClick={classifyCargo} disabled={classifying || !bookingForm.cargoDescription.trim()} className="mt-1.5 text-xs font-medium text-[#C6904D] hover:text-[#b07e3a] disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
-                    {classifying ? 'Analyzing...' : 'Analyze with AI \u2726'}
-                  </button>
-                  {cargoWarnings.length > 0 && (
-                    <div className="mt-2 px-3 py-2 rounded-lg bg-amber-50 border border-amber-200">
-                      {cargoWarnings.map((w, i) => <p key={i} className="text-xs text-amber-700">{w}</p>)}
+                  <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3">Cargo Details</h3>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-sm font-medium text-[#1a1a1a] mb-1">Description *</label>
+                      <input required className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]" placeholder="e.g. 12 cases premium wine, temperature sensitive" value={bookingForm.cargoDescription} onChange={e => setBookingForm({...bookingForm, cargoDescription: e.target.value})} />
+                      <button type="button" onClick={classifyCargo} disabled={classifying || !bookingForm.cargoDescription.trim()} className="mt-1.5 text-xs font-medium text-[#C6904D] hover:text-[#b07e3a] disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                        {classifying ? 'Analyzing...' : 'Analyze with AI \u2726'}
+                      </button>
+                      {cargoWarnings.length > 0 && (
+                        <div className="mt-2 px-3 py-2 rounded-lg bg-amber-50 border border-amber-200">
+                          {cargoWarnings.map((w, i) => <p key={i} className="text-xs text-amber-700">{w}</p>)}
+                        </div>
+                      )}
                     </div>
-                  )}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Weight (kg) *</label><input type="number" required step="0.1" max={listing.availableKg} className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]" value={bookingForm.weightKg} onChange={e => setBookingForm({...bookingForm, weightKg: e.target.value})} /></div>
+                      <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Volume (m&sup3;) *</label><input type="number" required step="0.1" max={listing.availableM3} className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]" value={bookingForm.volumeM3} onChange={e => setBookingForm({...bookingForm, volumeM3: e.target.value})} /></div>
+                    </div>
+                    <CargoCalculator onCalculated={(wt, vol) => setBookingForm(prev => ({ ...prev, weightKg: String(wt), volumeM3: String(vol) }))} />
+                    <div className="grid grid-cols-2 gap-3">
+                      <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Declared Value</label><input type="number" step="0.01" className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]" placeholder="e.g. 5000" value={bookingForm.declaredValue} onChange={e => setBookingForm({...bookingForm, declaredValue: e.target.value})} /></div>
+                      <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Special Handling</label><input className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]" placeholder="e.g. Refrigerated" value={bookingForm.specialHandling} onChange={e => setBookingForm({...bookingForm, specialHandling: e.target.value})} /></div>
+                    </div>
+                  </div>
                 </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Weight (kg) *</label><input type="number" required step="0.1" max={listing.availableKg} className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]" value={bookingForm.weightKg} onChange={e => setBookingForm({...bookingForm, weightKg: e.target.value})} /></div>
-                  <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Volume (m&sup3;) *</label><input type="number" required step="0.1" max={listing.availableM3} className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]" value={bookingForm.volumeM3} onChange={e => setBookingForm({...bookingForm, volumeM3: e.target.value})} /></div>
+
+                {/* Collection Details */}
+                <div>
+                  <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3">Collection Details</h3>
+                  <div className="space-y-3">
+                    <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Pickup Address *</label><input required className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]" placeholder="Full address for cargo collection" value={bookingForm.pickupAddress} onChange={e => setBookingForm({...bookingForm, pickupAddress: e.target.value})} /></div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Contact Name *</label><input required className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]" placeholder="Who to ask for" value={bookingForm.pickupContact} onChange={e => setBookingForm({...bookingForm, pickupContact: e.target.value})} /></div>
+                      <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Contact Phone *</label><input required type="tel" className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]" placeholder="+44 7700 900000" value={bookingForm.pickupPhone} onChange={e => setBookingForm({...bookingForm, pickupPhone: e.target.value})} /></div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-sm font-medium text-[#1a1a1a] mb-1">Preferred Time</label>
+                        <select className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D] bg-white" value={bookingForm.pickupTimeWindow} onChange={e => setBookingForm({...bookingForm, pickupTimeWindow: e.target.value})}>
+                          <option value="">Any time</option>
+                          <option value="morning">Morning (8am–12pm)</option>
+                          <option value="afternoon">Afternoon (12–5pm)</option>
+                          <option value="evening">Evening (5–9pm)</option>
+                        </select>
+                      </div>
+                      <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Access Notes</label><input className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]" placeholder="Gate code, dock #, etc." value={bookingForm.pickupNotes} onChange={e => setBookingForm({...bookingForm, pickupNotes: e.target.value})} /></div>
+                    </div>
+                  </div>
                 </div>
-                <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Vessel Name</label><input className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]" placeholder="e.g. Site name or vessel" value={bookingForm.vesselName} onChange={e => setBookingForm({...bookingForm, vesselName: e.target.value})} /></div>
-                <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Marina / Berth</label><input className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]" placeholder="e.g. Port Hercules, Berth 42" value={bookingForm.marinaName} onChange={e => setBookingForm({...bookingForm, marinaName: e.target.value})} /></div>
-                <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Special Handling</label><input className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]" placeholder="e.g. Refrigerated, fragile, temperature-controlled" value={bookingForm.specialHandling} onChange={e => setBookingForm({...bookingForm, specialHandling: e.target.value})} /></div>
+
+                {/* Delivery Details */}
+                <div>
+                  <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3">Delivery Details</h3>
+                  <div className="space-y-3">
+                    <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Delivery Address *</label><input required className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]" placeholder="Full address for delivery" value={bookingForm.deliveryAddress} onChange={e => setBookingForm({...bookingForm, deliveryAddress: e.target.value})} /></div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Recipient Name *</label><input required className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]" placeholder="Who will receive" value={bookingForm.deliveryContact} onChange={e => setBookingForm({...bookingForm, deliveryContact: e.target.value})} /></div>
+                      <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Recipient Phone *</label><input required type="tel" className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]" placeholder="+33 6 12 34 56 78" value={bookingForm.deliveryPhone} onChange={e => setBookingForm({...bookingForm, deliveryPhone: e.target.value})} /></div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-sm font-medium text-[#1a1a1a] mb-1">Preferred Time</label>
+                        <select className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D] bg-white" value={bookingForm.deliveryTimeWindow} onChange={e => setBookingForm({...bookingForm, deliveryTimeWindow: e.target.value})}>
+                          <option value="">Any time</option>
+                          <option value="morning">Morning (8am–12pm)</option>
+                          <option value="afternoon">Afternoon (12–5pm)</option>
+                          <option value="evening">Evening (5–9pm)</option>
+                        </select>
+                      </div>
+                      <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Vessel / Site Name</label><input className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]" placeholder="e.g. MY Serenity" value={bookingForm.vesselName} onChange={e => setBookingForm({...bookingForm, vesselName: e.target.value})} /></div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Marina / Berth</label><input className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]" placeholder="e.g. Port Hercules, Berth 42" value={bookingForm.marinaName} onChange={e => setBookingForm({...bookingForm, marinaName: e.target.value})} /></div>
+                      <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Delivery Notes</label><input className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]" placeholder="Special instructions" value={bookingForm.deliveryNotes} onChange={e => setBookingForm({...bookingForm, deliveryNotes: e.target.value})} /></div>
+                    </div>
+                  </div>
+                </div>
+
                 <button type="submit" disabled={formLoading} className="w-full btn-primary !py-3 text-sm disabled:opacity-50">{formLoading ? 'Confirming...' : 'Confirm Booking'}</button>
               </form>
             </div>

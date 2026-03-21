@@ -1,24 +1,23 @@
-// Top 200 most common passwords that pass basic complexity rules
-const COMMON_PASSWORDS = new Set([
-  'Password1', 'Password123', 'Qwerty123', 'Abc12345', 'Admin123',
-  'Welcome1', 'Passw0rd', 'Change123', 'Letmein1', 'Master123',
-  'Summer2024', 'Winter2024', 'Spring2024', 'Autumn2024',
-  'Iloveyou1', 'Sunshine1', 'Princess1', 'Football1', 'Charlie1',
-  'Shadow123', 'Dragon123', 'Michael1', 'Jordan123', 'Monkey123',
-  'Liverpool1', 'Arsenal123', 'Chelsea123', 'Delivery1', 'Onshore1',
-  'Password12', 'Qwerty1234', 'Abcdef123', 'Trustno1', 'Baseball1',
-  'Superman1', 'Batman123', 'Matrix123', 'Flower123', 'Hello123',
-  'P@ssw0rd', 'Pa$$word1', 'Passw0rd1', 'Test1234', 'User1234',
+// Common passwords that pass basic complexity rules (stored lowercase for fast lookup)
+const COMMON_PASSWORDS_LOWER = new Set([
+  'password1', 'password123', 'qwerty123', 'abc12345', 'admin123',
+  'welcome1', 'passw0rd', 'change123', 'letmein1', 'master123',
+  'summer2024', 'winter2024', 'spring2024', 'autumn2024',
+  'summer2025', 'winter2025', 'spring2025', 'autumn2025',
+  'summer2026', 'winter2026', 'spring2026', 'autumn2026',
+  'iloveyou1', 'sunshine1', 'princess1', 'football1', 'charlie1',
+  'shadow123', 'dragon123', 'michael1', 'jordan123', 'monkey123',
+  'liverpool1', 'arsenal123', 'chelsea123', 'delivery1', 'onshore1',
+  'password12', 'qwerty1234', 'abcdef123', 'trustno1', 'baseball1',
+  'superman1', 'batman123', 'matrix123', 'flower123', 'hello123',
+  'p@ssw0rd', 'pa$$word1', 'passw0rd1', 'test1234', 'user1234',
+  'secure123', 'access123', 'marine123', 'yacht1234', 'boat12345',
 ])
 
 export function isCommonPassword(password: string): boolean {
-  // Check exact match (case-insensitive)
-  if (COMMON_PASSWORDS.has(password)) return true
-  // Check lowercase version
-  for (const common of COMMON_PASSWORDS) {
-    if (password.toLowerCase() === common.toLowerCase()) return true
-  }
-  // Check if it's just a word + numbers pattern like "Company2024"
+  // Case-insensitive lookup via pre-lowered set
+  if (COMMON_PASSWORDS_LOWER.has(password.toLowerCase())) return true
+  // Check if it's just a word + 4 digits pattern like "Company2024"
   if (/^[A-Za-z]+\d{4}$/.test(password) && password.length < 12) return true
   return false
 }

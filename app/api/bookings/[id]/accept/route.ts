@@ -20,7 +20,14 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
     const booking = await prisma.booking.findUnique({
       where: { id },
-      include: { listing: { select: { carrierId: true, id: true } } },
+      include: {
+        listing: {
+          select: {
+            carrierId: true, id: true, originPort: true, destinationPort: true, departureDate: true,
+            carrier: { select: { id: true, name: true, company: true, phone: true, email: true } },
+          },
+        },
+      },
     })
 
     if (!booking) return NextResponse.json({ error: 'Booking not found' }, { status: 404 })
@@ -37,14 +44,27 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         data: { status: 'ACCEPTED' },
       })
 
-      // Notify shipper
+      // Notify shipper with carrier details
+      const carrier = booking.listing.carrier
+      const carrierInfo = [
+        carrier.name || carrier.company || 'Your carrier',
+        carrier.phone ? `Phone: ${carrier.phone}` : null,
+        carrier.email ? `Email: ${carrier.email}` : null,
+      ].filter(Boolean).join(' | ')
+
       await prisma.notification.create({
         data: {
           userId: booking.shipperId,
           type: 'BOOKING_CONFIRMED',
           title: 'Booking Accepted',
-          message: `Your booking #${booking.trackingCode} has been accepted by the carrier. You can now proceed to payment.`,
-          metadata: JSON.stringify({ bookingId: id }),
+          message: `Your booking #${booking.trackingCode} has been accepted! Carrier: ${carrierInfo}. You can now proceed to payment.`,
+          metadata: JSON.stringify({
+            bookingId: id,
+            carrierName: carrier.name,
+            carrierPhone: carrier.phone,
+            carrierEmail: carrier.email,
+            carrierCompany: carrier.company,
+          }),
         },
       })
 

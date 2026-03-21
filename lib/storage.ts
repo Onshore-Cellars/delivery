@@ -70,8 +70,8 @@ export async function uploadFile(options: UploadOptions): Promise<UploadResult> 
     throw new Error(`File type not allowed: ${options.contentType}`)
   }
 
-  // Validate file size
-  const size = typeof options.body === 'string' ? options.body.length : options.body.length
+  // Validate file size (use byte length for strings to handle multi-byte UTF-8)
+  const size = typeof options.body === 'string' ? new TextEncoder().encode(options.body).length : options.body.length
   if (size > MAX_FILE_SIZE) {
     throw new Error(`File too large: ${size} bytes (max ${MAX_FILE_SIZE})`)
   }

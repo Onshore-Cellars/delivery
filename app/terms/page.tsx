@@ -68,8 +68,11 @@ export default function TermsPage() {
             <li>Users must not use contact details obtained through the Platform to arrange deliveries outside the Platform or to circumvent the Platform&rsquo;s payment system.</li>
             <li>Contact details of counterparties are only shared after a booking is confirmed and payment is processed.</li>
             <li>Attempts to solicit direct business or bypass Platform fees will result in immediate account suspension.</li>
+            <li><strong>Platform Fee Liability:</strong> If any user arranges a delivery with a counterparty initially introduced through the Platform without processing the transaction through the Platform (&ldquo;Circumvention&rdquo;), the circumventing user(s) shall remain jointly and severally liable to Onshore Delivery for the full platform fee that would have been payable, plus an administrative charge of 50% of that fee. This applies to any transaction completed within 24 months of the initial introduction through the Platform.</li>
+            <li><strong>Monitoring:</strong> We use automated monitoring, including AI-powered content analysis, to detect circumvention attempts in messages, listings, and user activity. Flagged activity is reviewed by our team and may result in account suspension, fee recovery, or legal action.</li>
+            <li><strong>Reporting:</strong> Users who become aware of circumvention attempts by other users are encouraged to report them. Confirmed reports may result in a referral credit.</li>
           </ul>
-          <p className="mt-2">We anonymise and protect contact details until bookings are confirmed to protect all parties and ensure the marketplace operates fairly for everyone.</p>
+          <p className="mt-2">We anonymise and protect contact details until bookings are confirmed to protect all parties and ensure the marketplace operates fairly for everyone. These measures exist to maintain a fair marketplace for all users.</p>
         </section>
 
         <section>
