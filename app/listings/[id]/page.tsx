@@ -167,7 +167,15 @@ export default function ListingDetailPage() {
   if (!listing) return <div className="flex items-center justify-center py-20"><p className="text-slate-500">Listing not found</p></div>
 
   const fillPercent = Math.round(((listing.totalCapacityKg - listing.availableKg) / listing.totalCapacityKg) * 100)
-  const acceptedCargo = listing.acceptedCargo ? JSON.parse(listing.acceptedCargo) : []
+  let acceptedCargo: string[] = []
+  if (listing.acceptedCargo) {
+    try {
+      const parsed = JSON.parse(listing.acceptedCargo)
+      acceptedCargo = Array.isArray(parsed) ? parsed : [listing.acceptedCargo]
+    } catch {
+      acceptedCargo = listing.acceptedCargo.split(',').map((s: string) => s.trim()).filter(Boolean)
+    }
+  }
 
   return (
     <div className="page-container">
