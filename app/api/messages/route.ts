@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma'
 import { verifyToken, getTokenFromHeader } from '@/lib/auth'
 import { notifyNewMessage } from '@/lib/notifications'
 import { checkMessageForPII } from '@/lib/pii-filter'
+import { translateText, type LanguageCode } from '@/lib/ai'
 
 // GET conversations list
 export async function GET(request: NextRequest) {
@@ -87,11 +88,24 @@ export async function POST(request: NextRequest) {
     })
 
     if (!conversation) {
+      let autoSubject = subject || null
+
+      // Auto-generate subject from booking reference if not provided
+      if (!autoSubject && bookingRef) {
+        const refBooking = await prisma.booking.findFirst({
+          where: { trackingCode: bookingRef },
+          select: { listing: { select: { originPort: true, destinationPort: true } } },
+        })
+        if (refBooking) {
+          autoSubject = `${refBooking.listing.originPort} → ${refBooking.listing.destinationPort}`
+        }
+      }
+
       conversation = await prisma.conversation.create({
         data: {
           user1Id: u1,
           user2Id: u2,
-          subject: subject || null,
+          subject: autoSubject,
           bookingRef: bookingRef || null,
         },
       })
@@ -107,6 +121,24 @@ export async function POST(request: NextRequest) {
         sender: { select: { id: true, name: true, avatarUrl: true } },
       },
     })
+
+    // Auto-translate if sender and recipient have different preferred languages
+    prisma.user.findUnique({ where: { id: recipientId }, select: { preferredLanguage: true } })
+      .then(async (recipientUser) => {
+        const senderUser = await prisma.user.findUnique({ where: { id: decoded.userId }, select: { preferredLanguage: true } })
+        const recipientLang = recipientUser?.preferredLanguage as LanguageCode | undefined
+        const senderLang = senderUser?.preferredLanguage as LanguageCode | undefined
+        if (recipientLang && senderLang && recipientLang !== senderLang) {
+          const translated = await translateText(content, recipientLang, senderLang)
+          if (translated && translated !== content) {
+            await prisma.message.update({
+              where: { id: message.id },
+              data: { translations: JSON.stringify({ [recipientLang]: translated }) },
+            })
+          }
+        }
+      })
+      .catch((err) => console.error('Translation error:', err))
 
     // Update conversation timestamp
     await prisma.conversation.update({

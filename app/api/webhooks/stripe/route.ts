@@ -20,6 +20,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
     }
 
+    // Idempotency check — skip if we've already processed this event
+    const eventId = event.id
+    const existingLog = await prisma.auditLog.findFirst({
+      where: { action: 'STRIPE_WEBHOOK', details: { contains: eventId } }
+    })
+    if (existingLog) {
+      return NextResponse.json({ received: true, duplicate: true })
+    }
+
+    // Log this webhook for idempotency
+    await prisma.auditLog.create({
+      data: {
+        action: 'STRIPE_WEBHOOK',
+        details: JSON.stringify({ eventId, type: event.type }),
+      }
+    })
+
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as { metadata?: { bookingId?: string }; payment_intent?: string }
@@ -141,6 +158,61 @@ export async function POST(request: NextRequest) {
           await prisma.booking.update({
             where: { id: bookingId },
             data: { paymentStatus: 'REFUNDED' },
+          })
+        }
+        break
+      }
+
+      case 'charge.dispute.created': {
+        const dispute = event.data.object as { payment_intent?: string; reason?: string; amount?: number }
+        // Find booking by payment intent
+        if (dispute.payment_intent) {
+          const booking = await prisma.booking.findFirst({
+            where: { stripePaymentIntentId: dispute.payment_intent as string },
+            include: { listing: { select: { carrierId: true } } }
+          })
+          if (booking) {
+            // Update booking status
+            await prisma.booking.update({
+              where: { id: booking.id },
+              data: { status: 'DISPUTED' }
+            })
+            // Create dispute record
+            await prisma.dispute.create({
+              data: {
+                bookingId: booking.id,
+                raisedById: booking.shipperId,
+                againstId: booking.listing.carrierId,
+                type: 'OTHER',
+                description: `Stripe dispute filed: ${dispute.reason || 'unknown reason'}`,
+                status: 'OPEN',
+                priority: 'URGENT',
+                claimAmount: dispute.amount ? dispute.amount / 100 : null,
+              }
+            })
+            // Notify admin
+            const admins = await prisma.user.findMany({ where: { role: 'ADMIN' }, select: { id: true } })
+            for (const admin of admins) {
+              await createNotification({
+                userId: admin.id,
+                type: 'SYSTEM',
+                title: 'Stripe Dispute Filed',
+                message: `A chargeback dispute has been filed for booking ${booking.trackingCode}`,
+                linkUrl: `/admin`,
+              })
+            }
+          }
+        }
+        break
+      }
+
+      case 'payment_intent.canceled': {
+        const intent = event.data.object as { metadata?: { bookingId?: string } }
+        const bookingId = intent.metadata?.bookingId
+        if (bookingId) {
+          await prisma.booking.update({
+            where: { id: bookingId },
+            data: { paymentStatus: 'FAILED', status: 'CANCELLED' }
           })
         }
         break

@@ -58,6 +58,8 @@ export default function TrackingPage() {
   const [error, setError] = useState('')
   const [userBookings, setUserBookings] = useState<UserBooking[]>([])
   const [bookingsLoading, setBookingsLoading] = useState(false)
+  const [shipmentsPage, setShipmentsPage] = useState(1)
+  const SHIPMENTS_PER_PAGE = 10
 
   const fetchUserBookings = useCallback(async () => {
     if (!token) return
@@ -128,7 +130,7 @@ export default function TrackingPage() {
           <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-6 mb-8">
             <h2 className="text-sm font-bold text-[#1a1a1a] mb-4">Your Shipments</h2>
             <div className="space-y-2">
-              {userBookings.slice(0, 10).map(b => (
+              {userBookings.slice((shipmentsPage - 1) * SHIPMENTS_PER_PAGE, shipmentsPage * SHIPMENTS_PER_PAGE).map(b => (
                 <button
                   key={b.id}
                   onClick={() => { setCode(b.trackingCode); setTimeout(() => { const form = document.querySelector('form'); if (form) form.requestSubmit() }, 50) }}
@@ -139,7 +141,7 @@ export default function TrackingPage() {
                       <span className="text-xs font-mono text-[#C6904D] font-semibold">{b.trackingCode}</span>
                       <span className={`px-1.5 py-0.5 rounded text-[9px] font-semibold uppercase ${
                         b.status === 'DELIVERED' ? 'bg-green-50 text-green-700' :
-                        b.status === 'IN_TRANSIT' ? 'bg-blue-50 text-blue-700' :
+                        b.status === 'IN_TRANSIT' ? 'bg-indigo-50 text-indigo-700' :
                         b.status === 'CANCELLED' ? 'bg-red-50 text-red-700' :
                         'bg-amber-50 text-amber-700'
                       }`}>{b.status.replace('_', ' ')}</span>
@@ -154,6 +156,27 @@ export default function TrackingPage() {
                 </button>
               ))}
             </div>
+            {userBookings.length > SHIPMENTS_PER_PAGE && (
+              <div className="flex items-center justify-between px-4 pt-3 mt-2 border-t border-slate-100">
+                <button
+                  onClick={() => setShipmentsPage(p => Math.max(1, p - 1))}
+                  disabled={shipmentsPage === 1}
+                  className="px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  Previous
+                </button>
+                <span className="text-xs text-slate-500">
+                  Page {shipmentsPage} of {Math.ceil(userBookings.length / SHIPMENTS_PER_PAGE)}
+                </span>
+                <button
+                  onClick={() => setShipmentsPage(p => Math.min(Math.ceil(userBookings.length / SHIPMENTS_PER_PAGE), p + 1))}
+                  disabled={shipmentsPage >= Math.ceil(userBookings.length / SHIPMENTS_PER_PAGE)}
+                  className="px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  Next
+                </button>
+              </div>
+            )}
           </div>
         )}
         {user && !data && bookingsLoading && (
@@ -173,7 +196,7 @@ export default function TrackingPage() {
                 <span className={`badge border ${
                   data.booking.status === 'DELIVERED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
                   data.booking.status === 'CANCELLED' ? 'bg-red-50 text-red-700 border-red-200' :
-                  'bg-blue-50 text-blue-700 border-blue-200'
+                  'bg-indigo-50 text-indigo-700 border-indigo-200'
                 }`}>
                   {data.booking.status.replace('_', ' ')}
                 </span>

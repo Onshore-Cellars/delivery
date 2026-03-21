@@ -83,6 +83,12 @@ interface ActivityItem {
   meta?: string
 }
 
+interface AIInsights {
+  highlights: string[]
+  anomalies: string[]
+  recommendations: string[]
+}
+
 type TabKey = 'overview' | 'users' | 'bookings' | 'listings' | 'documents' | 'notifications' | 'activity' | 'settings'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -93,7 +99,7 @@ const statusColors: Record<string, string> = {
   PENDING: 'bg-amber-50 text-amber-700 border-amber-200',
   CONFIRMED: 'bg-emerald-50 text-emerald-700 border-emerald-200',
   PICKED_UP: 'bg-cyan-50 text-cyan-700 border-cyan-200',
-  IN_TRANSIT: 'bg-blue-50 text-blue-700 border-blue-200',
+  IN_TRANSIT: 'bg-indigo-50 text-indigo-700 border-indigo-200',
   CUSTOMS_HOLD: 'bg-orange-50 text-orange-700 border-orange-200',
   DELIVERED: 'bg-slate-100 text-slate-600 border-slate-200',
   CANCELLED: 'bg-red-50 text-red-700 border-red-200',
@@ -104,14 +110,14 @@ const listingStatusColors: Record<string, string> = {
   DRAFT: 'bg-slate-50 text-slate-600 border-slate-200',
   ACTIVE: 'bg-emerald-50 text-emerald-700 border-emerald-200',
   FULL: 'bg-amber-50 text-amber-700 border-amber-200',
-  IN_TRANSIT: 'bg-blue-50 text-blue-700 border-blue-200',
+  IN_TRANSIT: 'bg-indigo-50 text-indigo-700 border-indigo-200',
   COMPLETED: 'bg-slate-100 text-slate-600 border-slate-200',
   CANCELLED: 'bg-red-50 text-red-700 border-red-200',
 }
 
 const paymentStatusColors: Record<string, string> = {
   PENDING: 'bg-amber-50 text-amber-700 border-amber-200',
-  PROCESSING: 'bg-blue-50 text-blue-700 border-blue-200',
+  PROCESSING: 'bg-indigo-50 text-indigo-700 border-indigo-200',
   PAID: 'bg-emerald-50 text-emerald-700 border-emerald-200',
   REFUNDED: 'bg-purple-50 text-purple-700 border-purple-200',
   FAILED: 'bg-red-50 text-red-700 border-red-200',
@@ -179,6 +185,8 @@ export default function AdminPage() {
   const [editListingForm, setEditListingForm] = useState<Record<string, unknown>>({})
   const [editBooking, setEditBooking] = useState<RecentBooking | null>(null)
   const [editBookingForm, setEditBookingForm] = useState<Record<string, unknown>>({})
+  const [aiInsights, setAiInsights] = useState<AIInsights | null>(null)
+  const [aiInsightsLoading, setAiInsightsLoading] = useState(false)
 
   // ─── Helpers ──────────────────────────────────────────────────────────────
 
@@ -196,6 +204,23 @@ export default function AdminPage() {
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
     setToast({ message, type })
     setTimeout(() => setToast(null), 3000)
+  }
+
+  const fetchAIInsights = async () => {
+    if (!token) return
+    setAiInsightsLoading(true)
+    try {
+      const res = await fetch('/api/ai/admin-insights', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (!res.ok) throw new Error('Failed to fetch AI insights')
+      const data = await res.json()
+      setAiInsights(data)
+    } catch {
+      showToast('Failed to generate AI insights', 'error')
+    } finally {
+      setAiInsightsLoading(false)
+    }
   }
 
   // ─── Data Fetching ────────────────────────────────────────────────────────
@@ -695,6 +720,68 @@ export default function AdminPage() {
             {/* ═══════════════════ OVERVIEW TAB ═══════════════════ */}
             {tab === 'overview' && stats && (
               <div className="space-y-8">
+                {/* AI Insights */}
+                <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h3 className="text-sm font-semibold text-[#1d1d1f]">AI Insights</h3>
+                      <p className="text-xs text-slate-500 mt-0.5">AI-powered analysis of platform data</p>
+                    </div>
+                    <button
+                      onClick={fetchAIInsights}
+                      disabled={aiInsightsLoading}
+                      className="px-4 py-2 text-xs font-medium rounded-lg bg-[#0071e3] text-white hover:bg-[#0077ED] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    >
+                      {aiInsightsLoading ? (
+                        <>
+                          <svg className="animate-spin h-3.5 w-3.5" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+                          Generating…
+                        </>
+                      ) : (
+                        'Generate AI Insights'
+                      )}
+                    </button>
+                  </div>
+
+                  {aiInsights && (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                      <div className="rounded-lg border border-slate-100 p-4">
+                        <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Highlights</h4>
+                        <ul className="space-y-2">
+                          {aiInsights.highlights.map((item, i) => (
+                            <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
+                              <span className="mt-1.5 h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div className="rounded-lg border border-slate-100 p-4">
+                        <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Anomalies</h4>
+                        <ul className="space-y-2">
+                          {aiInsights.anomalies.map((item, i) => (
+                            <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
+                              <span className="mt-1.5 h-2 w-2 rounded-full bg-amber-500 shrink-0" />
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div className="rounded-lg border border-slate-100 p-4">
+                        <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Recommendations</h4>
+                        <ul className="space-y-2">
+                          {aiInsights.recommendations.map((item, i) => (
+                            <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
+                              <span className="mt-1.5 h-2 w-2 rounded-full bg-[#0071e3] shrink-0" />
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
                 {/* Primary Stats Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-5">
@@ -708,7 +795,7 @@ export default function AdminPage() {
                   <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-5">
                     <div className="flex items-center justify-between">
                       <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Active Listings</div>
-                      <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 text-sm font-bold">#</div>
+                      <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600 text-sm font-bold">#</div>
                     </div>
                     <div className="mt-2 text-3xl font-semibold text-[#1d1d1f]">{stats.listings.active}</div>
                     <div className="mt-2 text-xs text-slate-500">{stats.listings.total} total listings</div>
@@ -735,7 +822,7 @@ export default function AdminPage() {
                 <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
                   {[
                     { label: 'Two-Way Listings', value: stats.listings.twoWay || 0, color: 'text-[#C6904D]' },
-                    { label: 'MMSI Bookings', value: stats.bookings.withMMSI || 0, color: 'text-blue-600' },
+                    { label: 'MMSI Bookings', value: stats.bookings.withMMSI || 0, color: 'text-slate-700' },
                     { label: 'Return Leg Bookings', value: stats.bookings.returnLegs || 0, color: 'text-violet-600' },
                     { label: 'In Transit', value: stats.bookings.inTransit || 0, color: 'text-cyan-600' },
                     { label: 'Pending Docs', value: stats.documents?.pending || 0, color: 'text-amber-600' },
@@ -922,7 +1009,7 @@ export default function AdminPage() {
                                       setEditUser(u)
                                       setEditUserForm({ name: u.name, email: u.email, phone: u.phone || '', company: u.company || '', role: u.role, verified: u.verified, suspended: u.suspended || false, canCarry: u.canCarry || false, canShip: u.canShip || false })
                                     }}
-                                    className="px-2.5 py-1 text-xs font-medium rounded-md bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition-colors"
+                                    className="px-2.5 py-1 text-xs font-medium rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 transition-colors"
                                   >
                                     Edit
                                   </button>
@@ -1006,7 +1093,7 @@ export default function AdminPage() {
                                 <button
                                   onClick={() => handleBookingStatus(b.id, 'IN_TRANSIT')}
                                   disabled={!!actionLoading}
-                                  className="px-2 py-1 text-xs font-medium rounded-md bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 disabled:opacity-50"
+                                  className="px-2 py-1 text-xs font-medium rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 disabled:opacity-50"
                                 >
                                   In Transit
                                 </button>
@@ -1043,7 +1130,7 @@ export default function AdminPage() {
                                   setEditBooking(b)
                                   setEditBookingForm({ status: b.status, paymentStatus: b.paymentStatus, totalPrice: b.totalPrice, cargoDescription: b.cargoDescription || '', weightKg: b.weightKg || '', volumeM3: b.volumeM3 || '', pickupAddress: b.pickupAddress || '', deliveryAddress: b.deliveryAddress || '', deliveryNotes: '', adminNotes: '' })
                                 }}
-                                className="px-2 py-1 text-xs font-medium rounded-md bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100"
+                                className="px-2 py-1 text-xs font-medium rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100"
                               >
                                 Edit
                               </button>
@@ -1133,7 +1220,7 @@ export default function AdminPage() {
                                     setEditListing(l)
                                     setEditListingForm({ title: l.title, status: l.status, featured: l.featured, originPort: l.originPort, destinationPort: l.destinationPort, departureDate: l.departureDate ? l.departureDate.slice(0, 10) : '', totalCapacityKg: l.totalCapacityKg || '', availableKg: l.availableKg || '', pricePerKg: l.pricePerKg || '', pricePerM3: '', flatRate: l.flatRate || '', currency: 'EUR', biddingEnabled: false })
                                   }}
-                                  className="px-2.5 py-1 text-xs font-medium rounded-md bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition-colors"
+                                  className="px-2.5 py-1 text-xs font-medium rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 transition-colors"
                                 >
                                   Edit
                                 </button>
@@ -1321,7 +1408,7 @@ export default function AdminPage() {
                       <div key={item.id} className="px-6 py-4 hover:bg-slate-50 flex items-start gap-4">
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5 ${
                           item.type === 'booking'
-                            ? 'bg-blue-50 text-blue-600'
+                            ? 'bg-indigo-50 text-indigo-600'
                             : item.type === 'registration'
                             ? 'bg-emerald-50 text-emerald-600'
                             : 'bg-amber-50 text-amber-600'
@@ -1453,14 +1540,14 @@ export default function AdminPage() {
                         <span className="text-sm font-medium text-[#1a1a1a]">edward@onshorecellars.com</span>
                         <span className="text-xs text-slate-400 ml-2">Primary Admin</span>
                       </div>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">ADMIN</span>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#C6904D]/10 text-[#C6904D] border border-[#C6904D]/20">ADMIN</span>
                     </div>
                     <div className="flex items-center justify-between px-4 py-3 rounded-lg bg-slate-50">
                       <div>
                         <span className="text-sm font-medium text-[#1a1a1a]">info@onshoredelivery.com</span>
                         <span className="text-xs text-slate-400 ml-2">Support Admin</span>
                       </div>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">ADMIN</span>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#C6904D]/10 text-[#C6904D] border border-[#C6904D]/20">ADMIN</span>
                     </div>
                   </div>
                 </div>

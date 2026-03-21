@@ -29,7 +29,7 @@ const CATEGORIES = [
 
 const CATEGORY_COLORS: Record<string, string> = {
   general: 'bg-slate-100 text-slate-600',
-  routes: 'bg-blue-50 text-blue-700',
+  routes: 'bg-indigo-50 text-indigo-700',
   tips: 'bg-amber-50 text-[#9a7039]',
   wanted: 'bg-red-50 text-red-600',
   services: 'bg-green-50 text-green-700',

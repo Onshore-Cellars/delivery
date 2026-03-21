@@ -23,6 +23,7 @@ interface PortAutocompleteProps {
   required?: boolean
   className?: string
   name?: string
+  id?: string
 }
 
 interface GooglePrediction {
@@ -44,7 +45,7 @@ interface CombinedResult {
 }
 
 const typeLabels: Record<string, { label: string; color: string }> = {
-  port: { label: 'Port', color: 'bg-blue-100 text-blue-700' },
+  port: { label: 'Port', color: 'bg-indigo-100 text-indigo-700' },
   marina: { label: 'Marina', color: 'bg-emerald-100 text-emerald-700' },
   shipyard: { label: 'Shipyard', color: 'bg-amber-100 text-amber-700' },
   address: { label: 'Address', color: 'bg-slate-100 text-slate-600' },
@@ -58,6 +59,7 @@ export default function PortAutocomplete({
   required = false,
   className = '',
   name,
+  id,
 }: PortAutocompleteProps) {
   const [query, setQuery] = useState(value)
   const [results, setResults] = useState<CombinedResult[]>([])
@@ -241,13 +243,14 @@ export default function PortAutocomplete({
   }, [])
 
   const defaultInputCls =
-    'w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 outline-none transition-all'
+    'w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-900 focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 outline-none transition-all'
 
   return (
     <div ref={wrapperRef} className="relative">
       <input
         ref={inputRef}
         type="text"
+        id={id}
         name={name}
         value={query}
         onChange={handleInputChange}
@@ -277,7 +280,7 @@ export default function PortAutocomplete({
               onMouseDown={(e) => { e.preventDefault(); selectResult(result) }}
               onMouseEnter={() => setHighlightIndex(i)}
               className={`px-4 py-2.5 cursor-pointer flex items-center justify-between gap-2 transition-colors ${
-                i === highlightIndex ? 'bg-blue-50' : 'hover:bg-slate-50'
+                i === highlightIndex ? 'bg-amber-50' : 'hover:bg-slate-50'
               }`}
             >
               <div className="min-w-0">

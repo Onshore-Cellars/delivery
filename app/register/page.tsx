@@ -32,6 +32,7 @@ function RegisterForm() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [pendingGoogleToken, setPendingGoogleToken] = useState<string | null>(null)
+  const [acceptedTerms, setAcceptedTerms] = useState(false)
 
   const handleGoogleResponse = useCallback(async (response: { credential: string }) => {
     setError('')
@@ -80,7 +81,7 @@ function RegisterForm() {
     if (!formData.role) { setError('Please select an account type'); return }
     setError('')
     setLoading(true)
-    try { await register(formData) }
+    try { await register({ ...formData, acceptedTerms }) }
     catch (err) { setError(err instanceof Error ? err.message : 'Registration failed') }
     finally { setLoading(false) }
   }
@@ -122,7 +123,7 @@ function RegisterForm() {
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-5">
             {error && (
-              <div className="px-4 py-3 rounded-xl bg-red-50 border border-red-100">
+              <div className="px-4 py-3 rounded-xl bg-red-50 border border-red-100" role="alert">
                 <p className="text-sm text-red-700">{error}</p>
               </div>
             )}
@@ -215,7 +216,14 @@ function RegisterForm() {
               </div>
             </div>
 
-            <button type="submit" disabled={loading} className="w-full btn-primary !py-3.5 !text-[15px] disabled:opacity-50">
+            <label className="flex items-start gap-2.5 cursor-pointer">
+              <input type="checkbox" checked={acceptedTerms} onChange={e => setAcceptedTerms(e.target.checked)} className="mt-0.5 w-4 h-4 rounded border-slate-300 text-[#C6904D] focus:ring-[#C6904D]" />
+              <span className="text-sm text-slate-600">
+                I agree to the <Link href="/terms" className="text-[#C6904D] underline">Terms of Service</Link> and <Link href="/privacy" className="text-[#C6904D] underline">Privacy Policy</Link>
+              </span>
+            </label>
+
+            <button type="submit" disabled={loading || !acceptedTerms} className="w-full btn-primary !py-3.5 !text-[15px] disabled:opacity-50">
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
                   <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>

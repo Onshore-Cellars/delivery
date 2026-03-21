@@ -23,6 +23,7 @@ interface Message {
   read: boolean
   createdAt: string
   sender: { id: string; name: string; avatarUrl?: string }
+  translations?: string
 }
 
 interface OtherUser {
@@ -46,6 +47,9 @@ export default function MessagesPage() {
   const [sending, setSending] = useState(false)
   const [error, setError] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const [translationCache, setTranslationCache] = useState<Map<string, string>>(new Map())
+  const [translatingIds, setTranslatingIds] = useState<Set<string>>(new Set())
+  const [visibleTranslations, setVisibleTranslations] = useState<Set<string>>(new Set())
 
   const fetchConversations = useCallback(async () => {
     if (!token) return
@@ -121,6 +125,51 @@ export default function MessagesPage() {
       setError('Failed to send message. Please try again.')
     }
     finally { setSending(false) }
+  }
+
+  const targetLang = (user as unknown as Record<string, unknown>)?.preferredLanguage as string || 'en'
+
+  const getServerTranslation = (msg: Message): string | null => {
+    if (!msg.translations) return null
+    try {
+      const parsed = JSON.parse(msg.translations)
+      return parsed[targetLang] || null
+    } catch {
+      return null
+    }
+  }
+
+  const translateMessage = async (msg: Message) => {
+    if (translationCache.has(msg.id)) {
+      setVisibleTranslations(prev => { const next = new Set(prev); next.add(msg.id); return next })
+      return
+    }
+    setTranslatingIds(prev => { const next = new Set(prev); next.add(msg.id); return next })
+    try {
+      const res = await fetch('/api/ai/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ text: msg.content, targetLang }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setTranslationCache(prev => { const next = new Map(prev); next.set(msg.id, data.translation); return next })
+        setVisibleTranslations(prev => { const next = new Set(prev); next.add(msg.id); return next })
+      }
+    } catch (err) {
+      console.error('Translation failed', err)
+    } finally {
+      setTranslatingIds(prev => { const next = new Set(prev); next.delete(msg.id); return next })
+    }
+  }
+
+  const toggleTranslation = (msgId: string) => {
+    setVisibleTranslations(prev => {
+      const next = new Set(prev)
+      if (next.has(msgId)) next.delete(msgId)
+      else next.add(msgId)
+      return next
+    })
   }
 
   const getOther = (conv: Conversation) => conv.user1.id === user?.id ? conv.user2 : conv.user1
@@ -223,20 +272,56 @@ export default function MessagesPage() {
 
                   {/* Messages */}
                   <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
-                    {messages.map(msg => (
-                      <div key={msg.id} className={`flex ${msg.senderId === user.id ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-[70%] px-4 py-2.5 rounded-2xl text-sm ${
-                          msg.senderId === user.id
-                            ? 'bg-[#1d1d1f] text-white rounded-br-md'
-                            : 'bg-slate-100 text-[#1a1a1a] rounded-bl-md'
-                        }`}>
-                          <p className="whitespace-pre-wrap">{msg.content}</p>
-                          <div className={`text-[10px] mt-1 ${msg.senderId === user.id ? 'text-white/50' : 'text-slate-400'}`}>
-                            {formatTime(msg.createdAt)}
+                    {messages.map(msg => {
+                      const serverTrans = getServerTranslation(msg)
+                      const cachedTrans = translationCache.get(msg.id)
+                      const translation = serverTrans || cachedTrans
+                      const isVisible = visibleTranslations.has(msg.id)
+                      const isTranslating = translatingIds.has(msg.id)
+                      const isMine = msg.senderId === user.id
+
+                      return (
+                        <div key={msg.id} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
+                          <div className="max-w-[70%]">
+                            <div className={`px-4 py-2.5 rounded-2xl text-sm ${
+                              isMine
+                                ? 'bg-[#1d1d1f] text-white rounded-br-md'
+                                : 'bg-slate-100 text-[#1a1a1a] rounded-bl-md'
+                            }`}>
+                              <p className="whitespace-pre-wrap">{msg.content}</p>
+                              {isVisible && translation && (
+                                <p className={`whitespace-pre-wrap italic mt-1.5 pt-1.5 border-t text-xs ${
+                                  isMine ? 'border-white/10 text-white/70' : 'border-slate-200 text-slate-500'
+                                }`}>{translation}</p>
+                              )}
+                              <div className={`text-[10px] mt-1 ${isMine ? 'text-white/50' : 'text-slate-400'}`}>
+                                {formatTime(msg.createdAt)}
+                              </div>
+                            </div>
+                            <div className={`mt-0.5 ${isMine ? 'text-right' : 'text-left'}`}>
+                              {isTranslating ? (
+                                <span className="text-xs text-slate-400 inline-flex items-center gap-1">
+                                  <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+                                  Translating...
+                                </span>
+                              ) : serverTrans ? (
+                                <button onClick={() => toggleTranslation(msg.id)} className="text-xs text-slate-400 hover:text-[#C6904D] transition-colors">
+                                  {isVisible ? 'Hide translation' : 'Show translation'}
+                                </button>
+                              ) : cachedTrans ? (
+                                <button onClick={() => toggleTranslation(msg.id)} className="text-xs text-slate-400 hover:text-[#C6904D] transition-colors">
+                                  {isVisible ? 'Hide translation' : 'Show translation'}
+                                </button>
+                              ) : (
+                                <button onClick={() => translateMessage(msg)} className="text-xs text-slate-400 hover:text-[#C6904D] transition-colors">
+                                  Translate
+                                </button>
+                              )}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      )
+                    })}
                     <div ref={messagesEndRef} />
                   </div>
 

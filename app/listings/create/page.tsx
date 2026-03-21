@@ -60,12 +60,16 @@ export default function CreateListingPage() {
     returnNotes: '',
     cargoDescription: '',
     specialRequirements: '',
+    flexibleRoute: false,
+    maxDetourKm: '30',
+    flexibleStops: false,
   })
 
   const [costEstimate, setCostEstimate] = useState<null | { fuelCost: number; tollEstimate: number; ferryWarning?: string; totalEstimate: number; breakdown: { label: string; amount: number }[] }>(null)
   const [estimateDistance, setEstimateDistance] = useState('')
   const [estimateLoading, setEstimateLoading] = useState(false)
   const [estimateOpen, setEstimateOpen] = useState(false)
+  const [generatingDescription, setGeneratingDescription] = useState(false)
 
   const makes = useMemo(() => getVehicleMakes(), [])
   const modelsForMake = useMemo(() => selectedMake ? getModelsForMake(selectedMake) : [], [selectedMake])
@@ -128,6 +132,40 @@ export default function CreateListingPage() {
     }
   }
 
+  const handleGenerateDescription = async () => {
+    setGeneratingDescription(true)
+    try {
+      const features = [
+        form.hasRefrigeration && 'Refrigeration',
+        form.hasTailLift && 'Tail Lift',
+        form.hasGPS && 'GPS Tracking',
+      ].filter(Boolean)
+      const res = await fetch('/api/ai/listing-description', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          origin: form.originPort,
+          destination: form.destinationPort,
+          vehicleType: form.vehicleType,
+          vehicleName: form.vehicleName,
+          departureDate: form.departureDate,
+          capacity: form.totalCapacityKg ? `${form.totalCapacityKg}kg / ${form.totalCapacityM3}m³` : '',
+          features,
+          routeDirection: form.routeDirection,
+          acceptedCargo: form.acceptedCargo,
+          returnNotes: form.returnNotes,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to generate description')
+      setForm(prev => ({ ...prev, description: data.description }))
+    } catch {
+      // silently fail – user can still type manually
+    } finally {
+      setGeneratingDescription(false)
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!token) return
@@ -182,7 +220,7 @@ export default function CreateListingPage() {
 
         <form onSubmit={handleSubmit} className="space-y-8">
           {error && (
-            <div className="px-4 py-3 rounded-lg bg-red-50 border border-red-100">
+            <div className="px-4 py-3 rounded-lg bg-red-50 border border-red-100" role="alert">
               <p className="text-sm text-red-700">{error}</p>
             </div>
           )}
@@ -347,8 +385,9 @@ export default function CreateListingPage() {
             <h2 className="text-lg font-bold text-[#1a1a1a] mb-4">Route Details</h2>
             <div className="space-y-4">
               <div>
-                <label className={labelCls}>Listing Title *</label>
+                <label htmlFor="listing-title" className={labelCls}>Listing Title *</label>
                 <input
+                  id="listing-title"
                   name="title"
                   type="text"
                   required
@@ -360,8 +399,29 @@ export default function CreateListingPage() {
               </div>
 
               <div>
-                <label className={labelCls}>Description</label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label htmlFor="listing-description" className="text-sm font-medium text-[#1a1a1a]">Description</label>
+                  <button
+                    type="button"
+                    onClick={handleGenerateDescription}
+                    disabled={generatingDescription}
+                    className="inline-flex items-center gap-1 text-xs font-medium text-[#C6904D] hover:text-[#b07e3a] disabled:opacity-50 transition-colors"
+                  >
+                    {generatingDescription ? (
+                      <>
+                        <span className="animate-spin inline-block w-3 h-3 border border-current border-t-transparent rounded-full" />
+                        Generating…
+                      </>
+                    ) : (
+                      <>
+                        <span className="text-sm leading-none">&#10022;</span>
+                        Generate with AI
+                      </>
+                    )}
+                  </button>
+                </div>
                 <textarea
+                  id="listing-description"
                   name="description"
                   rows={3}
                   className={`${inputCls} resize-none`}
@@ -373,8 +433,9 @@ export default function CreateListingPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className={labelCls}>Origin (Port, Address or Company) *</label>
+                  <label htmlFor="listing-origin" className={labelCls}>Origin (Port, Address or Company) *</label>
                   <PortAutocomplete
+                    id="listing-origin"
                     value={form.originPort}
                     onChange={v => setForm(prev => ({ ...prev, originPort: v }))}
                     onSelect={(data: AddressData | null) => {
@@ -407,8 +468,9 @@ export default function CreateListingPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className={labelCls}>Destination (Port, Address or Company) *</label>
+                  <label htmlFor="listing-destination" className={labelCls}>Destination (Port, Address or Company) *</label>
                   <PortAutocomplete
+                    id="listing-destination"
                     value={form.destinationPort}
                     onChange={v => setForm(prev => ({ ...prev, destinationPort: v }))}
                     onSelect={(data: AddressData | null) => {
@@ -441,8 +503,9 @@ export default function CreateListingPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className={labelCls}>Departure Date *</label>
+                  <label htmlFor="listing-departure-date" className={labelCls}>Departure Date *</label>
                   <input
+                    id="listing-departure-date"
                     name="departureDate"
                     type="datetime-local"
                     required
@@ -730,8 +793,9 @@ export default function CreateListingPage() {
             <div className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                  <label className={labelCls}>{isSpaceNeeded ? 'Budget per kg' : 'Price per kg'}</label>
+                  <label htmlFor="listing-price-per-kg" className={labelCls}>{isSpaceNeeded ? 'Budget per kg' : 'Price per kg'}</label>
                   <input
+                    id="listing-price-per-kg"
                     name="pricePerKg"
                     type="number"
                     step="0.01"
@@ -742,8 +806,9 @@ export default function CreateListingPage() {
                   />
                 </div>
                 <div>
-                  <label className={labelCls}>Price per m&sup3;</label>
+                  <label htmlFor="listing-price-per-m3" className={labelCls}>Price per m&sup3;</label>
                   <input
+                    id="listing-price-per-m3"
                     name="pricePerM3"
                     type="number"
                     step="0.01"
@@ -754,8 +819,9 @@ export default function CreateListingPage() {
                   />
                 </div>
                 <div>
-                  <label className={labelCls}>{isSpaceNeeded ? 'Budget (flat rate)' : 'Or Flat Rate'}</label>
+                  <label htmlFor="listing-flat-rate" className={labelCls}>{isSpaceNeeded ? 'Budget (flat rate)' : 'Or Flat Rate'}</label>
                   <input
+                    id="listing-flat-rate"
                     name="flatRate"
                     type="number"
                     step="0.01"
@@ -766,6 +832,43 @@ export default function CreateListingPage() {
                   />
                 </div>
               </div>
+
+              {/* Auto-pricing suggestion */}
+              {form.originPort && form.destinationPort && !isSpaceNeeded && (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      const res = await fetch('/api/auto-price', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          originPort: form.originPort,
+                          destinationPort: form.destinationPort,
+                          distanceKm: estimateDistance || undefined,
+                          weightKg: form.totalCapacityKg || undefined,
+                          volumeM3: form.totalCapacityM3 || undefined,
+                          vehicleType: form.vehicleType || undefined,
+                        }),
+                      })
+                      if (res.ok) {
+                        const data = await res.json()
+                        const s = data.suggestion
+                        setForm(prev => ({
+                          ...prev,
+                          pricePerKg: s.pricePerKg ? String(s.pricePerKg) : prev.pricePerKg,
+                          pricePerM3: s.pricePerM3 ? String(s.pricePerM3) : prev.pricePerM3,
+                          flatRate: s.flatRate ? String(s.flatRate) : prev.flatRate,
+                        }))
+                      }
+                    } catch { /* ignore */ }
+                  }}
+                  className="inline-flex items-center gap-2 text-sm font-medium text-[#C6904D] hover:text-[#a87a3d] transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                  Auto-suggest prices based on similar routes
+                </button>
+              )}
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -830,6 +933,46 @@ export default function CreateListingPage() {
               </div>
             </div>
           </div>
+
+          {/* Route Flexibility */}
+          {!isSpaceNeeded && (
+            <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-5 sm:p-6">
+              <h2 className="text-lg font-bold text-[#1a1a1a] mb-1">Route Flexibility</h2>
+              <p className="text-xs text-slate-400 mb-4">Let users along your route find your listing — even if their pickup/drop isn&apos;t your exact origin or destination.</p>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="text-sm font-medium text-[#1a1a1a]">Flexible Route</label>
+                    <p className="text-xs text-slate-400 mt-0.5">Willing to detour for pickups/drops along your route</p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" name="flexibleRoute" checked={form.flexibleRoute} onChange={handleChange} className="sr-only peer" />
+                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#1d1d1f]"></div>
+                  </label>
+                </div>
+                {form.flexibleRoute && (
+                  <div>
+                    <label className={labelCls}>Max Detour (km)</label>
+                    <div className="flex items-center gap-3">
+                      <input type="range" min="5" max="100" step="5" className="flex-1 accent-[#C6904D]" value={form.maxDetourKm} onChange={e => setForm({ ...form, maxDetourKm: e.target.value })} />
+                      <span className="text-sm font-semibold text-[#1a1a1a] min-w-[48px] text-right">{form.maxDetourKm} km</span>
+                    </div>
+                    <p className="text-xs text-slate-400 mt-1">Users within {form.maxDetourKm}km of your route line will see this listing</p>
+                  </div>
+                )}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="text-sm font-medium text-[#1a1a1a]">Extra Stops OK</label>
+                    <p className="text-xs text-slate-400 mt-0.5">Willing to add stops along the way for additional pickups</p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" name="flexibleStops" checked={form.flexibleStops} onChange={handleChange} className="sr-only peer" />
+                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#1d1d1f]"></div>
+                  </label>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Route Cost Estimator */}
           <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de]">
@@ -902,11 +1045,11 @@ export default function CreateListingPage() {
                     )}
 
                     {form.totalCapacityKg && Number(form.totalCapacityKg) > 0 && (
-                      <div className="rounded-lg bg-blue-50 border border-blue-100 p-3">
-                        <p className="text-xs text-blue-800">
+                      <div className="rounded-lg bg-amber-50 border border-amber-100 p-3">
+                        <p className="text-xs text-amber-800">
                           <span className="font-medium">Suggested minimum price per kg:</span>{' '}
                           &euro;{(costEstimate.totalEstimate / Number(form.totalCapacityKg)).toFixed(2)}/kg
-                          <span className="text-blue-500 ml-1">(based on {form.totalCapacityKg}kg capacity)</span>
+                          <span className="text-[#C6904D] ml-1">(based on {form.totalCapacityKg}kg capacity)</span>
                         </p>
                       </div>
                     )}

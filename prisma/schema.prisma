@@ -163,6 +163,16 @@ model User {
   operatingRegions    String[]  @default([])    // e.g. ["French Riviera", "South Coast UK", "Balearics"]
   languagesSpoken     String[]  @default([])    // e.g. ["en", "fr", "es"]
 
+  // Language / i18n preference
+  preferredLanguage   String    @default("en")  // ISO 639-1: en, fr, es, it, el, nl, de, pt, tr, hr, ar
+
+  // GDPR & Terms
+  termsAcceptedAt     DateTime?
+  termsVersion        String?             // e.g. "2024-03-01"
+  privacyAcceptedAt   DateTime?
+  deletedAt           DateTime?           // Soft delete
+  dataExportRequestedAt DateTime?
+
   verified        Boolean   @default(false)
   suspended       Boolean   @default(false)
   lastLoginAt     DateTime?
@@ -189,6 +199,8 @@ model User {
   favourites       FavouriteCarrier[] @relation("favouriteUser")
   disputesRaised   Dispute[]       @relation("disputeRaiser")
   disputesAgainst  Dispute[]       @relation("disputeAgainst")
+  savedAlerts      SavedAlert[]
+  favouriteListings FavouriteListing[] @relation("favouriteListingUser")
 
   @@index([email])
   @@index([role])
@@ -274,6 +286,11 @@ model Listing {
   acceptedCargo      String?       // e.g. ["Provisions","Equipment","Wine"]
   restrictedItems    String?       // Items NOT allowed
 
+  // Flexibility — carrier willing to detour for pickups/drops along route
+  flexibleRoute      Boolean       @default(false)
+  maxDetourKm        Float?        // Max km off direct route carrier will deviate
+  flexibleStops      Boolean       @default(false) // Willing to make additional stops
+
   // Status & meta
   status             ListingStatus @default(ACTIVE)
   featured           Boolean       @default(false)
@@ -286,6 +303,7 @@ model Listing {
   bids               Bid[]
   quotes             Quote[]
   routeStops         RouteStop[]
+  favouritedBy       FavouriteListing[]
 
   @@index([carrierId])
   @@index([vehicleId])
@@ -371,6 +389,9 @@ model Booking {
   // Delivery time window
   deliveryTimeWindow String?      // "morning" (8-12), "afternoon" (12-17), "evening" (17-21), "any"
 
+  // Checkout expiry — pending bookings expire after 30 minutes
+  checkoutExpiresAt   DateTime?
+
   // Proof of delivery
   podSignature      String?
   podPhotoUrl       String?
@@ -397,6 +418,8 @@ model Booking {
   @@index([paymentStatus])
   @@index([listingId, status])
   @@index([shipperId, status])
+  @@index([stripePaymentIntentId])
+  @@index([checkoutExpiresAt])
 }
 
 model Bid {
@@ -559,6 +582,9 @@ model Message {
   content         String
   type            MessageType  @default(TEXT)
   attachmentUrl   String?
+
+  // AI translation cache: JSON map of { "fr": "translated text", "es": "..." }
+  translations    String?
 
   read            Boolean      @default(false)
   readAt          DateTime?
@@ -934,4 +960,83 @@ model RouteStop {
 
   @@index([listingId])
   @@index([listingId, stopOrder])
+}
+
+// ─── SAVED ALERTS (Listing Alerts / Saved Searches) ─────────────────────────
+// Users save search criteria and get notified when matching listings appear
+
+model SavedAlert {
+  id              String   @id @default(cuid())
+
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Search criteria
+  name            String?             // User-friendly label e.g. "Wine to Monaco"
+  originPort      String?
+  originLat       Float?
+  originLng       Float?
+  destinationPort String?
+  destLat         Float?
+  destLng         Float?
+  radiusKm        Float    @default(50)
+  vehicleType     String?
+  cargoType       String?
+  minCapacityKg   Float?
+  maxPricePerKg   Float?
+  dateFrom        DateTime?
+  dateTo          DateTime?
+  listingType     String?             // SPACE_AVAILABLE or SPACE_NEEDED
+  direction       String?             // outbound, return, both
+
+  // Notification preferences
+  pushEnabled     Boolean  @default(true)
+  emailEnabled    Boolean  @default(true)
+
+  // State
+  active          Boolean  @default(true)
+  lastTriggeredAt DateTime?
+  triggerCount    Int      @default(0)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId])
+  @@index([active])
+  @@index([originPort])
+  @@index([destinationPort])
+}
+
+// ─── FAVOURITE LISTINGS ─────────────────────────────────────────────────────
+// Users can bookmark listings they're interested in
+
+model FavouriteListing {
+  id          String   @id @default(cuid())
+
+  userId      String
+  user        User     @relation("favouriteListingUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  listingId   String
+  listing     Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+
+  @@unique([userId, listingId])
+  @@index([userId])
+  @@index([listingId])
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  userId      String?            // Who performed the action
+  targetId    String?            // Who/what was affected
+  action      String             // e.g. "USER_SUSPENDED", "BOOKING_CANCELLED", "PROFILE_UPDATED"
+  details     String?            // JSON of what changed
+  ipAddress   String?
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([targetId])
+  @@index([action])
+  @@index([createdAt])
 }
