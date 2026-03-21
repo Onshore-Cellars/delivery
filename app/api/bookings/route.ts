@@ -3,6 +3,9 @@ import prisma from '@/lib/prisma'
 import { verifyToken, getTokenFromHeader, generateTrackingCode } from '@/lib/auth'
 import { notifyBookingCreated } from '@/lib/notifications'
 import { calculatePlatformFee, calculateCarrierPayout } from '@/lib/stripe'
+import { createRateLimiter, getClientIP } from '@/lib/rate-limit'
+
+const bookingLimiter = createRateLimiter({ interval: 15 * 60_000, limit: 10 })
 
 export async function GET(request: NextRequest) {
   try {
@@ -77,6 +80,13 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limit booking creation
+    const ip = getClientIP(request)
+    const rl = bookingLimiter.check(ip)
+    if (!rl.success) {
+      return NextResponse.json({ error: 'Too many booking attempts. Please try again later.' }, { status: 429 })
+    }
+
     const token = getTokenFromHeader(request.headers.get('authorization'))
     if (!token) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -135,6 +145,14 @@ export async function POST(request: NextRequest) {
 
     if (weight > 50000 || volume > 200) {
       return NextResponse.json({ error: 'Weight or volume exceeds maximum allowed' }, { status: 400 })
+    }
+
+    if (declaredValue && (parseFloat(declaredValue) < 0 || parseFloat(declaredValue) > 10000000)) {
+      return NextResponse.json({ error: 'Declared value must be between 0 and 10,000,000' }, { status: 400 })
+    }
+
+    if (itemCount && (parseInt(itemCount) < 1 || parseInt(itemCount) > 10000)) {
+      return NextResponse.json({ error: 'Item count must be between 1 and 10,000' }, { status: 400 })
     }
 
     // Validate MMSI format if provided
@@ -211,6 +229,16 @@ export async function POST(request: NextRequest) {
       })
       if (existingBooking) {
         throw new Error('VALIDATION:You already have an active booking on this listing')
+      }
+
+      if (listing.maxItemLength && cargoLengthCm && parseFloat(cargoLengthCm) > listing.maxItemLength) {
+        throw new Error(`Cargo length ${cargoLengthCm}cm exceeds listing maximum of ${listing.maxItemLength}cm`)
+      }
+      if (listing.maxItemWidth && cargoWidthCm && parseFloat(cargoWidthCm) > listing.maxItemWidth) {
+        throw new Error(`Cargo width ${cargoWidthCm}cm exceeds listing maximum of ${listing.maxItemWidth}cm`)
+      }
+      if (listing.maxItemHeight && cargoHeightCm && parseFloat(cargoHeightCm) > listing.maxItemHeight) {
+        throw new Error(`Cargo height ${cargoHeightCm}cm exceeds listing maximum of ${listing.maxItemHeight}cm`)
       }
 
       // Check capacity based on route direction

@@ -2,9 +2,19 @@ import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { verifyToken, getTokenFromHeader } from '@/lib/auth'
 import { createCheckoutSession, calculatePlatformFee, calculateCarrierPayout } from '@/lib/stripe'
+import { createRateLimiter, getClientIP } from '@/lib/rate-limit'
+
+const checkoutLimiter = createRateLimiter({ interval: 15 * 60_000, limit: 10 })
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limit checkout
+    const ip = getClientIP(request)
+    const rl = checkoutLimiter.check(ip)
+    if (!rl.success) {
+      return NextResponse.json({ error: 'Too many checkout attempts. Please try again later.' }, { status: 429 })
+    }
+
     const token = getTokenFromHeader(request.headers.get('authorization'))
     if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     const decoded = verifyToken(token)
@@ -40,7 +50,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Not authorized' }, { status: 403 })
     }
 
-    if (booking.paymentStatus === 'PAID') {
+    if (booking.paymentStatus === 'PAID' || booking.paymentStatus === 'PROCESSING') {
       return NextResponse.json({ error: 'Already paid' }, { status: 400 })
     }
 

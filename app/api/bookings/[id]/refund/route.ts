@@ -72,6 +72,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       where: { id },
       data: {
         paymentStatus: isPartial ? 'PROCESSING' : 'REFUNDED',
+        ...(isPartial ? {} : { status: 'CANCELLED' }),
       },
       include: {
         shipper: { select: { id: true, name: true, email: true } },

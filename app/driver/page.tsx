@@ -292,8 +292,27 @@ export default function DriverPage() {
                           {stop.marinaName}{stop.berthNumber && `, Berth ${stop.berthNumber}`}
                         </p>
                       )}
+                      {stop.pickupAddress && (
+                        <p className="text-xs text-slate-400 mt-0.5">
+                          Pickup: {stop.pickupAddress}
+                          {' '}
+                          <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(stop.pickupAddress)}`}
+                             target="_blank" rel="noopener noreferrer"
+                             className="text-xs text-[#C6904D] hover:underline">
+                            Navigate
+                          </a>
+                        </p>
+                      )}
                       {stop.deliveryAddress && (
-                        <p className="text-xs text-slate-400 mt-0.5">{stop.deliveryAddress}</p>
+                        <p className="text-xs text-slate-400 mt-0.5">
+                          {stop.deliveryAddress}
+                          {' '}
+                          <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(stop.deliveryAddress)}`}
+                             target="_blank" rel="noopener noreferrer"
+                             className="text-xs text-[#C6904D] hover:underline">
+                            Navigate
+                          </a>
+                        </p>
                       )}
                       <p className="text-xs text-slate-400 mt-1">
                         Contact: {stop.shipper.name}

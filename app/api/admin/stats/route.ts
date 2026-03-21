@@ -97,6 +97,73 @@ export async function GET(request: NextRequest) {
       // Migration hasn't run yet — extended stats will be 0
     }
 
+    // Circumvention flag stats from AuditLog
+    let circumventionFlags = { total: 0, recentFlags: [] as unknown[], repeatOffenders: [] as unknown[] }
+    try {
+      const flagActions = ['CIRCUMVENTION_ATTEMPT', 'LISTING_CIRCUMVENTION_FLAG']
+
+      const [totalFlags, recentFlags, offenderCounts] = await Promise.all([
+        prisma.auditLog.count({
+          where: { action: { in: flagActions } },
+        }),
+        prisma.auditLog.findMany({
+          where: { action: { in: flagActions } },
+          take: 10,
+          orderBy: { createdAt: 'desc' },
+        }),
+        prisma.auditLog.groupBy({
+          by: ['userId'],
+          where: {
+            action: { in: flagActions },
+            userId: { not: null },
+          },
+          _count: { id: true },
+          having: {
+            id: { _count: { gte: 3 } },
+          },
+        }),
+      ])
+
+      // Fetch user details for recent flags
+      const recentUserIds = [...new Set(recentFlags.map(f => f.userId).filter(Boolean))] as string[]
+      const recentUsers = recentUserIds.length > 0
+        ? await prisma.user.findMany({
+            where: { id: { in: recentUserIds } },
+            select: { id: true, name: true, email: true, company: true, role: true },
+          })
+        : []
+      const userMap = new Map(recentUsers.map(u => [u.id, u]))
+
+      const recentFlagsWithUsers = recentFlags.map(f => ({
+        ...f,
+        user: f.userId ? userMap.get(f.userId) || null : null,
+      }))
+
+      // Fetch user details for repeat offenders
+      const offenderIds = offenderCounts.map(o => o.userId).filter(Boolean) as string[]
+      const offenderUsers = offenderIds.length > 0
+        ? await prisma.user.findMany({
+            where: { id: { in: offenderIds } },
+            select: { id: true, name: true, email: true, company: true, role: true, suspended: true },
+          })
+        : []
+      const offenderUserMap = new Map(offenderUsers.map(u => [u.id, u]))
+
+      const repeatOffenders = offenderCounts.map(o => ({
+        userId: o.userId,
+        flagCount: o._count.id,
+        user: o.userId ? offenderUserMap.get(o.userId) || null : null,
+      }))
+
+      circumventionFlags = {
+        total: totalFlags,
+        recentFlags: recentFlagsWithUsers,
+        repeatOffenders,
+      }
+    } catch {
+      // AuditLog table may not exist yet
+    }
+
     return NextResponse.json({
       stats: {
         users: { total: totalUsers, carriers, suppliers, yachtOwners, crew },
@@ -117,6 +184,7 @@ export async function GET(request: NextRequest) {
         },
         documents: { pending: pendingDocs },
         vehicles: { total: totalVehicles },
+        circumventionFlags,
       },
       recentBookings,
       recentUsers,

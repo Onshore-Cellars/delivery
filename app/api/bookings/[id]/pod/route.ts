@@ -110,9 +110,13 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
         shipperId: true,
         status: true,
         trackingCode: true,
+        pickupSignature: true,
+        pickupPhotoUrl: true,
+        pickupConfirmedAt: true,
         podSignature: true,
         podPhotoUrl: true,
         podNotes: true,
+        podRecipientName: true,
         actualDelivery: true,
         listing: { select: { carrierId: true } },
       },
@@ -126,14 +130,17 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     }
 
     return NextResponse.json({
-      pod: {
-        hasSignature: !!booking.podSignature,
-        hasPhoto: !!booking.podPhotoUrl,
-        signature: booking.podSignature,
-        photoUrl: booking.podPhotoUrl,
-        notes: booking.podNotes,
-        deliveredAt: booking.actualDelivery,
-        status: booking.status,
+      pickup: {
+        signature: booking.pickupSignature || null,
+        photoUrl: booking.pickupPhotoUrl || null,
+        confirmedAt: booking.pickupConfirmedAt || null,
+      },
+      delivery: {
+        signature: booking.podSignature || null,
+        photoUrl: booking.podPhotoUrl || null,
+        notes: booking.podNotes || null,
+        recipientName: booking.podRecipientName || null,
+        deliveredAt: booking.actualDelivery || null,
       },
     })
   } catch {
