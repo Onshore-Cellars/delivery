@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyToken } from '@/lib/auth'
+import { getTokenFromHeader, verifyToken } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 
 // GET /api/favourites — list user's favourite carriers
 export async function GET(req: NextRequest) {
   try {
-    const token = req.headers.get('authorization')?.replace('Bearer ', '')
+    const token = getTokenFromHeader(req.headers.get('authorization'))
     if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     const decoded = verifyToken(token)
     if (!decoded) return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
 // POST /api/favourites — add a favourite carrier
 export async function POST(req: NextRequest) {
   try {
-    const token = req.headers.get('authorization')?.replace('Bearer ', '')
+    const token = getTokenFromHeader(req.headers.get('authorization'))
     if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     const decoded = verifyToken(token)
     if (!decoded) return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
 // DELETE /api/favourites — remove a favourite carrier
 export async function DELETE(req: NextRequest) {
   try {
-    const token = req.headers.get('authorization')?.replace('Bearer ', '')
+    const token = getTokenFromHeader(req.headers.get('authorization'))
     if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     const decoded = verifyToken(token)
     if (!decoded) return NextResponse.json({ error: 'Invalid token' }, { status: 401 })

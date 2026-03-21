@@ -122,8 +122,9 @@ export default function ReviewsPage() {
       })
       if (res.ok) {
         const data: ReviewsResponse = await res.json()
-        const aboutMe = data.reviews.filter((r) => r.target.id === user.id)
-        const written = data.reviews.filter((r) => r.author.id === user.id)
+        const reviews = data.reviews || []
+        const aboutMe = reviews.filter((r) => r.target.id === user.id)
+        const written = reviews.filter((r) => r.author.id === user.id)
         setAboutMeReviews(aboutMe)
         setWrittenReviews(written)
         setAverage(data.average)
@@ -179,9 +180,13 @@ export default function ReviewsPage() {
         setRespondingTo(null)
         setResponseText('')
         fetchReviews()
+      } else {
+        const data = await res.json().catch(() => ({}))
+        setSubmitError(data.error || 'Failed to submit response.')
       }
     } catch (err) {
       console.error('Failed to submit response:', err)
+      setSubmitError('Failed to submit response. Please try again.')
     } finally {
       setSubmittingResponse(false)
     }

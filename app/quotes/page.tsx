@@ -228,7 +228,7 @@ export default function QuotesPage() {
       setRespondForm(emptyRespondForm)
       fetchQuotes()
     } catch (err) {
-      console.error(err)
+      setError(err instanceof Error ? err.message : 'Failed to respond to quote')
     } finally {
       setResponding(false)
     }
@@ -249,7 +249,7 @@ export default function QuotesPage() {
       }
       fetchQuotes()
     } catch (err) {
-      console.error(err)
+      setError(err instanceof Error ? err.message : 'Failed to accept quote')
     } finally {
       setActionLoading(null)
     }
@@ -270,7 +270,7 @@ export default function QuotesPage() {
       }
       fetchQuotes()
     } catch (err) {
-      console.error(err)
+      setError(err instanceof Error ? err.message : 'Failed to cancel quote')
     } finally {
       setActionLoading(null)
     }
@@ -300,6 +300,12 @@ export default function QuotesPage() {
             {showNewForm ? 'Cancel' : '+ Request Quote'}
           </button>
         </div>
+
+        {error && (
+          <div className="mb-6 px-4 py-3 rounded-lg bg-red-50 border border-red-200">
+            <p className="text-sm text-red-700 font-medium">{error}</p>
+          </div>
+        )}
 
         {/* New Quote Form */}
         {showNewForm && (

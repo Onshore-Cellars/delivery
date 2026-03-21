@@ -1,14 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
+import { getTokenFromHeader, verifyToken } from '@/lib/auth'
 
 // POST /api/admin/setup
-// Promotes Edward@onshorecellars.com to ADMIN role
-// This is a one-time setup endpoint secured by checking the email
+// Promotes designated emails to ADMIN role
+// Requires authentication — only the user themselves or an existing admin can promote
 const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || 'edward@onshorecellars.com,info@onshoredelivery.com')
   .toLowerCase().split(',').map(e => e.trim())
 
 export async function POST(request: NextRequest) {
   try {
+    const token = getTokenFromHeader(request.headers.get('authorization'))
+    if (!token) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+    }
+    const decoded = verifyToken(token)
+    if (!decoded) {
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
+    }
+
     const body = await request.json()
     const { email } = body
 
@@ -18,6 +28,11 @@ export async function POST(request: NextRequest) {
 
     // Only allow promotion of designated admin emails
     if (!ADMIN_EMAILS.includes(email.toLowerCase())) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
+    }
+
+    // Only the user themselves or an existing admin can trigger promotion
+    if (decoded.email.toLowerCase() !== email.toLowerCase() && decoded.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
 

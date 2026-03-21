@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
-import { verifyToken } from '@/lib/auth'
+import { getTokenFromHeader, verifyToken } from '@/lib/auth'
 
 // GET /api/bookings/[id]/documents - List documents for a booking
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
-    const token = req.headers.get('authorization')?.replace('Bearer ', '')
+    const token = getTokenFromHeader(req.headers.get('authorization'))
     if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
     const decoded = verifyToken(token)
@@ -46,7 +46,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
-    const token = req.headers.get('authorization')?.replace('Bearer ', '')
+    const token = getTokenFromHeader(req.headers.get('authorization'))
     if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
     const decoded = verifyToken(token)
