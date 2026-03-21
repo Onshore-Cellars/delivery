@@ -34,17 +34,18 @@ export async function POST(request: NextRequest) {
     } catch {
       return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
     }
-    const { email, password } = body
+    const { email: rawEmail, password } = body
 
-    if (!email || !password) {
+    if (!rawEmail || !password) {
       return NextResponse.json({ error: 'Email and password are required' }, { status: 400 })
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (typeof email !== 'string' || !emailRegex.test(email)) {
+    if (typeof rawEmail !== 'string' || !emailRegex.test(rawEmail)) {
       return NextResponse.json({ error: 'Invalid email format' }, { status: 400 })
     }
 
+    const email = rawEmail.toLowerCase().trim()
     const user = await prisma.user.findUnique({ where: { email } })
     if (!user) {
       return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 })

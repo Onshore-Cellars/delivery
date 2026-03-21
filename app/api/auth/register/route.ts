@@ -35,12 +35,13 @@ export async function POST(request: NextRequest) {
     } catch {
       return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
     }
-    const { email, password, name, role, phone, company, canCarry, canShip } = body
+    const { email: rawEmail, password, name, role, phone, company, canCarry, canShip } = body
 
-    if (!email || !password || !name || !role) {
+    if (!rawEmail || !password || !name || !role) {
       return NextResponse.json({ error: 'Email, password, name, and role are required' }, { status: 400 })
     }
 
+    const email = typeof rawEmail === 'string' ? rawEmail.toLowerCase().trim() : rawEmail
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) {
       return NextResponse.json({ error: 'Please enter a valid email address' }, { status: 400 })

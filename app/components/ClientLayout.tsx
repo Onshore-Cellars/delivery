@@ -30,25 +30,24 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname()
   const isLandingPage = pathname === '/'
   const isAuthPage = ['/login', '/register', '/forgot-password', '/reset-password', '/verify-email'].includes(pathname)
-  const showChrome = !isLandingPage
 
   return (
     <I18nProvider>
       <AuthProvider>
-        {showChrome && <Navbar />}
+        <Navbar transparent={isLandingPage} />
         <main
           id="main-content"
           className={
-            showChrome
-              ? isAuthPage
+            isLandingPage
+              ? ''
+              : isAuthPage
                 ? 'pt-16 pb-20 md:pb-0 min-h-screen'
                 : 'pt-16 pb-20 md:pb-0 min-h-screen bg-[#f5f5f7]'
-              : ''
           }
         >
           {children}
         </main>
-        {showChrome && !isAuthPage && <Footer />}
+        {!isLandingPage && !isAuthPage && <Footer />}
         <CookieConsent />
       </AuthProvider>
     </I18nProvider>
