@@ -4,12 +4,13 @@ import prisma from '@/lib/prisma'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { email, token } = body
+    const { email: rawEmail, token } = body
 
-    if (!email || !token) {
+    if (!rawEmail || !token) {
       return NextResponse.json({ error: 'Email and token are required' }, { status: 400 })
     }
 
+    const email = typeof rawEmail === 'string' ? rawEmail.toLowerCase().trim() : rawEmail
     const user = await prisma.user.findUnique({ where: { email } })
     if (!user) {
       return NextResponse.json({ error: 'Invalid verification link' }, { status: 400 })

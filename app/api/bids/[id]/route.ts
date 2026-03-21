@@ -33,43 +33,54 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const { action } = body // 'accept' or 'reject'
 
     if (action === 'accept') {
-      // Check capacity
-      if (bid.weightKg > bid.listing.availableKg || bid.volumeM3 > bid.listing.availableM3) {
-        return NextResponse.json({ error: 'Insufficient capacity' }, { status: 400 })
-      }
-
       const trackingCode = generateTrackingCode()
-
       const platformFee = calculatePlatformFee(bid.amount)
       const carrierPayout = calculateCarrierPayout(bid.amount)
 
-      // Accept bid → create booking (PENDING payment) + update listing + update bid
-      const [updatedBid, booking] = await prisma.$transaction([
-        prisma.bid.update({ where: { id }, data: { status: 'ACCEPTED' } }),
-        prisma.booking.create({
-          data: {
-            listingId: bid.listingId,
-            shipperId: bid.bidderId,
-            cargoDescription: bid.message || 'Bid-based booking',
-            cargoType: bid.cargoType || null,
-            weightKg: bid.weightKg,
-            volumeM3: bid.volumeM3,
-            totalPrice: bid.amount,
-            platformFee,
-            carrierPayout,
-            currency: bid.currency,
-            trackingCode,
-            status: 'PENDING',
-          },
-        }),
-        prisma.listing.update({
-          where: { id: bid.listingId },
-          data: {
-            availableKg: { decrement: bid.weightKg },
-            availableM3: { decrement: bid.volumeM3 },
-          },
-        }),
-      ])
+      // Accept bid → check capacity + create booking + update listing atomically
+      let updatedBid, booking
+      try {
+        const result = await prisma.$transaction(async (tx) => {
+          // Re-check capacity inside transaction to prevent race condition
+          const listing = await tx.listing.findUnique({ where: { id: bid.listingId }, select: { availableKg: true, availableM3: true } })
+          if (!listing || bid.weightKg > listing.availableKg || bid.volumeM3 > listing.availableM3) {
+            throw new Error('VALIDATION:Insufficient capacity for this bid')
+          }
+
+          const updBid = await tx.bid.update({ where: { id }, data: { status: 'ACCEPTED' } })
+          const bk = await tx.booking.create({
+            data: {
+              listingId: bid.listingId,
+              shipperId: bid.bidderId,
+              cargoDescription: bid.message || 'Bid-based booking',
+              cargoType: bid.cargoType || null,
+              weightKg: bid.weightKg,
+              volumeM3: bid.volumeM3,
+              totalPrice: bid.amount,
+              platformFee,
+              carrierPayout,
+              currency: bid.currency,
+              trackingCode,
+              status: 'PENDING',
+            },
+          })
+          await tx.listing.update({
+            where: { id: bid.listingId },
+            data: {
+              availableKg: { decrement: bid.weightKg },
+              availableM3: { decrement: bid.volumeM3 },
+            },
+          })
+          return { updatedBid: updBid, booking: bk }
+        })
+        updatedBid = result.updatedBid
+        booking = result.booking
+      } catch (txErr) {
+        if (txErr instanceof Error && txErr.message.startsWith('VALIDATION:')) {
+          return NextResponse.json({ error: txErr.message.replace('VALIDATION:', '') }, { status: 400 })
+        }
+        throw txErr
+      }
 
       // Notify bidder of acceptance
       try {

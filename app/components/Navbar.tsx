@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { useAuth } from './AuthProvider'
 
-export default function Navbar() {
+export default function Navbar({ transparent = false }: { transparent?: boolean }) {
   const { user, token, logout } = useAuth()
   const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -15,10 +15,10 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8)
+    const onScroll = () => setScrolled(window.scrollY > (transparent ? 20 : 8))
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
-  }, [])
+  }, [transparent])
 
   useEffect(() => {
     let active = true
@@ -53,6 +53,12 @@ export default function Navbar() {
 
   const close = () => setMobileMenuOpen(false)
   const isActive = (href: string) => pathname === href
+  const isTransparentMode = transparent && !scrolled
+  const navLinkCls = (href: string) => `px-4 py-2 rounded text-xs font-medium uppercase tracking-wider transition-colors hover:no-underline ${
+    isActive(href)
+      ? isTransparentMode ? 'bg-white/20 text-white' : 'bg-slate-100 text-[#1a1a1a]'
+      : isTransparentMode ? 'text-white/70 hover:text-white hover:bg-white/10' : 'text-slate-600 hover:text-[#1a1a1a] hover:bg-slate-50'
+  }`
 
   // Bottom tab items for mobile
   const bottomTabs = user ? [
@@ -82,37 +88,46 @@ export default function Navbar() {
   return (
     <>
       {/* ---- TOP NAVBAR (Desktop: full nav, Mobile: logo + actions) ---- */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-[#e8e4de] shadow-[0_0_25px_rgba(0,0,0,0.06)]">
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        transparent && !scrolled
+          ? 'bg-transparent'
+          : 'bg-white border-b border-[#e8e4de] shadow-[0_0_25px_rgba(0,0,0,0.06)]'
+      }`}>
         <div className="site-container">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <Link href="/" className="flex items-center hover:no-underline">
+            <Link href="/" className="flex items-center gap-2.5 hover:no-underline">
               <Image src="/logo.png" alt="Onshore Deliver" width={36} height={36} className="rounded-sm" />
+              {transparent && (
+                <span className={`text-lg font-semibold tracking-wide transition-colors duration-300 ${isTransparentMode ? 'text-white' : 'text-[#1a1a1a]'}`} style={{ fontFamily: 'var(--font-display)' }}>
+                  Onshore
+                </span>
+              )}
             </Link>
 
             {/* Desktop nav */}
             <div className="hidden md:flex items-center gap-1">
-              <Link href="/marketplace" className={`px-4 py-2 rounded text-xs font-medium uppercase tracking-wider transition-colors hover:no-underline ${isActive('/marketplace') ? 'bg-slate-100 text-[#1a1a1a]' : 'text-slate-600 hover:text-[#1a1a1a] hover:bg-slate-50'}`}>
+              <Link href="/marketplace" className={navLinkCls('/marketplace')}>
                 Marketplace
               </Link>
-              <Link href="/get-quotes" className={`px-4 py-2 rounded text-xs font-medium uppercase tracking-wider transition-colors hover:no-underline ${isActive('/get-quotes') ? 'bg-slate-100 text-[#1a1a1a]' : 'text-slate-600 hover:text-[#1a1a1a] hover:bg-slate-50'}`}>
+              <Link href="/get-quotes" className={navLinkCls('/get-quotes')}>
                 Get Quotes
               </Link>
-              <Link href="/tracking" className={`px-4 py-2 rounded text-xs font-medium uppercase tracking-wider transition-colors hover:no-underline ${isActive('/tracking') ? 'bg-slate-100 text-[#1a1a1a]' : 'text-slate-600 hover:text-[#1a1a1a] hover:bg-slate-50'}`}>
+              <Link href="/tracking" className={navLinkCls('/tracking')}>
                 Track
               </Link>
-              <Link href="/community" className={`px-4 py-2 rounded text-xs font-medium uppercase tracking-wider transition-colors hover:no-underline ${isActive('/community') ? 'bg-slate-100 text-[#1a1a1a]' : 'text-slate-600 hover:text-[#1a1a1a] hover:bg-slate-50'}`}>
+              <Link href="/community" className={navLinkCls('/community')}>
                 Community
               </Link>
 
               {user ? (
                 <>
-                  <Link href="/dashboard" className={`px-4 py-2 rounded text-xs font-medium uppercase tracking-wider transition-colors hover:no-underline ${isActive('/dashboard') ? 'bg-slate-100 text-[#1a1a1a]' : 'text-slate-600 hover:text-[#1a1a1a] hover:bg-slate-50'}`}>
+                  <Link href="/dashboard" className={navLinkCls('/dashboard')}>
                     Dashboard
                   </Link>
                   {user.canCarry && (
                     <>
-                      <Link href="/listings/create" className={`px-4 py-2 rounded text-xs font-medium uppercase tracking-wider transition-colors hover:no-underline ${isActive('/listings/create') ? 'bg-slate-100 text-[#1a1a1a]' : 'text-slate-600 hover:text-[#1a1a1a] hover:bg-slate-50'}`}>
+                      <Link href="/listings/create" className={navLinkCls('/listings/create')}>
                         List Space
                       </Link>
                       <Link href="/driver" className={`px-4 py-2 rounded text-xs font-medium uppercase tracking-wider transition-colors hover:no-underline ${isActive('/driver') ? 'bg-green-100 text-green-800' : 'text-green-700 hover:text-green-900 hover:bg-green-50'}`}>
@@ -121,16 +136,16 @@ export default function Navbar() {
                     </>
                   )}
                   {user.role === 'ADMIN' && (
-                    <Link href="/admin" className={`px-4 py-2 rounded text-xs font-medium uppercase tracking-wider transition-colors hover:no-underline ${isActive('/admin') ? 'bg-slate-100 text-[#1a1a1a]' : 'text-slate-600 hover:text-[#1a1a1a] hover:bg-slate-50'}`}>
+                    <Link href="/admin" className={navLinkCls('/admin')}>
                       Admin
                     </Link>
                   )}
 
-                  <div className="w-px h-6 bg-slate-200 mx-2" />
+                  <div className={`w-px h-6 mx-2 ${isTransparentMode ? 'bg-white/20' : 'bg-slate-200'}`} />
 
                   {/* Notifications */}
-                  <Link href="/dashboard" className="relative p-2 rounded hover:bg-slate-50 transition-colors" title="Notifications">
-                    <svg className="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <Link href="/dashboard" className={`relative p-2 rounded transition-colors ${isTransparentMode ? 'hover:bg-white/10' : 'hover:bg-slate-50'}`} title="Notifications">
+                    <svg className={`w-5 h-5 ${isTransparentMode ? 'text-white/70' : 'text-slate-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                     </svg>
                     {unreadNotifs > 0 && (
@@ -141,8 +156,8 @@ export default function Navbar() {
                   </Link>
 
                   {/* Messages */}
-                  <Link href="/messages" className="relative p-2 rounded hover:bg-slate-50 transition-colors" title="Messages">
-                    <svg className="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <Link href="/messages" className={`relative p-2 rounded transition-colors ${isTransparentMode ? 'hover:bg-white/10' : 'hover:bg-slate-50'}`} title="Messages">
+                    <svg className={`w-5 h-5 ${isTransparentMode ? 'text-white/70' : 'text-slate-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                     </svg>
                     {unreadMessages > 0 && (
@@ -177,8 +192,8 @@ export default function Navbar() {
                 </>
               ) : (
                 <>
-                  <div className="w-px h-6 bg-slate-200 mx-2" />
-                  <Link href="/login" className="px-4 py-2 rounded text-sm font-medium text-slate-600 hover:text-[#1a1a1a] hover:bg-slate-50 transition-colors hover:no-underline">
+                  <div className={`w-px h-6 mx-2 ${isTransparentMode ? 'bg-white/20' : 'bg-slate-200'}`} />
+                  <Link href="/login" className={`px-4 py-2 rounded text-sm font-medium transition-colors hover:no-underline ${isTransparentMode ? 'text-white/70 hover:text-white hover:bg-white/10' : 'text-slate-600 hover:text-[#1a1a1a] hover:bg-slate-50'}`}>
                     Sign In
                   </Link>
                   <Link href="/register" className="bg-[#C6904D] text-white text-xs font-semibold uppercase tracking-wider px-5 py-2.5 rounded-sm hover:bg-[#b07d3f] hover:no-underline transition-all">
@@ -191,8 +206,8 @@ export default function Navbar() {
             {/* Mobile: right side actions */}
             <div className="flex md:hidden items-center gap-2">
               {user && unreadMessages > 0 && (
-                <Link href="/messages" className="relative p-2 rounded hover:bg-slate-50">
-                  <svg className="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <Link href="/messages" className={`relative p-2 rounded ${isTransparentMode ? 'hover:bg-white/10' : 'hover:bg-slate-50'}`}>
+                  <svg className={`w-5 h-5 ${isTransparentMode ? 'text-white' : 'text-slate-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                   </svg>
                   <span className="absolute top-0.5 right-0.5 min-w-[16px] h-[16px] rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center">
@@ -202,7 +217,7 @@ export default function Navbar() {
               )}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 rounded text-slate-600 hover:bg-slate-50 transition-colors"
+                className={`p-2 rounded transition-colors ${isTransparentMode ? 'text-white hover:bg-white/10' : 'text-slate-600 hover:bg-slate-50'}`}
                 aria-label="Menu"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -26,6 +26,10 @@ export async function POST(request: NextRequest) {
         const bookingId = session.metadata?.bookingId
 
         if (bookingId) {
+          // Fetch booking first to calculate fees, then update in one query
+          const existingBooking = await prisma.booking.findUnique({ where: { id: bookingId }, select: { totalPrice: true } })
+          const totalPrice = existingBooking?.totalPrice ?? 0
+
           const booking = await prisma.booking.update({
             where: { id: bookingId },
             data: {
@@ -33,8 +37,8 @@ export async function POST(request: NextRequest) {
               paidAt: new Date(),
               status: 'CONFIRMED',
               stripePaymentIntentId: session.payment_intent as string,
-              platformFee: calculatePlatformFee((await prisma.booking.findUnique({ where: { id: bookingId } }))?.totalPrice ?? 0),
-              carrierPayout: calculateCarrierPayout((await prisma.booking.findUnique({ where: { id: bookingId } }))?.totalPrice ?? 0),
+              platformFee: calculatePlatformFee(totalPrice),
+              carrierPayout: calculateCarrierPayout(totalPrice),
             },
             include: {
               shipper: { select: { id: true, name: true, email: true } },

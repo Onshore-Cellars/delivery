@@ -59,12 +59,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid Google token' }, { status: 401 })
     }
 
+    // Normalize email
+    const normalizedEmail = googleUser.email.toLowerCase().trim()
+
     // Check if user exists by Google ID or email
     let user = await prisma.user.findFirst({
       where: {
         OR: [
           { googleId: googleUser.sub },
-          { email: googleUser.email },
+          { email: normalizedEmail },
         ],
       },
     })
@@ -81,11 +84,22 @@ export async function POST(request: NextRequest) {
         })
       }
 
-      // Update last login
-      await prisma.user.update({
-        where: { id: user.id },
-        data: { lastLoginAt: new Date() },
-      })
+      // Auto-promote admin emails
+      const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || 'edward@onshorecellars.com,info@onshoredelivery.com')
+        .toLowerCase().split(',').map(e => e.trim())
+
+      if (ADMIN_EMAILS.includes(user.email.toLowerCase()) && user.role !== 'ADMIN') {
+        user = await prisma.user.update({
+          where: { id: user.id },
+          data: { role: 'ADMIN', verified: true, canCarry: true, canShip: true, lastLoginAt: new Date() },
+        })
+      } else {
+        // Update last login
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { lastLoginAt: new Date() },
+        })
+      }
     } else {
       // New user — role is required for registration
       const validRoles = ['CARRIER', 'SUPPLIER', 'YACHT_OWNER']
@@ -98,7 +112,7 @@ export async function POST(request: NextRequest) {
 
       user = await prisma.user.create({
         data: {
-          email: googleUser.email,
+          email: normalizedEmail,
           name: googleUser.name,
           googleId: googleUser.sub,
           avatarUrl: googleUser.picture || null,
@@ -119,6 +133,8 @@ export async function POST(request: NextRequest) {
         company: user.company,
         phone: user.phone,
         avatarUrl: user.avatarUrl,
+        canCarry: user.canCarry,
+        canShip: user.canShip,
         verified: user.verified,
       },
       token,

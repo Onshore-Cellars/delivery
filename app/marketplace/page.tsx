@@ -145,6 +145,7 @@ export default function MarketplacePage() {
   const [bookingLoading, setBookingLoading] = useState(false)
   const [bookingSuccess, setBookingSuccess] = useState(false)
   const [bookingError, setBookingError] = useState('')
+  const [fetchError, setFetchError] = useState('')
 
   const mobileFilterRef = useRef<HTMLDivElement>(null)
 
@@ -155,8 +156,13 @@ export default function MarketplacePage() {
       if (res.ok) {
         const data = await res.json()
         setFeaturedListings(data.listings || [])
+      } else {
+        setFetchError('Failed to load featured listings.')
       }
-    } catch (err) { console.error('Error fetching featured:', err) }
+    } catch (err) {
+      console.error('Error fetching featured:', err)
+      setFetchError('Failed to load featured listings.')
+    }
     finally { setFeaturedLoading(false) }
   }, [])
 
@@ -193,8 +199,14 @@ export default function MarketplacePage() {
         const data = await res.json()
         setListings(data.listings || [])
         setPagination(data.pagination || { page, limit: ITEMS_PER_PAGE, total: 0, pages: 0 })
+        setFetchError('')
+      } else {
+        setFetchError('Failed to load listings. Please try again.')
       }
-    } catch (err) { console.error('Error:', err) }
+    } catch (err) {
+      console.error('Error:', err)
+      setFetchError('Failed to load listings. Please try again.')
+    }
     finally { setLoading(false) }
   }, [filters, resolveVehicleType])
 
@@ -208,7 +220,15 @@ export default function MarketplacePage() {
 
   const openBooking = (listing: Listing) => {
     setBookingModal(listing)
-    setBookingForm({ ...bookingForm, listingId: listing.id })
+    setBookingForm({
+      listingId: listing.id, cargoDescription: '', cargoType: '', weightKg: '', volumeM3: '',
+      itemCount: '1', declaredValue: '',
+      cargoLengthCm: '', cargoWidthCm: '', cargoHeightCm: '',
+      cargoImages: [],
+      specialHandling: '', pickupAddress: '', pickupContact: '', pickupPhone: '',
+      deliveryAddress: '', deliveryContact: '', deliveryPhone: '', deliveryNotes: '', deliveryTimeWindow: '',
+      yachtName: '', yachtMMSI: '', berthNumber: '', marinaName: '', routeDirection: 'outbound',
+    })
     setBookingSuccess(false)
     setBookingError('')
   }
@@ -226,6 +246,11 @@ export default function MarketplacePage() {
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error)
+      // Redirect to Stripe checkout if available, otherwise show success
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl
+        return
+      }
       setBookingSuccess(true)
       fetchListings(currentPage)
     } catch (err) {
@@ -458,6 +483,13 @@ export default function MarketplacePage() {
 
   return (
     <div>
+      {fetchError && (
+        <div className="site-container pt-4">
+          <div className="px-4 py-3 rounded-xl bg-red-50 border border-red-200">
+            <p className="text-sm font-medium text-red-800">{fetchError}</p>
+          </div>
+        </div>
+      )}
       {/* Search header */}
       <div className="bg-white border-b border-slate-200">
         <div className="site-container py-8 sm:py-10">

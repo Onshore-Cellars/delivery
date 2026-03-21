@@ -29,6 +29,7 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [success, setSuccess] = useState('')
+  const [error, setError] = useState('')
 
   const fetchProfile = useCallback(async () => {
     if (!token) return
@@ -62,7 +63,7 @@ export default function ProfilePage() {
   const saveProfile = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!token) return
-    setSaving(true); setSuccess('')
+    setSaving(true); setSuccess(''); setError('')
     try {
       const res = await fetch('/api/profile', {
         method: 'PATCH',
@@ -74,8 +75,13 @@ export default function ProfilePage() {
         setEditing(false)
         fetchProfile()
         refreshUser()
+      } else {
+        setError('Failed to save profile. Please try again.')
       }
-    } catch (err) { console.error(err) }
+    } catch (err) {
+      console.error(err)
+      setError('Failed to save profile. Please try again.')
+    }
     finally { setSaving(false) }
   }
 
@@ -93,6 +99,12 @@ export default function ProfilePage() {
         {success && (
           <div className="mb-6 px-4 py-3 rounded-lg bg-emerald-50 border border-emerald-200">
             <p className="text-sm text-emerald-700 font-medium">{success}</p>
+          </div>
+        )}
+
+        {error && (
+          <div className="mb-6 px-4 py-3 rounded-lg bg-red-50 border border-red-200">
+            <p className="text-sm text-red-700 font-medium">{error}</p>
           </div>
         )}
 
@@ -184,10 +196,21 @@ export default function ProfilePage() {
                 <input type="checkbox" checked={form.canCarry as boolean} onChange={async () => {
                   const val = !form.canCarry
                   setForm({...form, canCarry: val})
+                  setError('')
                   if (token) {
-                    await fetch('/api/profile', { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ canCarry: val }) })
-                    setSuccess('Capabilities updated')
-                    refreshUser()
+                    try {
+                      const res = await fetch('/api/profile', { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ canCarry: val }) })
+                      if (res.ok) {
+                        setSuccess('Capabilities updated')
+                        refreshUser()
+                      } else {
+                        setForm({...form, canCarry: !val})
+                        setError('Failed to update capability. Please try again.')
+                      }
+                    } catch {
+                      setForm({...form, canCarry: !val})
+                      setError('Failed to update capability. Please try again.')
+                    }
                   }
                 }} className="sr-only peer" />
                 <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#C6904D]"></div>
@@ -202,10 +225,21 @@ export default function ProfilePage() {
                 <input type="checkbox" checked={form.canShip as boolean} onChange={async () => {
                   const val = !form.canShip
                   setForm({...form, canShip: val})
+                  setError('')
                   if (token) {
-                    await fetch('/api/profile', { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ canShip: val }) })
-                    setSuccess('Capabilities updated')
-                    refreshUser()
+                    try {
+                      const res = await fetch('/api/profile', { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ canShip: val }) })
+                      if (res.ok) {
+                        setSuccess('Capabilities updated')
+                        refreshUser()
+                      } else {
+                        setForm({...form, canShip: !val})
+                        setError('Failed to update capability. Please try again.')
+                      }
+                    } catch {
+                      setForm({...form, canShip: !val})
+                      setError('Failed to update capability. Please try again.')
+                    }
                   }
                 }} className="sr-only peer" />
                 <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#C6904D]"></div>
@@ -245,12 +279,18 @@ export default function ProfilePage() {
             </div>
             <button onClick={async () => {
               if (!token) return
-              setSaving(true)
+              setSaving(true); setError('')
               try {
                 const yachtFields = { yachtName: form.yachtName, yachtMMSI: form.yachtMMSI, yachtIMO: form.yachtIMO, yachtFlag: form.yachtFlag, yachtLength: form.yachtLength ? parseFloat(form.yachtLength as string) : null, yachtType: form.yachtType, homePort: form.homePort }
-                await fetch('/api/profile', { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(yachtFields) })
-                setSuccess('Vessel details saved')
-              } catch { /* ignore */ }
+                const res = await fetch('/api/profile', { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(yachtFields) })
+                if (res.ok) {
+                  setSuccess('Vessel details saved')
+                } else {
+                  setError('Failed to save vessel details. Please try again.')
+                }
+              } catch {
+                setError('Failed to save vessel details. Please try again.')
+              }
               finally { setSaving(false) }
             }} disabled={saving} className="mt-4 btn-primary !text-sm !py-2.5 disabled:opacity-50">
               {saving ? 'Saving...' : 'Save Vessel Details'}
@@ -292,8 +332,18 @@ export default function ProfilePage() {
                 <input type="checkbox" checked={form.emailNotifications as boolean} onChange={async () => {
                   const val = !form.emailNotifications
                   setForm({...form, emailNotifications: val})
+                  setError('')
                   if (token) {
-                    await fetch('/api/profile', { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ emailNotifications: val }) })
+                    try {
+                      const res = await fetch('/api/profile', { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ emailNotifications: val }) })
+                      if (!res.ok) {
+                        setForm({...form, emailNotifications: !val})
+                        setError('Failed to update notification settings.')
+                      }
+                    } catch {
+                      setForm({...form, emailNotifications: !val})
+                      setError('Failed to update notification settings.')
+                    }
                   }
                 }} className="sr-only peer" />
                 <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#1a1a1a]"></div>
@@ -308,8 +358,18 @@ export default function ProfilePage() {
                 <input type="checkbox" checked={form.smsNotifications as boolean} onChange={async () => {
                   const val = !form.smsNotifications
                   setForm({...form, smsNotifications: val})
+                  setError('')
                   if (token) {
-                    await fetch('/api/profile', { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ smsNotifications: val }) })
+                    try {
+                      const res = await fetch('/api/profile', { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ smsNotifications: val }) })
+                      if (!res.ok) {
+                        setForm({...form, smsNotifications: !val})
+                        setError('Failed to update notification settings.')
+                      }
+                    } catch {
+                      setForm({...form, smsNotifications: !val})
+                      setError('Failed to update notification settings.')
+                    }
                   }
                 }} className="sr-only peer" />
                 <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#1a1a1a]"></div>

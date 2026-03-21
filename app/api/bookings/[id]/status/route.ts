@@ -36,7 +36,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const validTransitions: Record<string, string[]> = {
       PENDING: ['CONFIRMED', 'CANCELLED'],
       QUOTE_REQUESTED: ['QUOTED', 'CANCELLED'],
-      QUOTED: ['PENDING', 'CANCELLED'],
+      QUOTED: ['CONFIRMED', 'CANCELLED'],
       CONFIRMED: ['PICKED_UP', 'CANCELLED', 'DISPUTED'],
       PICKED_UP: ['IN_TRANSIT', 'CANCELLED', 'DISPUTED'],
       IN_TRANSIT: ['CUSTOMS_HOLD', 'DELIVERED', 'CANCELLED', 'DISPUTED'],
@@ -100,17 +100,20 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
       // Calculate cancellation fee based on time until departure
       let cancellationFee = 0
+      let cancellationPercent = ''
       if (booking.paymentStatus === 'PAID' && booking.totalPrice > 0) {
         const departure = booking.listing.departureDate
         const hoursUntilDeparture = (departure.getTime() - Date.now()) / (1000 * 60 * 60)
         if (hoursUntilDeparture < 24) {
-          cancellationFee = booking.totalPrice * 0.5 // 50% within 24hrs
+          cancellationFee = booking.totalPrice * 0.5
+          cancellationPercent = '50%'
         } else if (hoursUntilDeparture < 72) {
-          cancellationFee = booking.totalPrice * 0.25 // 25% within 3 days
+          cancellationFee = booking.totalPrice * 0.25
+          cancellationPercent = '25%'
         } else if (hoursUntilDeparture < 168) {
-          cancellationFee = booking.totalPrice * 0.1 // 10% within 7 days
+          cancellationFee = booking.totalPrice * 0.1
+          cancellationPercent = '10%'
         }
-        // More than 7 days: no fee
       }
 
       // Restore capacity
@@ -140,11 +143,14 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         })
       }
 
-      // Store cancellation fee if applicable
+      // Record cancellation fee as a tracking event (don't overwrite platformFee)
       if (cancellationFee > 0) {
-        await prisma.booking.update({
-          where: { id },
-          data: { platformFee: cancellationFee },
+        await prisma.trackingEvent.create({
+          data: {
+            bookingId: id,
+            status: 'CANCELLED',
+            description: `Cancellation fee: €${cancellationFee.toFixed(2)} (${cancellationPercent} of booking total)`,
+          },
         })
       }
     }

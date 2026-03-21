@@ -19,7 +19,11 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const { action, quotedPrice, validUntil, responseMessage } = body
 
     if (action === 'respond') {
-      // Carrier responds with price - allow provider or any carrier for open quotes
+      // Only carriers can respond to quotes
+      const responder = await prisma.user.findUnique({ where: { id: decoded.userId }, select: { canCarry: true } })
+      if (!responder?.canCarry && decoded.role !== 'ADMIN') {
+        return NextResponse.json({ error: 'Only carriers can respond to quotes' }, { status: 403 })
+      }
       if (quote.providerId && quote.providerId !== decoded.userId) {
         return NextResponse.json({ error: 'Not authorized' }, { status: 403 })
       }

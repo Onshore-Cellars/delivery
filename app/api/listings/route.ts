@@ -23,9 +23,16 @@ export async function GET(request: NextRequest) {
 
     const where: Prisma.ListingWhereInput = {}
 
-    // If filtering by carrier (dashboard), show all their listings regardless of status
+    // If filtering by carrier (dashboard), verify the requester owns these listings
     if (carrierId) {
-      where.carrierId = carrierId
+      const token = getTokenFromHeader(request.headers.get('authorization'))
+      const decoded = token ? verifyToken(token) : null
+      if (decoded && (decoded.userId === carrierId || decoded.role === 'ADMIN')) {
+        where.carrierId = carrierId // Show all statuses for own listings
+      } else {
+        where.carrierId = carrierId
+        where.status = 'ACTIVE' // Public view: only active
+      }
     } else if (showAll === 'true') {
       // Admin view: check token for admin role
       const token = getTokenFromHeader(request.headers.get('authorization'))

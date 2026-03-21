@@ -6,11 +6,13 @@ import { sendEmail, passwordResetEmail } from '@/lib/email'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { email } = body
+    const { email: rawEmail } = body
 
-    if (!email) {
+    if (!rawEmail) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 })
     }
+
+    const email = typeof rawEmail === 'string' ? rawEmail.toLowerCase().trim() : rawEmail
 
     // Always return success to prevent email enumeration
     const successMsg = 'If an account with that email exists, a password reset link has been sent.'

@@ -2,172 +2,10 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { useAuth } from './components/AuthProvider'
-import { useState, useEffect } from 'react'
 
 export default function Home() {
-  const { user } = useAuth()
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20)
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
-
-  useEffect(() => {
-    document.body.style.overflow = menuOpen ? 'hidden' : ''
-    return () => { document.body.style.overflow = '' }
-  }, [menuOpen])
-
   return (
     <div className="min-h-screen bg-white">
-      {/* ─── FIXED NAV ─── */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? 'bg-white/90 backdrop-blur-xl border-b border-slate-200/60 shadow-sm'
-          : 'bg-transparent'
-      }`}>
-        <div className="site-container">
-          <div className="flex items-center justify-between h-16">
-            {/* Logo */}
-            <Link href="/" className="flex items-center gap-2.5 hover:no-underline">
-              <Image src="/logo.png" alt="Onshore Deliver" width={32} height={32} className="rounded-sm" />
-              <span className={`text-lg font-semibold tracking-wide transition-colors duration-300 ${scrolled ? 'text-[#1a1a1a]' : 'text-white'}`} style={{ fontFamily: 'var(--font-display)' }}>
-                Onshore
-              </span>
-            </Link>
-
-            {/* Desktop links */}
-            <div className="hidden md:flex items-center gap-1">
-              {[
-                { href: '/marketplace', label: 'Marketplace' },
-                { href: '/get-quotes', label: 'Get Quotes' },
-                { href: '/tracking', label: 'Tracking' },
-                { href: '/about', label: 'About' },
-                { href: '/help', label: 'Support' },
-              ].map(link => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`px-4 py-2 rounded text-sm font-medium transition-colors hover:no-underline ${
-                    scrolled
-                      ? 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-                      : 'text-white/70 hover:text-white hover:bg-white/10'
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              ))}
-
-              <div className={`w-px h-5 mx-2 ${scrolled ? 'bg-slate-200' : 'bg-white/20'}`} />
-
-              {user ? (
-                <Link
-                  href="/dashboard"
-                  className="bg-[#C6904D] text-white text-sm font-semibold px-5 py-2.5 rounded hover:bg-[#b07d3f] hover:no-underline transition-colors"
-                >
-                  Dashboard
-                </Link>
-              ) : (
-                <>
-                  <Link
-                    href="/login"
-                    className={`px-4 py-2 rounded text-sm font-medium transition-colors hover:no-underline ${
-                      scrolled
-                        ? 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-                        : 'text-white/70 hover:text-white hover:bg-white/10'
-                    }`}
-                  >
-                    Sign In
-                  </Link>
-                  <Link
-                    href="/register"
-                    className="bg-[#C6904D] text-white text-sm font-semibold px-5 py-2.5 rounded hover:bg-[#b07d3f] hover:no-underline transition-colors"
-                  >
-                    Get Started
-                  </Link>
-                </>
-              )}
-            </div>
-
-            {/* Mobile hamburger */}
-            <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              className={`md:hidden p-2.5 -mr-2 rounded transition-colors ${
-                scrolled ? 'text-slate-700 hover:bg-slate-100' : 'text-white hover:bg-white/10'
-              }`}
-              aria-label="Menu"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                {menuOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
-                )}
-              </svg>
-            </button>
-          </div>
-        </div>
-      </nav>
-
-      {/* ─── MOBILE MENU OVERLAY ─── */}
-      {menuOpen && (
-        <div className="fixed inset-0 z-[60] md:hidden">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setMenuOpen(false)} />
-          <div className="absolute top-0 right-0 w-full max-w-[300px] h-full bg-white shadow-2xl animate-slide-in-right">
-            {/* Header */}
-            <div className="flex items-center justify-between h-16 px-5 border-b border-slate-100">
-              <span className="text-base font-bold text-slate-900">Menu</span>
-              <button onClick={() => setMenuOpen(false)} className="p-2 -mr-2 rounded text-slate-400 hover:text-slate-600 hover:bg-slate-50">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            {/* Links */}
-            <div className="p-3 space-y-0.5">
-              {[
-                { href: '/marketplace', label: 'Marketplace' },
-                { href: '/get-quotes', label: 'Get Quotes' },
-                { href: '/tracking', label: 'Tracking' },
-                { href: '/about', label: 'About' },
-                { href: '/help', label: 'Support' },
-              ].map(link => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMenuOpen(false)}
-                  className="block px-4 py-3.5 rounded text-[15px] font-medium text-slate-700 hover:bg-slate-50 hover:no-underline transition-colors"
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </div>
-
-            {/* CTA */}
-            <div className="absolute bottom-0 left-0 right-0 p-5 border-t border-slate-100 safe-bottom bg-white">
-              {user ? (
-                <Link href="/dashboard" onClick={() => setMenuOpen(false)} className="btn-primary w-full text-center !text-[15px]">
-                  Dashboard
-                </Link>
-              ) : (
-                <div className="space-y-2.5">
-                  <Link href="/register" onClick={() => setMenuOpen(false)} className="btn-primary w-full text-center !text-[15px]">
-                    Get Started
-                  </Link>
-                  <Link href="/login" onClick={() => setMenuOpen(false)} className="btn-secondary w-full text-center !text-[15px]">
-                    Sign In
-                  </Link>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* ─── HERO ─── */}
       <section className="relative bg-gradient-to-br from-[#1a1a1a] via-[#2a2520] to-[#1a1a1a] overflow-hidden">
         {/* Background grid */}
@@ -500,7 +338,7 @@ export default function Home() {
       </section>
 
       {/* ─── FOOTER ─── */}
-      <footer className="bg-white border-t border-slate-200">
+      <footer className="bg-white border-t border-slate-200 pb-20 md:pb-0">
         <div className="site-container py-10 sm:py-12">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
             <div className="flex items-center gap-2.5">
