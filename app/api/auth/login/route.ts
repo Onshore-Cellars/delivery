@@ -97,7 +97,9 @@ export async function POST(request: NextRequest) {
       token,
     })
   } catch (error) {
-    console.error('Login error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    const errMsg = error instanceof Error ? error.message : String(error)
+    const errStack = error instanceof Error ? error.stack : undefined
+    console.error('Login error:', errMsg, errStack)
+    return NextResponse.json({ error: 'Internal server error', detail: process.env.NODE_ENV !== 'production' ? errMsg : undefined }, { status: 500 })
   }
 }
