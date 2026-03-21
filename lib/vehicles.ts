@@ -27,6 +27,21 @@ export const vehicleTypes = [
   'Tail Lift Van',
   'Chassis Cab',
   'Sprinter',
+  // Expanded vehicle types for scale
+  'Car with Trailer',
+  'Estate Car',
+  'SUV',
+  'Motorcycle Courier',
+  'Cargo Bike',
+  'Minibus (Cargo)',
+  'Tipper Truck',
+  'Low Loader',
+  'Crane Truck (HIAB)',
+  'Temperature Controlled',
+  'Hazmat Vehicle',
+  'Tanker',
+  'Car Transporter',
+  'Boat Trailer',
   'Other',
 ] as const
 
@@ -166,6 +181,29 @@ export const vehicleSpecs: VehicleSpec[] = [
   { make: 'Ford', model: 'Transit Chassis Cab', type: 'Chassis Cab', maxPayloadKg: 1700, cargoVolumeM3: 0, cargoLengthCm: 400, cargoWidthCm: 210, cargoHeightCm: 0, fuelType: 'Diesel' },
   { make: 'Iveco', model: 'Daily Chassis Cab 3.5t', type: 'Chassis Cab', maxPayloadKg: 1900, cargoVolumeM3: 0, cargoLengthCm: 430, cargoWidthCm: 215, cargoHeightCm: 0, fuelType: 'Diesel' },
   { make: 'Mercedes-Benz', model: 'Sprinter Chassis Cab', type: 'Chassis Cab', maxPayloadKg: 1600, cargoVolumeM3: 0, cargoLengthCm: 440, cargoWidthCm: 210, cargoHeightCm: 0, fuelType: 'Diesel' },
+
+  // ─── CAR WITH TRAILER ───────────────────────────────────────────────────
+  { make: 'Land Rover', model: 'Defender + Trailer', type: 'Car with Trailer', maxPayloadKg: 1000, cargoVolumeM3: 4.0, cargoLengthCm: 240, cargoWidthCm: 150, cargoHeightCm: 120, fuelType: 'Diesel' },
+  { make: 'Toyota', model: 'Land Cruiser + Trailer', type: 'Car with Trailer', maxPayloadKg: 1100, cargoVolumeM3: 4.5, cargoLengthCm: 250, cargoWidthCm: 155, cargoHeightCm: 130, fuelType: 'Diesel' },
+  { make: 'Volkswagen', model: 'Touareg + Trailer', type: 'Car with Trailer', maxPayloadKg: 900, cargoVolumeM3: 3.5, cargoLengthCm: 230, cargoWidthCm: 145, cargoHeightCm: 110, fuelType: 'Diesel' },
+
+  // ─── ESTATE CARS ────────────────────────────────────────────────────────
+  { make: 'Volvo', model: 'V90 Estate', type: 'Estate Car', maxPayloadKg: 550, cargoVolumeM3: 1.5, cargoLengthCm: 180, cargoWidthCm: 110, cargoHeightCm: 80, fuelType: 'Diesel' },
+  { make: 'Mercedes-Benz', model: 'E-Class Estate', type: 'Estate Car', maxPayloadKg: 520, cargoVolumeM3: 1.4, cargoLengthCm: 175, cargoWidthCm: 105, cargoHeightCm: 78, fuelType: 'Diesel' },
+  { make: 'Skoda', model: 'Superb Combi', type: 'Estate Car', maxPayloadKg: 580, cargoVolumeM3: 1.7, cargoLengthCm: 190, cargoWidthCm: 110, cargoHeightCm: 82, fuelType: 'Diesel' },
+
+  // ─── CRANE TRUCKS (HIAB) ───────────────────────────────────────────────
+  { make: 'Iveco', model: 'Daily HIAB 3.5t', type: 'Crane Truck (HIAB)', maxPayloadKg: 1200, cargoVolumeM3: 8.0, cargoLengthCm: 350, cargoWidthCm: 210, cargoHeightCm: 0, fuelType: 'Diesel' },
+  { make: 'Mercedes-Benz', model: 'Atego HIAB 7.5t', type: 'Crane Truck (HIAB)', maxPayloadKg: 2800, cargoVolumeM3: 15.0, cargoLengthCm: 450, cargoWidthCm: 240, cargoHeightCm: 0, fuelType: 'Diesel' },
+  { make: 'MAN', model: 'TGL HIAB 7.5t', type: 'Crane Truck (HIAB)', maxPayloadKg: 2700, cargoVolumeM3: 14.0, cargoLengthCm: 440, cargoWidthCm: 240, cargoHeightCm: 0, fuelType: 'Diesel' },
+
+  // ─── MOTORCYCLE COURIER ─────────────────────────────────────────────────
+  { make: 'Honda', model: 'PCX 125 Courier', type: 'Motorcycle Courier', maxPayloadKg: 15, cargoVolumeM3: 0.05, cargoLengthCm: 40, cargoWidthCm: 30, cargoHeightCm: 30, fuelType: 'Petrol' },
+  { make: 'BMW', model: 'C 400 GT Courier', type: 'Motorcycle Courier', maxPayloadKg: 20, cargoVolumeM3: 0.07, cargoLengthCm: 45, cargoWidthCm: 35, cargoHeightCm: 35, fuelType: 'Petrol' },
+
+  // ─── BOAT TRAILER ──────────────────────────────────────────────────────
+  { make: 'Indespension', model: 'Boat Trailer 3.5t', type: 'Boat Trailer', maxPayloadKg: 2500, cargoVolumeM3: 0, cargoLengthCm: 800, cargoWidthCm: 250, cargoHeightCm: 0, fuelType: 'N/A' },
+  { make: 'Brian James', model: 'A-Max Boat Trailer', type: 'Boat Trailer', maxPayloadKg: 3000, cargoVolumeM3: 0, cargoLengthCm: 900, cargoWidthCm: 260, cargoHeightCm: 0, fuelType: 'N/A' },
 ]
 
 // Helper: Get unique makes

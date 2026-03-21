@@ -66,6 +66,15 @@ export async function GET(request: NextRequest) {
       where.featured = true
     }
 
+    const direction = searchParams.get('direction')
+    if (direction === 'return') {
+      where.routeDirection = { in: ['RETURN', 'BOTH'] }
+    } else if (direction === 'outbound') {
+      where.routeDirection = { in: ['OUTBOUND', 'BOTH'] }
+    } else if (direction === 'both') {
+      where.routeDirection = 'BOTH'
+    }
+
     if (minPrice || maxPrice) {
       const priceConditions: Prisma.ListingWhereInput[] = []
       if (minPrice) {
@@ -161,6 +170,9 @@ export async function POST(request: NextRequest) {
       totalCapacityKg, totalCapacityM3, maxItemLength, maxItemWidth, maxItemHeight,
       pricePerKg, pricePerM3, flatRate, currency, minimumCharge,
       biddingEnabled, minBidPrice, acceptedCargo, restrictedItems,
+      routeDirection, returnDepartureDate, returnEstimatedArrival,
+      returnAvailableKg, returnAvailableM3, returnPricePerKg, returnPricePerM3,
+      returnFlatRate, returnNotes,
     } = body
 
     if (!title || !vehicleType || !originPort || !destinationPort || !departureDate || !totalCapacityKg || !totalCapacityM3) {
@@ -204,6 +216,17 @@ export async function POST(request: NextRequest) {
         minBidPrice: minBidPrice ? parseFloat(minBidPrice) : null,
         acceptedCargo: acceptedCargo || null,
         restrictedItems: restrictedItems || null,
+        routeDirection: routeDirection || 'OUTBOUND',
+        returnDepartureDate: returnDepartureDate ? new Date(returnDepartureDate) : null,
+        returnEstimatedArrival: returnEstimatedArrival ? new Date(returnEstimatedArrival) : null,
+        returnAvailableKg: returnAvailableKg ? parseFloat(returnAvailableKg) : null,
+        returnAvailableM3: returnAvailableM3 ? parseFloat(returnAvailableM3) : null,
+        returnTotalKg: returnAvailableKg ? parseFloat(returnAvailableKg) : null,
+        returnTotalM3: returnAvailableM3 ? parseFloat(returnAvailableM3) : null,
+        returnPricePerKg: returnPricePerKg ? parseFloat(returnPricePerKg) : null,
+        returnPricePerM3: returnPricePerM3 ? parseFloat(returnPricePerM3) : null,
+        returnFlatRate: returnFlatRate ? parseFloat(returnFlatRate) : null,
+        returnNotes: returnNotes || null,
       },
       include: {
         carrier: {

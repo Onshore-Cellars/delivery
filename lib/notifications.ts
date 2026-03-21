@@ -1,6 +1,7 @@
 import prisma from './prisma'
 import { sendEmail, bookingConfirmationEmail, statusUpdateEmail, newMessageEmail, bidReceivedEmail } from './email'
 import { NotificationType } from '@prisma/client'
+import { sendSMSNotification, formatSMSUpdate } from './sms'
 
 interface CreateNotificationParams {
   userId: string
@@ -32,7 +33,7 @@ export async function createNotification(params: CreateNotificationParams) {
       try {
         const user = await prisma.user.findUnique({
           where: { id: userId },
-          select: { email: true, name: true, emailNotifications: true },
+          select: { email: true, name: true, phone: true, emailNotifications: true, smsNotifications: true },
         })
 
         if (user?.emailNotifications) {
@@ -45,6 +46,25 @@ export async function createNotification(params: CreateNotificationParams) {
             where: { id: notification.id },
             data: { emailSent: true },
           })
+        }
+
+        // Send SMS if user has it enabled (free via email-to-SMS gateway)
+        if (user?.smsNotifications && user?.phone) {
+          try {
+            const smsSent = await sendSMSNotification(
+              { phone: user.phone, smsNotifications: true },
+              message.slice(0, 160),
+              title,
+            )
+            if (smsSent) {
+              await prisma.notification.update({
+                where: { id: notification.id },
+                data: { smsSent: true },
+              })
+            }
+          } catch (smsError) {
+            console.error('Failed to send SMS notification:', smsError)
+          }
         }
       } catch (emailError) {
         console.error('Failed to send notification email:', emailError)
@@ -150,6 +170,20 @@ export async function notifyStatusUpdate(data: {
       location: data.location,
     })
     await sendEmail({ to: booking.shipper.email, ...template })
+  }
+
+  // Send SMS for status updates (free)
+  if (booking.trackingCode) {
+    const shipper = await prisma.user.findUnique({
+      where: { id: booking.shipper.id },
+      select: { phone: true, smsNotifications: true },
+    })
+    if (shipper) {
+      await sendSMSNotification(
+        shipper,
+        formatSMSUpdate(data.status, booking.trackingCode, data.description),
+      )
+    }
   }
 }
 

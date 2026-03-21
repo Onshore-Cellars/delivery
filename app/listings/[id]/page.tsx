@@ -41,6 +41,17 @@ interface ListingDetail {
   minBidPrice?: number
   acceptedCargo?: string
   restrictedItems?: string
+  routeDirection?: string
+  returnDepartureDate?: string
+  returnEstimatedArrival?: string
+  returnAvailableKg?: number
+  returnAvailableM3?: number
+  returnTotalKg?: number
+  returnTotalM3?: number
+  returnPricePerKg?: number
+  returnPricePerM3?: number
+  returnFlatRate?: number
+  returnNotes?: string
   status: string
   featured: boolean
   viewCount: number
@@ -258,6 +269,42 @@ export default function ListingDetailPage() {
                 </div>
               )}
             </div>
+
+            {/* Return Journey (Two-Way Route) */}
+            {(listing.routeDirection === 'BOTH' || listing.routeDirection === 'RETURN') && (
+              <div className="bg-white rounded-xl shadow-sm border border-[#C6904D]/20 p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <svg className="w-5 h-5 text-[#C6904D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                  </svg>
+                  <h2 className="font-bold text-[#1a1a1a]">Return Journey</h2>
+                  <span className="badge bg-[#C6904D]/10 text-[#C6904D] text-[10px]">Two-Way</span>
+                </div>
+                <p className="text-xs text-slate-400 mb-3">{listing.destinationPort} &rarr; {listing.originPort}</p>
+                {listing.returnDepartureDate && (
+                  <div className="text-sm text-slate-600 mb-2">
+                    Departs: {new Date(listing.returnDepartureDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                  </div>
+                )}
+                {(listing.returnAvailableKg || listing.returnAvailableM3) && (
+                  <div className="grid grid-cols-2 gap-3 mb-3">
+                    {listing.returnAvailableKg && <div><div className="text-xs text-slate-400">Available</div><div className="text-lg font-bold text-[#1a1a1a]">{listing.returnAvailableKg.toFixed(0)}kg</div></div>}
+                    {listing.returnAvailableM3 && <div><div className="text-xs text-slate-400">Volume</div><div className="text-lg font-bold text-[#1a1a1a]">{listing.returnAvailableM3.toFixed(1)}m&sup3;</div></div>}
+                  </div>
+                )}
+                {(listing.returnFlatRate || listing.returnPricePerKg || listing.returnPricePerM3) && (
+                  <div className="pt-3 border-t border-slate-100">
+                    <div className="text-xs text-slate-400 mb-1">Return Pricing</div>
+                    {listing.returnFlatRate && <div className="text-sm font-semibold text-[#1a1a1a]">{formatCurrency(listing.returnFlatRate, listing.currency)} flat</div>}
+                    {listing.returnPricePerKg && <div className="text-sm text-slate-600">{formatCurrency(listing.returnPricePerKg, listing.currency)}/kg</div>}
+                    {listing.returnPricePerM3 && <div className="text-sm text-slate-600">{formatCurrency(listing.returnPricePerM3, listing.currency)}/m&sup3;</div>}
+                  </div>
+                )}
+                {listing.returnNotes && (
+                  <p className="mt-3 text-xs text-slate-500 italic">{listing.returnNotes}</p>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Sidebar */}

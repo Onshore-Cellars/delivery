@@ -42,6 +42,15 @@ export default function CreateListingPage() {
     minBidPrice: '',
     acceptedCargo: '',
     restrictedItems: '',
+    routeDirection: 'OUTBOUND',
+    returnDepartureDate: '',
+    returnEstimatedArrival: '',
+    returnAvailableKg: '',
+    returnAvailableM3: '',
+    returnPricePerKg: '',
+    returnPricePerM3: '',
+    returnFlatRate: '',
+    returnNotes: '',
   })
 
   const makes = useMemo(() => getVehicleMakes(), [])
@@ -304,6 +313,85 @@ export default function CreateListingPage() {
                   />
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* Two-Way Route */}
+          <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-5 sm:p-6">
+            <h2 className="text-lg font-bold text-[#1a1a1a] mb-1">Route Direction</h2>
+            <p className="text-xs text-slate-400 mb-4">Offer space on your return journey too &mdash; reduce empty runs and earn more.</p>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {[
+                  { value: 'OUTBOUND', label: 'Outbound Only', desc: 'To destination' },
+                  { value: 'RETURN', label: 'Return Only', desc: 'Heading back' },
+                  { value: 'BOTH', label: 'Both Ways', desc: 'Space there & back' },
+                ].map(opt => (
+                  <label
+                    key={opt.value}
+                    className={`flex flex-col items-center gap-1.5 p-4 rounded-xl border-2 cursor-pointer transition-all text-center ${
+                      form.routeDirection === opt.value
+                        ? 'border-[#C6904D] bg-amber-50/50'
+                        : 'border-slate-200 hover:border-slate-300'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="routeDirection"
+                      value={opt.value}
+                      checked={form.routeDirection === opt.value}
+                      onChange={handleChange}
+                      className="sr-only"
+                    />
+                    <span className="text-sm font-semibold text-[#1a1a1a]">{opt.label}</span>
+                    <span className="text-xs text-slate-400">{opt.desc}</span>
+                  </label>
+                ))}
+              </div>
+
+              {(form.routeDirection === 'BOTH' || form.routeDirection === 'RETURN') && (
+                <div className="mt-4 p-4 rounded-xl bg-[#faf9f7] border border-[#e8e4de] space-y-4">
+                  <p className="text-xs font-semibold text-[#C6904D] uppercase tracking-wide">Return Journey Details</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className={labelCls}>Return Departure</label>
+                      <input name="returnDepartureDate" type="datetime-local" className={inputCls} value={form.returnDepartureDate} onChange={handleChange} />
+                    </div>
+                    <div>
+                      <label className={labelCls}>Return Est. Arrival</label>
+                      <input name="returnEstimatedArrival" type="datetime-local" className={inputCls} value={form.returnEstimatedArrival} onChange={handleChange} />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className={labelCls}>Return Capacity (kg)</label>
+                      <input name="returnAvailableKg" type="number" step="0.1" className={inputCls} placeholder="e.g. 1200" value={form.returnAvailableKg} onChange={handleChange} />
+                    </div>
+                    <div>
+                      <label className={labelCls}>Return Volume (m&sup3;)</label>
+                      <input name="returnAvailableM3" type="number" step="0.1" className={inputCls} placeholder="e.g. 8.5" value={form.returnAvailableM3} onChange={handleChange} />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                      <label className={labelCls}>Return Price/kg</label>
+                      <input name="returnPricePerKg" type="number" step="0.01" className={inputCls} placeholder="e.g. 1.50" value={form.returnPricePerKg} onChange={handleChange} />
+                    </div>
+                    <div>
+                      <label className={labelCls}>Return Price/m&sup3;</label>
+                      <input name="returnPricePerM3" type="number" step="0.01" className={inputCls} placeholder="e.g. 30.00" value={form.returnPricePerM3} onChange={handleChange} />
+                    </div>
+                    <div>
+                      <label className={labelCls}>Return Flat Rate</label>
+                      <input name="returnFlatRate" type="number" step="0.01" className={inputCls} placeholder="e.g. 300.00" value={form.returnFlatRate} onChange={handleChange} />
+                    </div>
+                  </div>
+                  <div>
+                    <label className={labelCls}>Return Journey Notes</label>
+                    <input name="returnNotes" type="text" className={inputCls} placeholder="e.g. Van empty on return, full capacity. Can collect from yacht." value={form.returnNotes} onChange={handleChange} />
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 

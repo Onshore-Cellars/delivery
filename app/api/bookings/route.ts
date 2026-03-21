@@ -72,6 +72,7 @@ export async function POST(request: NextRequest) {
       listingId, cargoDescription, cargoType, weightKg, volumeM3,
       specialHandling, pickupAddress, pickupContact,
       deliveryAddress, deliveryContact, deliveryNotes,
+      yachtName, yachtMMSI, berthNumber, marinaName, routeDirection,
     } = body
 
     if (!listingId || !cargoDescription || !weightKg || !volumeM3) {
@@ -135,6 +136,11 @@ export async function POST(request: NextRequest) {
           deliveryAddress: deliveryAddress || null,
           deliveryContact: deliveryContact || null,
           deliveryNotes: deliveryNotes || null,
+          yachtName: yachtName || null,
+          yachtMMSI: yachtMMSI || null,
+          berthNumber: berthNumber || null,
+          marinaName: marinaName || null,
+          routeDirection: routeDirection || null,
           totalPrice,
           trackingCode,
           currency: listing.currency,
