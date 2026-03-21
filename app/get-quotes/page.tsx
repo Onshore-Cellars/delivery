@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useAuth } from '../components/AuthProvider'
-import PortAutocomplete from '../components/PortAutocomplete'
+import PortAutocomplete, { type AddressData } from '../components/PortAutocomplete'
 
 interface PackageItem {
   id: string
@@ -427,6 +427,13 @@ export default function GetQuotesPage() {
                 <PortAutocomplete
                   value={form.pickupLocation}
                   onChange={v => updateForm('pickupLocation', v)}
+                  onSelect={(data: AddressData | null) => {
+                    if (data) {
+                      updateForm('pickupLocation', data.address || `${data.name}, ${data.city}`)
+                      if (data.postcode) updateForm('pickupPostcode', data.postcode)
+                      if (data.country) updateForm('pickupCountry', data.country)
+                    }
+                  }}
                   placeholder="City, port, or postcode"
                   className={inputClass}
                 />
@@ -466,6 +473,13 @@ export default function GetQuotesPage() {
                 <PortAutocomplete
                   value={form.deliveryLocation}
                   onChange={v => updateForm('deliveryLocation', v)}
+                  onSelect={(data: AddressData | null) => {
+                    if (data) {
+                      updateForm('deliveryLocation', data.address || `${data.name}, ${data.city}`)
+                      if (data.postcode) updateForm('deliveryPostcode', data.postcode)
+                      if (data.country) updateForm('deliveryCountry', data.country)
+                    }
+                  }}
                   placeholder="Marina, port, or address"
                   className={inputClass}
                 />

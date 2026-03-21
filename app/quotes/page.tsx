@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '../components/AuthProvider'
-import PortAutocomplete from '../components/PortAutocomplete'
+import PortAutocomplete, { type AddressData } from '../components/PortAutocomplete'
 
 interface PackageItem {
   id: string

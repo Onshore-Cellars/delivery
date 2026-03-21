@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '../../components/AuthProvider'
-import PortAutocomplete from '../../components/PortAutocomplete'
+import PortAutocomplete, { type AddressData } from '../../components/PortAutocomplete'
 import { vehicleSpecs, vehicleTypes, getVehicleMakes, getModelsForMake, type VehicleSpec } from '@/lib/vehicles'
 
 export default function CreateListingPage() {
@@ -252,13 +252,13 @@ export default function CreateListingPage() {
                   <PortAutocomplete
                     value={form.originPort}
                     onChange={v => setForm(prev => ({ ...prev, originPort: v }))}
-                    onSelect={entry => {
-                      if (entry) {
+                    onSelect={(data: AddressData | null) => {
+                      if (data) {
                         setForm(prev => ({
                           ...prev,
-                          originPort: `${entry.name}, ${entry.city}`,
-                          originRegion: entry.region || prev.originRegion,
-                          originCountry: entry.country || prev.originCountry,
+                          originPort: data.address || `${data.name}, ${data.city}`,
+                          originRegion: data.region || prev.originRegion,
+                          originCountry: data.country || prev.originCountry,
                         }))
                       }
                     }}
@@ -273,7 +273,7 @@ export default function CreateListingPage() {
                     name="originRegion"
                     type="text"
                     className={inputCls}
-                    placeholder="Auto-filled from port, or type manually"
+                    placeholder="Auto-filled, or type manually"
                     value={form.originRegion}
                     onChange={handleChange}
                   />
@@ -286,13 +286,13 @@ export default function CreateListingPage() {
                   <PortAutocomplete
                     value={form.destinationPort}
                     onChange={v => setForm(prev => ({ ...prev, destinationPort: v }))}
-                    onSelect={entry => {
-                      if (entry) {
+                    onSelect={(data: AddressData | null) => {
+                      if (data) {
                         setForm(prev => ({
                           ...prev,
-                          destinationPort: `${entry.name}, ${entry.city}`,
-                          destinationRegion: entry.region || prev.destinationRegion,
-                          destinationCountry: entry.country || prev.destinationCountry,
+                          destinationPort: data.address || `${data.name}, ${data.city}`,
+                          destinationRegion: data.region || prev.destinationRegion,
+                          destinationCountry: data.country || prev.destinationCountry,
                         }))
                       }
                     }}
@@ -307,7 +307,7 @@ export default function CreateListingPage() {
                     name="destinationRegion"
                     type="text"
                     className={inputCls}
-                    placeholder="Auto-filled from port, or type manually"
+                    placeholder="Auto-filled, or type manually"
                     value={form.destinationRegion}
                     onChange={handleChange}
                   />

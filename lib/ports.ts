@@ -6,24 +6,28 @@ export interface PortEntry {
   city: string
   country: string
   region: string
-  type: 'port' | 'marina' | 'shipyard'
+  type: 'port' | 'marina' | 'shipyard' | 'address'
+  postcode?: string
+  address?: string
+  lat?: number
+  lng?: number
 }
 
 export const ports: PortEntry[] = [
   // ─── FRANCE ───────────────────────────────────────────────────────────
   // Ports & Marinas
-  { name: 'Port Vauban', city: 'Antibes', country: 'France', region: 'French Riviera', type: 'port' },
-  { name: 'Port Gallice', city: 'Antibes', country: 'France', region: 'French Riviera', type: 'marina' },
-  { name: 'Port de la Salis', city: 'Antibes', country: 'France', region: 'French Riviera', type: 'marina' },
-  { name: 'Port Hercules', city: 'Monaco', country: 'Monaco', region: 'French Riviera', type: 'port' },
-  { name: 'Port de Fontvieille', city: 'Monaco', country: 'Monaco', region: 'French Riviera', type: 'port' },
-  { name: 'Port de Nice', city: 'Nice', country: 'France', region: 'French Riviera', type: 'port' },
-  { name: 'Port Lympia', city: 'Nice', country: 'France', region: 'French Riviera', type: 'port' },
+  { name: 'Port Vauban', city: 'Antibes', country: 'France', region: 'French Riviera', type: 'port', postcode: '06600', lat: 43.5804, lng: 7.1260 },
+  { name: 'Port Gallice', city: 'Antibes', country: 'France', region: 'French Riviera', type: 'marina', postcode: '06160', lat: 43.5583, lng: 7.0475 },
+  { name: 'Port de la Salis', city: 'Antibes', country: 'France', region: 'French Riviera', type: 'marina', postcode: '06160', lat: 43.5594, lng: 7.1177 },
+  { name: 'Port Hercules', city: 'Monaco', country: 'Monaco', region: 'French Riviera', type: 'port', postcode: '98000', lat: 43.7348, lng: 7.4208 },
+  { name: 'Port de Fontvieille', city: 'Monaco', country: 'Monaco', region: 'French Riviera', type: 'port', postcode: '98000', lat: 43.7278, lng: 7.4145 },
+  { name: 'Port de Nice', city: 'Nice', country: 'France', region: 'French Riviera', type: 'port', postcode: '06300', lat: 43.6942, lng: 7.2856 },
+  { name: 'Port Lympia', city: 'Nice', country: 'France', region: 'French Riviera', type: 'port', postcode: '06300', lat: 43.6947, lng: 7.2870 },
   { name: 'Port de Saint-Laurent-du-Var', city: 'Saint-Laurent-du-Var', country: 'France', region: 'French Riviera', type: 'marina' },
-  { name: 'Port de Cannes - Vieux Port', city: 'Cannes', country: 'France', region: 'French Riviera', type: 'port' },
+  { name: 'Port de Cannes - Vieux Port', city: 'Cannes', country: 'France', region: 'French Riviera', type: 'port', postcode: '06400', lat: 43.5513, lng: 7.0128 },
   { name: 'Port Pierre Canto', city: 'Cannes', country: 'France', region: 'French Riviera', type: 'marina' },
   { name: 'Port de Mandelieu-la-Napoule', city: 'Mandelieu-la-Napoule', country: 'France', region: 'French Riviera', type: 'marina' },
-  { name: 'Port de Saint-Tropez', city: 'Saint-Tropez', country: 'France', region: 'French Riviera', type: 'port' },
+  { name: 'Port de Saint-Tropez', city: 'Saint-Tropez', country: 'France', region: 'French Riviera', type: 'port', postcode: '83990', lat: 43.2727, lng: 6.6366 },
   { name: 'Port Grimaud', city: 'Grimaud', country: 'France', region: 'French Riviera', type: 'marina' },
   { name: 'Port de Villefranche-sur-Mer', city: 'Villefranche-sur-Mer', country: 'France', region: 'French Riviera', type: 'port' },
   { name: 'Port de Beaulieu', city: 'Beaulieu-sur-Mer', country: 'France', region: 'French Riviera', type: 'marina' },
@@ -32,7 +36,7 @@ export const ports: PortEntry[] = [
   { name: 'Port Fréjus', city: 'Fréjus', country: 'France', region: 'French Riviera', type: 'port' },
   { name: 'Port de Toulon', city: 'Toulon', country: 'France', region: 'Provence', type: 'port' },
   { name: 'Port de Hyères', city: 'Hyères', country: 'France', region: 'Provence', type: 'port' },
-  { name: 'Port de Marseille - Vieux Port', city: 'Marseille', country: 'France', region: 'Provence', type: 'port' },
+  { name: 'Port de Marseille - Vieux Port', city: 'Marseille', country: 'France', region: 'Provence', type: 'port', postcode: '13001', lat: 43.2951, lng: 5.3697 },
   { name: 'Port de la Joliette', city: 'Marseille', country: 'France', region: 'Provence', type: 'port' },
   { name: 'Port de Bandol', city: 'Bandol', country: 'France', region: 'Provence', type: 'marina' },
   { name: 'Port de Sète', city: 'Sète', country: 'France', region: 'Occitanie', type: 'port' },
@@ -53,8 +57,8 @@ export const ports: PortEntry[] = [
   { name: 'Vilanova Grand Marina Shipyard (Mediterranean)', city: 'Villefranche-sur-Mer', country: 'France', region: 'French Riviera', type: 'shipyard' },
 
   // ─── SPAIN ────────────────────────────────────────────────────────────
-  { name: 'Port de Barcelona', city: 'Barcelona', country: 'Spain', region: 'Catalonia', type: 'port' },
-  { name: 'Marina Port Vell', city: 'Barcelona', country: 'Spain', region: 'Catalonia', type: 'marina' },
+  { name: 'Port de Barcelona', city: 'Barcelona', country: 'Spain', region: 'Catalonia', type: 'port', postcode: '08039', lat: 41.3751, lng: 2.1869 },
+  { name: 'Marina Port Vell', city: 'Barcelona', country: 'Spain', region: 'Catalonia', type: 'marina', postcode: '08039', lat: 41.3759, lng: 2.1845 },
   { name: 'OneOcean Port Vell', city: 'Barcelona', country: 'Spain', region: 'Catalonia', type: 'marina' },
   { name: 'Port Olímpic', city: 'Barcelona', country: 'Spain', region: 'Catalonia', type: 'marina' },
   { name: 'Port Forum', city: 'Barcelona', country: 'Spain', region: 'Catalonia', type: 'marina' },
@@ -219,9 +223,9 @@ export const ports: PortEntry[] = [
   { name: 'Meyer Werft', city: 'Papenburg', country: 'Germany', region: 'Lower Saxony', type: 'shipyard' },
 
   // ─── UK ───────────────────────────────────────────────────────────────
-  { name: 'Port of Southampton', city: 'Southampton', country: 'United Kingdom', region: 'Hampshire', type: 'port' },
-  { name: 'Ocean Village Marina', city: 'Southampton', country: 'United Kingdom', region: 'Hampshire', type: 'marina' },
-  { name: 'Shamrock Quay Marina', city: 'Southampton', country: 'United Kingdom', region: 'Hampshire', type: 'marina' },
+  { name: 'Port of Southampton', city: 'Southampton', country: 'United Kingdom', region: 'Hampshire', type: 'port', postcode: 'SO14 2AQ', lat: 50.8975, lng: -1.3968 },
+  { name: 'Ocean Village Marina', city: 'Southampton', country: 'United Kingdom', region: 'Hampshire', type: 'marina', postcode: 'SO14 3TJ', lat: 50.8956, lng: -1.3882 },
+  { name: 'Shamrock Quay Marina', city: 'Southampton', country: 'United Kingdom', region: 'Hampshire', type: 'marina', postcode: 'SO14 5QL', lat: 50.8932, lng: -1.3826 },
   { name: 'Port of London (Tilbury)', city: 'London', country: 'United Kingdom', region: 'Essex', type: 'port' },
   { name: 'St Katharine Docks', city: 'London', country: 'United Kingdom', region: 'London', type: 'marina' },
   { name: 'Limehouse Marina', city: 'London', country: 'United Kingdom', region: 'London', type: 'marina' },
