@@ -14,6 +14,9 @@ export default function CreateListingPage() {
   const [error, setError] = useState('')
   const [selectedMake, setSelectedMake] = useState('')
   const [selectedSpec, setSelectedSpec] = useState<VehicleSpec | null>(null)
+  const [listingType, setListingType] = useState<'SPACE_AVAILABLE' | 'SPACE_NEEDED'>('SPACE_AVAILABLE')
+  const [showVehicleRequirements, setShowVehicleRequirements] = useState(false)
+  const isSpaceNeeded = listingType === 'SPACE_NEEDED'
   const [form, setForm] = useState({
     title: '',
     description: '',
@@ -55,7 +58,14 @@ export default function CreateListingPage() {
     returnPricePerM3: '',
     returnFlatRate: '',
     returnNotes: '',
+    cargoDescription: '',
+    specialRequirements: '',
   })
+
+  const [costEstimate, setCostEstimate] = useState<null | { fuelCost: number; tollEstimate: number; ferryWarning?: string; totalEstimate: number; breakdown: { label: string; amount: number }[] }>(null)
+  const [estimateDistance, setEstimateDistance] = useState('')
+  const [estimateLoading, setEstimateLoading] = useState(false)
+  const [estimateOpen, setEstimateOpen] = useState(false)
 
   const makes = useMemo(() => getVehicleMakes(), [])
   const modelsForMake = useMemo(() => selectedMake ? getModelsForMake(selectedMake) : [], [selectedMake])
@@ -93,6 +103,31 @@ export default function CreateListingPage() {
     setForm({ ...form, [target.name]: value })
   }
 
+  const handleEstimateCost = async () => {
+    if (!estimateDistance || !form.originCountry || !form.destinationCountry || !form.vehicleType) return
+    setEstimateLoading(true)
+    setCostEstimate(null)
+    try {
+      const res = await fetch('/api/route-cost', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          originCountry: form.originCountry,
+          destinationCountry: form.destinationCountry,
+          distanceKm: Number(estimateDistance),
+          vehicleType: form.vehicleType,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error)
+      setCostEstimate(data.estimate)
+    } catch {
+      setCostEstimate(null)
+    } finally {
+      setEstimateLoading(false)
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!token) return
@@ -103,7 +138,7 @@ export default function CreateListingPage() {
       const res = await fetch('/api/listings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, listingType }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error)
@@ -115,7 +150,7 @@ export default function CreateListingPage() {
     }
   }
 
-  if (!user || (!user.canCarry && user.role !== 'ADMIN')) {
+  if (!user || (!user.canCarry && !user.canShip && user.role !== 'ADMIN')) {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
@@ -141,8 +176,8 @@ export default function CreateListingPage() {
             &larr; Back to Dashboard
           </Link>
           <p className="text-[11px] font-semibold text-[#C6904D] uppercase tracking-[0.15em] mt-4 sm:mt-5 mb-1">New Listing</p>
-          <h1 className="text-xl sm:text-2xl font-semibold text-[#1a1a1a] tracking-[-0.02em]">List Your Van Space</h1>
-          <p className="text-sm text-slate-500 mt-1.5">Share spare capacity on your next delivery run.</p>
+          <h1 className="text-xl sm:text-2xl font-semibold text-[#1a1a1a] tracking-[-0.02em]">{isSpaceNeeded ? 'Post a Load / Space Needed' : 'List Your Van Space'}</h1>
+          <p className="text-sm text-slate-500 mt-1.5">{isSpaceNeeded ? 'Describe what you need delivered and let carriers bid.' : 'Share spare capacity on your next delivery run.'}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
@@ -152,10 +187,57 @@ export default function CreateListingPage() {
             </div>
           )}
 
-          {/* Vehicle Selection */}
+          {/* Listing Type Toggle */}
           <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-5 sm:p-6">
-            <h2 className="text-lg font-bold text-[#1a1a1a] mb-1">Vehicle Selection</h2>
-            <p className="text-xs text-slate-400 mb-4">Select your vehicle to auto-fill capacity specs, or enter manually below.</p>
+            <h2 className="text-lg font-bold text-[#1a1a1a] mb-1">What do you need?</h2>
+            <p className="text-xs text-slate-400 mb-4">Choose whether you have space to offer or need something delivered.</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <label
+                className={`flex flex-col items-center gap-1.5 p-4 rounded-xl border-2 cursor-pointer transition-all text-center ${
+                  listingType === 'SPACE_AVAILABLE'
+                    ? 'border-[#C6904D] bg-amber-50/50'
+                    : 'border-slate-200 hover:border-slate-300'
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="listingType"
+                  value="SPACE_AVAILABLE"
+                  checked={listingType === 'SPACE_AVAILABLE'}
+                  onChange={() => setListingType('SPACE_AVAILABLE')}
+                  className="sr-only"
+                />
+                <span className="text-2xl">&#128666;</span>
+                <span className="text-sm font-semibold text-[#1a1a1a]">I have space available</span>
+                <span className="text-xs text-slate-400">List spare capacity on your vehicle</span>
+              </label>
+              <label
+                className={`flex flex-col items-center gap-1.5 p-4 rounded-xl border-2 cursor-pointer transition-all text-center ${
+                  listingType === 'SPACE_NEEDED'
+                    ? 'border-[#C6904D] bg-amber-50/50'
+                    : 'border-slate-200 hover:border-slate-300'
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="listingType"
+                  value="SPACE_NEEDED"
+                  checked={listingType === 'SPACE_NEEDED'}
+                  onChange={() => setListingType('SPACE_NEEDED')}
+                  className="sr-only"
+                />
+                <span className="text-2xl">&#128230;</span>
+                <span className="text-sm font-semibold text-[#1a1a1a]">I need space / delivery</span>
+                <span className="text-xs text-slate-400">Post a load for carriers to bid on</span>
+              </label>
+            </div>
+          </div>
+
+          {/* Vehicle Selection - hidden for SPACE_NEEDED unless user opts in */}
+          {(!isSpaceNeeded || showVehicleRequirements) && (
+          <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-5 sm:p-6">
+            <h2 className="text-lg font-bold text-[#1a1a1a] mb-1">{isSpaceNeeded ? 'Vehicle Requirements' : 'Vehicle Selection'}</h2>
+            <p className="text-xs text-slate-400 mb-4">{isSpaceNeeded ? 'Specify vehicle requirements for your shipment (optional).' : 'Select your vehicle to auto-fill capacity specs, or enter manually below.'}</p>
             <div className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -216,6 +298,49 @@ export default function CreateListingPage() {
               )}
             </div>
           </div>
+          )}
+
+          {/* Vehicle requirements toggle for SPACE_NEEDED */}
+          {isSpaceNeeded && !showVehicleRequirements && (
+            <button
+              type="button"
+              onClick={() => setShowVehicleRequirements(true)}
+              className="w-full px-4 py-3 rounded-xl border-2 border-dashed border-slate-200 text-sm text-slate-500 hover:border-slate-300 hover:text-slate-700 transition-all"
+            >
+              + Add vehicle requirements (optional)
+            </button>
+          )}
+
+          {/* Cargo Description & Special Requirements for SPACE_NEEDED */}
+          {isSpaceNeeded && (
+            <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-5 sm:p-6">
+              <h2 className="text-lg font-bold text-[#1a1a1a] mb-4">Cargo Information</h2>
+              <div className="space-y-4">
+                <div>
+                  <label className={labelCls}>Cargo Description *</label>
+                  <textarea
+                    name="cargoDescription"
+                    rows={3}
+                    className={`${inputCls} resize-none`}
+                    placeholder="Describe what you need shipped, e.g. 10 cases of wine, marine engine parts..."
+                    value={form.cargoDescription}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div>
+                  <label className={labelCls}>Special Requirements</label>
+                  <textarea
+                    name="specialRequirements"
+                    rows={3}
+                    className={`${inputCls} resize-none`}
+                    placeholder="e.g. Needs refrigeration, fragile items, must be insured for X..."
+                    value={form.specialRequirements}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Route Details */}
           <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-5 sm:p-6">
@@ -421,10 +546,13 @@ export default function CreateListingPage() {
 
           {/* Vehicle & Capacity */}
           <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-5 sm:p-6">
-            <h2 className="text-lg font-bold text-[#1a1a1a] mb-1">Vehicle & Capacity</h2>
-            {selectedSpec && <p className="text-xs text-emerald-500 font-medium mb-4">Auto-filled from {selectedSpec.make} {selectedSpec.model} specs. You can override any value.</p>}
-            {!selectedSpec && <p className="text-xs text-slate-400 mb-4">Enter capacity manually, or select a vehicle above to auto-fill.</p>}
+            <h2 className="text-lg font-bold text-[#1a1a1a] mb-1">{isSpaceNeeded ? 'Shipment Size' : 'Vehicle & Capacity'}</h2>
+            {!isSpaceNeeded && selectedSpec && <p className="text-xs text-emerald-500 font-medium mb-4">Auto-filled from {selectedSpec.make} {selectedSpec.model} specs. You can override any value.</p>}
+            {!isSpaceNeeded && !selectedSpec && <p className="text-xs text-slate-400 mb-4">Enter capacity manually, or select a vehicle above to auto-fill.</p>}
+            {isSpaceNeeded && <p className="text-xs text-slate-400 mb-4">Enter the size and weight of your cargo.</p>}
             <div className="space-y-4">
+              {!isSpaceNeeded && (
+              <>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className={labelCls}>Vehicle Type *</label>
@@ -476,10 +604,12 @@ export default function CreateListingPage() {
                   />
                 </div>
               </div>
+              </>
+              )}
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className={labelCls}>Max Payload (kg) *</label>
+                  <label className={labelCls}>{isSpaceNeeded ? 'Cargo Weight (kg) *' : 'Max Payload (kg) *'}</label>
                   <input
                     name="totalCapacityKg"
                     type="number"
@@ -492,7 +622,7 @@ export default function CreateListingPage() {
                   />
                 </div>
                 <div>
-                  <label className={labelCls}>Cargo Volume (m&sup3;) *</label>
+                  <label className={labelCls}>{isSpaceNeeded ? 'Cargo Volume Needed (m\u00B3) *' : 'Cargo Volume (m\u00B3) *'}</label>
                   <input
                     name="totalCapacityM3"
                     type="number"
@@ -546,6 +676,7 @@ export default function CreateListingPage() {
               </div>
 
               {/* Vehicle Features */}
+              {!isSpaceNeeded && (
               <div className="pt-4 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input type="checkbox" name="hasRefrigeration" checked={form.hasRefrigeration} onChange={handleChange} className="w-4 h-4 rounded border-slate-300 text-[#1a1a1a] focus:ring-[#C6904D]" />
@@ -560,6 +691,7 @@ export default function CreateListingPage() {
                   <span className="text-sm text-[#1a1a1a]">GPS Tracking</span>
                 </label>
               </div>
+              )}
             </div>
           </div>
 
@@ -594,11 +726,11 @@ export default function CreateListingPage() {
 
           {/* Pricing */}
           <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-5 sm:p-6">
-            <h2 className="text-lg font-bold text-[#1a1a1a] mb-4">Pricing</h2>
+            <h2 className="text-lg font-bold text-[#1a1a1a] mb-4">{isSpaceNeeded ? 'Budget' : 'Pricing'}</h2>
             <div className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                  <label className={labelCls}>Price per kg</label>
+                  <label className={labelCls}>{isSpaceNeeded ? 'Budget per kg' : 'Price per kg'}</label>
                   <input
                     name="pricePerKg"
                     type="number"
@@ -622,7 +754,7 @@ export default function CreateListingPage() {
                   />
                 </div>
                 <div>
-                  <label className={labelCls}>Or Flat Rate</label>
+                  <label className={labelCls}>{isSpaceNeeded ? 'Budget (flat rate)' : 'Or Flat Rate'}</label>
                   <input
                     name="flatRate"
                     type="number"
@@ -699,12 +831,99 @@ export default function CreateListingPage() {
             </div>
           </div>
 
+          {/* Route Cost Estimator */}
+          <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de]">
+            <button
+              type="button"
+              onClick={() => setEstimateOpen(!estimateOpen)}
+              className="w-full flex items-center justify-between p-5 sm:p-6 text-left"
+            >
+              <div>
+                <h2 className="text-lg font-bold text-[#1a1a1a]">Route Cost Estimator</h2>
+                <p className="text-xs text-slate-400 mt-0.5">Estimate fuel, tolls &amp; ferry costs to help set your prices.</p>
+              </div>
+              <span className={`text-slate-400 transition-transform ${estimateOpen ? 'rotate-180' : ''}`}>
+                &#9660;
+              </span>
+            </button>
+            {estimateOpen && (
+              <div className="px-5 sm:px-6 pb-5 sm:pb-6 space-y-4 border-t border-slate-100 pt-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className={labelCls}>Distance (km)</label>
+                    <input
+                      type="number"
+                      step="1"
+                      className={inputCls}
+                      placeholder="e.g. 950"
+                      value={estimateDistance}
+                      onChange={e => setEstimateDistance(e.target.value)}
+                    />
+                  </div>
+                  <div className="flex items-end">
+                    <button
+                      type="button"
+                      onClick={handleEstimateCost}
+                      disabled={estimateLoading || !estimateDistance || !form.originCountry || !form.destinationCountry || !form.vehicleType}
+                      className="btn-outline text-sm !py-2.5 w-full disabled:opacity-40"
+                    >
+                      {estimateLoading ? 'Calculating...' : 'Calculate Estimate'}
+                    </button>
+                  </div>
+                </div>
+
+                {(!form.originCountry || !form.destinationCountry) && (
+                  <p className="text-xs text-amber-600">Fill in origin and destination above to enable the estimator.</p>
+                )}
+                {!form.vehicleType && (
+                  <p className="text-xs text-amber-600">Select a vehicle type above to enable the estimator.</p>
+                )}
+
+                {costEstimate && (
+                  <div className="rounded-xl bg-[#faf9f7] border border-[#e8e4de] p-4 space-y-3">
+                    <p className="text-xs font-semibold text-[#C6904D] uppercase tracking-wide">Cost Breakdown</p>
+                    <div className="space-y-2">
+                      {costEstimate.breakdown.map((item, i) => (
+                        <div key={i} className="flex items-center justify-between text-sm">
+                          <span className="text-slate-600">{item.label}</span>
+                          <span className="font-medium text-[#1a1a1a]">&euro;{item.amount.toFixed(2)}</span>
+                        </div>
+                      ))}
+                      <div className="flex items-center justify-between text-sm pt-2 border-t border-[#e8e4de]">
+                        <span className="font-semibold text-[#1a1a1a]">Total Estimated Cost</span>
+                        <span className="font-bold text-[#1a1a1a]">&euro;{costEstimate.totalEstimate.toFixed(2)}</span>
+                      </div>
+                    </div>
+
+                    {costEstimate.ferryWarning && (
+                      <div className="rounded-lg bg-amber-50 border border-amber-200 p-3">
+                        <p className="text-xs text-amber-800 font-medium">&#9875; Ferry: {costEstimate.ferryWarning}</p>
+                      </div>
+                    )}
+
+                    {form.totalCapacityKg && Number(form.totalCapacityKg) > 0 && (
+                      <div className="rounded-lg bg-blue-50 border border-blue-100 p-3">
+                        <p className="text-xs text-blue-800">
+                          <span className="font-medium">Suggested minimum price per kg:</span>{' '}
+                          &euro;{(costEstimate.totalEstimate / Number(form.totalCapacityKg)).toFixed(2)}/kg
+                          <span className="text-blue-500 ml-1">(based on {form.totalCapacityKg}kg capacity)</span>
+                        </p>
+                      </div>
+                    )}
+
+                    <p className="text-[10px] text-slate-400">Estimates are approximate and based on average European fuel and toll rates. Actual costs may vary.</p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
           <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
             <button
               type="submit"
               disabled={loading}
               className="btn-primary !py-3 sm:!px-8 text-sm disabled:opacity-50 w-full sm:w-auto">
-              {loading ? 'Creating...' : 'Publish Listing'}
+              {loading ? 'Creating...' : (isSpaceNeeded ? 'Post Load' : 'Publish Listing')}
             </button>
             <Link href="/dashboard" className="text-sm text-slate-500 hover:text-[#1a1a1a] transition-colors text-center">
               Cancel

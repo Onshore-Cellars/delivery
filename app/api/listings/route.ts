@@ -19,6 +19,7 @@ export async function GET(request: NextRequest) {
     const page = Math.max(1, parseInt(searchParams.get('page') || '1') || 1)
     const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '20') || 20))
     const carrierId = searchParams.get('carrierId')
+    const listingType = searchParams.get('listingType')
     const showAll = searchParams.get('all')
 
     const where: Prisma.ListingWhereInput = {}
@@ -45,6 +46,10 @@ export async function GET(request: NextRequest) {
     } else {
       // Public marketplace: only active listings
       where.status = 'ACTIVE'
+    }
+
+    if (listingType) {
+      where.listingType = listingType
     }
 
     if (origin) {
@@ -142,7 +147,7 @@ export async function GET(request: NextRequest) {
         where,
         include: {
           carrier: {
-            select: { id: true, name: true, company: true, avatarUrl: true },
+            select: { id: true, avatarUrl: true },
           },
           _count: { select: { bookings: true } },
         },
@@ -180,11 +185,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }
 
-    const creator = await prisma.user.findUnique({ where: { id: decoded.userId }, select: { canCarry: true } })
-    if (!creator?.canCarry && decoded.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'Enable "I can carry / deliver" in your profile to create listings' }, { status: 403 })
-    }
-
     const body = await request.json()
     const {
       title, description, vehicleType, vehicleName, vehicleReg,
@@ -197,9 +197,30 @@ export async function POST(request: NextRequest) {
       routeDirection, returnDepartureDate, returnEstimatedArrival,
       returnAvailableKg, returnAvailableM3, returnPricePerKg, returnPricePerM3,
       returnFlatRate, returnNotes,
+      listingType: rawListingType, cargoDescription, specialRequirements,
     } = body
 
-    if (!title || !vehicleType || !originPort || !destinationPort || !departureDate || !totalCapacityKg || !totalCapacityM3) {
+    const listingType = rawListingType === 'SPACE_NEEDED' ? 'SPACE_NEEDED' : 'SPACE_AVAILABLE'
+
+    const creator = await prisma.user.findUnique({ where: { id: decoded.userId }, select: { canCarry: true, canShip: true } })
+
+    if (listingType === 'SPACE_NEEDED') {
+      if (!creator?.canShip && decoded.role !== 'ADMIN') {
+        return NextResponse.json({ error: 'Enable "I can ship" in your profile to post space-needed listings' }, { status: 403 })
+      }
+    } else {
+      if (!creator?.canCarry && decoded.role !== 'ADMIN') {
+        return NextResponse.json({ error: 'Enable "I can carry / deliver" in your profile to create listings' }, { status: 403 })
+      }
+    }
+
+    const isSpaceNeeded = listingType === 'SPACE_NEEDED'
+
+    if (!title || !originPort || !destinationPort || !departureDate || !totalCapacityKg || !totalCapacityM3) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+    }
+
+    if (!isSpaceNeeded && !vehicleType) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
@@ -213,9 +234,10 @@ export async function POST(request: NextRequest) {
     const listing = await prisma.listing.create({
       data: {
         carrierId: decoded.userId,
+        listingType,
         title,
-        description: description || null,
-        vehicleType,
+        description: description || (isSpaceNeeded && cargoDescription ? cargoDescription : null),
+        vehicleType: vehicleType || (isSpaceNeeded ? 'N/A' : ''),
         vehicleName: vehicleName || null,
         vehicleReg: vehicleReg || null,
         hasRefrigeration: hasRefrigeration || false,
@@ -247,7 +269,7 @@ export async function POST(request: NextRequest) {
         biddingEnabled: biddingEnabled || false,
         minBidPrice: minBidPrice ? parseFloat(minBidPrice) : null,
         acceptedCargo: acceptedCargo || null,
-        restrictedItems: restrictedItems || null,
+        restrictedItems: isSpaceNeeded ? (specialRequirements || restrictedItems || null) : (restrictedItems || null),
         routeDirection: routeDirection || 'OUTBOUND',
         returnDepartureDate: returnDepartureDate ? new Date(returnDepartureDate) : null,
         returnEstimatedArrival: returnEstimatedArrival ? new Date(returnEstimatedArrival) : null,
@@ -262,7 +284,7 @@ export async function POST(request: NextRequest) {
       },
       include: {
         carrier: {
-          select: { id: true, name: true, company: true },
+          select: { id: true, avatarUrl: true },
         },
       },
     })

@@ -22,6 +22,12 @@ interface RecentBooking {
   status: string
   paymentStatus: string
   createdAt: string
+  trackingCode?: string
+  cargoDescription?: string
+  weightKg?: number
+  volumeM3?: number
+  pickupAddress?: string
+  deliveryAddress?: string
   shipper: { name: string; company?: string }
   listing: { title: string; originPort: string; destinationPort: string }
 }
@@ -34,6 +40,9 @@ interface AdminUser {
   company?: string
   phone?: string
   verified: boolean
+  suspended?: boolean
+  canCarry?: boolean
+  canShip?: boolean
   createdAt: string
   _count: { listings: number; bookings: number }
 }
@@ -164,6 +173,12 @@ export default function AdminPage() {
   const [broadcastMessage, setBroadcastMessage] = useState('')
   const [broadcastRole, setBroadcastRole] = useState('')
   const [broadcastSending, setBroadcastSending] = useState(false)
+  const [editUser, setEditUser] = useState<AdminUser | null>(null)
+  const [editUserForm, setEditUserForm] = useState<Record<string, unknown>>({})
+  const [editListing, setEditListing] = useState<AdminListing | null>(null)
+  const [editListingForm, setEditListingForm] = useState<Record<string, unknown>>({})
+  const [editBooking, setEditBooking] = useState<RecentBooking | null>(null)
+  const [editBookingForm, setEditBookingForm] = useState<Record<string, unknown>>({})
 
   // ─── Helpers ──────────────────────────────────────────────────────────────
 
@@ -341,6 +356,78 @@ export default function AdminPage() {
     } finally {
       setActionLoading(null)
     }
+  }
+
+  // ─── Edit User ──────────────────────────────────────────────────────────
+
+  const handleEditUser = async () => {
+    if (!token || !editUser) return
+    setActionLoading(`edit-${editUser.id}`)
+    try {
+      const res = await fetch('/api/admin/users', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ userId: editUser.id, updates: editUserForm }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setAllUsers(prev => prev.map(u => u.id === editUser.id ? { ...data.user, _count: data.user._count } : u))
+        showToast('User updated successfully')
+        setEditUser(null)
+      } else {
+        const data = await res.json()
+        showToast(data.error || 'Failed to update user', 'error')
+      }
+    } catch { showToast('Network error', 'error') }
+    finally { setActionLoading(null) }
+  }
+
+  // ─── Edit Listing ──────────────────────────────────────────────────────────
+
+  const handleEditListing = async () => {
+    if (!token || !editListing) return
+    setActionLoading(`edit-listing-${editListing.id}`)
+    try {
+      const res = await fetch(`/api/listings/${editListing.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify(editListingForm),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setAllListings(prev => prev.map(l => l.id === editListing.id ? { ...l, ...data.listing || data } : l))
+        showToast('Listing updated successfully')
+        setEditListing(null)
+      } else {
+        const data = await res.json()
+        showToast(data.error || 'Failed to update listing', 'error')
+      }
+    } catch { showToast('Network error', 'error') }
+    finally { setActionLoading(null) }
+  }
+
+  // ─── Edit Booking ──────────────────────────────────────────────────────────
+
+  const handleEditBooking = async () => {
+    if (!token || !editBooking) return
+    setActionLoading(`edit-booking-${editBooking.id}`)
+    try {
+      const res = await fetch('/api/admin/bookings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ bookingId: editBooking.id, updates: editBookingForm }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setAllBookings(prev => prev.map(b => b.id === editBooking.id ? { ...b, ...data.booking || data } : b))
+        showToast('Booking updated successfully')
+        setEditBooking(null)
+      } else {
+        const data = await res.json()
+        showToast(data.error || 'Failed to update booking', 'error')
+      }
+    } catch { showToast('Network error', 'error') }
+    finally { setActionLoading(null) }
   }
 
   // ─── Document Actions ─────────────────────────────────────────────────────
@@ -830,6 +917,15 @@ export default function AdminPage() {
                                       {actionLoading === `${u.id}-suspend` ? '...' : 'Suspend'}
                                     </button>
                                   )}
+                                  <button
+                                    onClick={() => {
+                                      setEditUser(u)
+                                      setEditUserForm({ name: u.name, email: u.email, phone: u.phone || '', company: u.company || '', role: u.role, verified: u.verified, suspended: u.suspended || false, canCarry: u.canCarry || false, canShip: u.canShip || false })
+                                    }}
+                                    className="px-2.5 py-1 text-xs font-medium rounded-md bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition-colors"
+                                  >
+                                    Edit
+                                  </button>
                                 </div>
                               )}
                             </td>
@@ -942,6 +1038,15 @@ export default function AdminPage() {
                                   Refund
                                 </button>
                               )}
+                              <button
+                                onClick={() => {
+                                  setEditBooking(b)
+                                  setEditBookingForm({ status: b.status, paymentStatus: b.paymentStatus, totalPrice: b.totalPrice, cargoDescription: b.cargoDescription || '', weightKg: b.weightKg || '', volumeM3: b.volumeM3 || '', pickupAddress: b.pickupAddress || '', deliveryAddress: b.deliveryAddress || '', deliveryNotes: '', adminNotes: '' })
+                                }}
+                                className="px-2 py-1 text-xs font-medium rounded-md bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100"
+                              >
+                                Edit
+                              </button>
                             </div>
                           </div>
                         </div>
@@ -1011,17 +1116,28 @@ export default function AdminPage() {
                               )}
                             </td>
                             <td className="px-6 py-3">
-                              <button
-                                onClick={() => handleToggleFeatured(l.id, l.featured)}
-                                disabled={actionLoading === `listing-${l.id}`}
-                                className={`px-2.5 py-1 text-xs font-medium rounded-md border transition-colors disabled:opacity-50 ${
-                                  l.featured
-                                    ? 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
-                                    : 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100'
-                                }`}
-                              >
-                                {actionLoading === `listing-${l.id}` ? '...' : l.featured ? 'Unfeature' : 'Feature'}
-                              </button>
+                              <div className="flex gap-1">
+                                <button
+                                  onClick={() => handleToggleFeatured(l.id, l.featured)}
+                                  disabled={actionLoading === `listing-${l.id}`}
+                                  className={`px-2.5 py-1 text-xs font-medium rounded-md border transition-colors disabled:opacity-50 ${
+                                    l.featured
+                                      ? 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                                      : 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100'
+                                  }`}
+                                >
+                                  {actionLoading === `listing-${l.id}` ? '...' : l.featured ? 'Unfeature' : 'Feature'}
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setEditListing(l)
+                                    setEditListingForm({ title: l.title, status: l.status, featured: l.featured, originPort: l.originPort, destinationPort: l.destinationPort, departureDate: l.departureDate ? l.departureDate.slice(0, 10) : '', totalCapacityKg: l.totalCapacityKg || '', availableKg: l.availableKg || '', pricePerKg: l.pricePerKg || '', pricePerM3: '', flatRate: l.flatRate || '', currency: 'EUR', biddingEnabled: false })
+                                  }}
+                                  className="px-2.5 py-1 text-xs font-medium rounded-md bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition-colors"
+                                >
+                                  Edit
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         ))}
@@ -1353,6 +1469,287 @@ export default function AdminPage() {
           </div>
         )}
       </div>
+
+      {/* ═══════════════════ EDIT USER MODAL ═══════════════════ */}
+      {editUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setEditUser(null)} />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 m-4">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-semibold text-[#1d1d1f]">Edit User</h3>
+              <button onClick={() => setEditUser(null)} className="p-1 rounded-lg hover:bg-slate-100">
+                <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Name</label>
+                <input type="text" value={editUserForm.name as string || ''} onChange={e => setEditUserForm(prev => ({ ...prev, name: e.target.value }))}
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Email</label>
+                <input type="email" value={editUserForm.email as string || ''} onChange={e => setEditUserForm(prev => ({ ...prev, email: e.target.value }))}
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Phone</label>
+                <input type="text" value={editUserForm.phone as string || ''} onChange={e => setEditUserForm(prev => ({ ...prev, phone: e.target.value }))}
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Company</label>
+                <input type="text" value={editUserForm.company as string || ''} onChange={e => setEditUserForm(prev => ({ ...prev, company: e.target.value }))}
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Role</label>
+                <select value={editUserForm.role as string || ''} onChange={e => setEditUserForm(prev => ({ ...prev, role: e.target.value }))}
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10">
+                  <option value="CARRIER">Carrier</option>
+                  <option value="SUPPLIER">Supplier</option>
+                  <option value="YACHT_OWNER">Yacht Owner</option>
+                  <option value="CREW">Crew</option>
+                  <option value="ADMIN">Admin</option>
+                </select>
+              </div>
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium text-[#1d1d1f]">Verified</label>
+                <button type="button" onClick={() => setEditUserForm(prev => ({ ...prev, verified: !prev.verified }))}
+                  className={`relative w-11 h-6 rounded-full transition-colors ${editUserForm.verified ? 'bg-emerald-500' : 'bg-slate-300'}`}>
+                  <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${editUserForm.verified ? 'translate-x-5' : ''}`} />
+                </button>
+              </div>
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium text-[#1d1d1f]">Suspended</label>
+                <button type="button" onClick={() => setEditUserForm(prev => ({ ...prev, suspended: !prev.suspended }))}
+                  className={`relative w-11 h-6 rounded-full transition-colors ${editUserForm.suspended ? 'bg-red-500' : 'bg-slate-300'}`}>
+                  <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${editUserForm.suspended ? 'translate-x-5' : ''}`} />
+                </button>
+              </div>
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium text-[#1d1d1f]">Can Carry</label>
+                <button type="button" onClick={() => setEditUserForm(prev => ({ ...prev, canCarry: !prev.canCarry }))}
+                  className={`relative w-11 h-6 rounded-full transition-colors ${editUserForm.canCarry ? 'bg-emerald-500' : 'bg-slate-300'}`}>
+                  <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${editUserForm.canCarry ? 'translate-x-5' : ''}`} />
+                </button>
+              </div>
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium text-[#1d1d1f]">Can Ship</label>
+                <button type="button" onClick={() => setEditUserForm(prev => ({ ...prev, canShip: !prev.canShip }))}
+                  className={`relative w-11 h-6 rounded-full transition-colors ${editUserForm.canShip ? 'bg-emerald-500' : 'bg-slate-300'}`}>
+                  <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${editUserForm.canShip ? 'translate-x-5' : ''}`} />
+                </button>
+              </div>
+            </div>
+            <div className="flex gap-3 mt-6 pt-4 border-t border-slate-100">
+              <button onClick={() => setEditUser(null)} className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-medium text-slate-600 hover:bg-slate-50">Cancel</button>
+              <button onClick={handleEditUser} disabled={!!actionLoading} className="flex-1 px-4 py-2.5 rounded-xl bg-[#1d1d1f] text-white text-sm font-medium hover:bg-[#333] disabled:opacity-50">
+                {actionLoading ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ═══════════════════ EDIT LISTING MODAL ═══════════════════ */}
+      {editListing && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setEditListing(null)} />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 m-4">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-semibold text-[#1d1d1f]">Edit Listing</h3>
+              <button onClick={() => setEditListing(null)} className="p-1 rounded-lg hover:bg-slate-100">
+                <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Title</label>
+                <input type="text" value={editListingForm.title as string || ''} onChange={e => setEditListingForm(prev => ({ ...prev, title: e.target.value }))}
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Status</label>
+                <select value={editListingForm.status as string || ''} onChange={e => setEditListingForm(prev => ({ ...prev, status: e.target.value }))}
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10">
+                  <option value="DRAFT">Draft</option>
+                  <option value="ACTIVE">Active</option>
+                  <option value="FULL">Full</option>
+                  <option value="IN_TRANSIT">In Transit</option>
+                  <option value="COMPLETED">Completed</option>
+                  <option value="CANCELLED">Cancelled</option>
+                </select>
+              </div>
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium text-[#1d1d1f]">Featured</label>
+                <button type="button" onClick={() => setEditListingForm(prev => ({ ...prev, featured: !prev.featured }))}
+                  className={`relative w-11 h-6 rounded-full transition-colors ${editListingForm.featured ? 'bg-amber-500' : 'bg-slate-300'}`}>
+                  <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${editListingForm.featured ? 'translate-x-5' : ''}`} />
+                </button>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Origin Port</label>
+                <input type="text" value={editListingForm.originPort as string || ''} onChange={e => setEditListingForm(prev => ({ ...prev, originPort: e.target.value }))}
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Destination Port</label>
+                <input type="text" value={editListingForm.destinationPort as string || ''} onChange={e => setEditListingForm(prev => ({ ...prev, destinationPort: e.target.value }))}
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Departure Date</label>
+                <input type="date" value={editListingForm.departureDate as string || ''} onChange={e => setEditListingForm(prev => ({ ...prev, departureDate: e.target.value }))}
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Total Capacity (kg)</label>
+                  <input type="number" value={editListingForm.totalCapacityKg as number || ''} onChange={e => setEditListingForm(prev => ({ ...prev, totalCapacityKg: e.target.value ? Number(e.target.value) : '' }))}
+                    className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Available (kg)</label>
+                  <input type="number" value={editListingForm.availableKg as number || ''} onChange={e => setEditListingForm(prev => ({ ...prev, availableKg: e.target.value ? Number(e.target.value) : '' }))}
+                    className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10" />
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Price/kg</label>
+                  <input type="number" step="0.01" value={editListingForm.pricePerKg as number || ''} onChange={e => setEditListingForm(prev => ({ ...prev, pricePerKg: e.target.value ? Number(e.target.value) : '' }))}
+                    className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Price/m3</label>
+                  <input type="number" step="0.01" value={editListingForm.pricePerM3 as number || ''} onChange={e => setEditListingForm(prev => ({ ...prev, pricePerM3: e.target.value ? Number(e.target.value) : '' }))}
+                    className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Flat Rate</label>
+                  <input type="number" step="0.01" value={editListingForm.flatRate as number || ''} onChange={e => setEditListingForm(prev => ({ ...prev, flatRate: e.target.value ? Number(e.target.value) : '' }))}
+                    className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Currency</label>
+                <select value={editListingForm.currency as string || 'EUR'} onChange={e => setEditListingForm(prev => ({ ...prev, currency: e.target.value }))}
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10">
+                  <option value="EUR">EUR</option>
+                  <option value="USD">USD</option>
+                  <option value="GBP">GBP</option>
+                </select>
+              </div>
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium text-[#1d1d1f]">Bidding Enabled</label>
+                <button type="button" onClick={() => setEditListingForm(prev => ({ ...prev, biddingEnabled: !prev.biddingEnabled }))}
+                  className={`relative w-11 h-6 rounded-full transition-colors ${editListingForm.biddingEnabled ? 'bg-emerald-500' : 'bg-slate-300'}`}>
+                  <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${editListingForm.biddingEnabled ? 'translate-x-5' : ''}`} />
+                </button>
+              </div>
+            </div>
+            <div className="flex gap-3 mt-6 pt-4 border-t border-slate-100">
+              <button onClick={() => setEditListing(null)} className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-medium text-slate-600 hover:bg-slate-50">Cancel</button>
+              <button onClick={handleEditListing} disabled={!!actionLoading} className="flex-1 px-4 py-2.5 rounded-xl bg-[#1d1d1f] text-white text-sm font-medium hover:bg-[#333] disabled:opacity-50">
+                {actionLoading ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ═══════════════════ EDIT BOOKING MODAL ═══════════════════ */}
+      {editBooking && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setEditBooking(null)} />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 m-4">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-semibold text-[#1d1d1f]">Edit Booking</h3>
+              <button onClick={() => setEditBooking(null)} className="p-1 rounded-lg hover:bg-slate-100">
+                <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Status</label>
+                <select value={editBookingForm.status as string || ''} onChange={e => setEditBookingForm(prev => ({ ...prev, status: e.target.value }))}
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10">
+                  <option value="QUOTE_REQUESTED">Quote Requested</option>
+                  <option value="QUOTED">Quoted</option>
+                  <option value="PENDING">Pending</option>
+                  <option value="CONFIRMED">Confirmed</option>
+                  <option value="PICKED_UP">Picked Up</option>
+                  <option value="IN_TRANSIT">In Transit</option>
+                  <option value="CUSTOMS_HOLD">Customs Hold</option>
+                  <option value="DELIVERED">Delivered</option>
+                  <option value="CANCELLED">Cancelled</option>
+                  <option value="DISPUTED">Disputed</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Payment Status</label>
+                <select value={editBookingForm.paymentStatus as string || ''} onChange={e => setEditBookingForm(prev => ({ ...prev, paymentStatus: e.target.value }))}
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10">
+                  <option value="PENDING">Pending</option>
+                  <option value="PROCESSING">Processing</option>
+                  <option value="PAID">Paid</option>
+                  <option value="REFUNDED">Refunded</option>
+                  <option value="FAILED">Failed</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Total Price</label>
+                <input type="number" step="0.01" value={editBookingForm.totalPrice as number || ''} onChange={e => setEditBookingForm(prev => ({ ...prev, totalPrice: e.target.value ? Number(e.target.value) : '' }))}
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Cargo Description</label>
+                <textarea rows={2} value={editBookingForm.cargoDescription as string || ''} onChange={e => setEditBookingForm(prev => ({ ...prev, cargoDescription: e.target.value }))}
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 resize-none" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Weight (kg)</label>
+                  <input type="number" step="0.01" value={editBookingForm.weightKg as number || ''} onChange={e => setEditBookingForm(prev => ({ ...prev, weightKg: e.target.value ? Number(e.target.value) : '' }))}
+                    className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Volume (m3)</label>
+                  <input type="number" step="0.01" value={editBookingForm.volumeM3 as number || ''} onChange={e => setEditBookingForm(prev => ({ ...prev, volumeM3: e.target.value ? Number(e.target.value) : '' }))}
+                    className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Pickup Address</label>
+                <input type="text" value={editBookingForm.pickupAddress as string || ''} onChange={e => setEditBookingForm(prev => ({ ...prev, pickupAddress: e.target.value }))}
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Delivery Address</label>
+                <input type="text" value={editBookingForm.deliveryAddress as string || ''} onChange={e => setEditBookingForm(prev => ({ ...prev, deliveryAddress: e.target.value }))}
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Delivery Notes</label>
+                <textarea rows={2} value={editBookingForm.deliveryNotes as string || ''} onChange={e => setEditBookingForm(prev => ({ ...prev, deliveryNotes: e.target.value }))}
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 resize-none" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Admin Notes</label>
+                <textarea rows={2} value={editBookingForm.adminNotes as string || ''} onChange={e => setEditBookingForm(prev => ({ ...prev, adminNotes: e.target.value }))}
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 resize-none" />
+              </div>
+            </div>
+            <div className="flex gap-3 mt-6 pt-4 border-t border-slate-100">
+              <button onClick={() => setEditBooking(null)} className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-medium text-slate-600 hover:bg-slate-50">Cancel</button>
+              <button onClick={handleEditBooking} disabled={!!actionLoading} className="flex-1 px-4 py-2.5 rounded-xl bg-[#1d1d1f] text-white text-sm font-medium hover:bg-[#333] disabled:opacity-50">
+                {actionLoading ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }

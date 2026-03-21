@@ -54,14 +54,10 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { userId, action } = body
+    const { userId, action, updates } = body
 
-    if (!userId || !action) {
-      return NextResponse.json({ error: 'userId and action are required' }, { status: 400 })
-    }
-
-    if (!['verify', 'suspend', 'unsuspend'].includes(action)) {
-      return NextResponse.json({ error: 'Invalid action. Must be "verify", "suspend", or "unsuspend"' }, { status: 400 })
+    if (!userId) {
+      return NextResponse.json({ error: 'userId is required' }, { status: 400 })
     }
 
     const user = await prisma.user.findUnique({ where: { id: userId } })
@@ -69,8 +65,39 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-    if (user.role === 'ADMIN') {
-      return NextResponse.json({ error: 'Cannot modify admin users' }, { status: 403 })
+    if (user.role === 'ADMIN' && decoded.userId !== userId) {
+      return NextResponse.json({ error: 'Cannot modify other admin users' }, { status: 403 })
+    }
+
+    // Full edit mode: updates object provided
+    if (updates && typeof updates === 'object') {
+      const allowed = ['name', 'email', 'phone', 'company', 'role', 'verified', 'suspended', 'canCarry', 'canShip',
+        'yachtName', 'yachtMMSI', 'yachtIMO', 'yachtFlag', 'yachtLength', 'yachtType',
+        'homePort', 'marineCertified', 'backgroundChecked', 'yearsExperience'] as const
+      const updateData: Record<string, unknown> = {}
+      for (const key of allowed) {
+        if (key in updates) {
+          updateData[key] = updates[key]
+        }
+      }
+      if (Object.keys(updateData).length === 0) {
+        return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 })
+      }
+      const updatedUser = await prisma.user.update({
+        where: { id: userId },
+        data: updateData,
+        select: {
+          id: true, email: true, name: true, role: true, phone: true, company: true,
+          verified: true, suspended: true, canCarry: true, canShip: true, createdAt: true,
+          _count: { select: { listings: true, bookings: true } },
+        },
+      })
+      return NextResponse.json({ user: updatedUser, message: 'User updated successfully' })
+    }
+
+    // Action mode (legacy): verify/suspend/unsuspend
+    if (!action || !['verify', 'suspend', 'unsuspend'].includes(action)) {
+      return NextResponse.json({ error: 'Valid action or updates object required' }, { status: 400 })
     }
 
     const updateData: Record<string, boolean> = {}

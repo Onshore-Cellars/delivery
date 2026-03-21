@@ -31,6 +31,8 @@ enum BookingStatus {
   QUOTE_REQUESTED
   QUOTED
   PENDING
+  ACCEPTED
+  REJECTED
   CONFIRMED
   PICKED_UP
   IN_TRANSIT
@@ -199,6 +201,8 @@ model Listing {
   carrierId          String
   carrier            User          @relation("carrierListings", fields: [carrierId], references: [id], onDelete: Cascade)
 
+  listingType        String        @default("SPACE_AVAILABLE") // "SPACE_AVAILABLE" or "SPACE_NEEDED"
+
   title              String
   description        String?
 
@@ -293,6 +297,7 @@ model Listing {
   @@index([status, departureDate])
   @@index([originPort, destinationPort])
   @@index([routeDirection])
+  @@index([listingType])
 }
 
 model Booking {

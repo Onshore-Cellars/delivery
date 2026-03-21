@@ -20,7 +20,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     }
     const { status, location, description } = body
 
-    const validStatuses = ['CONFIRMED', 'PICKED_UP', 'IN_TRANSIT', 'CUSTOMS_HOLD', 'DELIVERED', 'CANCELLED', 'DISPUTED']
+    const validStatuses = ['ACCEPTED', 'REJECTED', 'CONFIRMED', 'PICKED_UP', 'IN_TRANSIT', 'CUSTOMS_HOLD', 'DELIVERED', 'CANCELLED', 'DISPUTED']
     if (!validStatuses.includes(status)) {
       return NextResponse.json({ error: 'Invalid status' }, { status: 400 })
     }
@@ -34,7 +34,9 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
     // Validate status transitions
     const validTransitions: Record<string, string[]> = {
-      PENDING: ['CONFIRMED', 'CANCELLED'],
+      PENDING: ['ACCEPTED', 'REJECTED', 'CANCELLED'],
+      ACCEPTED: ['CONFIRMED', 'CANCELLED'],
+      REJECTED: [],
       QUOTE_REQUESTED: ['QUOTED', 'CANCELLED'],
       QUOTED: ['CONFIRMED', 'CANCELLED'],
       CONFIRMED: ['PICKED_UP', 'CANCELLED', 'DISPUTED'],
@@ -70,6 +72,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     }
 
     const statusDescriptions: Record<string, string> = {
+      ACCEPTED: 'Booking accepted by carrier — awaiting payment',
+      REJECTED: 'Booking declined by carrier',
       CONFIRMED: 'Booking confirmed by carrier',
       PICKED_UP: 'Cargo picked up',
       IN_TRANSIT: 'Cargo in transit',
@@ -152,6 +156,68 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
             description: `Cancellation fee: €${cancellationFee.toFixed(2)} (${cancellationPercent} of booking total)`,
           },
         })
+      }
+    }
+
+    // If rejected by carrier, restore listing capacity and notify shipper
+    if (status === 'REJECTED') {
+      const isReturnLeg = booking.routeDirection === 'return'
+      if (isReturnLeg) {
+        const updateData: Record<string, unknown> = {
+          returnAvailableKg: { increment: booking.weightKg },
+          returnAvailableM3: { increment: booking.volumeM3 },
+        }
+        if (booking.listing.status === 'FULL') {
+          updateData.status = 'ACTIVE'
+        }
+        await prisma.listing.update({
+          where: { id: booking.listingId },
+          data: updateData,
+        })
+      } else {
+        const updateData: Record<string, unknown> = {
+          availableKg: { increment: booking.weightKg },
+          availableM3: { increment: booking.volumeM3 },
+        }
+        if (booking.listing.status === 'FULL') {
+          updateData.status = 'ACTIVE'
+        }
+        await prisma.listing.update({
+          where: { id: booking.listingId },
+          data: updateData,
+        })
+      }
+
+      // Notify shipper of rejection
+      try {
+        await prisma.notification.create({
+          data: {
+            userId: booking.shipperId,
+            type: 'BOOKING_CANCELLED',
+            title: 'Booking Declined',
+            message: `Your booking #${booking.trackingCode} was not accepted by the carrier.`,
+            metadata: JSON.stringify({ bookingId: id }),
+          },
+        })
+      } catch (notifErr) {
+        console.error('Rejection notification error:', notifErr)
+      }
+    }
+
+    // If accepted by carrier, notify shipper to proceed to payment
+    if (status === 'ACCEPTED') {
+      try {
+        await prisma.notification.create({
+          data: {
+            userId: booking.shipperId,
+            type: 'BOOKING_CONFIRMED',
+            title: 'Booking Accepted',
+            message: `Your booking #${booking.trackingCode} has been accepted by the carrier. You can now proceed to payment.`,
+            metadata: JSON.stringify({ bookingId: id }),
+          },
+        })
+      } catch (notifErr) {
+        console.error('Acceptance notification error:', notifErr)
       }
     }
 

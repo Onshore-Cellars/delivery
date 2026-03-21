@@ -12,13 +12,11 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       include: {
         carrier: {
           select: {
-            id: true, name: true, company: true, avatarUrl: true,
-            bio: true, city: true, country: true,
-            createdAt: true,
+            id: true, avatarUrl: true,
             receivedReviews: {
               select: { rating: true },
             },
-            _count: { select: { listings: true, receivedReviews: true } },
+            _count: { select: { receivedReviews: true } },
           },
         },
         bookings: {
@@ -82,7 +80,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     }
 
     const body = await request.json()
-    const allowedFields = [
+    const baseFields = [
       'title', 'description', 'vehicleType', 'vehicleName',
       'hasRefrigeration', 'hasTailLift', 'hasGPS', 'insuranceValue',
       'originPort', 'originRegion', 'originCountry',
@@ -92,6 +90,16 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       'pricePerKg', 'pricePerM3', 'flatRate', 'currency', 'minimumCharge',
       'biddingEnabled', 'minBidPrice', 'acceptedCargo', 'restrictedItems',
     ]
+    // Admins can edit additional fields
+    const adminFields = decoded.role === 'ADMIN' ? [
+      'status', 'featured', 'availableKg', 'availableM3',
+      'routeDirection', 'returnAvailableKg', 'returnAvailableM3',
+      'returnTotalKg', 'returnTotalM3', 'returnPricePerKg', 'returnPricePerM3',
+      'returnFlatRate', 'returnDepartureDate', 'returnEstimatedArrival',
+      'maxItemLength', 'maxItemWidth', 'maxItemHeight',
+      'estimatedDistance', 'viewCount',
+    ] : []
+    const allowedFields = [...baseFields, ...adminFields]
 
     const numericFields = [
       'totalCapacityKg', 'totalCapacityM3', 'pricePerKg', 'pricePerM3',
