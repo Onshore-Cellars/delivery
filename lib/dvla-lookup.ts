@@ -119,7 +119,8 @@ export function detectPlateCountry(plate: string): 'UK' | 'FR' | 'DE' | 'ES' | '
   // UK: AB12 CDE or AB12CDE (2 letters, 2 digits, 3 letters)
   if (/^[A-Z]{2}\d{2}[A-Z]{3}$/.test(clean)) return 'UK'
 
-  // France: AA-123-AA (SIV format since 2009)
+  // France & Italy share the same AA-123-AA format (SIV / targa)
+  // Cannot distinguish by regex alone — default to FR, disambiguate via API if needed
   if (/^[A-Z]{2}\d{3}[A-Z]{2}$/.test(clean)) return 'FR'
 
   // Germany: XXX-XX-1234 pattern
@@ -127,9 +128,6 @@ export function detectPlateCountry(plate: string): 'UK' | 'FR' | 'DE' | 'ES' | '
 
   // Spain: 1234 BCD
   if (/^\d{4}[A-Z]{3}$/.test(clean)) return 'ES'
-
-  // Italy: AA 123 AA
-  if (/^[A-Z]{2}\d{3}[A-Z]{2}$/.test(clean)) return 'IT'
 
   return 'unknown'
 }

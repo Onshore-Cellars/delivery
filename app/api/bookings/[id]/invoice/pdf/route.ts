@@ -18,20 +18,20 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       include: {
         listing: {
           select: {
-            carrier: { select: { name: true, email: true, company: true, address: true, city: true, country: true } },
+            carrier: { select: { id: true, name: true, email: true, company: true, address: true, city: true, country: true } },
             originPort: true,
             destinationPort: true,
             vehicleType: true,
             departureDate: true,
           },
         },
-        shipper: { select: { name: true, email: true, company: true, address: true, city: true, country: true } },
+        shipper: { select: { id: true, name: true, email: true, company: true, address: true, city: true, country: true } },
       },
     })
     if (!booking) return NextResponse.json({ error: 'Booking not found' }, { status: 404 })
 
-    const isCarrier = booking.listing.carrier.email === decoded.email
-    const isShipper = booking.shipper.email === decoded.email
+    const isCarrier = booking.listing.carrier.id === decoded.userId
+    const isShipper = booking.shipper.id === decoded.userId
     if (!isCarrier && !isShipper && decoded.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Not authorized' }, { status: 403 })
     }

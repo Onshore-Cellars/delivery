@@ -122,6 +122,12 @@ export default function ListingDetailPage() {
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error)
+      // Redirect to Stripe checkout if payment URL is provided
+      if (data.checkoutUrl) {
+        setFormSuccess('Redirecting to payment...')
+        window.location.href = data.checkoutUrl
+        return
+      }
       setFormSuccess(`Booking confirmed! Tracking: ${data.booking.trackingCode}`)
       fetchListing()
     } catch (err) { setFormError(err instanceof Error ? err.message : 'Failed') }
@@ -166,8 +172,16 @@ export default function ListingDetailPage() {
   if (loading) return <div className="flex items-center justify-center py-20"><div className="loading-shimmer w-64 h-8 rounded-lg" /></div>
   if (!listing) return <div className="flex items-center justify-center py-20"><p className="text-slate-500">Listing not found</p></div>
 
-  const fillPercent = Math.round(((listing.totalCapacityKg - listing.availableKg) / listing.totalCapacityKg) * 100)
-  const acceptedCargo = listing.acceptedCargo ? JSON.parse(listing.acceptedCargo) : []
+  const fillPercent = listing.totalCapacityKg > 0 ? Math.round(((listing.totalCapacityKg - listing.availableKg) / listing.totalCapacityKg) * 100) : 0
+  let acceptedCargo: string[] = []
+  if (listing.acceptedCargo) {
+    try {
+      const parsed = JSON.parse(listing.acceptedCargo)
+      acceptedCargo = Array.isArray(parsed) ? parsed : [listing.acceptedCargo]
+    } catch {
+      acceptedCargo = listing.acceptedCargo.split(',').map((s: string) => s.trim()).filter(Boolean)
+    }
+  }
 
   return (
     <div className="page-container">

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { verifyToken, getTokenFromHeader, generateTrackingCode } from '@/lib/auth'
 import { notifyBookingCreated } from '@/lib/notifications'
+import { createCheckoutSession, calculatePlatformFee, calculateCarrierPayout } from '@/lib/stripe'
 
 export async function GET(request: NextRequest) {
   try {
@@ -193,6 +194,10 @@ export async function POST(request: NextRequest) {
         totalPrice = listing.minimumCharge
       }
 
+      // Calculate platform fee and carrier payout
+      const platformFee = calculatePlatformFee(totalPrice)
+      const carrierPayout = calculateCarrierPayout(totalPrice)
+
       // Create booking
       const booking = await tx.booking.create({
         data: {
@@ -227,13 +232,15 @@ export async function POST(request: NextRequest) {
           marinaName: marinaName || null,
           routeDirection: routeDirection || null,
           totalPrice,
+          platformFee,
+          carrierPayout,
           trackingCode,
           currency: listing.currency,
         },
         include: {
           listing: {
             include: {
-              carrier: { select: { id: true, name: true, company: true } },
+              carrier: { select: { id: true, name: true, company: true, stripeAccountId: true } },
             },
           },
         },
@@ -314,7 +321,40 @@ export async function POST(request: NextRequest) {
       console.error('Notification error:', notifErr)
     }
 
-    return NextResponse.json({ booking: result }, { status: 201 })
+    // Create Stripe Checkout Session for payment
+    let checkoutUrl: string | null = null
+    try {
+      const shipper = await prisma.user.findUnique({
+        where: { id: decoded.userId },
+        select: { email: true, name: true },
+      })
+
+      if (shipper && result.totalPrice > 0) {
+        const appUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
+        const session = await createCheckoutSession({
+          bookingId: result.id,
+          amount: result.totalPrice,
+          currency: result.currency,
+          customerEmail: shipper.email,
+          customerName: shipper.name,
+          description: `Delivery: ${result.listing.originPort} → ${result.listing.destinationPort}`,
+          origin: result.listing.originPort,
+          destination: result.listing.destinationPort,
+          successUrl: `${appUrl}/dashboard?payment=success&booking=${result.id}`,
+          cancelUrl: `${appUrl}/dashboard?payment=cancelled&booking=${result.id}`,
+          carrierStripeAccountId: result.listing.carrier.stripeAccountId || undefined,
+        })
+        checkoutUrl = session.url
+      }
+    } catch (stripeErr) {
+      console.error('Stripe checkout error:', stripeErr)
+      // Booking is still created — user can pay later
+    }
+
+    return NextResponse.json({
+      booking: result,
+      checkoutUrl,
+    }, { status: 201 })
   } catch (error) {
     // Handle validation errors thrown from transaction
     if (error instanceof Error && error.message.startsWith('VALIDATION:')) {
@@ -322,7 +362,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: msg }, { status: 400 })
     }
     console.error('Booking creation error:', error)
-    const message = error instanceof Error ? error.message : 'Internal server error'
-    return NextResponse.json({ error: message }, { status: 500 })
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

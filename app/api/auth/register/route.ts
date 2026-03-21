@@ -115,9 +115,9 @@ export async function POST(request: NextRequest) {
     // Send email verification for non-admin users
     if (!isAdminEmail) {
       try {
-        const verifyToken = generateSecureToken()
+        const emailVerifyToken = generateSecureToken()
         const appUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
-        const verifyLink = `${appUrl}/verify-email?token=${verifyToken}&email=${encodeURIComponent(email)}`
+        const verifyLink = `${appUrl}/verify-email?token=${emailVerifyToken}&email=${encodeURIComponent(email)}`
 
         // Store verification token
         await prisma.notification.create({
@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
             userId: user.id,
             type: 'SYSTEM',
             title: 'EMAIL_VERIFY',
-            message: verifyToken,
+            message: emailVerifyToken,
             metadata: JSON.stringify({ expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() }),
           },
         })

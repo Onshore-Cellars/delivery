@@ -188,17 +188,21 @@ export default function AdminPage() {
   const fetchData = useCallback(async () => {
     if (!token) return
     try {
-      const [statsRes, usersRes, listingsRes, docsRes] = await Promise.all([
+      const [statsRes, usersRes, listingsRes, docsRes, bookingsRes] = await Promise.all([
         fetch('/api/admin/stats', { headers: { Authorization: `Bearer ${token}` } }),
         fetch('/api/admin/users', { headers: { Authorization: `Bearer ${token}` } }),
         fetch('/api/listings?all=true&limit=100', { headers: { Authorization: `Bearer ${token}` } }),
         fetch('/api/admin/documents', { headers: { Authorization: `Bearer ${token}` } }),
+        fetch('/api/admin/bookings', { headers: { Authorization: `Bearer ${token}` } }),
       ])
 
       if (statsRes.ok) {
         const data = await statsRes.json()
         setStats(data.stats)
-        setAllBookings(data.recentBookings || [])
+      }
+      if (bookingsRes.ok) {
+        const data = await bookingsRes.json()
+        setAllBookings(data.bookings || [])
       }
       if (usersRes.ok) {
         const data = await usersRes.json()

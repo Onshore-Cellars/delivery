@@ -176,8 +176,8 @@ export function generateKey(folder: string, filename: string): string {
   const timestamp = Date.now()
   const rand = Math.random().toString(36).slice(2, 8)
   const ext = filename.split('.').pop() || 'bin'
-  const safeName = filename.replace(/[^a-zA-Z0-9.-]/g, '_').slice(0, 50)
-  return `${folder}/${timestamp}-${rand}-${safeName}.${ext}`
+  const nameWithoutExt = filename.replace(/\.[^.]+$/, '').replace(/[^a-zA-Z0-9.-]/g, '_').slice(0, 50)
+  return `${folder}/${timestamp}-${rand}-${nameWithoutExt}.${ext}`
 }
 
 export function getPublicUrl(key: string): string {

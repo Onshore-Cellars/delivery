@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, useCallback, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '../components/AuthProvider'
 
@@ -25,8 +25,11 @@ interface Booking {
   weightKg: number
   volumeM3: number
   totalPrice: number
+  platformFee: number
+  carrierPayout: number
   currency: string
   status: string
+  paymentStatus: string
   trackingCode: string
   createdAt: string
   listing: {
@@ -48,6 +51,27 @@ const statusColors: Record<string, string> = {
   CONFIRMED: 'bg-green-50 text-green-700 border-green-200',
   PICKED_UP: 'bg-blue-50 text-blue-700 border-blue-200',
   DELIVERED: 'bg-slate-100 text-slate-600 border-slate-200',
+}
+
+function PaymentBanner() {
+  const searchParams = useSearchParams()
+  const payment = searchParams.get('payment')
+  if (!payment) return null
+  if (payment === 'success') {
+    return (
+      <div className="mb-6 px-4 py-3 rounded-xl bg-green-50 border border-green-200">
+        <p className="text-sm font-medium text-green-800">Payment successful! Your booking is confirmed. Check your email for the receipt.</p>
+      </div>
+    )
+  }
+  if (payment === 'cancelled') {
+    return (
+      <div className="mb-6 px-4 py-3 rounded-xl bg-amber-50 border border-amber-200">
+        <p className="text-sm font-medium text-amber-800">Payment was cancelled. Your booking has been created — you can pay from your dashboard.</p>
+      </div>
+    )
+  }
+  return null
 }
 
 export default function DashboardPage() {
@@ -100,6 +124,8 @@ export default function DashboardPage() {
 
   return (
     <div className="page-container">
+      <Suspense><PaymentBanner /></Suspense>
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8 gap-3">
         <div>
@@ -272,9 +298,27 @@ export default function DashboardPage() {
                         <div className="sm:text-right">
                           <div className="text-lg font-bold text-[#1a1a1a]">{formatCurrency(b.totalPrice, b.currency)}</div>
                           <div className="text-xs text-slate-400 mt-0.5">{b.weightKg} kg &middot; {b.volumeM3} m&sup3;</div>
+                          {b.paymentStatus && (
+                            <span className={`inline-block text-[10px] font-bold uppercase tracking-wider mt-1 px-2 py-0.5 rounded ${
+                              b.paymentStatus === 'PAID' ? 'bg-green-50 text-green-700' :
+                              b.paymentStatus === 'FAILED' ? 'bg-red-50 text-red-700' :
+                              b.paymentStatus === 'REFUNDED' ? 'bg-purple-50 text-purple-700' :
+                              'bg-amber-50 text-amber-700'
+                            }`}>{b.paymentStatus}</span>
+                          )}
                           {b.trackingCode && (
                             <div className="mt-1.5 inline-flex text-xs font-mono text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg">{b.trackingCode}</div>
                           )}
+                          <div className="mt-2 flex gap-2 justify-end">
+                            <a
+                              href={`/api/bookings/${b.id}/invoice/pdf`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[11px] font-medium text-[#C6904D] hover:text-[#a87a3d] transition-colors"
+                            >
+                              Download Invoice
+                            </a>
+                          </div>
                         </div>
                       </div>
                     </div>

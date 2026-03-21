@@ -29,7 +29,7 @@ function Footer() {
 export default function ClientLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname()
   const isLandingPage = pathname === '/'
-  const isAuthPage = pathname === '/login' || pathname === '/register'
+  const isAuthPage = ['/login', '/register', '/forgot-password', '/reset-password', '/verify-email'].includes(pathname)
   const showChrome = !isLandingPage
 
   return (

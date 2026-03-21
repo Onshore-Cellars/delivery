@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { verifyToken, getTokenFromHeader, generateTrackingCode } from '@/lib/auth'
 import { createNotification } from '@/lib/notifications'
+import { createCheckoutSession, calculatePlatformFee, calculateCarrierPayout } from '@/lib/stripe'
 
 // Accept or reject a bid (carrier only)
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -39,20 +40,26 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
       const trackingCode = generateTrackingCode()
 
-      // Accept bid → create booking + update listing + update bid
-      const [updatedBid] = await prisma.$transaction([
+      const platformFee = calculatePlatformFee(bid.amount)
+      const carrierPayout = calculateCarrierPayout(bid.amount)
+
+      // Accept bid → create booking (PENDING payment) + update listing + update bid
+      const [updatedBid, booking] = await prisma.$transaction([
         prisma.bid.update({ where: { id }, data: { status: 'ACCEPTED' } }),
         prisma.booking.create({
           data: {
             listingId: bid.listingId,
             shipperId: bid.bidderId,
             cargoDescription: bid.message || 'Bid-based booking',
+            cargoType: bid.cargoType || null,
             weightKg: bid.weightKg,
             volumeM3: bid.volumeM3,
             totalPrice: bid.amount,
+            platformFee,
+            carrierPayout,
             currency: bid.currency,
             trackingCode,
-            status: 'CONFIRMED',
+            status: 'PENDING',
           },
         }),
         prisma.listing.update({
@@ -70,12 +77,42 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
           userId: bid.bidderId,
           type: 'BID_ACCEPTED',
           title: 'Bid Accepted',
-          message: `Your bid of ${bid.currency === 'GBP' ? '£' : '€'}${bid.amount.toFixed(2)} on ${bid.listing.title} was accepted! A booking has been created.`,
+          message: `Your bid of ${bid.currency === 'GBP' ? '£' : '€'}${bid.amount.toFixed(2)} on ${bid.listing.title} was accepted! Please complete payment.`,
           linkUrl: '/dashboard',
         })
-      } catch {}
+      } catch (e) { console.error('Notification error:', e) }
 
-      return NextResponse.json({ bid: updatedBid, message: 'Bid accepted, booking created' })
+      // Create Stripe checkout session for payment
+      let checkoutUrl: string | null = null
+      try {
+        const bidder = await prisma.user.findUnique({
+          where: { id: bid.bidderId },
+          select: { email: true, name: true },
+        })
+        const carrier = await prisma.user.findUnique({
+          where: { id: bid.listing.carrierId },
+          select: { stripeAccountId: true },
+        })
+        if (bidder && bid.amount > 0) {
+          const appUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
+          const session = await createCheckoutSession({
+            bookingId: booking.id,
+            amount: bid.amount,
+            currency: bid.currency,
+            customerEmail: bidder.email,
+            customerName: bidder.name,
+            description: `Delivery: ${bid.listing.originPort} → ${bid.listing.destinationPort}`,
+            origin: bid.listing.originPort,
+            destination: bid.listing.destinationPort,
+            successUrl: `${appUrl}/dashboard?payment=success&booking=${booking.id}`,
+            cancelUrl: `${appUrl}/dashboard?payment=cancelled&booking=${booking.id}`,
+            carrierStripeAccountId: carrier?.stripeAccountId || undefined,
+          })
+          checkoutUrl = session.url
+        }
+      } catch (e) { console.error('Stripe checkout error:', e) }
+
+      return NextResponse.json({ bid: updatedBid, booking, checkoutUrl, message: 'Bid accepted — payment required' })
     } else if (action === 'reject') {
       const updatedBid = await prisma.bid.update({
         where: { id },
@@ -91,7 +128,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
           message: `Your bid on ${bid.listing.title} was not accepted. You can submit a new bid or browse other listings.`,
           linkUrl: '/marketplace',
         })
-      } catch {}
+      } catch (e) { console.error('Notification error:', e) }
 
       return NextResponse.json({ bid: updatedBid })
     } else {
