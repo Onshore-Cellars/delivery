@@ -86,28 +86,45 @@ export default function DashboardPage() {
   const fetchData = useCallback(async () => {
     if (!token) return
     setError('')
+    const errors: string[] = []
     try {
       if (user?.canCarry || user?.role === 'ADMIN') {
-        const res = await fetch(`/api/listings?carrierId=${user.id}&limit=100`, { headers: { Authorization: `Bearer ${token}` } })
-        if (res.ok) {
-          const data = await res.json()
-          setListings(data.listings || [])
-        } else {
-          setError('Failed to load listings. Please try again.')
+        try {
+          const res = await fetch(`/api/listings?carrierId=${user.id}&limit=100`, { headers: { Authorization: `Bearer ${token}` } })
+          if (res.ok) {
+            const data = await res.json()
+            setListings(data.listings || [])
+          } else {
+            const errData = await res.json().catch(() => ({}))
+            console.error('Listings fetch failed:', res.status, errData)
+            errors.push(`Listings: ${errData.error || `Error ${res.status}`}`)
+          }
+        } catch (err) {
+          console.error('Listings fetch error:', err)
+          errors.push('Could not load listings')
         }
       }
-      const bookRes = await fetch('/api/bookings', { headers: { Authorization: `Bearer ${token}` } })
-      if (bookRes.ok) {
-        const data = await bookRes.json()
-        setBookings(data.bookings || [])
-      } else {
-        setError('Failed to load bookings. Please try again.')
+      try {
+        const bookRes = await fetch('/api/bookings', { headers: { Authorization: `Bearer ${token}` } })
+        if (bookRes.ok) {
+          const data = await bookRes.json()
+          setBookings(data.bookings || [])
+        } else {
+          const errData = await bookRes.json().catch(() => ({}))
+          console.error('Bookings fetch failed:', bookRes.status, errData)
+          errors.push(`Bookings: ${errData.error || `Error ${bookRes.status}`}`)
+        }
+      } catch (err) {
+        console.error('Bookings fetch error:', err)
+        errors.push('Could not load bookings')
       }
+      if (errors.length > 0) setError(errors.join('. ') + '. Please try again.')
     } catch (err) {
       console.error('Error fetching data:', err)
       setError('Something went wrong loading your data. Please try again.')
+    } finally {
+      setLoading(false)
     }
-    finally { setLoading(false) }
   }, [token, user])
 
   useEffect(() => {
