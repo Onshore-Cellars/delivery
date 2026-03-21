@@ -73,6 +73,10 @@ enum NotificationType {
   LISTING_EXPIRING
   DOCUMENT_VERIFIED
   DOCUMENT_REJECTED
+  ROUTE_STARTED
+  ROUTE_ETA_UPDATE
+  DRIVER_ARRIVED
+  RETURN_ROUTE_AVAILABLE
   SYSTEM
 }
 
@@ -101,6 +105,12 @@ enum DocumentStatus {
   VERIFIED
   REJECTED
   EXPIRED
+}
+
+enum RouteDirection {
+  OUTBOUND     // To yacht / marina / shipyard
+  RETURN       // Back from yacht / marina
+  BOTH         // Two-way — space available in both directions
 }
 
 // ─── MODELS ───────────────────────────────────────────────────────────────────
@@ -204,6 +214,19 @@ model Listing {
   stops              String?       // JSON array of intermediate stops
   estimatedDistance   Float?        // km
 
+  // Two-way route support
+  routeDirection     RouteDirection @default(OUTBOUND)
+  returnDepartureDate DateTime?    // When the return leg departs
+  returnEstimatedArrival DateTime? // When the return leg arrives
+  returnAvailableKg  Float?        // Capacity on return leg
+  returnAvailableM3  Float?        // Volume on return leg
+  returnTotalKg      Float?        // Total capacity on return leg
+  returnTotalM3      Float?        // Total volume on return leg
+  returnPricePerKg   Float?
+  returnPricePerM3   Float?
+  returnFlatRate     Float?
+  returnNotes        String?       // e.g. "Empty on return, full capacity available"
+
   // Schedule
   departureDate      DateTime
   estimatedArrival   DateTime?
@@ -255,6 +278,7 @@ model Listing {
   @@index([featured])
   @@index([status, departureDate])
   @@index([originPort, destinationPort])
+  @@index([routeDirection])
 }
 
 model Booking {
@@ -296,8 +320,12 @@ model Booking {
   deliveryEmail     String?
   deliveryNotes     String?
   yachtName         String?
+  yachtMMSI         String?       // MMSI for vessel tracking
   berthNumber       String?
   marinaName        String?
+
+  // Route direction for this booking (outbound or return leg)
+  routeDirection    String?       // "outbound" or "return"
 
   // Pricing
   totalPrice        Float
@@ -461,6 +489,7 @@ model Notification {
   read        Boolean          @default(false)
   readAt      DateTime?
   emailSent   Boolean          @default(false)
+  smsSent     Boolean          @default(false)
 
   createdAt   DateTime         @default(now())
 

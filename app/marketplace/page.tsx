@@ -24,6 +24,10 @@ interface Listing {
   pricePerM3?: number
   flatRate?: number
   currency: string
+  routeDirection?: string
+  returnAvailableKg?: number
+  returnAvailableM3?: number
+  returnFlatRate?: number
   featured: boolean
   carrier: {
     id: string
@@ -44,6 +48,11 @@ interface BookingForm {
   pickupAddress: string
   deliveryAddress: string
   deliveryNotes: string
+  yachtName: string
+  yachtMMSI: string
+  berthNumber: string
+  marinaName: string
+  routeDirection: string
 }
 
 interface Pagination {
@@ -58,6 +67,7 @@ interface Filters {
   destination: string
   dateFrom: string
   vehicleType: string
+  direction: string
   minPrice: string
   maxPrice: string
   minWeight: string
@@ -103,7 +113,7 @@ export default function MarketplacePage() {
   const [featuredLoading, setFeaturedLoading] = useState(true)
 
   const [filters, setFilters] = useState<Filters>({
-    origin: '', destination: '', dateFrom: '', vehicleType: '',
+    origin: '', destination: '', dateFrom: '', vehicleType: '', direction: '',
     minPrice: '', maxPrice: '', minWeight: '', minVolume: '', sort: '',
     features: { refrigerated: false, gps: false, tailLift: false },
   })
@@ -114,6 +124,7 @@ export default function MarketplacePage() {
   const [bookingForm, setBookingForm] = useState<BookingForm>({
     listingId: '', cargoDescription: '', cargoType: '', weightKg: '', volumeM3: '',
     specialHandling: '', pickupAddress: '', deliveryAddress: '', deliveryNotes: '',
+    yachtName: '', yachtMMSI: '', berthNumber: '', marinaName: '', routeDirection: 'outbound',
   })
   const [bookingLoading, setBookingLoading] = useState(false)
   const [bookingSuccess, setBookingSuccess] = useState(false)
@@ -151,6 +162,7 @@ export default function MarketplacePage() {
       if (vt) params.append('vehicleType', vt)
       if (filters.minPrice) params.append('minPrice', filters.minPrice)
       if (filters.maxPrice) params.append('maxPrice', filters.maxPrice)
+      if (filters.direction) params.append('direction', filters.direction)
       if (filters.minWeight) params.append('minWeight', filters.minWeight)
       if (filters.minVolume) params.append('minVolume', filters.minVolume)
       if (filters.sort) params.append('sort', filters.sort)
@@ -217,7 +229,7 @@ export default function MarketplacePage() {
   const handleSearch = () => { setCurrentPage(1); fetchListings(1) }
 
   const resetFilters = () => {
-    setFilters({ origin: '', destination: '', dateFrom: '', vehicleType: '', minPrice: '', maxPrice: '', minWeight: '', minVolume: '', sort: '', features: { refrigerated: false, gps: false, tailLift: false } })
+    setFilters({ origin: '', destination: '', dateFrom: '', vehicleType: '', direction: '', minPrice: '', maxPrice: '', minWeight: '', minVolume: '', sort: '', features: { refrigerated: false, gps: false, tailLift: false } })
     setCurrentPage(1)
   }
 
@@ -261,6 +273,16 @@ export default function MarketplacePage() {
 
   const FilterContent = ({ onApply }: { onApply?: () => void }) => (
     <div className="space-y-5">
+      <div>
+        <label className="block text-sm font-semibold text-[#1a1a1a] mb-2">Route Direction</label>
+        <select className={selectClass} value={filters.direction} onChange={(e) => setFilters({ ...filters, direction: e.target.value })}>
+          <option value="">All Directions</option>
+          <option value="outbound">Outbound (to yacht/marina)</option>
+          <option value="return">Return (back from yacht)</option>
+          <option value="both">Two-way routes only</option>
+        </select>
+      </div>
+
       <div>
         <label className="block text-sm font-semibold text-[#1a1a1a] mb-2">Vehicle Type</label>
         <select className={selectClass} value={filters.vehicleType} onChange={(e) => setFilters({ ...filters, vehicleType: e.target.value })}>
@@ -349,9 +371,21 @@ export default function MarketplacePage() {
             {listing.carrier.company && <span className="text-slate-400"> &middot; {listing.carrier.company}</span>}
           </p>
         </div>
-        <span className="badge bg-slate-100 text-slate-700 whitespace-nowrap text-xs">
-          {listing.vehicleType}
-        </span>
+        <div className="flex flex-col items-end gap-1">
+          <span className="badge bg-slate-100 text-slate-700 whitespace-nowrap text-xs">
+            {listing.vehicleType}
+          </span>
+          {listing.routeDirection === 'BOTH' && (
+            <span className="badge bg-[#C6904D]/10 text-[#C6904D] border border-[#C6904D]/20 whitespace-nowrap text-[10px]">
+              Two-way
+            </span>
+          )}
+          {listing.routeDirection === 'RETURN' && (
+            <span className="badge bg-blue-50 text-blue-600 border border-blue-100 whitespace-nowrap text-[10px]">
+              Return
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Route */}
@@ -662,6 +696,60 @@ export default function MarketplacePage() {
                   <label className="block text-sm font-semibold text-[#1a1a1a] mb-2">Special Handling</label>
                   <input type="text" className={inputClass} placeholder="e.g. Refrigerated, fragile" value={bookingForm.specialHandling} onChange={(e) => setBookingForm({ ...bookingForm, specialHandling: e.target.value })} />
                 </div>
+
+                {/* Yacht / Vessel Details */}
+                <div className="pt-3 border-t border-slate-100">
+                  <p className="text-xs font-semibold text-[#C6904D] uppercase tracking-wider mb-3">Yacht / Vessel Details</p>
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-medium text-[#1a1a1a] mb-1">Yacht Name</label>
+                        <input type="text" className={inputClass} placeholder="e.g. MY Serenity" value={bookingForm.yachtName} onChange={(e) => setBookingForm({ ...bookingForm, yachtName: e.target.value })} />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-[#1a1a1a] mb-1">MMSI Number</label>
+                        <input type="text" className={inputClass} placeholder="9 digits" maxLength={9} pattern="\d{9}" value={bookingForm.yachtMMSI} onChange={(e) => setBookingForm({ ...bookingForm, yachtMMSI: e.target.value.replace(/\D/g, '').slice(0, 9) })} />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-medium text-[#1a1a1a] mb-1">Marina</label>
+                        <input type="text" className={inputClass} placeholder="e.g. Port Vauban" value={bookingForm.marinaName} onChange={(e) => setBookingForm({ ...bookingForm, marinaName: e.target.value })} />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-[#1a1a1a] mb-1">Berth Number</label>
+                        <input type="text" className={inputClass} placeholder="e.g. B-24" value={bookingForm.berthNumber} onChange={(e) => setBookingForm({ ...bookingForm, berthNumber: e.target.value })} />
+                      </div>
+                    </div>
+                    {bookingForm.yachtMMSI && bookingForm.yachtMMSI.length === 9 && (
+                      <div className="flex items-center gap-2 text-xs text-blue-600">
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
+                        <a href={`https://www.marinetraffic.com/en/ais/details/ships/mmsi:${bookingForm.yachtMMSI}`} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                          Track vessel on MarineTraffic
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Route direction selection for two-way listings */}
+                {bookingModal.routeDirection === 'BOTH' && (
+                  <div>
+                    <label className="block text-sm font-semibold text-[#1a1a1a] mb-2">Which leg?</label>
+                    <div className="grid grid-cols-2 gap-3">
+                      {[
+                        { value: 'outbound', label: 'Outbound', desc: `To ${bookingModal.destinationPort}` },
+                        { value: 'return', label: 'Return', desc: `Back to ${bookingModal.originPort}` },
+                      ].map(opt => (
+                        <label key={opt.value} className={`flex flex-col items-center p-3 rounded-xl border-2 cursor-pointer transition-all text-center ${bookingForm.routeDirection === opt.value ? 'border-[#C6904D] bg-amber-50/50' : 'border-slate-200'}`}>
+                          <input type="radio" name="routeDirection" value={opt.value} checked={bookingForm.routeDirection === opt.value} onChange={(e) => setBookingForm({ ...bookingForm, routeDirection: e.target.value })} className="sr-only" />
+                          <span className="text-sm font-semibold text-[#1a1a1a]">{opt.label}</span>
+                          <span className="text-[11px] text-slate-400">{opt.desc}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Price estimate */}
                 {bookingForm.weightKg && bookingForm.volumeM3 && (

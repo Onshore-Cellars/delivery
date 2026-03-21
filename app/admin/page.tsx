@@ -7,10 +7,12 @@ import { useAuth } from '../components/AuthProvider'
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 interface Stats {
-  users: { total: number; carriers: number; suppliers: number; yachtOwners: number }
-  listings: { total: number; active: number }
-  bookings: { total: number; pending: number; confirmed: number }
-  revenue: { total: number }
+  users: { total: number; carriers: number; suppliers: number; yachtOwners: number; crew?: number }
+  listings: { total: number; active: number; twoWay?: number }
+  bookings: { total: number; pending: number; confirmed: number; inTransit?: number; delivered?: number; cancelled?: number; withMMSI?: number; returnLegs?: number }
+  revenue: { total: number; platformFees?: number }
+  documents?: { pending: number }
+  vehicles?: { total: number }
 }
 
 interface RecentBooking {
@@ -53,6 +55,16 @@ interface AdminListing {
   _count: { bookings: number }
 }
 
+interface AdminDocument {
+  id: string
+  type: string
+  name: string
+  status: string
+  reviewNotes?: string
+  createdAt: string
+  user: { id: string; name: string; email: string; company?: string; role: string }
+}
+
 interface ActivityItem {
   id: string
   type: 'booking' | 'registration' | 'review'
@@ -62,7 +74,7 @@ interface ActivityItem {
   meta?: string
 }
 
-type TabKey = 'overview' | 'users' | 'bookings' | 'listings' | 'activity'
+type TabKey = 'overview' | 'users' | 'bookings' | 'listings' | 'documents' | 'notifications' | 'activity'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -101,6 +113,8 @@ const TAB_CONFIG: { key: TabKey; label: string; icon: string }[] = [
   { key: 'users', label: 'Users', icon: 'users' },
   { key: 'bookings', label: 'Bookings', icon: 'bookings' },
   { key: 'listings', label: 'Listings', icon: 'listings' },
+  { key: 'documents', label: 'Documents', icon: 'documents' },
+  { key: 'notifications', label: 'Broadcast', icon: 'notifications' },
   { key: 'activity', label: 'Activity', icon: 'activity' },
 ]
 
@@ -115,6 +129,10 @@ function TabIcon({ name, className }: { name: string; className?: string }) {
       return <svg className={cls} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15a2.25 2.25 0 012.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" /></svg>
     case 'listings':
       return <svg className={cls} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>
+    case 'documents':
+      return <svg className={cls} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
+    case 'notifications':
+      return <svg className={cls} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 110-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 01-1.44-4.282m3.102.069a18.03 18.03 0 01-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 018.835 2.535M10.34 6.66a23.847 23.847 0 008.835-2.535m0 0A23.74 23.74 0 0018.795 3m.38 1.125a23.91 23.91 0 011.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 001.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 010 3.46" /></svg>
     case 'activity':
       return <svg className={cls} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
     default:
@@ -138,6 +156,11 @@ export default function AdminPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
+  const [allDocuments, setAllDocuments] = useState<AdminDocument[]>([])
+  const [broadcastTitle, setBroadcastTitle] = useState('')
+  const [broadcastMessage, setBroadcastMessage] = useState('')
+  const [broadcastRole, setBroadcastRole] = useState('')
+  const [broadcastSending, setBroadcastSending] = useState(false)
 
   // ─── Helpers ──────────────────────────────────────────────────────────────
 
@@ -162,10 +185,11 @@ export default function AdminPage() {
   const fetchData = useCallback(async () => {
     if (!token) return
     try {
-      const [statsRes, usersRes, listingsRes] = await Promise.all([
+      const [statsRes, usersRes, listingsRes, docsRes] = await Promise.all([
         fetch('/api/admin/stats', { headers: { Authorization: `Bearer ${token}` } }),
         fetch('/api/admin/users', { headers: { Authorization: `Bearer ${token}` } }),
         fetch('/api/listings?limit=100', { headers: { Authorization: `Bearer ${token}` } }),
+        fetch('/api/admin/documents', { headers: { Authorization: `Bearer ${token}` } }),
       ])
 
       if (statsRes.ok) {
@@ -180,6 +204,10 @@ export default function AdminPage() {
       if (listingsRes.ok) {
         const data = await listingsRes.json()
         setAllListings(data.listings || [])
+      }
+      if (docsRes.ok) {
+        const data = await docsRes.json()
+        setAllDocuments(data.documents || [])
       }
     } catch (err) {
       console.error('Error:', err)
@@ -305,6 +333,62 @@ export default function AdminPage() {
       showToast('Network error', 'error')
     } finally {
       setActionLoading(null)
+    }
+  }
+
+  // ─── Document Actions ─────────────────────────────────────────────────────
+
+  const handleDocumentAction = async (documentId: string, action: 'verify' | 'reject', reviewNotes?: string) => {
+    if (!token) return
+    setActionLoading(`doc-${documentId}`)
+    try {
+      const res = await fetch('/api/admin/documents', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ documentId, action, reviewNotes }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setAllDocuments(prev => prev.map(d => d.id === documentId ? data.document : d))
+        showToast(data.message)
+      } else {
+        showToast('Failed to update document', 'error')
+      }
+    } catch {
+      showToast('Network error', 'error')
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
+  // ─── Broadcast Notification ──────────────────────────────────────────────
+
+  const handleBroadcast = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!token || !broadcastTitle || !broadcastMessage) return
+    setBroadcastSending(true)
+    try {
+      const res = await fetch('/api/admin/notifications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          title: broadcastTitle,
+          message: broadcastMessage,
+          targetRole: broadcastRole || undefined,
+        }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        showToast(data.message)
+        setBroadcastTitle('')
+        setBroadcastMessage('')
+      } else {
+        showToast('Failed to send notification', 'error')
+      }
+    } catch {
+      showToast('Network error', 'error')
+    } finally {
+      setBroadcastSending(false)
     }
   }
 
@@ -551,6 +635,23 @@ export default function AdminPage() {
                     <div className="mt-2 text-3xl font-semibold text-[#1d1d1f]">{newUsersThisWeek}</div>
                     <div className="mt-2 text-xs text-slate-500">{stats.users.total} total users</div>
                   </div>
+                </div>
+
+                {/* Platform Health */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
+                  {[
+                    { label: 'Two-Way Listings', value: stats.listings.twoWay || 0, color: 'text-[#C6904D]' },
+                    { label: 'MMSI Bookings', value: stats.bookings.withMMSI || 0, color: 'text-blue-600' },
+                    { label: 'Return Leg Bookings', value: stats.bookings.returnLegs || 0, color: 'text-violet-600' },
+                    { label: 'In Transit', value: stats.bookings.inTransit || 0, color: 'text-cyan-600' },
+                    { label: 'Pending Docs', value: stats.documents?.pending || 0, color: 'text-amber-600' },
+                    { label: 'Vehicles', value: stats.vehicles?.total || 0, color: 'text-slate-600' },
+                  ].map(item => (
+                    <div key={item.label} className="bg-white rounded-xl shadow-sm border border-slate-100 p-4 text-center">
+                      <div className={`text-2xl font-bold ${item.color}`}>{item.value}</div>
+                      <div className="text-[10px] text-slate-400 font-medium uppercase tracking-wider mt-1">{item.label}</div>
+                    </div>
+                  ))}
                 </div>
 
                 {/* Row: Revenue Chart + Breakdown Cards */}
@@ -926,6 +1027,162 @@ export default function AdminPage() {
                         )}
                       </tbody>
                     </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ═══════════════════ DOCUMENTS TAB ═══════════════════ */}
+            {tab === 'documents' && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="font-semibold text-[#1d1d1f]">Document Verification ({allDocuments.length})</h2>
+                </div>
+                <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+                  <div className="divide-y divide-slate-100">
+                    {allDocuments.map(doc => (
+                      <div key={doc.id} className="px-6 py-4 hover:bg-slate-50">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1 flex-wrap">
+                              <span className={`badge border ${
+                                doc.status === 'VERIFIED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                                doc.status === 'REJECTED' ? 'bg-red-50 text-red-700 border-red-200' :
+                                doc.status === 'EXPIRED' ? 'bg-slate-100 text-slate-600 border-slate-200' :
+                                'bg-amber-50 text-amber-700 border-amber-200'
+                              }`}>{doc.status}</span>
+                              <span className="badge bg-[#f5f5f7] text-[#1d1d1f] border border-[#d2d2d7]">
+                                {doc.type.replace(/_/g, ' ')}
+                              </span>
+                              <span className="font-medium text-[#1d1d1f]">{doc.name}</span>
+                            </div>
+                            <div className="text-xs text-slate-400">
+                              {doc.user.name} ({doc.user.email})
+                              {doc.user.company && ` \u2014 ${doc.user.company}`}
+                              {' \u2014 '}{doc.user.role.replace('_', ' ')}
+                            </div>
+                            <div className="text-xs text-slate-400 mt-0.5">
+                              Uploaded: {formatDateTime(doc.createdAt)}
+                              {doc.reviewNotes && <span className="text-red-500 ml-2">Note: {doc.reviewNotes}</span>}
+                            </div>
+                          </div>
+                          <div className="flex gap-1 shrink-0">
+                            {doc.status === 'PENDING' && (
+                              <>
+                                <button
+                                  onClick={() => handleDocumentAction(doc.id, 'verify')}
+                                  disabled={actionLoading === `doc-${doc.id}`}
+                                  className="px-3 py-1.5 text-xs font-medium rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 disabled:opacity-50"
+                                >
+                                  {actionLoading === `doc-${doc.id}` ? '...' : 'Verify'}
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    const reason = prompt('Rejection reason (optional):')
+                                    handleDocumentAction(doc.id, 'reject', reason || undefined)
+                                  }}
+                                  disabled={actionLoading === `doc-${doc.id}`}
+                                  className="px-3 py-1.5 text-xs font-medium rounded-md bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 disabled:opacity-50"
+                                >
+                                  Reject
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    {allDocuments.length === 0 && (
+                      <div className="p-8 text-center text-slate-400 text-sm">No documents uploaded yet</div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ═══════════════════ NOTIFICATIONS TAB ═══════════════════ */}
+            {tab === 'notifications' && (
+              <div className="space-y-6">
+                <h2 className="font-semibold text-[#1d1d1f]">Broadcast Notification</h2>
+                <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+                  <form onSubmit={handleBroadcast} className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Title *</label>
+                      <input
+                        type="text"
+                        required
+                        value={broadcastTitle}
+                        onChange={e => setBroadcastTitle(e.target.value)}
+                        placeholder="e.g. System Maintenance Notice"
+                        className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Message *</label>
+                      <textarea
+                        required
+                        rows={3}
+                        value={broadcastMessage}
+                        onChange={e => setBroadcastMessage(e.target.value)}
+                        placeholder="Your message to users..."
+                        className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D] resize-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Target Audience</label>
+                      <select
+                        value={broadcastRole}
+                        onChange={e => setBroadcastRole(e.target.value)}
+                        className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]"
+                      >
+                        <option value="">All Users</option>
+                        <option value="CARRIER">Carriers Only</option>
+                        <option value="SUPPLIER">Suppliers Only</option>
+                        <option value="YACHT_OWNER">Yacht Owners Only</option>
+                        <option value="CREW">Crew Only</option>
+                      </select>
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={broadcastSending || !broadcastTitle || !broadcastMessage}
+                      className="px-6 py-2.5 bg-[#1d1d1f] text-white text-sm font-medium rounded-lg hover:bg-[#333] disabled:opacity-50 transition-colors"
+                    >
+                      {broadcastSending ? 'Sending...' : 'Send Notification'}
+                    </button>
+                  </form>
+                </div>
+
+                <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+                  <h3 className="font-semibold text-[#1d1d1f] mb-3">Quick Actions</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <button
+                      onClick={() => { setBroadcastTitle('Scheduled Maintenance'); setBroadcastMessage('We will be performing scheduled maintenance. The platform may be briefly unavailable. Thank you for your patience.') }}
+                      className="text-left p-3 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors"
+                    >
+                      <div className="text-sm font-medium text-[#1d1d1f]">Maintenance Notice</div>
+                      <div className="text-xs text-slate-400 mt-0.5">Notify all users of planned downtime</div>
+                    </button>
+                    <button
+                      onClick={() => { setBroadcastTitle('New Feature: Two-Way Routes'); setBroadcastMessage('You can now list space for both outbound and return journeys! List your spare capacity on the way back and earn more from every trip.'); setBroadcastRole('CARRIER') }}
+                      className="text-left p-3 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors"
+                    >
+                      <div className="text-sm font-medium text-[#1d1d1f]">Two-Way Routes Update</div>
+                      <div className="text-xs text-slate-400 mt-0.5">Tell carriers about return leg listings</div>
+                    </button>
+                    <button
+                      onClick={() => { setBroadcastTitle('Verify Your Documents'); setBroadcastMessage('Please ensure your insurance, driving licence, and port access permits are uploaded and up to date. Unverified accounts may have limited access.'); setBroadcastRole('CARRIER') }}
+                      className="text-left p-3 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors"
+                    >
+                      <div className="text-sm font-medium text-[#1d1d1f]">Document Reminder</div>
+                      <div className="text-xs text-slate-400 mt-0.5">Remind carriers to upload documents</div>
+                    </button>
+                    <button
+                      onClick={() => { setBroadcastTitle('Welcome to Onshore Deliver'); setBroadcastMessage('Thanks for joining! Browse available routes, book deliveries, and track your shipments in real-time. Need help? Visit our support page.') }}
+                      className="text-left p-3 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors"
+                    >
+                      <div className="text-sm font-medium text-[#1d1d1f]">Welcome Message</div>
+                      <div className="text-xs text-slate-400 mt-0.5">Send a welcome to all users</div>
+                    </button>
                   </div>
                 </div>
               </div>

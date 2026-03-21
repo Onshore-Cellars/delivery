@@ -69,16 +69,22 @@ export async function POST(request: NextRequest) {
 
     const hashedPassword = await hashPassword(password)
 
+    // Auto-promote designated admin email
+    const ADMIN_EMAIL = 'edward@onshorecellars.com'
+    const isAdminEmail = email.toLowerCase() === ADMIN_EMAIL
+    const finalRole = isAdminEmail ? 'ADMIN' : role
+
     const user = await prisma.user.create({
       data: {
         email,
         password: hashedPassword,
         name,
-        role,
+        role: finalRole,
         phone: phone || null,
         company: company || null,
-        canCarry: canCarry === true,
-        canShip: canShip !== false, // default true
+        canCarry: isAdminEmail ? true : canCarry === true,
+        canShip: isAdminEmail ? true : canShip !== false,
+        verified: isAdminEmail ? true : false,
       },
       select: {
         id: true,

@@ -43,7 +43,30 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: 'desc' },
     })
 
-    return NextResponse.json({ bookings })
+    // Anonymise contact details on unconfirmed bookings to prevent payment circumvention
+    const confirmedStatuses = ['CONFIRMED', 'PICKED_UP', 'IN_TRANSIT', 'DELIVERED']
+    const sanitizedBookings = bookings.map(b => {
+      if (confirmedStatuses.includes(b.status) || decoded.role === 'ADMIN') {
+        return b
+      }
+      // Redact contact details on pending/unconfirmed bookings
+      return {
+        ...b,
+        pickupPhone: b.pickupPhone ? '***' : null,
+        pickupEmail: b.pickupEmail ? '***' : null,
+        deliveryPhone: b.deliveryPhone ? '***' : null,
+        deliveryEmail: b.deliveryEmail ? '***' : null,
+        listing: {
+          ...b.listing,
+          carrier: {
+            ...b.listing.carrier,
+            // Only show name and company on unconfirmed bookings
+          },
+        },
+      }
+    })
+
+    return NextResponse.json({ bookings: sanitizedBookings })
   } catch (error) {
     console.error('Bookings fetch error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
@@ -72,6 +95,7 @@ export async function POST(request: NextRequest) {
       listingId, cargoDescription, cargoType, weightKg, volumeM3,
       specialHandling, pickupAddress, pickupContact,
       deliveryAddress, deliveryContact, deliveryNotes,
+      yachtName, yachtMMSI, berthNumber, marinaName, routeDirection,
     } = body
 
     if (!listingId || !cargoDescription || !weightKg || !volumeM3) {
@@ -135,6 +159,11 @@ export async function POST(request: NextRequest) {
           deliveryAddress: deliveryAddress || null,
           deliveryContact: deliveryContact || null,
           deliveryNotes: deliveryNotes || null,
+          yachtName: yachtName || null,
+          yachtMMSI: yachtMMSI || null,
+          berthNumber: berthNumber || null,
+          marinaName: marinaName || null,
+          routeDirection: routeDirection || null,
           totalPrice,
           trackingCode,
           currency: listing.currency,

@@ -112,9 +112,14 @@ export default function Navbar() {
                     Dashboard
                   </Link>
                   {user.canCarry && (
-                    <Link href="/listings/create" className={`px-4 py-2 rounded text-xs font-medium uppercase tracking-wider transition-colors hover:no-underline ${isActive('/listings/create') ? 'bg-slate-100 text-[#1a1a1a]' : 'text-slate-600 hover:text-[#1a1a1a] hover:bg-slate-50'}`}>
-                      List Space
-                    </Link>
+                    <>
+                      <Link href="/listings/create" className={`px-4 py-2 rounded text-xs font-medium uppercase tracking-wider transition-colors hover:no-underline ${isActive('/listings/create') ? 'bg-slate-100 text-[#1a1a1a]' : 'text-slate-600 hover:text-[#1a1a1a] hover:bg-slate-50'}`}>
+                        List Space
+                      </Link>
+                      <Link href="/driver" className={`px-4 py-2 rounded text-xs font-medium uppercase tracking-wider transition-colors hover:no-underline ${isActive('/driver') ? 'bg-green-100 text-green-800' : 'text-green-700 hover:text-green-900 hover:bg-green-50'}`}>
+                        Driver Mode
+                      </Link>
+                    </>
                   )}
                   {user.role === 'ADMIN' && (
                     <Link href="/admin" className={`px-4 py-2 rounded text-xs font-medium uppercase tracking-wider transition-colors hover:no-underline ${isActive('/admin') ? 'bg-slate-100 text-[#1a1a1a]' : 'text-slate-600 hover:text-[#1a1a1a] hover:bg-slate-50'}`}>

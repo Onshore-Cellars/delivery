@@ -183,12 +183,12 @@ export default function Home() {
           </div>
 
           <h1 className="animate-fade-up text-[1.75rem] sm:text-[2.75rem] md:text-[3.5rem] leading-[1.1] font-light text-white tracking-wide max-w-2xl" style={{ fontFamily: 'var(--font-display)' }}>
-            Delivery logistics for the{' '}
-            <span className="gradient-text">Mediterranean.</span>
+            One van, not five.{' '}
+            <span className="gradient-text">Smarter deliveries.</span>
           </h1>
 
           <p className="animate-fade-up mt-6 text-[15px] sm:text-lg text-slate-400 max-w-lg leading-relaxed" style={{ animationDelay: '80ms' }}>
-            Share van space, book deliveries, and get supplies dockside. The marketplace that connects carriers with yacht owners and provisioners.
+            Stop sending five vans to the same yacht. Consolidate deliveries, book return legs, and get last-minute orders to your vessel or shipyard &mdash; fast.
           </p>
 
           <div className="animate-fade-up mt-10 flex flex-col sm:flex-row gap-4" style={{ animationDelay: '160ms' }}>
@@ -296,6 +296,85 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ─── TWO-WAY ROUTES ─── */}
+      <section className="bg-white border-b border-slate-100">
+        <div className="site-container py-20 sm:py-28">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 items-center">
+            <div>
+              <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-[#C6904D]/10 border border-[#C6904D]/20 mb-5">
+                <svg className="w-4 h-4 text-[#C6904D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                </svg>
+                <span className="text-xs font-semibold text-[#C6904D] tracking-wide uppercase">Two-Way Routes</span>
+              </div>
+              <h2 className="text-[1.5rem] sm:text-[2.25rem] font-light text-[#1a1a1a] tracking-wide leading-tight mb-4" style={{ fontFamily: 'var(--font-display)' }}>
+                Full there.{' '}
+                <span className="text-[#C6904D]">Empty back?</span>{' '}
+                Not anymore.
+              </h2>
+              <p className="text-[15px] text-slate-500 leading-relaxed mb-6">
+                Every delivery van that drives to a marina drives back empty. That&apos;s wasted fuel, wasted time, and a missed opportunity. With two-way route listings, carriers offer space in both directions &mdash; and earn on the return.
+              </p>
+              <ul className="space-y-3">
+                {[
+                  'Carriers list outbound and return legs in one listing',
+                  'Crew can send laundry, returns, or equipment back to shore',
+                  'Vendors consolidate pickups from multiple yachts on the return',
+                  'Halve the number of vans at the marina',
+                ].map(item => (
+                  <li key={item} className="flex items-start gap-2.5 text-sm text-slate-600">
+                    <svg className="w-4 h-4 text-[#C6904D] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                    </svg>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="bg-[#faf9f7] rounded-2xl border border-[#e8e4de] p-6 sm:p-8">
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-sm font-bold text-[#1a1a1a]">Outbound &mdash; Antibes to Monaco</div>
+                    <div className="text-xs text-slate-400 mt-0.5">Provisions, wine, engine parts &middot; 850kg loaded</div>
+                    <div className="mt-2 h-2 bg-green-100 rounded-full">
+                      <div className="h-full bg-green-500 rounded-full" style={{ width: '85%' }} />
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center justify-center">
+                  <svg className="w-6 h-6 text-[#C6904D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                  </svg>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-sm font-bold text-[#1a1a1a]">Return &mdash; Monaco to Antibes</div>
+                    <div className="text-xs text-slate-400 mt-0.5">Crew luggage, warranty returns &middot; 200kg booked</div>
+                    <div className="mt-2 h-2 bg-blue-100 rounded-full">
+                      <div className="h-full bg-blue-500 rounded-full" style={{ width: '20%' }} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-6 text-center">
+                <span className="text-xs text-slate-400">Space available on both legs</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ─── POPULAR ROUTES ─── */}
       <section className="bg-white">
         <div className="site-container py-20 sm:py-28">
@@ -360,7 +439,7 @@ export default function Home() {
                 Already heading to a port or marina? Monetise your spare van space.
               </p>
               <ul className="space-y-3 mb-8">
-                {['List space in under 2 minutes', 'Set your own prices', 'Get paid directly via Stripe', 'Manage everything from your phone'].map(item => (
+                {['List both outbound & return legs', 'Set your own prices per direction', 'Get paid directly via Stripe', 'No more empty return journeys'].map(item => (
                   <li key={item} className="flex items-start gap-3 text-sm text-slate-700">
                     <svg className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
@@ -376,14 +455,14 @@ export default function Home() {
 
             <div className="rounded-lg bg-white border-2 border-slate-200 p-6 sm:p-8">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-50 text-[#9a7039] rounded text-xs font-bold mb-5 uppercase tracking-wide">
-                Shippers
+                Crew &amp; Vendors
               </div>
-              <h3 className="text-xl font-semibold text-[#1a1a1a] mb-3">For owners & suppliers</h3>
+              <h3 className="text-xl font-semibold text-[#1a1a1a] mb-3">For crew, vendors &amp; fleet managers</h3>
               <p className="text-sm text-slate-500 mb-6 leading-relaxed">
-                Need provisions or supplies delivered? We connect you with carriers on route.
+                Last-minute parts, provisions, or equipment? Get it to your yacht or shipyard without the hassle.
               </p>
               <ul className="space-y-3 mb-8">
-                {['Search routes by port & date', 'Book exactly the space you need', 'Track deliveries in real-time', 'Secure payment with protection'].map(item => (
+                {['Book outbound & return journeys', 'MMSI tracking — deliveries follow your vessel', 'Live driver tracking with ETA & SMS alerts', 'Secure payment with protection'].map(item => (
                   <li key={item} className="flex items-start gap-3 text-sm text-slate-700">
                     <svg className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
@@ -392,7 +471,7 @@ export default function Home() {
                   </li>
                 ))}
               </ul>
-              <Link href="/register?role=YACHT_OWNER" className="btn-primary !text-sm !py-3 !px-6">
+              <Link href="/register?role=CREW" className="btn-primary !text-sm !py-3 !px-6">
                 Start shipping
               </Link>
             </div>
@@ -404,10 +483,10 @@ export default function Home() {
       <section className="bg-gradient-to-br from-[#1a1a1a] to-[#2a2520]">
         <div className="site-container py-20 sm:py-28 text-center">
           <h2 className="text-[1.5rem] sm:text-[2.25rem] lg:text-[2.75rem] font-light text-white tracking-wide leading-tight" style={{ fontFamily: 'var(--font-display)' }}>
-            Ready to simplify your delivery logistics?
+            Stop sending empty vans.
           </h2>
           <p className="mt-4 text-[15px] sm:text-lg text-slate-400 max-w-md mx-auto">
-            Join carriers and suppliers across the Mediterranean.
+            Join crew, vendors, fleet managers, and carriers making maritime logistics smarter.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/register" className="btn-primary text-[15px] sm:text-base !px-8">

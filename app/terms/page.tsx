@@ -48,42 +48,67 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="text-base font-semibold text-[#1a1a1a] mb-2">7. Liability</h2>
+          <h2 className="text-base font-semibold text-[#1a1a1a] mb-2">7. Platform Right to Cancel</h2>
+          <p>Onshore Deliver reserves the right, at its sole discretion, to cancel any booking, suspend any listing, or remove any user from the Platform at any time and for any reason, including but not limited to:</p>
+          <ul className="list-disc pl-5 space-y-1 mt-2">
+            <li>Suspected fraudulent, abusive, or unsafe behaviour.</li>
+            <li>Breach of these Terms of Service or any applicable law.</li>
+            <li>Activity that is harmful to other users, the Platform, or the maritime community we serve.</li>
+            <li>Failure to provide accurate information or valid documentation when requested.</li>
+            <li>Any conduct that, in our judgement, is detrimental to the integrity or reputation of the Platform.</li>
+          </ul>
+          <p className="mt-2">Where a booking is cancelled by Onshore Deliver, the shipper will receive a full refund. We are not liable for any consequential losses arising from such cancellation. We will endeavour to provide a reason for cancellation where possible, but are under no obligation to do so.</p>
+        </section>
+
+        <section>
+          <h2 className="text-base font-semibold text-[#1a1a1a] mb-2">8. Communication &amp; Contact Details</h2>
+          <p>All communication between carriers and shippers must be conducted through the Platform&rsquo;s messaging system or via the contact details provided within the booking interface. Users agree that:</p>
+          <ul className="list-disc pl-5 space-y-1 mt-2">
+            <li>Contact details (phone numbers, email addresses) shared through the Platform are for delivery coordination purposes only.</li>
+            <li>Users must not use contact details obtained through the Platform to arrange deliveries outside the Platform or to circumvent the Platform&rsquo;s payment system.</li>
+            <li>Contact details of counterparties are only shared after a booking is confirmed and payment is processed.</li>
+            <li>Attempts to solicit direct business or bypass Platform fees will result in immediate account suspension.</li>
+          </ul>
+          <p className="mt-2">We anonymise and protect contact details until bookings are confirmed to protect all parties and ensure the marketplace operates fairly for everyone.</p>
+        </section>
+
+        <section>
+          <h2 className="text-base font-semibold text-[#1a1a1a] mb-2">9. Liability</h2>
           <p>Onshore Deliver is a marketplace platform and does not assume liability for loss, damage, or delay of cargo during transit. Carriers are independently responsible for their insurance coverage. We strongly recommend that shippers declare the value of their goods and ensure adequate coverage. Our liability is limited to the platform fees paid for the relevant booking.</p>
         </section>
 
         <section>
-          <h2 className="text-base font-semibold text-[#1a1a1a] mb-2">8. Prohibited Items</h2>
+          <h2 className="text-base font-semibold text-[#1a1a1a] mb-2">10. Prohibited Items</h2>
           <p>The following may not be shipped through the Platform: illegal substances, weapons, explosives, live animals, human remains, and any goods prohibited by the laws of the origin or destination country. Dangerous goods (ADR) may only be shipped by carriers with appropriate certifications.</p>
         </section>
 
         <section>
-          <h2 className="text-base font-semibold text-[#1a1a1a] mb-2">9. Proof of Delivery</h2>
+          <h2 className="text-base font-semibold text-[#1a1a1a] mb-2">11. Proof of Delivery</h2>
           <p>Carriers are required to obtain proof of delivery, which may include a digital signature, photograph, and recipient name. Proof of delivery serves as confirmation that the goods were received and releases the carrier payout. Disputes must be raised within 48 hours of delivery.</p>
         </section>
 
         <section>
-          <h2 className="text-base font-semibold text-[#1a1a1a] mb-2">10. Reviews & Ratings</h2>
+          <h2 className="text-base font-semibold text-[#1a1a1a] mb-2">12. Reviews & Ratings</h2>
           <p>Users may leave honest reviews after completed deliveries. Reviews must be factual and not defamatory. We reserve the right to remove reviews that violate these guidelines. Carriers may respond to reviews publicly.</p>
         </section>
 
         <section>
-          <h2 className="text-base font-semibold text-[#1a1a1a] mb-2">11. Intellectual Property</h2>
+          <h2 className="text-base font-semibold text-[#1a1a1a] mb-2">13. Intellectual Property</h2>
           <p>All content, branding, and software on the Platform is owned by Onshore Deliver. Users retain ownership of content they upload but grant us a licence to display it on the Platform.</p>
         </section>
 
         <section>
-          <h2 className="text-base font-semibold text-[#1a1a1a] mb-2">12. Termination</h2>
+          <h2 className="text-base font-semibold text-[#1a1a1a] mb-2">14. Termination</h2>
           <p>We may suspend or terminate accounts that violate these terms, engage in fraudulent activity, or receive persistent poor reviews. Users may delete their accounts at any time; outstanding payments will be settled before account closure.</p>
         </section>
 
         <section>
-          <h2 className="text-base font-semibold text-[#1a1a1a] mb-2">13. Governing Law</h2>
+          <h2 className="text-base font-semibold text-[#1a1a1a] mb-2">15. Governing Law</h2>
           <p>These terms are governed by the laws of France. Any disputes shall be subject to the exclusive jurisdiction of the courts of Antibes, France.</p>
         </section>
 
         <section>
-          <h2 className="text-base font-semibold text-[#1a1a1a] mb-2">14. Contact</h2>
+          <h2 className="text-base font-semibold text-[#1a1a1a] mb-2">16. Contact</h2>
           <p>For questions about these terms, contact us at <a href="mailto:legal@onshore.delivery" className="text-[#C6904D] hover:underline">legal@onshore.delivery</a>.</p>
         </section>
       </div>
