@@ -58,18 +58,9 @@ interface ListingDetail {
   _count: { bookings: number; bids: number }
   carrier: {
     id: string
-    name: string
-    company?: string
     avatarUrl?: string
-    phone?: string
-    email?: string
-    bio?: string
-    city?: string
-    country?: string
-    createdAt: string
     avgRating: number
     reviewCount: number
-    _count: { listings: number; receivedReviews: number }
   }
 }
 
@@ -356,7 +347,7 @@ export default function ListingDetailPage() {
                       </button>
                     )}
                     <button onClick={() => { setShowContact(!showContact); setShowBooking(false); setShowBid(false) }} className="w-full px-4 py-3 text-sm font-medium text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
-                      Contact Carrier
+                      Message Carrier
                     </button>
                   </>
                 )}
@@ -367,15 +358,15 @@ export default function ListingDetailPage() {
                 )}
               </div>
 
-              {/* Carrier Info */}
+              {/* Carrier Info (anonymous until booking confirmed) */}
               <div className="mt-6 pt-6 border-t border-slate-100">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 rounded-full bg-[#f5f5f7] flex items-center justify-center">
-                    <span className="text-sm font-semibold text-[#1a1a1a]">{listing.carrier.name.split(' ').map(n => n[0]).join('')}</span>
+                    <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                   </div>
                   <div>
-                    <div className="font-semibold text-[#1a1a1a] text-sm">{listing.carrier.name}</div>
-                    {listing.carrier.company && <div className="text-xs text-slate-400">{listing.carrier.company}</div>}
+                    <div className="font-semibold text-[#1a1a1a] text-sm">Verified Carrier</div>
+                    <div className="text-xs text-slate-400">Identity revealed after booking</div>
                   </div>
                 </div>
                 {listing.carrier.avgRating > 0 && (
@@ -389,14 +380,8 @@ export default function ListingDetailPage() {
                   </div>
                 )}
                 <div className="text-xs text-slate-400">
-                  {listing.carrier._count.listings} listings &middot; Member since {new Date(listing.carrier.createdAt).getFullYear()}
+                  {listing._count.bookings} completed deliveries
                 </div>
-                {listing.carrier.phone && user && (
-                  <a href={`tel:${listing.carrier.phone}`} className="mt-3 flex items-center gap-2 text-sm text-[#1a1a1a] hover:text-[#1a1a1a] transition-colors">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
-                    Call {listing.carrier.name.split(' ')[0]}
-                  </a>
-                )}
               </div>
 
               <div className="mt-4 text-xs text-slate-400 text-center">{listing.viewCount} views &middot; {listing._count.bookings} bookings</div>
@@ -449,29 +434,18 @@ export default function ListingDetailPage() {
           </div>
         )}
 
-        {/* Contact Modal */}
+        {/* Message Carrier Modal */}
         {showContact && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
             <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full">
               <div className="p-6 border-b border-slate-100 flex justify-between items-center">
-                <h2 className="text-xl font-bold text-[#1a1a1a]">Contact {listing.carrier.name}</h2>
+                <h2 className="text-xl font-bold text-[#1a1a1a]">Message Carrier</h2>
                 <button onClick={() => setShowContact(false)} className="p-2 hover:bg-slate-100 rounded-lg"><svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
               </div>
               <form onSubmit={sendMessage} className="p-6 space-y-4">
-                {listing.carrier.phone && (
-                  <a href={`tel:${listing.carrier.phone}`} className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors">
-                    <svg className="w-5 h-5 text-[#1a1a1a]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
-                    <div><div className="font-medium text-[#1a1a1a] text-sm">Call {listing.carrier.name.split(' ')[0]}</div><div className="text-xs text-slate-400">{listing.carrier.phone}</div></div>
-                  </a>
-                )}
-                {listing.carrier.email && (
-                  <a href={`mailto:${listing.carrier.email}?subject=RE: ${listing.title}`} className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors">
-                    <svg className="w-5 h-5 text-[#1a1a1a]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                    <div><div className="font-medium text-[#1a1a1a] text-sm">Email</div><div className="text-xs text-slate-400">{listing.carrier.email}</div></div>
-                  </a>
-                )}
-                <div className="pt-2 border-t border-slate-100">
-                  <label className="block text-sm font-medium text-[#1a1a1a] mb-1">Send In-App Message</label>
+                <p className="text-sm text-slate-500">Send an in-app message to the carrier. Contact details will be shared after a confirmed booking.</p>
+                <div>
+                  <label className="block text-sm font-medium text-[#1a1a1a] mb-1">Your Message</label>
                   <textarea rows={4} required className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D] resize-none" placeholder="Hi, I'm interested in your listing..." value={messageContent} onChange={e => setMessageContent(e.target.value)} />
                 </div>
                 <button type="submit" disabled={formLoading} className="w-full btn-primary !py-3 text-sm disabled:opacity-50">{formLoading ? 'Sending...' : 'Send Message'}</button>

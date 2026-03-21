@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { verifyToken, getTokenFromHeader } from '@/lib/auth'
 import { notifyNewMessage } from '@/lib/notifications'
+import { checkMessageForPII } from '@/lib/pii-filter'
 
 // GET conversations list
 export async function GET(request: NextRequest) {
@@ -61,6 +62,12 @@ export async function POST(request: NextRequest) {
 
     if (!recipientId || !content) {
       return NextResponse.json({ error: 'Recipient and content are required' }, { status: 400 })
+    }
+
+    // Check for PII (contact info)
+    const piiCheck = checkMessageForPII(content)
+    if (piiCheck.blocked) {
+      return NextResponse.json({ error: piiCheck.reason }, { status: 400 })
     }
 
     if (recipientId === decoded.userId) {

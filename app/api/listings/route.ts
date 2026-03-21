@@ -19,6 +19,7 @@ export async function GET(request: NextRequest) {
     const page = Math.max(1, parseInt(searchParams.get('page') || '1') || 1)
     const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '20') || 20))
     const carrierId = searchParams.get('carrierId')
+    const listingType = searchParams.get('listingType')
     const showAll = searchParams.get('all')
 
     const where: Prisma.ListingWhereInput = {}
@@ -47,14 +48,39 @@ export async function GET(request: NextRequest) {
       where.status = 'ACTIVE'
     }
 
-    if (origin) {
+    if (listingType) {
+      where.listingType = listingType
+    }
+
+    // Proximity search: if lat/lng provided, use radius filtering
+    const originLat = searchParams.get('originLat') ? parseFloat(searchParams.get('originLat')!) : null
+    const originLng = searchParams.get('originLng') ? parseFloat(searchParams.get('originLng')!) : null
+    const destLat = searchParams.get('destLat') ? parseFloat(searchParams.get('destLat')!) : null
+    const destLng = searchParams.get('destLng') ? parseFloat(searchParams.get('destLng')!) : null
+    const radiusKm = parseFloat(searchParams.get('radiusKm') || '50')
+
+    let useProximityOrigin = false
+    let useProximityDest = false
+
+    if (originLat && originLng && !isNaN(originLat) && !isNaN(originLng)) {
+      useProximityOrigin = true
+      // Bounding box pre-filter (fast) — ~1 degree ≈ 111km
+      const degRange = radiusKm / 111
+      where.originLat = { gte: originLat - degRange, lte: originLat + degRange }
+      where.originLng = { gte: originLng - degRange, lte: originLng + degRange }
+    } else if (origin) {
       where.OR = [
         { originPort: { contains: origin, mode: 'insensitive' } },
         { originRegion: { contains: origin, mode: 'insensitive' } },
       ]
     }
 
-    if (destination) {
+    if (destLat && destLng && !isNaN(destLat) && !isNaN(destLng)) {
+      useProximityDest = true
+      const degRange = radiusKm / 111
+      where.destinationLat = { gte: destLat - degRange, lte: destLat + degRange }
+      where.destinationLng = { gte: destLng - degRange, lte: destLng + degRange }
+    } else if (destination) {
       where.AND = [
         ...(Array.isArray(where.AND) ? where.AND : where.AND ? [where.AND] : []),
         {
@@ -137,21 +163,55 @@ export async function GET(request: NextRequest) {
       orderBy = [{ departureDate: 'asc' }]
     }
 
-    const [listings, total] = await Promise.all([
+    // Haversine distance calculation helper
+    const haversineKm = (lat1: number, lng1: number, lat2: number, lng2: number): number => {
+      const R = 6371
+      const dLat = (lat2 - lat1) * Math.PI / 180
+      const dLng = (lng2 - lng1) * Math.PI / 180
+      const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) ** 2
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+    }
+
+    // If using proximity search, fetch extra results for post-filter precision
+    const fetchLimit = (useProximityOrigin || useProximityDest) ? limit * 3 : limit
+    const fetchSkip = (useProximityOrigin || useProximityDest) ? 0 : (page - 1) * limit
+
+    const [rawListings, rawTotal] = await Promise.all([
       prisma.listing.findMany({
         where,
         include: {
           carrier: {
-            select: { id: true, name: true, company: true, avatarUrl: true },
+            select: { id: true, avatarUrl: true },
           },
           _count: { select: { bookings: true } },
         },
         orderBy,
-        skip: (page - 1) * limit,
-        take: limit,
+        skip: fetchSkip,
+        take: fetchLimit,
       }),
       prisma.listing.count({ where }),
     ])
+
+    // Apply precise Haversine filtering for proximity searches
+    let listings = rawListings
+    let total = rawTotal
+
+    if (useProximityOrigin || useProximityDest) {
+      listings = rawListings.filter(l => {
+        if (useProximityOrigin && originLat && originLng && l.originLat && l.originLng) {
+          const dist = haversineKm(originLat, originLng, l.originLat, l.originLng)
+          if (dist > radiusKm) return false
+        }
+        if (useProximityDest && destLat && destLng && l.destinationLat && l.destinationLng) {
+          const dist = haversineKm(destLat, destLng, l.destinationLat, l.destinationLng)
+          if (dist > radiusKm) return false
+        }
+        return true
+      })
+      total = listings.length
+      // Apply pagination after filtering
+      listings = listings.slice((page - 1) * limit, page * limit)
+    }
 
     return NextResponse.json({
       listings,
@@ -180,11 +240,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }
 
-    const creator = await prisma.user.findUnique({ where: { id: decoded.userId }, select: { canCarry: true } })
-    if (!creator?.canCarry && decoded.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'Enable "I can carry / deliver" in your profile to create listings' }, { status: 403 })
-    }
-
     const body = await request.json()
     const {
       title, description, vehicleType, vehicleName, vehicleReg,
@@ -197,9 +252,30 @@ export async function POST(request: NextRequest) {
       routeDirection, returnDepartureDate, returnEstimatedArrival,
       returnAvailableKg, returnAvailableM3, returnPricePerKg, returnPricePerM3,
       returnFlatRate, returnNotes,
+      listingType: rawListingType, cargoDescription, specialRequirements,
     } = body
 
-    if (!title || !vehicleType || !originPort || !destinationPort || !departureDate || !totalCapacityKg || !totalCapacityM3) {
+    const listingType = rawListingType === 'SPACE_NEEDED' ? 'SPACE_NEEDED' : 'SPACE_AVAILABLE'
+
+    const creator = await prisma.user.findUnique({ where: { id: decoded.userId }, select: { canCarry: true, canShip: true } })
+
+    if (listingType === 'SPACE_NEEDED') {
+      if (!creator?.canShip && decoded.role !== 'ADMIN') {
+        return NextResponse.json({ error: 'Enable "I can ship" in your profile to post space-needed listings' }, { status: 403 })
+      }
+    } else {
+      if (!creator?.canCarry && decoded.role !== 'ADMIN') {
+        return NextResponse.json({ error: 'Enable "I can carry / deliver" in your profile to create listings' }, { status: 403 })
+      }
+    }
+
+    const isSpaceNeeded = listingType === 'SPACE_NEEDED'
+
+    if (!title || !originPort || !destinationPort || !departureDate || !totalCapacityKg || !totalCapacityM3) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+    }
+
+    if (!isSpaceNeeded && !vehicleType) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
@@ -213,9 +289,10 @@ export async function POST(request: NextRequest) {
     const listing = await prisma.listing.create({
       data: {
         carrierId: decoded.userId,
+        listingType,
         title,
-        description: description || null,
-        vehicleType,
+        description: description || (isSpaceNeeded && cargoDescription ? cargoDescription : null),
+        vehicleType: vehicleType || (isSpaceNeeded ? 'N/A' : ''),
         vehicleName: vehicleName || null,
         vehicleReg: vehicleReg || null,
         hasRefrigeration: hasRefrigeration || false,
@@ -247,7 +324,7 @@ export async function POST(request: NextRequest) {
         biddingEnabled: biddingEnabled || false,
         minBidPrice: minBidPrice ? parseFloat(minBidPrice) : null,
         acceptedCargo: acceptedCargo || null,
-        restrictedItems: restrictedItems || null,
+        restrictedItems: isSpaceNeeded ? (specialRequirements || restrictedItems || null) : (restrictedItems || null),
         routeDirection: routeDirection || 'OUTBOUND',
         returnDepartureDate: returnDepartureDate ? new Date(returnDepartureDate) : null,
         returnEstimatedArrival: returnEstimatedArrival ? new Date(returnEstimatedArrival) : null,
@@ -262,7 +339,7 @@ export async function POST(request: NextRequest) {
       },
       include: {
         carrier: {
-          select: { id: true, name: true, company: true },
+          select: { id: true, avatarUrl: true },
         },
       },
     })

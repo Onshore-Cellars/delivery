@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { verifyToken, getTokenFromHeader, generateTrackingCode } from '@/lib/auth'
 import { notifyBookingCreated } from '@/lib/notifications'
-import { createCheckoutSession, calculatePlatformFee, calculateCarrierPayout } from '@/lib/stripe'
+import { calculatePlatformFee, calculateCarrierPayout } from '@/lib/stripe'
 
 export async function GET(request: NextRequest) {
   try {
@@ -151,7 +151,7 @@ export async function POST(request: NextRequest) {
         where: {
           listingId,
           shipperId: decoded.userId,
-          status: { in: ['PENDING', 'CONFIRMED', 'PICKED_UP', 'IN_TRANSIT'] },
+          status: { in: ['PENDING', 'ACCEPTED', 'CONFIRMED', 'PICKED_UP', 'IN_TRANSIT'] },
         },
       })
       if (existingBooking) {
@@ -321,39 +321,24 @@ export async function POST(request: NextRequest) {
       console.error('Notification error:', notifErr)
     }
 
-    // Create Stripe Checkout Session for payment
-    let checkoutUrl: string | null = null
+    // Notify the carrier that they have a new booking request to review
     try {
-      const shipper = await prisma.user.findUnique({
-        where: { id: decoded.userId },
-        select: { email: true, name: true },
+      await prisma.notification.create({
+        data: {
+          userId: result.listing.carrierId,
+          type: 'BOOKING_CREATED',
+          title: 'New Booking Request',
+          message: `You have a new booking request #${result.trackingCode || trackingCode} from a shipper. Please review and accept or reject it.`,
+          metadata: JSON.stringify({ bookingId: result.id }),
+        },
       })
-
-      if (shipper && result.totalPrice > 0) {
-        const appUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
-        const session = await createCheckoutSession({
-          bookingId: result.id,
-          amount: result.totalPrice,
-          currency: result.currency,
-          customerEmail: shipper.email,
-          customerName: shipper.name,
-          description: `Delivery: ${result.listing.originPort} → ${result.listing.destinationPort}`,
-          origin: result.listing.originPort,
-          destination: result.listing.destinationPort,
-          successUrl: `${appUrl}/dashboard?payment=success&booking=${result.id}`,
-          cancelUrl: `${appUrl}/dashboard?payment=cancelled&booking=${result.id}`,
-          carrierStripeAccountId: result.listing.carrier.stripeAccountId || undefined,
-        })
-        checkoutUrl = session.url
-      }
-    } catch (stripeErr) {
-      console.error('Stripe checkout error:', stripeErr)
-      // Booking is still created — user can pay later
+    } catch (carrierNotifErr) {
+      console.error('Carrier notification error:', carrierNotifErr)
     }
 
     return NextResponse.json({
       booking: result,
-      checkoutUrl,
+      awaitingConfirmation: true,
     }, { status: 201 })
   } catch (error) {
     // Handle validation errors thrown from transaction

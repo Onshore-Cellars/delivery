@@ -1,9 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { AuthProvider } from './AuthProvider'
+import { AuthProvider, useAuth } from './AuthProvider'
 import Navbar from './Navbar'
 import CookieConsent from './CookieConsent'
+import PushNotificationPrompt from './PushNotificationPrompt'
 import { I18nProvider } from '@/lib/i18n'
 import { usePathname } from 'next/navigation'
 import { ReactNode } from 'react'
@@ -24,6 +25,12 @@ function Footer() {
       </div>
     </footer>
   )
+}
+
+function PushPromptWrapper() {
+  const { token } = useAuth()
+  if (!token) return null
+  return <PushNotificationPrompt token={token} />
 }
 
 export default function ClientLayout({ children }: { children: ReactNode }) {
@@ -49,6 +56,7 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
         </main>
         {!isLandingPage && !isAuthPage && <Footer />}
         <CookieConsent />
+        <PushPromptWrapper />
       </AuthProvider>
     </I18nProvider>
   )
