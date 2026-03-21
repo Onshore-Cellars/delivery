@@ -191,16 +191,16 @@ export default function Home() {
                   </svg>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-10 h-10 rounded-full bg-[#C6904D]/10 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-5 h-5 text-[#C6904D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                     </svg>
                   </div>
                   <div className="flex-1">
                     <div className="text-sm font-bold text-[#1a1a1a]">Return &mdash; Monaco to Antibes</div>
                     <div className="text-xs text-slate-400 mt-0.5">Crew luggage, warranty returns &middot; 200kg booked</div>
-                    <div className="mt-2 h-2 bg-blue-100 rounded-full">
-                      <div className="h-full bg-blue-500 rounded-full" style={{ width: '20%' }} />
+                    <div className="mt-2 h-2 bg-[#C6904D]/20 rounded-full">
+                      <div className="h-full bg-[#C6904D] rounded-full" style={{ width: '20%' }} />
                     </div>
                   </div>
                 </div>

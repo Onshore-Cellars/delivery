@@ -181,7 +181,19 @@ export async function GET(request: NextRequest) {
         where,
         include: {
           carrier: {
-            select: { id: true, avatarUrl: true },
+            select: {
+              id: true,
+              avatarUrl: true,
+              name: true,
+              company: true,
+              receivedReviews: {
+                select: { rating: true },
+              },
+            },
+          },
+          routeStops: {
+            select: { portName: true, lat: true, lng: true, stopOrder: true },
+            orderBy: { stopOrder: 'asc' },
           },
           _count: { select: { bookings: true } },
         },
@@ -192,21 +204,73 @@ export async function GET(request: NextRequest) {
       prisma.listing.count({ where }),
     ])
 
+    // Cross-track distance: distance from point C to the great circle line A→B
+    const crossTrackDistKm = (aLat: number, aLng: number, bLat: number, bLng: number, cLat: number, cLng: number): number => {
+      const R = 6371
+      const toRad = (d: number) => d * Math.PI / 180
+      const dAC = haversineKm(aLat, aLng, cLat, cLng) / R
+      const bearAC = Math.atan2(
+        Math.sin(toRad(cLng - aLng)) * Math.cos(toRad(cLat)),
+        Math.cos(toRad(aLat)) * Math.sin(toRad(cLat)) - Math.sin(toRad(aLat)) * Math.cos(toRad(cLat)) * Math.cos(toRad(cLng - aLng))
+      )
+      const bearAB = Math.atan2(
+        Math.sin(toRad(bLng - aLng)) * Math.cos(toRad(bLat)),
+        Math.cos(toRad(aLat)) * Math.sin(toRad(bLat)) - Math.sin(toRad(aLat)) * Math.cos(toRad(bLat)) * Math.cos(toRad(bLng - aLng))
+      )
+      const xt = Math.asin(Math.sin(dAC) * Math.sin(bearAC - bearAB))
+      return Math.abs(xt * R)
+    }
+
+    // Check if point C is "between" A and B along the route (not past either end)
+    const isAlongRoute = (aLat: number, aLng: number, bLat: number, bLng: number, cLat: number, cLng: number): boolean => {
+      const dAB = haversineKm(aLat, aLng, bLat, bLng)
+      const dAC = haversineKm(aLat, aLng, cLat, cLng)
+      const dCB = haversineKm(cLat, cLng, bLat, bLng)
+      // Point is along route if the sum of distances from endpoints is close to the total route distance
+      // Allow 20% tolerance for curved routes
+      return dAC <= dAB * 1.2 && dCB <= dAB * 1.2
+    }
+
     // Apply precise Haversine filtering for proximity searches
     let listings = rawListings
     let total = rawTotal
 
     if (useProximityOrigin || useProximityDest) {
       listings = rawListings.filter(l => {
+        // Standard proximity check
+        let originMatch = !useProximityOrigin
+        let destMatch = !useProximityDest
+
         if (useProximityOrigin && originLat && originLng && l.originLat && l.originLng) {
           const dist = haversineKm(originLat, originLng, l.originLat, l.originLng)
-          if (dist > radiusKm) return false
+          if (dist <= radiusKm) originMatch = true
         }
         if (useProximityDest && destLat && destLng && l.destinationLat && l.destinationLng) {
           const dist = haversineKm(destLat, destLng, l.destinationLat, l.destinationLng)
-          if (dist > radiusKm) return false
+          if (dist <= radiusKm) destMatch = true
         }
-        return true
+
+        if (originMatch && destMatch) return true
+
+        // Route corridor matching: if listing has flexible route, check if search point
+        // falls within maxDetourKm of the listing's route line
+        if (l.flexibleRoute && l.originLat && l.originLng && l.destinationLat && l.destinationLng) {
+          const detourLimit = l.maxDetourKm || 30
+
+          if (!originMatch && useProximityOrigin && originLat && originLng) {
+            const xtDist = crossTrackDistKm(l.originLat, l.originLng, l.destinationLat, l.destinationLng, originLat, originLng)
+            const along = isAlongRoute(l.originLat, l.originLng, l.destinationLat, l.destinationLng, originLat, originLng)
+            if (xtDist <= detourLimit && along) originMatch = true
+          }
+
+          if (!destMatch && useProximityDest && destLat && destLng) {
+            const xtDist = crossTrackDistKm(l.originLat, l.originLng, l.destinationLat, l.destinationLng, destLat, destLng)
+            const along = isAlongRoute(l.originLat, l.originLng, l.destinationLat, l.destinationLng, destLat, destLng)
+            if (xtDist <= detourLimit && along) destMatch = true
+          }
+        }
+
+        return originMatch && destMatch
       })
       total = listings.length
       // Apply pagination after filtering
@@ -253,6 +317,9 @@ export async function POST(request: NextRequest) {
       returnAvailableKg, returnAvailableM3, returnPricePerKg, returnPricePerM3,
       returnFlatRate, returnNotes,
       listingType: rawListingType, cargoDescription, specialRequirements,
+      flexibleRoute, maxDetourKm, flexibleStops,
+      originLat: bodyOriginLat, originLng: bodyOriginLng,
+      destinationLat: bodyDestLat, destinationLng: bodyDestLng,
     } = body
 
     const listingType = rawListingType === 'SPACE_NEEDED' ? 'SPACE_NEEDED' : 'SPACE_AVAILABLE'
@@ -336,6 +403,13 @@ export async function POST(request: NextRequest) {
         returnPricePerM3: returnPricePerM3 ? parseFloat(returnPricePerM3) : null,
         returnFlatRate: returnFlatRate ? parseFloat(returnFlatRate) : null,
         returnNotes: returnNotes || null,
+        flexibleRoute: flexibleRoute || false,
+        maxDetourKm: maxDetourKm ? parseFloat(maxDetourKm) : null,
+        flexibleStops: flexibleStops || false,
+        originLat: bodyOriginLat ? parseFloat(bodyOriginLat) : null,
+        originLng: bodyOriginLng ? parseFloat(bodyOriginLng) : null,
+        destinationLat: bodyDestLat ? parseFloat(bodyDestLat) : null,
+        destinationLng: bodyDestLng ? parseFloat(bodyDestLng) : null,
       },
       include: {
         carrier: {
@@ -344,9 +418,100 @@ export async function POST(request: NextRequest) {
       },
     })
 
+    // Fire-and-forget: check saved alerts for matching users
+    triggerAlerts(listing).catch(err => console.error('Alert trigger error:', err))
+
     return NextResponse.json({ listing }, { status: 201 })
   } catch (error) {
     console.error('Listing creation error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
+
+// ─── Alert Triggering ──────────────────────────────────────────────────────
+async function triggerAlerts(listing: { id: string; originPort: string; destinationPort: string; originLat?: number | null; originLng?: number | null; destinationLat?: number | null; destinationLng?: number | null; listingType: string; vehicleType: string; departureDate: Date; carrier: { id: string } }) {
+  try {
+    const { sendPushToUser } = await import('@/lib/push')
+
+    const alerts = await prisma.savedAlert.findMany({
+      where: { active: true },
+      include: { user: { select: { id: true, name: true, emailNotifications: true } } },
+    })
+
+    const haversine = (lat1: number, lng1: number, lat2: number, lng2: number) => {
+      const R = 6371
+      const dLat = (lat2 - lat1) * Math.PI / 180
+      const dLng = (lng2 - lng1) * Math.PI / 180
+      const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) ** 2
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+    }
+
+    for (const alert of alerts) {
+      // Don't alert the listing creator
+      if (alert.userId === listing.carrier.id) continue
+
+      let match = true
+
+      // Check listing type
+      if (alert.listingType && alert.listingType !== listing.listingType) { match = false; continue }
+
+      // Check vehicle type
+      if (alert.vehicleType && alert.vehicleType !== listing.vehicleType) { match = false; continue }
+
+      // Check date range
+      if (alert.dateFrom && listing.departureDate < alert.dateFrom) { match = false; continue }
+      if (alert.dateTo && listing.departureDate > alert.dateTo) { match = false; continue }
+
+      // Check origin proximity
+      if (alert.originPort) {
+        if (alert.originLat && alert.originLng && listing.originLat && listing.originLng) {
+          const dist = haversine(alert.originLat, alert.originLng, listing.originLat, listing.originLng)
+          if (dist > alert.radiusKm) { match = false; continue }
+        } else if (!listing.originPort.toLowerCase().includes(alert.originPort.toLowerCase())) {
+          match = false; continue
+        }
+      }
+
+      // Check destination proximity
+      if (alert.destinationPort) {
+        if (alert.destLat && alert.destLng && listing.destinationLat && listing.destinationLng) {
+          const dist = haversine(alert.destLat, alert.destLng, listing.destinationLat, listing.destinationLng)
+          if (dist > alert.radiusKm) { match = false; continue }
+        } else if (!listing.destinationPort.toLowerCase().includes(alert.destinationPort.toLowerCase())) {
+          match = false; continue
+        }
+      }
+
+      if (!match) continue
+
+      // Create notification
+      await prisma.notification.create({
+        data: {
+          userId: alert.userId,
+          type: 'RETURN_ROUTE_AVAILABLE',
+          title: 'New listing matches your alert',
+          message: `${listing.originPort} → ${listing.destinationPort} · ${alert.name || 'Your saved search'}`,
+          linkUrl: `/listings/${listing.id}`,
+        },
+      })
+
+      // Send push notification
+      if (alert.pushEnabled) {
+        await sendPushToUser(alert.userId, {
+          title: 'Route Alert Match',
+          body: `New listing: ${listing.originPort} → ${listing.destinationPort}`,
+          url: `/listings/${listing.id}`,
+          tag: `alert-${alert.id}`,
+        })
+      }
+
+      // Update alert stats
+      await prisma.savedAlert.update({
+        where: { id: alert.id },
+        data: { lastTriggeredAt: new Date(), triggerCount: { increment: 1 } },
+      })
+    }
+  } catch (err) {
+    console.error('Alert trigger failed:', err)
   }
 }

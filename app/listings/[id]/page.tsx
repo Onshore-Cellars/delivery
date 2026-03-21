@@ -206,7 +206,7 @@ export default function ListingDetailPage() {
 
               <div className="mt-6 flex flex-wrap gap-2">
                 <span className="badge bg-[#f5f5f7] text-[#1a1a1a] border border-[#d2d2d7]">{listing.vehicleType}</span>
-                {listing.hasRefrigeration && <span className="badge bg-blue-50 text-blue-700 border border-blue-200">Refrigerated</span>}
+                {listing.hasRefrigeration && <span className="badge bg-indigo-50 text-indigo-700 border border-indigo-200">Refrigerated</span>}
                 {listing.hasTailLift && <span className="badge bg-purple-50 text-purple-700 border border-purple-200">Tail Lift</span>}
                 {listing.hasGPS && <span className="badge bg-emerald-50 text-emerald-700 border border-emerald-200">GPS Tracked</span>}
                 {listing.isRecurring && <span className="badge bg-amber-50 text-amber-700 border border-amber-200">Recurring: {listing.recurringSchedule}</span>}

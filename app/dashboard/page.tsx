@@ -46,10 +46,10 @@ const statusColors: Record<string, string> = {
   FULL: 'bg-amber-50 text-amber-700 border-amber-200',
   COMPLETED: 'bg-slate-100 text-slate-600 border-slate-200',
   CANCELLED: 'bg-red-50 text-red-700 border-red-200',
-  IN_TRANSIT: 'bg-blue-50 text-blue-700 border-blue-200',
+  IN_TRANSIT: 'bg-indigo-50 text-indigo-700 border-indigo-200',
   PENDING: 'bg-amber-50 text-amber-700 border-amber-200',
   CONFIRMED: 'bg-green-50 text-green-700 border-green-200',
-  PICKED_UP: 'bg-blue-50 text-blue-700 border-blue-200',
+  PICKED_UP: 'bg-indigo-50 text-indigo-700 border-indigo-200',
   DELIVERED: 'bg-slate-100 text-slate-600 border-slate-200',
 }
 
@@ -295,7 +295,7 @@ export default function DashboardPage() {
                         <div className="sm:text-right">
                           <div className="text-sm text-slate-500 mb-1.5">{l.availableKg.toFixed(0)} kg / {l.availableM3.toFixed(1)} m&sup3; available</div>
                           <div className="w-full sm:w-32 h-2 bg-slate-100 rounded-full overflow-hidden">
-                            <div className="h-full bg-blue-600 rounded-full transition-all" style={{ width: `${((l.totalCapacityKg - l.availableKg) / l.totalCapacityKg * 100)}%` }} />
+                            <div className="h-full bg-[#C6904D] rounded-full transition-all" style={{ width: `${((l.totalCapacityKg - l.availableKg) / l.totalCapacityKg * 100)}%` }} />
                           </div>
                         </div>
                       </div>
@@ -339,9 +339,9 @@ export default function DashboardPage() {
                             }`}>{b.paymentStatus}</span>
                           )}
                           {b.trackingCode && (
-                            <div className="mt-1.5 inline-flex text-xs font-mono text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg">{b.trackingCode}</div>
+                            <div className="mt-1.5 inline-flex text-xs font-mono text-[#1a1a1a] bg-slate-100 px-2.5 py-1 rounded-lg">{b.trackingCode}</div>
                           )}
-                          <div className="mt-2 flex gap-2 justify-end">
+                          <div className="mt-2 flex gap-2 justify-end flex-wrap">
                             <a
                               href={`/api/bookings/${b.id}/invoice/pdf`}
                               target="_blank"
@@ -350,6 +350,14 @@ export default function DashboardPage() {
                             >
                               Download Invoice
                             </a>
+                            {(b.status === 'DELIVERED' || b.status === 'COMPLETED') && (
+                              <Link
+                                href={`/marketplace?origin=${encodeURIComponent(b.listing.originPort)}&destination=${encodeURIComponent(b.listing.destinationPort)}`}
+                                className="text-[11px] font-medium text-slate-500 hover:text-[#1a1a1a] transition-colors"
+                              >
+                                Book Again
+                              </Link>
+                            )}
                           </div>
                         </div>
                       </div>

@@ -89,7 +89,7 @@ const emptyRespondForm: RespondForm = {
 
 const statusConfig: Record<string, { label: string; classes: string }> = {
   PENDING: { label: 'Pending', classes: 'bg-amber-50 text-amber-700 border border-amber-200' },
-  QUOTED: { label: 'Quoted', classes: 'bg-blue-50 text-blue-700 border border-blue-200' },
+  QUOTED: { label: 'Quoted', classes: 'bg-indigo-50 text-indigo-700 border border-indigo-200' },
   ACCEPTED: { label: 'Accepted', classes: 'bg-emerald-50 text-emerald-700 border border-emerald-200' },
   EXPIRED: { label: 'Expired', classes: 'bg-slate-50 text-slate-500 border border-slate-200' },
   CANCELLED: { label: 'Cancelled', classes: 'bg-red-50 text-red-600 border border-red-200' },

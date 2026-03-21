@@ -139,7 +139,7 @@ export default function TrackingPage() {
                       <span className="text-xs font-mono text-[#C6904D] font-semibold">{b.trackingCode}</span>
                       <span className={`px-1.5 py-0.5 rounded text-[9px] font-semibold uppercase ${
                         b.status === 'DELIVERED' ? 'bg-green-50 text-green-700' :
-                        b.status === 'IN_TRANSIT' ? 'bg-blue-50 text-blue-700' :
+                        b.status === 'IN_TRANSIT' ? 'bg-indigo-50 text-indigo-700' :
                         b.status === 'CANCELLED' ? 'bg-red-50 text-red-700' :
                         'bg-amber-50 text-amber-700'
                       }`}>{b.status.replace('_', ' ')}</span>
@@ -173,7 +173,7 @@ export default function TrackingPage() {
                 <span className={`badge border ${
                   data.booking.status === 'DELIVERED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
                   data.booking.status === 'CANCELLED' ? 'bg-red-50 text-red-700 border-red-200' :
-                  'bg-blue-50 text-blue-700 border-blue-200'
+                  'bg-indigo-50 text-indigo-700 border-indigo-200'
                 }`}>
                   {data.booking.status.replace('_', ' ')}
                 </span>

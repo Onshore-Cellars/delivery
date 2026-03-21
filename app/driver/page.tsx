@@ -261,7 +261,7 @@ export default function DriverPage() {
                   <div className="flex items-start gap-3">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold ${
                       stop.status === 'DELIVERED' ? 'bg-green-100 text-green-700' :
-                      stop.status === 'IN_TRANSIT' ? 'bg-blue-100 text-blue-700' :
+                      stop.status === 'IN_TRANSIT' ? 'bg-indigo-100 text-indigo-700' :
                       'bg-slate-100 text-slate-500'
                     }`}>
                       {index + 1}
@@ -270,7 +270,7 @@ export default function DriverPage() {
                       <h3 className="text-sm font-bold text-[#1a1a1a]">{stop.cargoDescription}</h3>
                       <p className="text-xs text-slate-400 mt-0.5">
                         {stop.weightKg}kg &middot; {stop.volumeM3}m&sup3;
-                        {stop.routeDirection === 'return' && <span className="ml-1 text-blue-500 font-medium">(Return)</span>}
+                        {stop.routeDirection === 'return' && <span className="ml-1 text-[#C6904D] font-medium">(Return)</span>}
                       </p>
                       {stop.yachtName && (
                         <p className="text-xs text-slate-500 mt-1">
@@ -280,7 +280,7 @@ export default function DriverPage() {
                               href={`https://www.marinetraffic.com/en/ais/details/ships/mmsi:${stop.yachtMMSI}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="ml-1.5 text-blue-500 hover:underline"
+                              className="ml-1.5 text-[#C6904D] hover:underline"
                             >
                               Track vessel
                             </a>
@@ -303,7 +303,7 @@ export default function DriverPage() {
                   </div>
                   {stop.liveTracking.length > 0 && (
                     <div className="text-right flex-shrink-0">
-                      <span className="text-[10px] font-mono text-blue-500 bg-blue-50 px-2 py-0.5 rounded">
+                      <span className="text-[10px] font-mono text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">
                         {stop.trackingCode}
                       </span>
                     </div>

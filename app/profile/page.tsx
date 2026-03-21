@@ -251,7 +251,7 @@ export default function ProfilePage() {
               <span className="font-medium text-[#1a1a1a]">Current role:</span>
               <span className="badge bg-amber-50 text-[#9a7039]">{profile.role.replace('_', ' ')}</span>
               {form.canCarry && <span className="badge bg-green-50 text-green-700">Can Carry</span>}
-              {form.canShip && <span className="badge bg-blue-50 text-blue-700">Can Ship</span>}
+              {form.canShip && <span className="badge bg-indigo-50 text-indigo-700">Can Ship</span>}
             </div>
           </div>
         </div>
