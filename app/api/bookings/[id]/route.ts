@@ -76,6 +76,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       'deliveryNotes', 'deliveryTimeWindow',
       'yachtName', 'yachtMMSI', 'berthNumber', 'marinaName',
       'specialHandling', 'cargoDescription',
+      'cargoLengthCm', 'cargoWidthCm', 'cargoHeightCm', 'cargoImages',
     ]
 
     const data: Record<string, unknown> = {}

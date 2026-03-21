@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useAuth } from '../components/AuthProvider'
 import PortAutocomplete from '../components/PortAutocomplete'
+import CargoImageUpload from '../components/CargoImageUpload'
 import Link from 'next/link'
 
 interface Listing {
@@ -46,6 +47,10 @@ interface BookingForm {
   volumeM3: string
   itemCount: string
   declaredValue: string
+  cargoLengthCm: string
+  cargoWidthCm: string
+  cargoHeightCm: string
+  cargoImages: string[]
   specialHandling: string
   pickupAddress: string
   pickupContact: string
@@ -131,6 +136,8 @@ export default function MarketplacePage() {
   const [bookingForm, setBookingForm] = useState<BookingForm>({
     listingId: '', cargoDescription: '', cargoType: '', weightKg: '', volumeM3: '',
     itemCount: '1', declaredValue: '',
+    cargoLengthCm: '', cargoWidthCm: '', cargoHeightCm: '',
+    cargoImages: [],
     specialHandling: '', pickupAddress: '', pickupContact: '', pickupPhone: '',
     deliveryAddress: '', deliveryContact: '', deliveryPhone: '', deliveryNotes: '', deliveryTimeWindow: '',
     yachtName: '', yachtMMSI: '', berthNumber: '', marinaName: '', routeDirection: 'outbound',
@@ -696,6 +703,41 @@ export default function MarketplacePage() {
                     <label className="block text-sm font-semibold text-[#1a1a1a] mb-2">Declared Value</label>
                     <input type="number" min="0" step="0.01" className={inputClass} placeholder="e.g. 5000" value={bookingForm.declaredValue} onChange={(e) => setBookingForm({ ...bookingForm, declaredValue: e.target.value })} />
                   </div>
+                </div>
+
+                {/* Cargo Dimensions */}
+                <div className="pt-3 border-t border-slate-100">
+                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Cargo Size (optional)</p>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div>
+                      <label className="block text-[11px] text-slate-400 mb-1">Length (cm)</label>
+                      <input type="number" min="0" step="1" className={inputClass} placeholder="cm" value={bookingForm.cargoLengthCm} onChange={(e) => setBookingForm({ ...bookingForm, cargoLengthCm: e.target.value })} />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] text-slate-400 mb-1">Width (cm)</label>
+                      <input type="number" min="0" step="1" className={inputClass} placeholder="cm" value={bookingForm.cargoWidthCm} onChange={(e) => setBookingForm({ ...bookingForm, cargoWidthCm: e.target.value })} />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] text-slate-400 mb-1">Height (cm)</label>
+                      <input type="number" min="0" step="1" className={inputClass} placeholder="cm" value={bookingForm.cargoHeightCm} onChange={(e) => setBookingForm({ ...bookingForm, cargoHeightCm: e.target.value })} />
+                    </div>
+                  </div>
+                  {bookingForm.cargoLengthCm && bookingForm.cargoWidthCm && bookingForm.cargoHeightCm && (
+                    <p className="text-[11px] text-slate-400 mt-1.5">
+                      {(parseFloat(bookingForm.cargoLengthCm) * parseFloat(bookingForm.cargoWidthCm) / 10000).toFixed(2)} m&sup2; floor area &middot;{' '}
+                      {(parseFloat(bookingForm.cargoLengthCm) * parseFloat(bookingForm.cargoWidthCm) * parseFloat(bookingForm.cargoHeightCm) / 1000000).toFixed(3)} m&sup3; volume
+                    </p>
+                  )}
+                </div>
+
+                {/* Cargo Photos */}
+                <div className="pt-3 border-t border-slate-100">
+                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Cargo Photos (optional)</p>
+                  <CargoImageUpload
+                    images={bookingForm.cargoImages}
+                    onChange={(imgs) => setBookingForm({ ...bookingForm, cargoImages: imgs })}
+                    maxImages={5}
+                  />
                 </div>
 
                 {/* Pickup Details */}

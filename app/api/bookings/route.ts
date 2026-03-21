@@ -103,6 +103,7 @@ export async function POST(request: NextRequest) {
     }
     const {
       listingId, cargoDescription, cargoType, weightKg, volumeM3,
+      cargoLengthCm, cargoWidthCm, cargoHeightCm, cargoImages,
       specialHandling, pickupAddress, pickupContact, pickupPhone, pickupEmail,
       deliveryAddress, deliveryContact, deliveryPhone, deliveryEmail,
       deliveryNotes, deliveryTimeWindow,
@@ -202,6 +203,12 @@ export async function POST(request: NextRequest) {
           weightKg: weight,
           volumeM3: volume,
           itemCount: itemCount ? parseInt(itemCount) : 1,
+          cargoLengthCm: cargoLengthCm ? parseFloat(cargoLengthCm) : null,
+          cargoWidthCm: cargoWidthCm ? parseFloat(cargoWidthCm) : null,
+          cargoHeightCm: cargoHeightCm ? parseFloat(cargoHeightCm) : null,
+          cargoImages: cargoImages && Array.isArray(cargoImages) && cargoImages.length > 0
+            ? JSON.stringify(cargoImages)
+            : null,
           declaredValue: declaredValue ? parseFloat(declaredValue) : null,
           specialHandling: specialHandling || null,
           pickupAddress: pickupAddress || null,
