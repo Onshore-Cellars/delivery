@@ -60,9 +60,7 @@ export async function GET() {
     })
 
     return NextResponse.json({
-      adminExists: admins.length > 0,
-      admins: admins.map(a => ({ email: a.email, isAdmin: a.role === 'ADMIN' })),
-      adminEmails: ADMIN_EMAILS,
+      adminExists: admins.some(a => a.role === 'ADMIN'),
     })
   } catch (error) {
     console.error('Admin check error:', error)
