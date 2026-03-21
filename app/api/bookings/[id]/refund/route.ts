@@ -88,6 +88,33 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       },
     })
 
+    // Restore listing capacity on full refund (booking cancelled)
+    if (!isPartial) {
+      const isReturnLeg = booking.routeDirection === 'return'
+      if (isReturnLeg) {
+        await prisma.listing.update({
+          where: { id: booking.listingId },
+          data: {
+            returnAvailableKg: { increment: booking.weightKg },
+            returnAvailableM3: { increment: booking.volumeM3 },
+          },
+        })
+      } else {
+        await prisma.listing.update({
+          where: { id: booking.listingId },
+          data: {
+            availableKg: { increment: booking.weightKg },
+            availableM3: { increment: booking.volumeM3 },
+          },
+        })
+      }
+      // Reopen listing if it was FULL
+      await prisma.listing.update({
+        where: { id: booking.listingId, status: 'FULL' },
+        data: { status: 'ACTIVE' },
+      }).catch(() => {})
+    }
+
     // Notify shipper
     await createNotification({
       userId: booking.shipperId,

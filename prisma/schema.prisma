@@ -225,7 +225,7 @@ model Listing {
 
   // Vehicle
   vehicleId          String?
-  vehicle            Vehicle?      @relation(fields: [vehicleId], references: [id])
+  vehicle            Vehicle?      @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
   vehicleType        String
   vehicleName        String?
   vehicleReg         String?       // Number plate
