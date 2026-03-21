@@ -84,6 +84,10 @@ export async function POST(request: NextRequest) {
         })
       }
 
+      if (user.suspended) {
+        return NextResponse.json({ error: 'Your account has been suspended. Please contact support.' }, { status: 403 })
+      }
+
       // Auto-promote admin emails
       const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || 'edward@onshorecellars.com,info@onshoredelivery.com')
         .toLowerCase().split(',').map(e => e.trim())

@@ -27,12 +27,17 @@ export async function GET(request: NextRequest) {
         canCarry: true,
         canShip: true,
         verified: true,
+        suspended: true,
         createdAt: true,
       },
     })
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    }
+
+    if (user.suspended) {
+      return NextResponse.json({ error: 'Your account has been suspended.' }, { status: 403 })
     }
 
     return NextResponse.json({ user })
