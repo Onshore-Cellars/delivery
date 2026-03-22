@@ -19,21 +19,19 @@ interface Post {
 
 const CATEGORIES = [
   { value: '', label: 'All Posts' },
-  { value: 'general', label: 'General' },
   { value: 'routes', label: 'Routes & Schedules' },
+  { value: 'wanted', label: 'Cargo & Capacity Wanted' },
+  { value: 'ports', label: 'Ports & Marinas' },
+  { value: 'customs', label: 'Customs & Regulations' },
   { value: 'tips', label: 'Tips & Advice' },
-  { value: 'wanted', label: 'Wanted / Looking For' },
-  { value: 'services', label: 'Services' },
-  { value: 'news', label: 'News & Updates' },
 ]
 
 const CATEGORY_COLORS: Record<string, string> = {
-  general: 'bg-slate-100 text-slate-600',
   routes: 'bg-indigo-50 text-indigo-700',
-  tips: 'bg-amber-50 text-[#9a7039]',
   wanted: 'bg-red-50 text-red-600',
-  services: 'bg-green-50 text-green-700',
-  news: 'bg-purple-50 text-purple-700',
+  ports: 'bg-sky-50 text-sky-700',
+  customs: 'bg-amber-50 text-[#9a7039]',
+  tips: 'bg-green-50 text-green-700',
 }
 
 export default function CommunityPage() {
@@ -42,7 +40,7 @@ export default function CommunityPage() {
   const [loading, setLoading] = useState(true)
   const [category, setCategory] = useState('')
   const [showNewPost, setShowNewPost] = useState(false)
-  const [newPost, setNewPost] = useState({ title: '', content: '', category: 'general' })
+  const [newPost, setNewPost] = useState({ title: '', content: '', category: 'routes' })
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
 
@@ -79,7 +77,7 @@ export default function CommunityPage() {
         body: JSON.stringify(newPost),
       })
       if (res.ok) {
-        setNewPost({ title: '', content: '', category: 'general' })
+        setNewPost({ title: '', content: '', category: 'routes' })
         setShowNewPost(false)
         setError('')
         fetchPosts()

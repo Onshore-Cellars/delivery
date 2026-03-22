@@ -62,8 +62,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Title and content are required' }, { status: 400 })
     }
 
-    const validCategories = ['general', 'routes', 'tips', 'wanted', 'services', 'news']
-    const postCategory = validCategories.includes(category) ? category : 'general'
+    const validCategories = ['routes', 'wanted', 'ports', 'customs', 'tips']
+    const postCategory = validCategories.includes(category) ? category : 'routes'
 
     const post = await prisma.communityPost.create({
       data: {
