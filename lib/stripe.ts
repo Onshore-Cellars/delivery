@@ -82,6 +82,8 @@ export async function createCheckoutSession(params: {
     mode: 'payment',
     success_url: params.successUrl,
     cancel_url: params.cancelUrl,
+    // Expire the Stripe session after 30 minutes to match local checkoutExpiresAt
+    expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
     metadata: {
       bookingId: params.bookingId,
     },

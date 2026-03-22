@@ -219,6 +219,86 @@ export async function POST(request: NextRequest) {
         }
         break
       }
+
+      case 'checkout.session.expired': {
+        // Stripe session expired (matches our 30-min expires_at) — cancel the booking
+        const session = event.data.object as { metadata?: { bookingId?: string } }
+        const bookingId = session.metadata?.bookingId
+        if (bookingId) {
+          const booking = await prisma.booking.findUnique({
+            where: { id: bookingId },
+            select: { id: true, status: true, paymentStatus: true, weightKg: true, volumeM3: true, listingId: true, routeDirection: true },
+          })
+          if (booking && booking.status === 'PENDING' && booking.paymentStatus !== 'PAID') {
+            await prisma.$transaction(async (tx) => {
+              await tx.booking.update({
+                where: { id: bookingId },
+                data: { status: 'CANCELLED', paymentStatus: 'FAILED' },
+              })
+              // Restore listing capacity
+              if (booking.routeDirection === 'return') {
+                await tx.listing.update({
+                  where: { id: booking.listingId },
+                  data: {
+                    returnAvailableKg: { increment: booking.weightKg },
+                    returnAvailableM3: { increment: booking.volumeM3 },
+                  },
+                })
+              } else {
+                await tx.listing.update({
+                  where: { id: booking.listingId },
+                  data: {
+                    availableKg: { increment: booking.weightKg },
+                    availableM3: { increment: booking.volumeM3 },
+                  },
+                })
+              }
+              // Reactivate listing if it was FULL
+              const listing = await tx.listing.findUnique({ where: { id: booking.listingId } })
+              if (listing && listing.status === 'FULL') {
+                await tx.listing.update({ where: { id: booking.listingId }, data: { status: 'ACTIVE' } })
+              }
+            })
+          }
+        }
+        break
+      }
+
+      case 'charge.dispute.closed': {
+        // Dispute resolved — update dispute record status
+        const dispute = event.data.object as { payment_intent?: string; status?: string }
+        if (dispute.payment_intent) {
+          const booking = await prisma.booking.findFirst({
+            where: { stripePaymentIntentId: dispute.payment_intent as string },
+          })
+          if (booking) {
+            const won = dispute.status === 'won'
+            // Update any open disputes for this booking
+            await prisma.dispute.updateMany({
+              where: { bookingId: booking.id, status: 'OPEN' },
+              data: {
+                status: won ? 'RESOLVED' : 'RESOLVED',
+                resolution: won ? 'Dispute resolved in platform\'s favor' : 'Dispute lost — refund issued by Stripe',
+                resolvedAt: new Date(),
+              },
+            })
+            // If we lost the dispute, mark booking accordingly
+            if (!won) {
+              await prisma.booking.update({
+                where: { id: booking.id },
+                data: { paymentStatus: 'REFUNDED' },
+              })
+            } else {
+              // Won — restore booking to previous state if it was disputed
+              await prisma.booking.update({
+                where: { id: booking.id },
+                data: { status: 'CONFIRMED' },
+              })
+            }
+          }
+        }
+        break
+      }
     }
 
     return NextResponse.json({ received: true })

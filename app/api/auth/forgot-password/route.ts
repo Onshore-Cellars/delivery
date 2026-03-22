@@ -9,7 +9,7 @@ const limiter = createRateLimiter({ interval: 15 * 60_000, limit: 5 })
 export async function POST(request: NextRequest) {
   try {
     const ip = getClientIP(request)
-    const rl = limiter.check(ip)
+    const rl = await limiter.check(ip)
     if (!rl.success) {
       return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 })
     }

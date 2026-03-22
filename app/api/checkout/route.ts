@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
   try {
     // Rate limit checkout
     const ip = getClientIP(request)
-    const rl = checkoutLimiter.check(ip)
+    const rl = await checkoutLimiter.check(ip)
     if (!rl.success) {
       return NextResponse.json({ error: 'Too many checkout attempts. Please try again later.' }, { status: 429 })
     }

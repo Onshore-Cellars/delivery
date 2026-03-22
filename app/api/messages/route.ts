@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const ip = getClientIP(request)
-    const rl = messageLimiter.check(ip)
+    const rl = await messageLimiter.check(ip)
     if (!rl.success) {
       return NextResponse.json({ error: 'Sending too many messages. Please slow down.' }, { status: 429 })
     }

@@ -92,7 +92,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
             data: { status: 'REJECTED' },
           })
           return { updatedBid: updBid, booking: bk }
-        })
+        }, { isolationLevel: 'Serializable' })
         updatedBid = result.updatedBid
         booking = result.booking
       } catch (txErr) {

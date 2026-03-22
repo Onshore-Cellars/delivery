@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
   try {
     // Rate limit booking creation
     const ip = getClientIP(request)
-    const rl = bookingLimiter.check(ip)
+    const rl = await bookingLimiter.check(ip)
     if (!rl.success) {
       return NextResponse.json({ error: 'Too many booking attempts. Please try again later.' }, { status: 429 })
     }
@@ -175,7 +175,9 @@ export async function POST(request: NextRequest) {
     const trackingCode = generateTrackingCode()
 
     const result = await prisma.$transaction(async (tx) => {
-      // Expire stale pending checkouts and restore their capacity
+      // Serializable isolation prevents double-booking race conditions —
+      // concurrent requests reading the same listing capacity will conflict
+      // and the loser retries or fails instead of overbooking.
       const expiredBookings = await tx.booking.findMany({
         where: {
           status: 'PENDING',
@@ -389,7 +391,7 @@ export async function POST(request: NextRequest) {
       }
 
       return booking
-    })
+    }, { isolationLevel: 'Serializable' })
 
     // Send notifications (outside transaction)
     try {
