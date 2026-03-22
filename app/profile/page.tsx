@@ -358,10 +358,30 @@ export default function ProfilePage() {
             <a href="/reviews" className="px-4 py-3 rounded border border-[#e8e4de] text-center font-medium text-[#1a1a1a] hover:bg-[#faf9f7] transition-colors hover:no-underline">
               Reviews ({profile._count.receivedReviews})
             </a>
+            <a href="/notifications" className="px-4 py-3 rounded border border-[#e8e4de] text-center font-medium text-[#1a1a1a] hover:bg-[#faf9f7] transition-colors hover:no-underline">
+              Notifications
+            </a>
+            <a href="/disputes" className="px-4 py-3 rounded border border-[#e8e4de] text-center font-medium text-[#1a1a1a] hover:bg-[#faf9f7] transition-colors hover:no-underline">
+              Disputes
+            </a>
+            <a href="/analytics" className="px-4 py-3 rounded border border-[#e8e4de] text-center font-medium text-[#1a1a1a] hover:bg-[#faf9f7] transition-colors hover:no-underline">
+              Analytics
+            </a>
+            <a href="/insurance" className="px-4 py-3 rounded border border-[#e8e4de] text-center font-medium text-[#1a1a1a] hover:bg-[#faf9f7] transition-colors hover:no-underline">
+              Insurance
+            </a>
             {form.canCarry && (
+              <>
               <a href="/listings/create" className="px-4 py-3 rounded border border-[#e8e4de] text-center font-medium text-[#1a1a1a] hover:bg-[#faf9f7] transition-colors hover:no-underline">
                 List Van Space
               </a>
+              <a href="/vehicles" className="px-4 py-3 rounded border border-[#e8e4de] text-center font-medium text-[#1a1a1a] hover:bg-[#faf9f7] transition-colors hover:no-underline">
+                My Vehicles
+              </a>
+              <a href="/earnings" className="px-4 py-3 rounded border border-[#e8e4de] text-center font-medium text-[#1a1a1a] hover:bg-[#faf9f7] transition-colors hover:no-underline">
+                Earnings
+              </a>
+              </>
             )}
           </div>
         </div>

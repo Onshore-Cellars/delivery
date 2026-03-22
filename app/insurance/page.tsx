@@ -56,6 +56,8 @@ export default function InsurancePage() {
   const [calcCategory, setCalcCategory] = useState('marine_equipment')
   const [calcCrossBorder, setCalcCrossBorder] = useState(false)
   const [estimates, setEstimates] = useState<{ tier: { id: string; name: string; description: string; features: string[]; excessGBP: number }; premiumGBP: number; premiumEUR: number; recommended: boolean }[] | null>(null)
+  const [calcError, setCalcError] = useState('')
+  const [calcLoading, setCalcLoading] = useState(false)
 
   const fetchData = useCallback(async () => {
     if (!token) return
@@ -74,13 +76,22 @@ export default function InsurancePage() {
 
   const getEstimate = async () => {
     if (!calcValue || parseFloat(calcValue) <= 0) return
+    setCalcError('')
+    setCalcLoading(true)
+    setEstimates(null)
     try {
       const res = await fetch(`/api/insurance?value=${calcValue}&category=${calcCategory}&crossBorder=${calcCrossBorder}`)
       if (res.ok) {
         const data = await res.json()
         setEstimates(data.estimates)
+      } else {
+        setCalcError('Failed to get estimate. Please try again.')
       }
-    } catch { /* ignore */ }
+    } catch {
+      setCalcError('Could not connect to the server. Please try again.')
+    } finally {
+      setCalcLoading(false)
+    }
   }
 
   if (authLoading) return <div className="min-h-screen bg-[#faf9f7]" />
@@ -209,10 +220,12 @@ export default function InsurancePage() {
                 </label>
               </div>
             </div>
-            <button onClick={getEstimate}
-              className="px-5 py-2.5 bg-[#1a1a1a] text-white rounded-lg text-sm font-semibold hover:bg-[#333] transition-colors mb-6">
-              Calculate
+            <button onClick={getEstimate} disabled={calcLoading}
+              className="px-5 py-2.5 bg-[#1a1a1a] text-white rounded-lg text-sm font-semibold hover:bg-[#333] disabled:opacity-50 transition-colors mb-6">
+              {calcLoading ? 'Calculating...' : 'Calculate'}
             </button>
+
+            {calcError && <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">{calcError}</div>}
 
             {estimates && (
               <div className="grid sm:grid-cols-3 gap-4">

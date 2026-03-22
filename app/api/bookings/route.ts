@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
   try {
     // Rate limit booking creation
     const ip = getClientIP(request)
-    const rl = bookingLimiter.check(ip)
+    const rl = await bookingLimiter.check(ip)
     if (!rl.success) {
       return NextResponse.json({ error: 'Too many booking attempts. Please try again later.' }, { status: 429 })
     }
@@ -100,10 +100,13 @@ export async function POST(request: NextRequest) {
     // Check suspended status
     const currentUser = await prisma.user.findUnique({
       where: { id: decoded.userId },
-      select: { suspended: true, canShip: true },
+      select: { suspended: true, canShip: true, verified: true },
     })
     if (currentUser?.suspended) {
       return NextResponse.json({ error: 'Your account is suspended' }, { status: 403 })
+    }
+    if (!currentUser?.verified) {
+      return NextResponse.json({ error: 'Please verify your email before creating a booking' }, { status: 403 })
     }
 
     let body
@@ -175,7 +178,9 @@ export async function POST(request: NextRequest) {
     const trackingCode = generateTrackingCode()
 
     const result = await prisma.$transaction(async (tx) => {
-      // Expire stale pending checkouts and restore their capacity
+      // Serializable isolation prevents double-booking race conditions —
+      // concurrent requests reading the same listing capacity will conflict
+      // and the loser retries or fails instead of overbooking.
       const expiredBookings = await tx.booking.findMany({
         where: {
           status: 'PENDING',
@@ -259,8 +264,11 @@ export async function POST(request: NextRequest) {
         if (listing.routeDirection === 'OUTBOUND') {
           throw new Error('VALIDATION:This listing does not offer return leg capacity')
         }
-        const returnKg = listing.returnAvailableKg ?? 0
-        const returnM3 = listing.returnAvailableM3 ?? 0
+        const returnKg = listing.returnAvailableKg
+        const returnM3 = listing.returnAvailableM3
+        if (returnKg == null || returnM3 == null) {
+          throw new Error('VALIDATION:This listing has no return leg capacity configured')
+        }
         if (weight > returnKg || volume > returnM3) {
           throw new Error('VALIDATION:Requested capacity exceeds available return leg space')
         }
@@ -386,7 +394,7 @@ export async function POST(request: NextRequest) {
       }
 
       return booking
-    })
+    }, { isolationLevel: 'Serializable' })
 
     // Send notifications (outside transaction)
     try {

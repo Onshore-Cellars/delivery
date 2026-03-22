@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getTokenFromHeader, verifyToken } from '@/lib/auth'
 import prisma from '@/lib/prisma'
+import { createNotification } from '@/lib/notifications'
 
 // GET /api/disputes — list user's disputes
 export async function GET(req: NextRequest) {
@@ -89,6 +90,27 @@ export async function POST(req: NextRequest) {
         claimAmount: claimAmount && !isNaN(parseFloat(claimAmount)) ? parseFloat(claimAmount) : null,
       },
     })
+
+    // Notify the other party about the dispute
+    await createNotification({
+      userId: againstId,
+      type: 'SYSTEM',
+      title: 'Dispute Filed Against You',
+      message: `A ${type.replace('_', ' ').toLowerCase()} dispute has been filed for booking ${booking.trackingCode || bookingId}.`,
+      linkUrl: `/dashboard`,
+    })
+
+    // Notify admins
+    const admins = await prisma.user.findMany({ where: { role: 'ADMIN' }, select: { id: true } })
+    for (const admin of admins) {
+      await createNotification({
+        userId: admin.id,
+        type: 'SYSTEM',
+        title: 'New Dispute Filed',
+        message: `A ${type.replace('_', ' ').toLowerCase()} dispute has been filed for booking ${booking.trackingCode || bookingId}.`,
+        linkUrl: `/admin`,
+      })
+    }
 
     return NextResponse.json({ dispute }, { status: 201 })
   } catch (error) {

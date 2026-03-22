@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { generateSecureToken } from '@/lib/auth'
-import { sendEmail, passwordResetEmail } from '@/lib/email'
+import { passwordResetEmail } from '@/lib/email'
+import { queueEmail } from '@/lib/email-queue'
 import { createRateLimiter, getClientIP } from '@/lib/rate-limit'
 
 const limiter = createRateLimiter({ interval: 15 * 60_000, limit: 5 })
@@ -9,7 +10,7 @@ const limiter = createRateLimiter({ interval: 15 * 60_000, limit: 5 })
 export async function POST(request: NextRequest) {
   try {
     const ip = getClientIP(request)
-    const rl = limiter.check(ip)
+    const rl = await limiter.check(ip)
     if (!rl.success) {
       return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 })
     }
@@ -57,7 +58,7 @@ export async function POST(request: NextRequest) {
     const resetLink = `${appUrl}/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`
 
     const template = passwordResetEmail({ name: user.name, resetLink })
-    await sendEmail({ to: email, ...template })
+    await queueEmail({ to: email, ...template })
 
     return NextResponse.json({ message: successMsg })
   } catch (error) {

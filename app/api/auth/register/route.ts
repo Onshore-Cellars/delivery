@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { hashPassword, generateToken, generateSecureToken } from '@/lib/auth'
 import { isCommonPassword } from '@/lib/password-check'
-import { sendEmail, welcomeEmail, emailVerificationEmail } from '@/lib/email'
+import { welcomeEmail, emailVerificationEmail } from '@/lib/email'
+import { queueEmail } from '@/lib/email-queue'
 
 // Simple in-memory rate limiter for registration
 const registerAttempts = new Map<string, { count: number; resetAt: number }>()
@@ -120,7 +121,7 @@ export async function POST(request: NextRequest) {
     // Send welcome email (async, don't block registration)
     try {
       const template = welcomeEmail({ name: user.name, role: user.role })
-      await sendEmail({ to: email, ...template })
+      await queueEmail({ to: email, ...template })
     } catch (emailErr) {
       console.error('Welcome email error:', emailErr)
     }
@@ -144,7 +145,7 @@ export async function POST(request: NextRequest) {
         })
 
         const template = emailVerificationEmail({ name: user.name, verifyLink })
-        await sendEmail({ to: email, ...template })
+        await queueEmail({ to: email, ...template })
       } catch (verifyErr) {
         console.error('Verification email error:', verifyErr)
       }

@@ -5,7 +5,7 @@ import { verifyToken, getTokenFromHeader } from '@/lib/auth'
 function isAuthorized(request: NextRequest): boolean {
   // Check x-cron-secret header
   const cronSecret = request.headers.get('x-cron-secret')
-  if (cronSecret && cronSecret === process.env.CRON_SECRET) {
+  if (cronSecret && process.env.CRON_SECRET && cronSecret === process.env.CRON_SECRET) {
     return true
   }
 
@@ -39,9 +39,14 @@ export async function POST(request: NextRequest) {
       include: { listing: true },
     })
 
-    // Cancel each and restore listing capacity
+    // Cancel each and restore listing capacity (idempotent — skip if already cancelled)
     for (const booking of expiredBookings) {
       await prisma.$transaction(async (tx) => {
+        // Re-check status inside transaction to prevent double-processing
+        // (the booking creation transaction also expires stale checkouts)
+        const current = await tx.booking.findUnique({ where: { id: booking.id }, select: { status: true } })
+        if (!current || current.status !== 'PENDING') return
+
         await tx.booking.update({
           where: { id: booking.id },
           data: { status: 'CANCELLED' },
@@ -74,7 +79,7 @@ export async function POST(request: NextRequest) {
             data: { status: 'ACTIVE' },
           })
         }
-      })
+      }, { isolationLevel: 'Serializable' })
     }
 
     return NextResponse.json({ expired: expiredBookings.length })

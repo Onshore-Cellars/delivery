@@ -96,11 +96,11 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
           })
         }
 
-        // Reopen listing if it was FULL
-        await tx.listing.update({
+        // Reopen listing if it was FULL (ignore "not found" when listing isn't FULL)
+        await tx.listing.updateMany({
           where: { id: booking.listingId, status: 'FULL' },
           data: { status: 'ACTIVE' },
-        }).catch(() => {}) // ignore if not FULL
+        })
 
         return b
       })

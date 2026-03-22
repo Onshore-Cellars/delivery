@@ -327,7 +327,14 @@ export async function POST(request: NextRequest) {
 
     const listingType = rawListingType === 'SPACE_NEEDED' ? 'SPACE_NEEDED' : 'SPACE_AVAILABLE'
 
-    const creator = await prisma.user.findUnique({ where: { id: decoded.userId }, select: { canCarry: true, canShip: true } })
+    const creator = await prisma.user.findUnique({ where: { id: decoded.userId }, select: { canCarry: true, canShip: true, verified: true, suspended: true } })
+
+    if (creator?.suspended) {
+      return NextResponse.json({ error: 'Your account is suspended' }, { status: 403 })
+    }
+    if (!creator?.verified) {
+      return NextResponse.json({ error: 'Please verify your email before creating a listing' }, { status: 403 })
+    }
 
     if (listingType === 'SPACE_NEEDED') {
       if (!creator?.canShip && decoded.role !== 'ADMIN') {

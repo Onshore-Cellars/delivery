@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyToken, getTokenFromHeader } from '@/lib/auth'
 import { recommendConsolidation } from '@/lib/ai'
+import { aiLimiter, getClientIP } from '@/lib/rate-limit'
 
 export async function POST(request: NextRequest) {
   try {
+    const ip = getClientIP(request)
+    const rl = await aiLimiter.check(ip)
+    if (!rl.success) {
+      return NextResponse.json({ error: 'Too many AI requests. Please wait a moment.' }, { status: 429 })
+    }
     const token = getTokenFromHeader(request.headers.get('authorization'))
     if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     const decoded = verifyToken(token)

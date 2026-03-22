@@ -10,6 +10,7 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
   const { user, token, logout } = useAuth()
   const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false)
   const [unreadNotifs, setUnreadNotifs] = useState(0)
   const [unreadMessages, setUnreadMessages] = useState(0)
   const [scrolled, setScrolled] = useState(false)
@@ -140,6 +141,37 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
                       Admin
                     </Link>
                   )}
+
+                  {/* More dropdown */}
+                  <div className="relative">
+                    <button
+                      onClick={() => setMoreMenuOpen(!moreMenuOpen)}
+                      onBlur={() => setTimeout(() => setMoreMenuOpen(false), 150)}
+                      className={`px-3 py-2 rounded text-xs font-medium uppercase tracking-wider transition-colors ${
+                        moreMenuOpen || ['/analytics','/insurance','/disputes','/earnings','/vehicles','/quotes','/reviews'].includes(pathname)
+                          ? isTransparentMode ? 'bg-white/20 text-white' : 'bg-slate-100 text-[#1a1a1a]'
+                          : isTransparentMode ? 'text-white/70 hover:text-white hover:bg-white/10' : 'text-slate-600 hover:text-[#1a1a1a] hover:bg-slate-50'
+                      }`}
+                      aria-label="More pages"
+                    >
+                      More
+                      <svg className="w-3 h-3 ml-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                    </button>
+                    {moreMenuOpen && (
+                      <div className="absolute top-full right-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-slate-200 py-1 z-50">
+                        <Link href="/quotes" className="block px-4 py-2.5 text-sm text-[#1a1a1a] hover:bg-slate-50 hover:no-underline">Quotes</Link>
+                        <Link href="/analytics" className="block px-4 py-2.5 text-sm text-[#1a1a1a] hover:bg-slate-50 hover:no-underline">Analytics</Link>
+                        <Link href="/insurance" className="block px-4 py-2.5 text-sm text-[#1a1a1a] hover:bg-slate-50 hover:no-underline">Insurance</Link>
+                        <Link href="/disputes" className="block px-4 py-2.5 text-sm text-[#1a1a1a] hover:bg-slate-50 hover:no-underline">Disputes</Link>
+                        {user.canCarry && (
+                          <>
+                            <Link href="/earnings" className="block px-4 py-2.5 text-sm text-[#1a1a1a] hover:bg-slate-50 hover:no-underline">Earnings</Link>
+                            <Link href="/vehicles" className="block px-4 py-2.5 text-sm text-[#1a1a1a] hover:bg-slate-50 hover:no-underline">My Vehicles</Link>
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </div>
 
                   <div className={`w-px h-6 mx-2 ${isTransparentMode ? 'bg-white/20' : 'bg-slate-200'}`} />
 
@@ -325,6 +357,10 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
                     </Link>
                     </>
                   )}
+                  <Link href="/disputes" onClick={close} className={`flex items-center gap-3.5 px-4 py-3.5 rounded text-[15px] font-medium transition-colors hover:no-underline ${isActive('/disputes') ? 'bg-amber-50 text-[#C6904D]' : 'text-[#1a1a1a] hover:bg-slate-50'}`}>
+                    <svg className={`w-5 h-5 ${isActive('/disputes') ? 'text-[#C6904D]' : 'text-slate-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" /></svg>
+                    Disputes
+                  </Link>
                   <Link href="/analytics" onClick={close} className={`flex items-center gap-3.5 px-4 py-3.5 rounded text-[15px] font-medium transition-colors hover:no-underline ${isActive('/analytics') ? 'bg-amber-50 text-[#C6904D]' : 'text-[#1a1a1a] hover:bg-slate-50'}`}>
                     <svg className={`w-5 h-5 ${isActive('/analytics') ? 'text-[#C6904D]' : 'text-slate-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
                     Analytics

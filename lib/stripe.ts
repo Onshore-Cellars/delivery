@@ -17,7 +17,7 @@ function createStripeClient(): Stripe {
     })
   }
   return new Stripe(key, {
-    apiVersion: '2025-09-30.clover' as Stripe.LatestApiVersion,
+    apiVersion: '2025-03-31.basil' as Stripe.LatestApiVersion,
   })
 }
 
@@ -82,6 +82,8 @@ export async function createCheckoutSession(params: {
     mode: 'payment',
     success_url: params.successUrl,
     cancel_url: params.cancelUrl,
+    // Expire the Stripe session after 30 minutes to match local checkoutExpiresAt
+    expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
     metadata: {
       bookingId: params.bookingId,
     },
@@ -165,9 +167,10 @@ export function constructWebhookEvent(payload: string, signature: string): Strip
 }
 
 export function calculatePlatformFee(amount: number): number {
-  return amount * (PLATFORM_FEE_PERCENT / 100)
+  return Math.round(amount * (PLATFORM_FEE_PERCENT / 100) * 100) / 100
 }
 
 export function calculateCarrierPayout(amount: number): number {
-  return amount * (1 - PLATFORM_FEE_PERCENT / 100)
+  const fee = calculatePlatformFee(amount)
+  return Math.round((amount - fee) * 100) / 100
 }

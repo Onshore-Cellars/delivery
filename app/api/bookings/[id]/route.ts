@@ -32,6 +32,20 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ error: 'Not authorized' }, { status: 403 })
     }
 
+    // Redact contact details for unconfirmed bookings to prevent circumventing platform
+    const isPaid = ['PAID', 'PROCESSING'].includes(booking.paymentStatus)
+    const isConfirmedOrBeyond = !['PENDING', 'ACCEPTED', 'REJECTED', 'CANCELLED'].includes(booking.status)
+    if (!isPaid && !isConfirmedOrBeyond && !isAdmin) {
+      if (isShipper && booking.listing.carrier) {
+        booking.listing.carrier.phone = ''
+        booking.listing.carrier.email = ''
+      }
+      if (isCarrier) {
+        booking.shipper.phone = ''
+        booking.shipper.email = ''
+      }
+    }
+
     return NextResponse.json({ booking })
   } catch (error) {
     console.error('Booking fetch error:', error)

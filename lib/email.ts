@@ -1,6 +1,7 @@
 // Email utility — supports SMTP (nodemailer) and Resend API
 
 import nodemailer from 'nodemailer'
+import { sanitizeHtml } from './sanitize'
 
 interface EmailOptions {
   to: string
@@ -117,6 +118,17 @@ function wrapEmail(content: string): string {
 </html>`
 }
 
+// Sanitize all string values in a template data object to prevent HTML injection
+function safeData<T extends Record<string, unknown>>(data: T): T {
+  const result = { ...data }
+  for (const key of Object.keys(result)) {
+    if (typeof result[key] === 'string') {
+      (result as Record<string, unknown>)[key] = sanitizeHtml(result[key] as string)
+    }
+  }
+  return result
+}
+
 // ─── TEMPLATES ────────────────────────────────────────────────────────────────
 
 export function bookingConfirmationEmail(data: {
@@ -128,6 +140,7 @@ export function bookingConfirmationEmail(data: {
   cargoDescription: string
   totalPrice: string
 }): EmailTemplate {
+  data = safeData(data)
   const html = wrapEmail(`
     <h2 style="color:#0f1628;font-size:24px;margin:0 0 16px;">Booking Confirmed!</h2>
     <p style="color:#475569;font-size:16px;line-height:1.6;">
@@ -191,6 +204,7 @@ export function statusUpdateEmail(data: {
     CANCELLED: '#ef4444',
   }
 
+  data = safeData(data)
   const color = statusColors[data.status] || '#3b82f6'
 
   const html = wrapEmail(`
@@ -225,6 +239,7 @@ export function newMessageEmail(data: {
   senderName: string
   preview: string
 }): EmailTemplate {
+  data = safeData(data)
   const html = wrapEmail(`
     <h2 style="color:#0f1628;font-size:24px;margin:0 0 16px;">New Message</h2>
     <p style="color:#475569;font-size:16px;line-height:1.6;">
@@ -253,6 +268,7 @@ export function bidReceivedEmail(data: {
   weightKg: number
   volumeM3: number
 }): EmailTemplate {
+  data = safeData(data)
   const html = wrapEmail(`
     <h2 style="color:#0f1628;font-size:24px;margin:0 0 16px;">New Bid Received</h2>
     <p style="color:#475569;font-size:16px;line-height:1.6;">
@@ -285,6 +301,7 @@ export function deliveryConfirmationEmail(data: {
   hasSignature: boolean
   hasPhoto: boolean
 }): EmailTemplate {
+  data = safeData(data)
   const html = wrapEmail(`
     <h2 style="color:#0f1628;font-size:24px;margin:0 0 16px;">Delivery Confirmed!</h2>
     <p style="color:#475569;font-size:16px;line-height:1.6;">
@@ -331,6 +348,7 @@ export function paymentReceiptEmail(data: {
   paidAt: string
   invoiceUrl: string
 }): EmailTemplate {
+  data = safeData(data)
   const html = wrapEmail(`
     <h2 style="color:#0f1628;font-size:24px;margin:0 0 16px;">Payment Receipt</h2>
     <p style="color:#475569;font-size:16px;line-height:1.6;">
@@ -376,6 +394,7 @@ export function carrierPayoutEmail(data: {
   platformFee: string
   deliveredAt: string
 }): EmailTemplate {
+  data = safeData(data)
   const html = wrapEmail(`
     <h2 style="color:#0f1628;font-size:24px;margin:0 0 16px;">Payout Processed</h2>
     <p style="color:#475569;font-size:16px;line-height:1.6;">
@@ -410,6 +429,7 @@ export function carrierPayoutEmail(data: {
 }
 
 export function welcomeEmail(data: { name: string; role: string }): EmailTemplate {
+  data = safeData(data)
   const html = wrapEmail(`
     <h2 style="color:#0f1628;font-size:24px;margin:0 0 16px;">Welcome to Onshore Deliver!</h2>
     <p style="color:#475569;font-size:16px;line-height:1.6;">
@@ -451,6 +471,7 @@ export function documentStatusEmail(data: {
   status: 'VERIFIED' | 'REJECTED'
   reviewNotes?: string
 }): EmailTemplate {
+  data = safeData(data)
   const isVerified = data.status === 'VERIFIED'
   const html = wrapEmail(`
     <h2 style="color:#0f1628;font-size:24px;margin:0 0 16px;">Document ${isVerified ? 'Verified' : 'Requires Attention'}</h2>
@@ -488,6 +509,7 @@ export function quoteRequestEmail(data: {
   cargoDescription: string
   weightKg: number
 }): EmailTemplate {
+  data = safeData(data)
   const html = wrapEmail(`
     <h2 style="color:#0f1628;font-size:24px;margin:0 0 16px;">Quote Requested</h2>
     <p style="color:#475569;font-size:16px;line-height:1.6;">
@@ -511,6 +533,7 @@ export function quoteRequestEmail(data: {
 }
 
 export function passwordResetEmail(data: { name: string; resetLink: string }): EmailTemplate {
+  data = safeData(data)
   const html = wrapEmail(`
     <h2 style="color:#0f1628;font-size:24px;margin:0 0 16px;">Reset Your Password</h2>
     <p style="color:#475569;font-size:16px;line-height:1.6;">
@@ -537,6 +560,7 @@ export function alertMatchEmail(data: {
   listingId: string
   alertName: string | null
 }): EmailTemplate {
+  data = safeData(data)
   const APP_URL_RESOLVED = process.env.NEXTAUTH_URL || 'http://localhost:3000'
   const html = wrapEmail(`
     <h2 style="color:#0f1628;font-size:24px;margin:0 0 16px;">New Listing Match${data.alertName ? `: ${data.alertName}` : ''}</h2>
@@ -562,6 +586,7 @@ export function alertMatchEmail(data: {
 }
 
 export function emailVerificationEmail(data: { name: string; verifyLink: string }): EmailTemplate {
+  data = safeData(data)
   const html = wrapEmail(`
     <h2 style="color:#0f1628;font-size:24px;margin:0 0 16px;">Verify Your Email</h2>
     <p style="color:#475569;font-size:16px;line-height:1.6;">

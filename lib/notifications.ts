@@ -1,5 +1,6 @@
 import prisma from './prisma'
 import { sendEmail, bookingConfirmationEmail, statusUpdateEmail, newMessageEmail, bidReceivedEmail, alertMatchEmail } from './email'
+import { queueEmail } from './email-queue'
 import { NotificationType } from '@prisma/client'
 import { sendSMSNotification, formatSMSUpdate } from './sms'
 import { generateAlertEmail } from './ai'
@@ -38,7 +39,7 @@ export async function createNotification(params: CreateNotificationParams) {
         })
 
         if (user?.emailNotifications) {
-          await sendEmail({
+          await queueEmail({
             to: user.email,
             subject: title,
             html: `<p>Hi ${user.name},</p><p>${message}</p>`,
@@ -128,7 +129,7 @@ export async function notifyBookingCreated(booking: {
       cargoDescription: booking.cargoDescription,
       totalPrice: priceStr,
     })
-    await sendEmail({ to: booking.shipper.email, ...template })
+    await queueEmail({ to: booking.shipper.email, ...template })
   }
 
   // Notify carrier with collection & delivery details
@@ -184,7 +185,7 @@ export async function notifyStatusUpdate(data: {
       description: data.description,
       location: data.location,
     })
-    await sendEmail({ to: booking.shipper.email, ...template })
+    await queueEmail({ to: booking.shipper.email, ...template })
   }
 
   // Send SMS for status updates (free)
@@ -229,7 +230,7 @@ export async function notifyNewMessage(data: {
       senderName: sender.name,
       preview: data.preview.slice(0, 200),
     })
-    await sendEmail({ to: recipient.email, ...template })
+    await queueEmail({ to: recipient.email, ...template })
   }
 }
 
@@ -270,7 +271,7 @@ export async function notifyBidReceived(data: {
       weightKg: data.weightKg,
       volumeM3: data.volumeM3,
     })
-    await sendEmail({ to: carrier.email, ...template })
+    await queueEmail({ to: carrier.email, ...template })
   }
 }
 
@@ -399,7 +400,7 @@ export async function triggerListingAlerts(listing: {
               listingId: listing.id,
               alertName: alert.name,
             })
-            await sendEmail({ to: alert.user.email, ...template })
+            await queueEmail({ to: alert.user.email, ...template })
           }
         } catch (emailErr) {
           console.error(`Failed to send alert email to ${alert.user.email}:`, emailErr)

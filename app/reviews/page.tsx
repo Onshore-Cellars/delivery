@@ -96,6 +96,8 @@ export default function ReviewsPage() {
   const [average, setAverage] = useState(0)
   const [count, setCount] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [aiSummary, setAiSummary] = useState<{ summary: string; strengths: string[]; improvements: string[]; themes: string[] } | null>(null)
+  const [loadingSummary, setLoadingSummary] = useState(false)
   const [respondingTo, setRespondingTo] = useState<string | null>(null)
   const [responseText, setResponseText] = useState('')
   const [submittingResponse, setSubmittingResponse] = useState(false)
@@ -341,6 +343,51 @@ export default function ReviewsPage() {
             )}
           </div>
         </div>
+
+        {/* AI Review Summary */}
+        {aboutMeReviews.length >= 3 && (
+          <div className="bg-gradient-to-br from-[#C6904D]/5 to-transparent rounded-xl border border-[#C6904D]/20 p-6 sm:p-8 mb-6">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-base font-semibold text-[#1a1a1a]">AI Review Summary</h2>
+              <button
+                onClick={async () => {
+                  if (!token || !user) return
+                  setLoadingSummary(true)
+                  try {
+                    const res = await fetch(`/api/ai/review-summary?userId=${user.id}`, {
+                      headers: { Authorization: `Bearer ${token}` },
+                    })
+                    if (res.ok) setAiSummary(await res.json())
+                  } catch { /* ignore */ }
+                  finally { setLoadingSummary(false) }
+                }}
+                disabled={loadingSummary}
+                className="px-4 py-2 bg-[#C6904D] text-white rounded-lg text-xs font-semibold hover:bg-[#b07d3f] disabled:opacity-50 transition-colors"
+              >
+                {loadingSummary ? 'Analysing...' : aiSummary ? 'Refresh' : 'Generate Summary'}
+              </button>
+            </div>
+            {aiSummary ? (
+              <div className="space-y-3 text-sm">
+                <p className="text-slate-600">{aiSummary.summary}</p>
+                {aiSummary.strengths?.length > 0 && (
+                  <div>
+                    <span className="text-xs font-semibold text-green-700">Strengths:</span>
+                    <ul className="mt-1 space-y-0.5">{aiSummary.strengths.map((s, i) => <li key={i} className="text-xs text-slate-500 flex items-start gap-1"><span className="text-green-500">+</span>{s}</li>)}</ul>
+                  </div>
+                )}
+                {aiSummary.improvements?.length > 0 && (
+                  <div>
+                    <span className="text-xs font-semibold text-amber-700">Areas for improvement:</span>
+                    <ul className="mt-1 space-y-0.5">{aiSummary.improvements.map((s, i) => <li key={i} className="text-xs text-slate-500 flex items-start gap-1"><span className="text-amber-500">-</span>{s}</li>)}</ul>
+                  </div>
+                )}
+              </div>
+            ) : !loadingSummary ? (
+              <p className="text-xs text-slate-500">Get an AI-powered analysis of your review themes, strengths, and areas for improvement.</p>
+            ) : null}
+          </div>
+        )}
 
         {/* Write New Review Form */}
         {showNewReview && (

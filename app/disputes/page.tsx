@@ -42,6 +42,33 @@ export default function DisputesPage() {
   const [error, setError] = useState('')
   const [showCreate, setShowCreate] = useState(false)
   const [creating, setCreating] = useState(false)
+  const [assessingId, setAssessingId] = useState<string | null>(null)
+  const [assessments, setAssessments] = useState<Record<string, { recommendation: string; reasoning: string; suggestedResolution: string; fairnessScore: number }>>({})
+
+  const assessDispute = async (d: Dispute) => {
+    if (!token || user?.role !== 'ADMIN') return
+    setAssessingId(d.id)
+    try {
+      const res = await fetch('/api/ai/dispute-assessment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          disputeType: d.type,
+          description: d.description,
+          claimAmount: d.claimAmount,
+          bookingTotal: d.booking.totalPrice,
+          cargoDescription: d.booking.cargoDescription,
+          trackingEvents: [],
+          messages: [],
+        }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setAssessments(prev => ({ ...prev, [d.id]: data }))
+      }
+    } catch { /* ignore */ }
+    finally { setAssessingId(null) }
+  }
   const [createForm, setCreateForm] = useState({ bookingId: '', type: 'DAMAGE', description: '', claimAmount: '' })
 
   const fetchDisputes = useCallback(async () => {
@@ -60,6 +87,7 @@ export default function DisputesPage() {
 
   const handleCreate = async () => {
     if (!createForm.bookingId || !createForm.description) { setError('Booking ID and description are required'); return }
+    if (createForm.claimAmount && parseFloat(createForm.claimAmount) < 0) { setError('Claim amount cannot be negative'); return }
     setCreating(true)
     try {
       const res = await fetch('/api/disputes', {
@@ -161,6 +189,31 @@ export default function DisputesPage() {
                   <span>Raised by: {d.raisedBy.name}{d.raisedBy.id === user?.id ? ' (you)' : ''}</span>
                   <span>Against: {d.against.name}{d.against.id === user?.id ? ' (you)' : ''}</span>
                 </div>
+
+                {/* AI Assessment (admin only) */}
+                {user?.role === 'ADMIN' && (
+                  <div className="mt-3 pt-3 border-t border-[#e8e4de]">
+                    {assessments[d.id] ? (
+                      <div className="bg-[#faf9f7] rounded p-3 text-xs space-y-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="font-semibold text-[#1a1a1a]">AI Assessment</span>
+                          <span className="px-2 py-0.5 rounded-full bg-[#C6904D]/10 text-[#C6904D] font-medium">Fairness: {assessments[d.id].fairnessScore}/10</span>
+                        </div>
+                        <p className="text-slate-600"><strong>Recommendation:</strong> {assessments[d.id].recommendation}</p>
+                        <p className="text-slate-500">{assessments[d.id].reasoning}</p>
+                        <p className="text-slate-600"><strong>Suggested Resolution:</strong> {assessments[d.id].suggestedResolution}</p>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => assessDispute(d)}
+                        disabled={assessingId === d.id}
+                        className="px-3 py-1.5 bg-[#C6904D] text-white rounded text-xs font-medium hover:bg-[#b07d3f] disabled:opacity-50 transition-colors"
+                      >
+                        {assessingId === d.id ? 'Assessing...' : 'AI Assess'}
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
             ))}
           </div>

@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
   try {
     // Rate limit checkout
     const ip = getClientIP(request)
-    const rl = checkoutLimiter.check(ip)
+    const rl = await checkoutLimiter.check(ip)
     if (!rl.success) {
       return NextResponse.json({ error: 'Too many checkout attempts. Please try again later.' }, { status: 429 })
     }
@@ -56,6 +56,11 @@ export async function POST(request: NextRequest) {
 
     if (['CANCELLED', 'DISPUTED'].includes(booking.status)) {
       return NextResponse.json({ error: 'Cannot pay for a cancelled or disputed booking' }, { status: 400 })
+    }
+
+    // Enforce checkout expiry — prevent payment for expired bookings
+    if (booking.checkoutExpiresAt && new Date(booking.checkoutExpiresAt) < new Date()) {
+      return NextResponse.json({ error: 'This booking has expired. Please create a new booking.' }, { status: 400 })
     }
 
     const appUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'

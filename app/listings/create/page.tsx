@@ -142,7 +142,7 @@ export default function CreateListingPage() {
       ].filter(Boolean)
       const res = await fetch('/api/ai/listing-description', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         body: JSON.stringify({
           origin: form.originPort,
           destination: form.destinationPort,
@@ -159,8 +159,8 @@ export default function CreateListingPage() {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed to generate description')
       setForm(prev => ({ ...prev, description: data.description }))
-    } catch {
-      // silently fail – user can still type manually
+    } catch (err) {
+      console.error('AI description generation failed:', err)
     } finally {
       setGeneratingDescription(false)
     }
