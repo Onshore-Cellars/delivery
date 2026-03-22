@@ -84,6 +84,40 @@ export function getPackagingById(id: string): PackagingType | undefined {
   return packagingTypes.find(p => p.id === id)
 }
 
+// ─── PACKAGE DEFS (for quote/booking forms) ─────────────────────────────────
+// Single source of truth for package type defaults used across pages
+
+export interface PackageDef {
+  value: string
+  label: string
+  defaultL: number
+  defaultW: number
+  defaultH: number
+  defaultKg: number
+  isPallet: boolean
+}
+
+export const PACKAGE_DEFS: PackageDef[] = [
+  { value: 'pallet',         label: 'Full Pallet (UK)',     defaultL: 120, defaultW: 100, defaultH: 150, defaultKg: 600, isPallet: true },
+  { value: 'half-pallet',    label: 'Half Euro Pallet',     defaultL: 80,  defaultW: 60,  defaultH: 150, defaultKg: 300, isPallet: true },
+  { value: 'quarter-pallet', label: 'Quarter Pallet',       defaultL: 60,  defaultW: 40,  defaultH: 150, defaultKg: 150, isPallet: true },
+  { value: 'euro-pallet',    label: 'Euro Pallet (EUR 1)',  defaultL: 120, defaultW: 80,  defaultH: 150, defaultKg: 500, isPallet: true },
+  { value: 'industrial-pallet', label: 'Industrial Pallet', defaultL: 120, defaultW: 120, defaultH: 150, defaultKg: 800, isPallet: true },
+  { value: 'box',            label: 'Box / Carton',         defaultL: 60,  defaultW: 40,  defaultH: 40,  defaultKg: 25,  isPallet: false },
+  { value: 'box-small',      label: 'Small Box',            defaultL: 30,  defaultW: 30,  defaultH: 30,  defaultKg: 5,   isPallet: false },
+  { value: 'box-medium',     label: 'Medium Box',           defaultL: 50,  defaultW: 40,  defaultH: 40,  defaultKg: 15,  isPallet: false },
+  { value: 'crate',          label: 'Crate',                defaultL: 100, defaultW: 60,  defaultH: 60,  defaultKg: 80,  isPallet: false },
+  { value: 'wine-case',      label: 'Wine Case (12 btl)',   defaultL: 50,  defaultW: 33,  defaultH: 18,  defaultKg: 18,  isPallet: false },
+  { value: 'drum',           label: 'Barrel / Drum',        defaultL: 60,  defaultW: 60,  defaultH: 90,  defaultKg: 200, isPallet: false },
+  { value: 'loose',          label: 'Loose Item',           defaultL: 0,   defaultW: 0,   defaultH: 0,   defaultKg: 0,   isPallet: false },
+  { value: 'oversized',      label: 'Oversized / Custom',   defaultL: 0,   defaultW: 0,   defaultH: 0,   defaultKg: 0,   isPallet: false },
+]
+
+export function calcCubicMetres(l: number, w: number, h: number): number {
+  if (!l || !w || !h) return 0
+  return Math.round(((l / 100) * (w / 100) * (h / 100)) * 10000) / 10000
+}
+
 export const vehicleSpecs: VehicleSpec[] = [
   // ─── SMALL VANS ────────────────────────────────────────────────────────────
   { make: 'Ford', model: 'Transit Connect L1', type: 'Small Van', maxPayloadKg: 625, cargoVolumeM3: 2.9, cargoLengthCm: 180, cargoWidthCm: 155, cargoHeightCm: 120, fuelType: 'Diesel' },

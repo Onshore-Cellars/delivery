@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '../components/AuthProvider'
 import PortAutocomplete, { type AddressData } from '../components/PortAutocomplete'
+import { PACKAGE_DEFS, calcCubicMetres } from '@/lib/vehicles'
 
 interface PackageItem {
   id: string
@@ -55,18 +56,7 @@ interface RespondForm {
   responseMessage: string
 }
 
-const PACKAGE_TYPES = [
-  { value: 'pallet', label: 'Full Pallet', defaultW: 120, defaultD: 80, defaultH: 150, defaultKg: 300 },
-  { value: 'half-pallet', label: 'Half Pallet', defaultW: 80, defaultD: 60, defaultH: 100, defaultKg: 150 },
-  { value: 'quarter-pallet', label: 'Quarter Pallet', defaultW: 60, defaultD: 40, defaultH: 80, defaultKg: 75 },
-  { value: 'euro-pallet', label: 'Euro Pallet (EUR)', defaultW: 120, defaultD: 80, defaultH: 144, defaultKg: 500 },
-  { value: 'box', label: 'Box / Carton', defaultW: 60, defaultD: 40, defaultH: 40, defaultKg: 25 },
-  { value: 'crate', label: 'Crate', defaultW: 100, defaultD: 60, defaultH: 60, defaultKg: 80 },
-  { value: 'wine-case', label: 'Wine Case (12 btl)', defaultW: 50, defaultD: 34, defaultH: 18, defaultKg: 18 },
-  { value: 'drum', label: 'Barrel / Drum', defaultW: 60, defaultD: 60, defaultH: 90, defaultKg: 200 },
-  { value: 'loose', label: 'Loose Item', defaultW: 0, defaultD: 0, defaultH: 0, defaultKg: 0 },
-  { value: 'oversized', label: 'Oversized / Custom', defaultW: 0, defaultD: 0, defaultH: 0, defaultKg: 0 },
-]
+const PACKAGE_TYPES = PACKAGE_DEFS
 
 function generateId() {
   return Math.random().toString(36).substring(2, 9)
@@ -158,7 +148,7 @@ export default function QuotesPage() {
       type: def.value,
       quantity: 1,
       weightKg: def.defaultKg,
-      lengthCm: def.defaultD,
+      lengthCm: def.defaultL,
       widthCm: def.defaultW,
       heightCm: def.defaultH,
       description: '',
@@ -170,7 +160,7 @@ export default function QuotesPage() {
       if (p.id !== id) return p
       if (field === 'type') {
         const def = PACKAGE_TYPES.find(t => t.value === value)
-        if (def) return { ...p, type: String(value), weightKg: def.defaultKg, lengthCm: def.defaultD, widthCm: def.defaultW, heightCm: def.defaultH }
+        if (def) return { ...p, type: String(value), weightKg: def.defaultKg, lengthCm: def.defaultL, widthCm: def.defaultW, heightCm: def.defaultH }
       }
       return { ...p, [field]: value }
     }))
@@ -403,22 +393,19 @@ export default function QuotesPage() {
                         <label className="block text-[10px] text-slate-500 mb-0.5">Wt (kg)</label>
                         <input type="number" min="0" step="0.1" className="w-full px-2 py-1.5 rounded border border-slate-200 text-xs" value={pkg.weightKg} onChange={e => updatePackage(pkg.id, 'weightKg', parseFloat(e.target.value) || 0)} />
                       </div>
-                      {(typeInfo?.defaultW === 0 || pkg.type === 'loose' || pkg.type === 'oversized') && (
-                        <>
-                          <div className="w-16">
-                            <label className="block text-[10px] text-slate-500 mb-0.5">L cm</label>
-                            <input type="number" min="0" className="w-full px-2 py-1.5 rounded border border-slate-200 text-xs" value={pkg.lengthCm} onChange={e => updatePackage(pkg.id, 'lengthCm', parseInt(e.target.value) || 0)} />
-                          </div>
-                          <div className="w-16">
-                            <label className="block text-[10px] text-slate-500 mb-0.5">W cm</label>
-                            <input type="number" min="0" className="w-full px-2 py-1.5 rounded border border-slate-200 text-xs" value={pkg.widthCm} onChange={e => updatePackage(pkg.id, 'widthCm', parseInt(e.target.value) || 0)} />
-                          </div>
-                          <div className="w-16">
-                            <label className="block text-[10px] text-slate-500 mb-0.5">H cm</label>
-                            <input type="number" min="0" className="w-full px-2 py-1.5 rounded border border-slate-200 text-xs" value={pkg.heightCm} onChange={e => updatePackage(pkg.id, 'heightCm', parseInt(e.target.value) || 0)} />
-                          </div>
-                        </>
-                      )}
+                      {/* Dimensions — always shown; L/W locked for pallets */}
+                      <div className="w-16">
+                        <label className="block text-[10px] text-slate-500 mb-0.5">L cm{typeInfo?.isPallet ? '' : ''}</label>
+                        <input type="number" min="1" max="2400" disabled={typeInfo?.isPallet} className={"w-full px-2 py-1.5 rounded border text-xs" + (typeInfo?.isPallet ? ' bg-slate-100 text-slate-500 border-slate-200 cursor-not-allowed' : ' border-slate-200')} value={pkg.lengthCm} onChange={e => updatePackage(pkg.id, 'lengthCm', parseInt(e.target.value) || 0)} />
+                      </div>
+                      <div className="w-16">
+                        <label className="block text-[10px] text-slate-500 mb-0.5">W cm</label>
+                        <input type="number" min="1" max="2400" disabled={typeInfo?.isPallet} className={"w-full px-2 py-1.5 rounded border text-xs" + (typeInfo?.isPallet ? ' bg-slate-100 text-slate-500 border-slate-200 cursor-not-allowed' : ' border-slate-200')} value={pkg.widthCm} onChange={e => updatePackage(pkg.id, 'widthCm', parseInt(e.target.value) || 0)} />
+                      </div>
+                      <div className="w-16">
+                        <label className="block text-[10px] text-slate-500 mb-0.5">H cm{typeInfo?.isPallet ? ' ✎' : ''}</label>
+                        <input type="number" min="1" max="2400" className="w-full px-2 py-1.5 rounded border border-slate-200 text-xs" value={pkg.heightCm} onChange={e => updatePackage(pkg.id, 'heightCm', parseInt(e.target.value) || 0)} />
+                      </div>
                       <div className="flex-1 min-w-[100px]">
                         <label className="block text-[10px] text-slate-500 mb-0.5">Note</label>
                         <input type="text" className="w-full px-2 py-1.5 rounded border border-slate-200 text-xs" placeholder="Optional" value={pkg.description} onChange={e => updatePackage(pkg.id, 'description', e.target.value)} />
@@ -426,6 +413,17 @@ export default function QuotesPage() {
                       <button type="button" onClick={() => removePackage(pkg.id)} className="p-1.5 text-slate-400 hover:text-red-500 transition-colors">
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                       </button>
+                      {/* Per-item CBM */}
+                      {pkg.lengthCm > 0 && pkg.widthCm > 0 && pkg.heightCm > 0 && (
+                        <div className="w-full">
+                          <p className="text-[10px] text-slate-400 mt-0.5">
+                            {calcCubicMetres(pkg.lengthCm, pkg.widthCm, pkg.heightCm)} m³/unit
+                            {pkg.quantity > 1 && (
+                              <> · <strong className="text-[#C6904D]">{(calcCubicMetres(pkg.lengthCm, pkg.widthCm, pkg.heightCm) * pkg.quantity).toFixed(4)} m³ total</strong></>
+                            )}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   )
                 })}
