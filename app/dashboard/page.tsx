@@ -222,7 +222,7 @@ export default function DashboardPage() {
                       <StatCard label="Revenue" value={formatCurrency(bookings.reduce((sum, b) => sum + b.totalPrice, 0))} />
                       <StatCard label="Fill Rate" value={
                         listings.length > 0
-                          ? `${Math.round(listings.reduce((sum, l) => sum + ((l.totalCapacityKg - l.availableKg) / l.totalCapacityKg * 100), 0) / listings.length)}%`
+                          ? `${Math.round(listings.reduce((sum, l) => sum + (l.totalCapacityKg > 0 ? ((l.totalCapacityKg - l.availableKg) / l.totalCapacityKg * 100) : 0), 0) / listings.length)}%`
                           : '0%'
                       } />
                     </>

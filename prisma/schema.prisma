@@ -424,6 +424,8 @@ model Booking {
   insurancePremium  Float?            // Premium paid
   insuredValue      Float?            // Declared value for insurance
 
+  adminNotes        String?           // Internal admin notes
+
   @@index([listingId])
   @@index([shipperId])
   @@index([status])

@@ -259,8 +259,11 @@ export async function POST(request: NextRequest) {
         if (listing.routeDirection === 'OUTBOUND') {
           throw new Error('VALIDATION:This listing does not offer return leg capacity')
         }
-        const returnKg = listing.returnAvailableKg ?? 0
-        const returnM3 = listing.returnAvailableM3 ?? 0
+        const returnKg = listing.returnAvailableKg
+        const returnM3 = listing.returnAvailableM3
+        if (returnKg == null || returnM3 == null) {
+          throw new Error('VALIDATION:This listing has no return leg capacity configured')
+        }
         if (weight > returnKg || volume > returnM3) {
           throw new Error('VALIDATION:Requested capacity exceeds available return leg space')
         }

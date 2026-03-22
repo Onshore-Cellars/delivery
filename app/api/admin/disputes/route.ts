@@ -133,6 +133,9 @@ export async function PATCH(request: NextRequest) {
 
     // If refundAmount is provided and status is RESOLVED, trigger a refund
     if (refundAmount && refundAmount > 0 && status === 'RESOLVED') {
+      if (refundAmount > dispute.booking.totalPrice) {
+        return NextResponse.json({ error: 'Refund amount cannot exceed booking total' }, { status: 400 })
+      }
       // Update the booking payment status to REFUNDED
       await prisma.booking.update({
         where: { id: dispute.bookingId },

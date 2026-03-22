@@ -148,7 +148,7 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
                       onClick={() => setMoreMenuOpen(!moreMenuOpen)}
                       onBlur={() => setTimeout(() => setMoreMenuOpen(false), 150)}
                       className={`px-3 py-2 rounded text-xs font-medium uppercase tracking-wider transition-colors ${
-                        moreMenuOpen || ['/analytics','/insurance','/disputes','/earnings','/vehicles','/quotes'].includes(pathname)
+                        moreMenuOpen || ['/analytics','/insurance','/disputes','/earnings','/vehicles','/quotes','/reviews'].includes(pathname)
                           ? isTransparentMode ? 'bg-white/20 text-white' : 'bg-slate-100 text-[#1a1a1a]'
                           : isTransparentMode ? 'text-white/70 hover:text-white hover:bg-white/10' : 'text-slate-600 hover:text-[#1a1a1a] hover:bg-slate-50'
                       }`}

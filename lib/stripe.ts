@@ -17,7 +17,7 @@ function createStripeClient(): Stripe {
     })
   }
   return new Stripe(key, {
-    apiVersion: '2025-09-30.clover' as Stripe.LatestApiVersion,
+    apiVersion: '2025-03-31.basil' as Stripe.LatestApiVersion,
   })
 }
 

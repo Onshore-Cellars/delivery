@@ -71,7 +71,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const updatedBooking = await prisma.booking.update({
       where: { id },
       data: {
-        paymentStatus: isPartial ? 'PROCESSING' : 'REFUNDED',
+        paymentStatus: 'REFUNDED',
         ...(isPartial ? {} : { status: 'CANCELLED' }),
       },
       include: {

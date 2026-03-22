@@ -1,6 +1,7 @@
 // Push notification sender — uses Web Push Protocol
 // Requires VAPID keys: VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_EMAIL
 import prisma from '@/lib/prisma'
+import crypto from 'crypto'
 
 interface PushPayload {
   title: string
@@ -67,18 +68,25 @@ async function sendWebPush(
   }
 
   try {
-    // Build JWT for VAPID
+    // Build and sign JWT for VAPID using ES256
     const audience = new URL(subscription.endpoint).origin
-    const header = btoa(JSON.stringify({ typ: 'JWT', alg: 'ES256' }))
+    const base64url = (buf: Buffer | string) =>
+      (typeof buf === 'string' ? Buffer.from(buf) : buf)
+        .toString('base64').replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_')
+
+    const header = base64url(JSON.stringify({ typ: 'JWT', alg: 'ES256' }))
     const now = Math.floor(Date.now() / 1000)
-    const claims = btoa(JSON.stringify({
+    const claims = base64url(JSON.stringify({
       aud: audience,
       exp: now + 86400,
       sub: VAPID_EMAIL,
     }))
 
-    // Sign JWT (in production use a proper JWT library)
-    const token = `${header}.${claims}` // Simplified — in production use proper ES256 signing
+    const unsignedToken = `${header}.${claims}`
+    const keyPem = Buffer.from(VAPID_PRIVATE_KEY, 'base64url')
+    const key = crypto.createPrivateKey({ key: keyPem, format: 'der', type: 'pkcs8' })
+    const signature = crypto.sign('sha256', Buffer.from(unsignedToken), key)
+    const token = `${unsignedToken}.${base64url(signature)}`
 
     const body = JSON.stringify(payload)
 

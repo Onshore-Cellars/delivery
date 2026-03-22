@@ -79,6 +79,10 @@ function RegisterForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!formData.role) { setError('Please select an account type'); return }
+    if (formData.password.length < 8) { setError('Password must be at least 8 characters'); return }
+    if (!/[A-Z]/.test(formData.password) || !/[a-z]/.test(formData.password) || !/[0-9]/.test(formData.password)) {
+      setError('Password must include uppercase, lowercase, and a number'); return
+    }
     setError('')
     setLoading(true)
     try { await register({ ...formData, acceptedTerms }) }

@@ -4,7 +4,7 @@ import { verifyToken, getTokenFromHeader } from '@/lib/auth'
 
 function isAuthorized(request: NextRequest): boolean {
   const cronSecret = request.headers.get('x-cron-secret')
-  if (cronSecret && cronSecret === process.env.CRON_SECRET) return true
+  if (cronSecret && process.env.CRON_SECRET && cronSecret === process.env.CRON_SECRET) return true
   const token = getTokenFromHeader(request.headers.get('authorization'))
   if (token) {
     const decoded = verifyToken(token)
