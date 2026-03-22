@@ -234,6 +234,32 @@ export default function DashboardPage() {
                   )}
                 </div>
 
+                {/* Quick Links */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                  <Link href="/analytics" className="px-4 py-3 rounded-xl border border-slate-200 text-center text-sm font-medium text-[#1a1a1a] hover:bg-slate-50 transition-colors hover:no-underline">
+                    Analytics
+                  </Link>
+                  <Link href="/notifications" className="px-4 py-3 rounded-xl border border-slate-200 text-center text-sm font-medium text-[#1a1a1a] hover:bg-slate-50 transition-colors hover:no-underline">
+                    Notifications
+                  </Link>
+                  <Link href="/insurance" className="px-4 py-3 rounded-xl border border-slate-200 text-center text-sm font-medium text-[#1a1a1a] hover:bg-slate-50 transition-colors hover:no-underline">
+                    Insurance
+                  </Link>
+                  <Link href="/disputes" className="px-4 py-3 rounded-xl border border-slate-200 text-center text-sm font-medium text-[#1a1a1a] hover:bg-slate-50 transition-colors hover:no-underline">
+                    Disputes
+                  </Link>
+                  {user.canCarry && (
+                    <>
+                      <Link href="/earnings" className="px-4 py-3 rounded-xl border border-slate-200 text-center text-sm font-medium text-[#1a1a1a] hover:bg-slate-50 transition-colors hover:no-underline">
+                        Earnings
+                      </Link>
+                      <Link href="/vehicles" className="px-4 py-3 rounded-xl border border-slate-200 text-center text-sm font-medium text-[#1a1a1a] hover:bg-slate-50 transition-colors hover:no-underline">
+                        Vehicles
+                      </Link>
+                    </>
+                  )}
+                </div>
+
                 {/* Recent bookings */}
                 <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
                   <div className="px-5 sm:px-6 py-4 border-b border-slate-100">

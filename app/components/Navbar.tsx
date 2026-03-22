@@ -325,6 +325,10 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
                     </Link>
                     </>
                   )}
+                  <Link href="/disputes" onClick={close} className={`flex items-center gap-3.5 px-4 py-3.5 rounded text-[15px] font-medium transition-colors hover:no-underline ${isActive('/disputes') ? 'bg-amber-50 text-[#C6904D]' : 'text-[#1a1a1a] hover:bg-slate-50'}`}>
+                    <svg className={`w-5 h-5 ${isActive('/disputes') ? 'text-[#C6904D]' : 'text-slate-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" /></svg>
+                    Disputes
+                  </Link>
                   <Link href="/analytics" onClick={close} className={`flex items-center gap-3.5 px-4 py-3.5 rounded text-[15px] font-medium transition-colors hover:no-underline ${isActive('/analytics') ? 'bg-amber-50 text-[#C6904D]' : 'text-[#1a1a1a] hover:bg-slate-50'}`}>
                     <svg className={`w-5 h-5 ${isActive('/analytics') ? 'text-[#C6904D]' : 'text-slate-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
                     Analytics
