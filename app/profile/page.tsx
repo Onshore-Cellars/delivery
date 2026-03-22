@@ -402,6 +402,48 @@ export default function ProfilePage() {
           </div>
         </div>
 
+        {/* Change Password */}
+        <div className="bg-white rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-6 sm:p-8 mb-6">
+          <h2 className="font-bold text-[#1a1a1a] mb-4">Change Password</h2>
+          <form onSubmit={async (e) => {
+            e.preventDefault()
+            setError('')
+            setSuccess('')
+            const fd = new FormData(e.currentTarget)
+            const currentPassword = fd.get('currentPassword') as string
+            const newPassword = fd.get('newPassword') as string
+            const confirmPassword = fd.get('confirmPassword') as string
+            if (newPassword !== confirmPassword) { setError('Passwords do not match'); return }
+            if (newPassword.length < 8) { setError('Password must be at least 8 characters'); return }
+            try {
+              const res = await fetch('/api/auth/change-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ currentPassword, newPassword }),
+              })
+              const data = await res.json()
+              if (res.ok) { setSuccess('Password changed successfully'); (e.target as HTMLFormElement).reset() }
+              else setError(data.error || 'Failed to change password')
+            } catch { setError('Failed to change password') }
+          }} className="space-y-3">
+            <div>
+              <label className="block text-sm font-medium text-[#1a1a1a] mb-1">Current Password</label>
+              <input type="password" name="currentPassword" required minLength={8} className="w-full px-4 py-3 sm:py-2.5 rounded-lg border border-slate-200 text-base sm:text-sm focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 outline-none" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-[#1a1a1a] mb-1">New Password</label>
+              <input type="password" name="newPassword" required minLength={8} className="w-full px-4 py-3 sm:py-2.5 rounded-lg border border-slate-200 text-base sm:text-sm focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 outline-none" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-[#1a1a1a] mb-1">Confirm New Password</label>
+              <input type="password" name="confirmPassword" required minLength={8} className="w-full px-4 py-3 sm:py-2.5 rounded-lg border border-slate-200 text-base sm:text-sm focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 outline-none" />
+            </div>
+            <button type="submit" className="px-5 py-2.5 bg-[#1a1a1a] text-white rounded-lg text-sm font-semibold hover:bg-[#333] transition-colors">
+              Change Password
+            </button>
+          </form>
+        </div>
+
         {/* Notification Settings */}
         <div className="bg-white rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-6 sm:p-8">
           <h2 className="font-bold text-[#1a1a1a] mb-4">Notification Settings</h2>

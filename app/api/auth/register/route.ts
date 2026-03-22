@@ -81,8 +81,8 @@ export async function POST(request: NextRequest) {
     const hashedPassword = await hashPassword(password)
 
     // Auto-promote designated admin emails (configurable via env)
-    const adminEmails = (process.env.ADMIN_EMAILS || 'edward@onshorecellars.com,info@onshoredelivery.com')
-      .toLowerCase().split(',').map(e => e.trim())
+    const adminEmails = (process.env.ADMIN_EMAILS || '')
+      .toLowerCase().split(',').map(e => e.trim()).filter(Boolean)
     const isAdminEmail = adminEmails.includes(email.toLowerCase())
     const finalRole = isAdminEmail ? 'ADMIN' : role
 

@@ -85,8 +85,8 @@ export async function POST(request: NextRequest) {
       }
 
       // Auto-promote admin emails
-      const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || 'edward@onshorecellars.com,info@onshoredelivery.com')
-        .toLowerCase().split(',').map(e => e.trim())
+      const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || '')
+        .toLowerCase().split(',').map(e => e.trim()).filter(Boolean)
 
       if (ADMIN_EMAILS.includes(user.email.toLowerCase()) && user.role !== 'ADMIN') {
         user = await prisma.user.update({

@@ -5,8 +5,8 @@ import { getTokenFromHeader, verifyToken } from '@/lib/auth'
 // POST /api/admin/setup
 // Promotes designated emails to ADMIN role
 // Requires authentication — only the user themselves or an existing admin can promote
-const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || 'edward@onshorecellars.com,info@onshoredelivery.com')
-  .toLowerCase().split(',').map(e => e.trim())
+const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || '')
+  .toLowerCase().split(',').map(e => e.trim()).filter(Boolean)
 
 export async function POST(request: NextRequest) {
   try {

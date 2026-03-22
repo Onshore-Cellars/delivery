@@ -2,9 +2,18 @@ import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { generateSecureToken } from '@/lib/auth'
 import { sendEmail, passwordResetEmail } from '@/lib/email'
+import { createRateLimiter, getClientIP } from '@/lib/rate-limit'
+
+const limiter = createRateLimiter({ interval: 15 * 60_000, limit: 5 })
 
 export async function POST(request: NextRequest) {
   try {
+    const ip = getClientIP(request)
+    const rl = limiter.check(ip)
+    if (!rl.success) {
+      return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 })
+    }
+
     const body = await request.json()
     const { email: rawEmail } = body
 
