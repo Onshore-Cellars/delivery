@@ -402,6 +402,48 @@ export default function ProfilePage() {
           </div>
         </div>
 
+        {/* Change Password */}
+        <div className="bg-white rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-6 sm:p-8 mb-6">
+          <h2 className="font-bold text-[#1a1a1a] mb-4">Change Password</h2>
+          <form onSubmit={async (e) => {
+            e.preventDefault()
+            setError('')
+            setSuccess('')
+            const fd = new FormData(e.currentTarget)
+            const currentPassword = fd.get('currentPassword') as string
+            const newPassword = fd.get('newPassword') as string
+            const confirmPassword = fd.get('confirmPassword') as string
+            if (newPassword !== confirmPassword) { setError('Passwords do not match'); return }
+            if (newPassword.length < 8) { setError('Password must be at least 8 characters'); return }
+            try {
+              const res = await fetch('/api/auth/change-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ currentPassword, newPassword }),
+              })
+              const data = await res.json()
+              if (res.ok) { setSuccess('Password changed successfully'); (e.target as HTMLFormElement).reset() }
+              else setError(data.error || 'Failed to change password')
+            } catch { setError('Failed to change password') }
+          }} className="space-y-3">
+            <div>
+              <label className="block text-sm font-medium text-[#1a1a1a] mb-1">Current Password</label>
+              <input type="password" name="currentPassword" required minLength={8} className="w-full px-4 py-3 sm:py-2.5 rounded-lg border border-slate-200 text-base sm:text-sm focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 outline-none" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-[#1a1a1a] mb-1">New Password</label>
+              <input type="password" name="newPassword" required minLength={8} className="w-full px-4 py-3 sm:py-2.5 rounded-lg border border-slate-200 text-base sm:text-sm focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 outline-none" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-[#1a1a1a] mb-1">Confirm New Password</label>
+              <input type="password" name="confirmPassword" required minLength={8} className="w-full px-4 py-3 sm:py-2.5 rounded-lg border border-slate-200 text-base sm:text-sm focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 outline-none" />
+            </div>
+            <button type="submit" className="px-5 py-2.5 bg-[#1a1a1a] text-white rounded-lg text-sm font-semibold hover:bg-[#333] transition-colors">
+              Change Password
+            </button>
+          </form>
+        </div>
+
         {/* Notification Settings */}
         <div className="bg-white rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-6 sm:p-8">
           <h2 className="font-bold text-[#1a1a1a] mb-4">Notification Settings</h2>
@@ -458,6 +500,48 @@ export default function ProfilePage() {
                 <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#1a1a1a]"></div>
               </label>
             </div>
+          </div>
+        </div>
+        {/* Data Management */}
+        <div className="bg-white rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-6 sm:p-8">
+          <h2 className="font-bold text-[#1a1a1a] mb-2">Data Management</h2>
+          <p className="text-xs text-slate-400 mb-5">Export or delete your account data. See our <a href="/privacy" className="text-[#C6904D] hover:underline">privacy policy</a> for details.</p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button
+              onClick={async () => {
+                try {
+                  const res = await fetch('/api/profile/export', { headers: { Authorization: `Bearer ${token}` } })
+                  if (res.ok) {
+                    const blob = await res.blob()
+                    const url = URL.createObjectURL(blob)
+                    const a = document.createElement('a')
+                    a.href = url
+                    a.download = `onshore-data-export-${new Date().toISOString().slice(0,10)}.json`
+                    a.click()
+                    URL.revokeObjectURL(url)
+                    setSuccess('Data exported successfully')
+                  } else setError('Failed to export data')
+                } catch { setError('Failed to export data') }
+              }}
+              className="px-5 py-2.5 border border-[#e8e4de] rounded-lg text-sm font-semibold text-[#1a1a1a] hover:bg-[#faf9f7] transition-colors"
+            >
+              Export My Data
+            </button>
+            <button
+              onClick={async () => {
+                if (!confirm('Are you sure you want to delete your account? This action cannot be undone. All your data, bookings, and listings will be permanently removed.')) return
+                const confirmText = prompt('Type DELETE to confirm account deletion:')
+                if (confirmText !== 'DELETE') return
+                try {
+                  const res = await fetch('/api/profile/delete', { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } })
+                  if (res.ok) { alert('Your account has been deleted.'); window.location.href = '/' }
+                  else { const d = await res.json(); setError(d.error || 'Failed to delete account') }
+                } catch { setError('Failed to delete account') }
+              }}
+              className="px-5 py-2.5 border border-red-200 rounded-lg text-sm font-semibold text-red-600 hover:bg-red-50 transition-colors"
+            >
+              Delete Account
+            </button>
           </div>
         </div>
       </div>

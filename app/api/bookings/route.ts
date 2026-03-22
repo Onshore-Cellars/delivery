@@ -137,10 +137,21 @@ export async function POST(request: NextRequest) {
     }
 
     const weight = parseFloat(weightKg)
-    const volume = parseFloat(volumeM3)
+    let volume = parseFloat(volumeM3)
+
+    // Auto-calculate volume from dimensions if not provided
+    if ((isNaN(volume) || volume <= 0) && cargoLengthCm && cargoWidthCm && cargoHeightCm) {
+      const l = parseFloat(cargoLengthCm)
+      const w = parseFloat(cargoWidthCm)
+      const h = parseFloat(cargoHeightCm)
+      const count = itemCount ? parseInt(itemCount) : 1
+      if (l > 0 && w > 0 && h > 0) {
+        volume = parseFloat(((l * w * h * count) / 1000000).toFixed(2))
+      }
+    }
 
     if (isNaN(weight) || isNaN(volume) || weight <= 0 || volume <= 0) {
-      return NextResponse.json({ error: 'Weight and volume must be positive numbers' }, { status: 400 })
+      return NextResponse.json({ error: 'Weight and volume must be positive numbers. Provide volumeM3 or cargo dimensions (length, width, height in cm).' }, { status: 400 })
     }
 
     if (weight > 50000 || volume > 200) {

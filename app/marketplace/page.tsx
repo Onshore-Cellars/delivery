@@ -107,15 +107,22 @@ interface Package {
   weightKg: number
 }
 
-const PACKAGE_PRESETS: Record<string, { label: string; lengthCm: number; widthCm: number; heightCm: number; weightKg: number }> = {
-  'small-box': { label: 'Small Box (40×30×30cm)', lengthCm: 40, widthCm: 30, heightCm: 30, weightKg: 5 },
-  'medium-box': { label: 'Medium Box (60×40×40cm)', lengthCm: 60, widthCm: 40, heightCm: 40, weightKg: 15 },
-  'large-box': { label: 'Large Box (80×60×50cm)', lengthCm: 80, widthCm: 60, heightCm: 50, weightKg: 30 },
-  'wine-case': { label: 'Wine Case (12 bottles)', lengthCm: 50, widthCm: 34, heightCm: 18, weightKg: 16 },
-  'euro-pallet': { label: 'Euro Pallet (120×80cm)', lengthCm: 120, widthCm: 80, heightCm: 150, weightKg: 500 },
-  'half-pallet': { label: 'Half Pallet (80×60cm)', lengthCm: 80, widthCm: 60, heightCm: 100, weightKg: 250 },
-  'crate': { label: 'Shipping Crate', lengthCm: 100, widthCm: 60, heightCm: 60, weightKg: 50 },
-  'tube': { label: 'Tube/Roll', lengthCm: 120, widthCm: 15, heightCm: 15, weightKg: 10 },
+const PACKAGE_PRESETS: Record<string, { label: string; lengthCm: number; widthCm: number; heightCm: number; weightKg: number; group: string }> = {
+  // Boxes
+  'small-box': { label: 'Small Box (30×30×30cm)', lengthCm: 30, widthCm: 30, heightCm: 30, weightKg: 5, group: 'Boxes' },
+  'medium-box': { label: 'Medium Box (50×40×40cm)', lengthCm: 50, widthCm: 40, heightCm: 40, weightKg: 15, group: 'Boxes' },
+  'large-box': { label: 'Large Box (60×50×50cm)', lengthCm: 60, widthCm: 50, heightCm: 50, weightKg: 25, group: 'Boxes' },
+  // Pallets — Euro standards
+  'quarter-pallet': { label: 'Quarter Pallet (60×40cm)', lengthCm: 60, widthCm: 40, heightCm: 150, weightKg: 150, group: 'Pallets' },
+  'half-pallet': { label: 'Half Euro Pallet (80×60cm)', lengthCm: 80, widthCm: 60, heightCm: 150, weightKg: 300, group: 'Pallets' },
+  'euro-pallet': { label: 'Euro Pallet (120×80cm)', lengthCm: 120, widthCm: 80, heightCm: 150, weightKg: 500, group: 'Pallets' },
+  'uk-pallet': { label: 'Full Pallet UK (120×100cm)', lengthCm: 120, widthCm: 100, heightCm: 150, weightKg: 600, group: 'Pallets' },
+  'industrial-pallet': { label: 'Industrial Pallet (120×120cm)', lengthCm: 120, widthCm: 120, heightCm: 150, weightKg: 800, group: 'Pallets' },
+  // Other
+  'wine-case': { label: 'Wine Case (12 bottles)', lengthCm: 50, widthCm: 33, heightCm: 18, weightKg: 18, group: 'Other' },
+  'crate': { label: 'Shipping Crate', lengthCm: 100, widthCm: 60, heightCm: 60, weightKg: 50, group: 'Other' },
+  'drum': { label: 'Drum / Barrel', lengthCm: 60, widthCm: 60, heightCm: 90, weightKg: 100, group: 'Other' },
+  'tube': { label: 'Tube / Roll', lengthCm: 120, widthCm: 15, heightCm: 15, weightKg: 10, group: 'Other' },
 }
 
 const ITEMS_PER_PAGE = 10
@@ -1103,13 +1110,18 @@ export default function MarketplacePage() {
                   <label className="block text-sm font-semibold text-[#1a1a1a] mb-2">Cargo Type</label>
                   <select className={selectClass} value={bookingForm.cargoType} onChange={(e) => setBookingForm({ ...bookingForm, cargoType: e.target.value })}>
                     <option value="">Select type...</option>
-                    <option value="Provisions">Provisions & Food</option>
+                    <option value="Provisions & Food">Provisions & Food</option>
                     <option value="Wine & Spirits">Wine & Spirits</option>
-                    <option value="Equipment">Marine Equipment</option>
+                    <option value="Marine Equipment">Marine Equipment</option>
                     <option value="Spare Parts">Spare Parts</option>
                     <option value="Luxury Goods">Luxury Goods</option>
-                    <option value="Crew Gear">Crew Gear & Uniforms</option>
-                    <option value="Interior">Interior & Decor</option>
+                    <option value="Crew Gear & Uniforms">Crew Gear & Uniforms</option>
+                    <option value="Interior & Decor">Interior & Decor</option>
+                    <option value="Chandlery">Chandlery</option>
+                    <option value="Electronics">Electronics</option>
+                    <option value="Sails & Canvas">Sails & Canvas</option>
+                    <option value="Cleaning Supplies">Cleaning Supplies</option>
+                    <option value="Medical Supplies">Medical Supplies</option>
                     <option value="Other">Other</option>
                   </select>
                 </div>
@@ -1125,20 +1137,26 @@ export default function MarketplacePage() {
                   </div>
 
                   {showPackagePicker && (
-                    <div className="grid grid-cols-2 gap-2 mb-3">
-                      {Object.entries(PACKAGE_PRESETS).map(([key, preset]) => (
+                    <div className="space-y-3 mb-3">
+                      {['Pallets', 'Boxes', 'Other'].map(group => (
+                        <div key={group}>
+                          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">{group}</p>
+                          <div className="grid grid-cols-2 gap-2">
+                      {Object.entries(PACKAGE_PRESETS).filter(([, p]) => p.group === group).map(([key, preset]) => (
                         <button
                           key={key}
                           type="button"
                           onClick={() => {
                             const newPkg: Package = {
-                              type: key.includes('pallet') ? 'pallet' : key.includes('crate') ? 'crate' : key.includes('tube') ? 'tube' : 'box',
+                              type: key.includes('pallet') ? 'pallet' : key.includes('crate') ? 'crate' : key.includes('tube') ? 'tube' : key.includes('drum') ? 'custom' : 'box',
                               quantity: 1,
-                              ...preset,
+                              lengthCm: preset.lengthCm,
+                              widthCm: preset.widthCm,
+                              heightCm: preset.heightCm,
+                              weightKg: preset.weightKg,
                             }
                             const updated = [...packages, newPkg]
                             setPackages(updated)
-                            // Auto-calculate totals
                             const totalWeight = updated.reduce((sum, p) => sum + p.weightKg * p.quantity, 0)
                             const totalVolume = updated.reduce((sum, p) => sum + (p.lengthCm * p.widthCm * p.heightCm * p.quantity) / 1000000, 0)
                             setBookingForm(prev => ({
@@ -1151,8 +1169,11 @@ export default function MarketplacePage() {
                           className="text-left p-2 rounded-lg border border-slate-200 hover:border-[#C6904D] hover:bg-[#C6904D]/5 transition-colors"
                         >
                           <div className="text-xs font-medium text-[#1a1a1a]">{preset.label}</div>
-                          <div className="text-[10px] text-slate-400">{preset.weightKg}kg</div>
+                          <div className="text-[10px] text-slate-400">{preset.weightKg}kg &middot; {(preset.lengthCm * preset.widthCm * preset.heightCm / 1000000).toFixed(2)}m&sup3;</div>
                         </button>
+                      ))}
+                          </div>
+                        </div>
                       ))}
                     </div>
                   )}
@@ -1236,21 +1257,42 @@ export default function MarketplacePage() {
                   </div>
                 </div>
 
-                {/* Cargo Dimensions */}
+                {/* Cargo Dimensions — auto-calculates volume */}
                 <div className="pt-3 border-t border-slate-100">
-                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Cargo Size (optional)</p>
+                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Cargo Size (optional — auto-fills volume)</p>
                   <div className="grid grid-cols-3 gap-3">
                     <div>
                       <label className="block text-[11px] text-slate-400 mb-1">Length (cm)</label>
-                      <input type="number" min="0" step="1" className={inputClass} placeholder="cm" value={bookingForm.cargoLengthCm} onChange={(e) => setBookingForm({ ...bookingForm, cargoLengthCm: e.target.value })} />
+                      <input type="number" min="0" step="1" className={inputClass} placeholder="cm" value={bookingForm.cargoLengthCm} onChange={(e) => {
+                        const l = parseFloat(e.target.value) || 0
+                        const w = parseFloat(bookingForm.cargoWidthCm) || 0
+                        const h = parseFloat(bookingForm.cargoHeightCm) || 0
+                        const count = parseInt(bookingForm.itemCount) || 1
+                        const vol = l > 0 && w > 0 && h > 0 ? ((l * w * h * count) / 1000000).toFixed(2) : bookingForm.volumeM3
+                        setBookingForm({ ...bookingForm, cargoLengthCm: e.target.value, ...(l > 0 && w > 0 && h > 0 ? { volumeM3: vol } : {}) })
+                      }} />
                     </div>
                     <div>
                       <label className="block text-[11px] text-slate-400 mb-1">Width (cm)</label>
-                      <input type="number" min="0" step="1" className={inputClass} placeholder="cm" value={bookingForm.cargoWidthCm} onChange={(e) => setBookingForm({ ...bookingForm, cargoWidthCm: e.target.value })} />
+                      <input type="number" min="0" step="1" className={inputClass} placeholder="cm" value={bookingForm.cargoWidthCm} onChange={(e) => {
+                        const l = parseFloat(bookingForm.cargoLengthCm) || 0
+                        const w = parseFloat(e.target.value) || 0
+                        const h = parseFloat(bookingForm.cargoHeightCm) || 0
+                        const count = parseInt(bookingForm.itemCount) || 1
+                        const vol = l > 0 && w > 0 && h > 0 ? ((l * w * h * count) / 1000000).toFixed(2) : bookingForm.volumeM3
+                        setBookingForm({ ...bookingForm, cargoWidthCm: e.target.value, ...(l > 0 && w > 0 && h > 0 ? { volumeM3: vol } : {}) })
+                      }} />
                     </div>
                     <div>
                       <label className="block text-[11px] text-slate-400 mb-1">Height (cm)</label>
-                      <input type="number" min="0" step="1" className={inputClass} placeholder="cm" value={bookingForm.cargoHeightCm} onChange={(e) => setBookingForm({ ...bookingForm, cargoHeightCm: e.target.value })} />
+                      <input type="number" min="0" step="1" className={inputClass} placeholder="cm" value={bookingForm.cargoHeightCm} onChange={(e) => {
+                        const l = parseFloat(bookingForm.cargoLengthCm) || 0
+                        const w = parseFloat(bookingForm.cargoWidthCm) || 0
+                        const h = parseFloat(e.target.value) || 0
+                        const count = parseInt(bookingForm.itemCount) || 1
+                        const vol = l > 0 && w > 0 && h > 0 ? ((l * w * h * count) / 1000000).toFixed(2) : bookingForm.volumeM3
+                        setBookingForm({ ...bookingForm, cargoHeightCm: e.target.value, ...(l > 0 && w > 0 && h > 0 ? { volumeM3: vol } : {}) })
+                      }} />
                     </div>
                   </div>
                   {bookingForm.cargoLengthCm && bookingForm.cargoWidthCm && bookingForm.cargoHeightCm && (
