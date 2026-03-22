@@ -28,6 +28,8 @@ export default function LoginPage() {
   const [showRoleSelect, setShowRoleSelect] = useState(false)
   const [pendingGoogleToken, setPendingGoogleToken] = useState<string | null>(null)
   const [googleReady, setGoogleReady] = useState(false)
+  const [googleFailed, setGoogleFailed] = useState(false)
+  const googleConfigured = !!process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
 
   const handleGoogleResponse = useCallback(async (response: { credential: string }) => {
     setError('')
@@ -68,12 +70,13 @@ export default function LoginPage() {
           window.google.accounts.id.renderButton(btnEl, { theme: 'outline', size: 'large', width: '100%', text: 'signin_with', shape: 'pill' })
         }
         setGoogleReady(true)
+      } else {
+        setGoogleFailed(true)
       }
     }
-    script.onerror = () => setGoogleReady(false)
+    script.onerror = () => setGoogleFailed(true)
     document.head.appendChild(script)
-    // If script hasn't loaded after 3s, show fallback
-    const timeout = setTimeout(() => { if (!window.google?.accounts?.id) setGoogleReady(false) }, 3000)
+    const timeout = setTimeout(() => { if (!window.google?.accounts?.id) setGoogleFailed(true) }, 5000)
     return () => { script.remove(); clearTimeout(timeout) }
   }, [handleGoogleResponse])
 
@@ -153,11 +156,11 @@ export default function LoginPage() {
             <div className="relative flex justify-center text-xs"><span className="bg-white px-3 text-slate-400 uppercase tracking-wider font-medium">or</span></div>
           </div>
 
-          {/* Google Sign-in: show real button if ready, otherwise fallback */}
-          {process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID && (
+          {/* Google Sign-in: show real button if ready, fallback only if configured but failed */}
+          {googleConfigured && (
             <div id="google-signin-btn" className={`flex justify-center ${googleReady ? '' : 'hidden'}`} />
           )}
-          {!googleReady && (
+          {googleConfigured && !googleReady && googleFailed && (
             <div className="text-center">
               <p className="text-xs text-slate-400 mb-2">Google sign-in is not available right now</p>
               <p className="text-xs text-slate-400">Please use email and password to sign in</p>

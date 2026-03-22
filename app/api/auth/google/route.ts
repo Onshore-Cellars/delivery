@@ -19,9 +19,15 @@ async function verifyGoogleToken(idToken: string): Promise<GoogleTokenPayload | 
     const payload = await res.json()
 
     // Verify the audience matches our client ID
-    const clientId = process.env.GOOGLE_CLIENT_ID
-    if (!clientId || payload.aud !== clientId) {
-      console.error('Google token audience mismatch')
+    // Check both GOOGLE_CLIENT_ID and NEXT_PUBLIC_GOOGLE_CLIENT_ID to prevent
+    // misconfiguration — they must have the same value but either might be set
+    const clientId = process.env.GOOGLE_CLIENT_ID || process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
+    if (!clientId) {
+      console.error('Neither GOOGLE_CLIENT_ID nor NEXT_PUBLIC_GOOGLE_CLIENT_ID is configured')
+      return null
+    }
+    if (payload.aud !== clientId) {
+      console.error('Google token audience mismatch:', payload.aud, '!==', clientId)
       return null
     }
 
