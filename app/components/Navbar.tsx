@@ -10,6 +10,7 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
   const { user, token, logout } = useAuth()
   const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false)
   const [unreadNotifs, setUnreadNotifs] = useState(0)
   const [unreadMessages, setUnreadMessages] = useState(0)
   const [scrolled, setScrolled] = useState(false)
@@ -140,6 +141,37 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
                       Admin
                     </Link>
                   )}
+
+                  {/* More dropdown */}
+                  <div className="relative">
+                    <button
+                      onClick={() => setMoreMenuOpen(!moreMenuOpen)}
+                      onBlur={() => setTimeout(() => setMoreMenuOpen(false), 150)}
+                      className={`px-3 py-2 rounded text-xs font-medium uppercase tracking-wider transition-colors ${
+                        moreMenuOpen || ['/analytics','/insurance','/disputes','/earnings','/vehicles','/quotes'].includes(pathname)
+                          ? isTransparentMode ? 'bg-white/20 text-white' : 'bg-slate-100 text-[#1a1a1a]'
+                          : isTransparentMode ? 'text-white/70 hover:text-white hover:bg-white/10' : 'text-slate-600 hover:text-[#1a1a1a] hover:bg-slate-50'
+                      }`}
+                      aria-label="More pages"
+                    >
+                      More
+                      <svg className="w-3 h-3 ml-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                    </button>
+                    {moreMenuOpen && (
+                      <div className="absolute top-full right-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-slate-200 py-1 z-50">
+                        <Link href="/quotes" className="block px-4 py-2.5 text-sm text-[#1a1a1a] hover:bg-slate-50 hover:no-underline">Quotes</Link>
+                        <Link href="/analytics" className="block px-4 py-2.5 text-sm text-[#1a1a1a] hover:bg-slate-50 hover:no-underline">Analytics</Link>
+                        <Link href="/insurance" className="block px-4 py-2.5 text-sm text-[#1a1a1a] hover:bg-slate-50 hover:no-underline">Insurance</Link>
+                        <Link href="/disputes" className="block px-4 py-2.5 text-sm text-[#1a1a1a] hover:bg-slate-50 hover:no-underline">Disputes</Link>
+                        {user.canCarry && (
+                          <>
+                            <Link href="/earnings" className="block px-4 py-2.5 text-sm text-[#1a1a1a] hover:bg-slate-50 hover:no-underline">Earnings</Link>
+                            <Link href="/vehicles" className="block px-4 py-2.5 text-sm text-[#1a1a1a] hover:bg-slate-50 hover:no-underline">My Vehicles</Link>
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </div>
 
                   <div className={`w-px h-6 mx-2 ${isTransparentMode ? 'bg-white/20' : 'bg-slate-200'}`} />
 
