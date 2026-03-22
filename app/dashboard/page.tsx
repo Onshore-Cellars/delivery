@@ -84,6 +84,8 @@ export default function DashboardPage() {
   const [tab, setTab] = useState<'overview' | 'listings' | 'bookings'>('overview')
   const [bookingPage, setBookingPage] = useState(1)
   const BOOKINGS_PER_PAGE = 10
+  const [aiConsolidation, setAiConsolidation] = useState<{ suggestions: string[]; potentialSavings: string; reasoning: string } | null>(null)
+  const [loadingConsolidation, setLoadingConsolidation] = useState(false)
 
   const fetchData = useCallback(async () => {
     if (!token) return
@@ -259,6 +261,61 @@ export default function DashboardPage() {
                     </>
                   )}
                 </div>
+
+                {/* AI Consolidation Suggestions */}
+                {bookings.length >= 2 && (
+                  <div className="bg-gradient-to-br from-[#C6904D]/5 to-transparent rounded-2xl border border-[#C6904D]/20 p-5 sm:p-6">
+                    <div className="flex items-center justify-between mb-3">
+                      <div>
+                        <h2 className="font-bold text-[#1a1a1a] text-base">AI Insights</h2>
+                        <p className="text-xs text-slate-500 mt-0.5">Smart suggestions to optimise your deliveries</p>
+                      </div>
+                      <button
+                        onClick={async () => {
+                          setLoadingConsolidation(true)
+                          try {
+                            const pending = bookings.filter(b => ['PENDING', 'CONFIRMED'].includes(b.status))
+                            const res = await fetch('/api/ai/consolidation', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                              body: JSON.stringify({
+                                bookings: pending.map(b => ({
+                                  origin: b.listing?.originPort, destination: b.listing?.destinationPort,
+                                  weightKg: b.weightKg, volumeM3: b.volumeM3, departureDate: b.listing?.departureDate,
+                                })),
+                                availableListings: listings.filter(l => l.status === 'ACTIVE').map(l => ({
+                                  origin: l.originPort, destination: l.destinationPort,
+                                  availableKg: l.availableKg, availableM3: l.availableM3, departureDate: l.departureDate,
+                                })),
+                              }),
+                            })
+                            if (res.ok) setAiConsolidation(await res.json())
+                          } catch { /* ignore */ }
+                          finally { setLoadingConsolidation(false) }
+                        }}
+                        disabled={loadingConsolidation}
+                        className="px-4 py-2 bg-[#C6904D] text-white rounded-lg text-xs font-semibold hover:bg-[#b07d3f] disabled:opacity-50 transition-colors"
+                      >
+                        {loadingConsolidation ? 'Analysing...' : aiConsolidation ? 'Refresh' : 'Analyse'}
+                      </button>
+                    </div>
+                    {aiConsolidation ? (
+                      <div className="space-y-2">
+                        {aiConsolidation.suggestions?.map((s, i) => (
+                          <div key={i} className="flex items-start gap-2 text-sm text-slate-600">
+                            <span className="text-[#C6904D] mt-0.5">*</span>{s}
+                          </div>
+                        ))}
+                        {aiConsolidation.potentialSavings && (
+                          <p className="text-xs font-medium text-green-600 mt-2">Potential savings: {aiConsolidation.potentialSavings}</p>
+                        )}
+                        <p className="text-xs text-slate-400 mt-1">{aiConsolidation.reasoning}</p>
+                      </div>
+                    ) : !loadingConsolidation ? (
+                      <p className="text-xs text-slate-500">Analyse your bookings and listings for consolidation opportunities and cost savings.</p>
+                    ) : null}
+                  </div>
+                )}
 
                 {/* Recent bookings */}
                 <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">

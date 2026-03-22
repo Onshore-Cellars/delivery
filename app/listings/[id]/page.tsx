@@ -184,7 +184,7 @@ export default function ListingDetailPage() {
     try {
       const res = await fetch('/api/ai/classify-cargo', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         body: JSON.stringify({ description: bookingForm.cargoDescription }),
       })
       const data = await res.json()

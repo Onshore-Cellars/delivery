@@ -66,6 +66,8 @@ export default function GetQuotesPage() {
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState('')
+  const [aiEstimate, setAiEstimate] = useState<{ estimatedPriceMin: number; estimatedPriceMax: number; currency: string; confidence: string; reasoning: string } | null>(null)
+  const [estimatingAI, setEstimatingAI] = useState(false)
 
   const [packages, setPackages] = useState<PackageItem[]>([])
 
@@ -619,6 +621,56 @@ export default function GetQuotesPage() {
               placeholder="Any other details carriers should know..."
               value={form.additionalInfo} onChange={(e) => updateForm('additionalInfo', e.target.value)} />
           </div>
+
+          {/* AI Price Estimate */}
+          {token && totalWeight > 0 && form.pickupLocation && form.deliveryLocation && (
+            <div className="bg-gradient-to-br from-[#C6904D]/5 to-transparent rounded-lg border border-[#C6904D]/20 p-6">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-base font-semibold text-[#1a1a1a]">AI Price Estimate</h2>
+                <button
+                  onClick={async () => {
+                    setEstimatingAI(true)
+                    try {
+                      const res = await fetch('/api/ai/quote-estimate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                        body: JSON.stringify({
+                          origin: form.pickupLocation,
+                          destination: form.deliveryLocation,
+                          distanceKm: 500,
+                          weightKg: totalWeight,
+                          volumeM3: totalVolume,
+                          cargoType: form.cargoType || 'general',
+                          vehicleType: form.transportMethod || 'Van',
+                        }),
+                      })
+                      if (res.ok) {
+                        const data = await res.json()
+                        setAiEstimate(data)
+                      }
+                    } catch { /* ignore */ }
+                    finally { setEstimatingAI(false) }
+                  }}
+                  disabled={estimatingAI}
+                  className="px-4 py-2 bg-[#C6904D] text-white rounded-lg text-xs font-semibold hover:bg-[#b07d3f] disabled:opacity-50 transition-colors"
+                >
+                  {estimatingAI ? 'Estimating...' : aiEstimate ? 'Re-estimate' : 'Get AI Estimate'}
+                </button>
+              </div>
+              {aiEstimate && (
+                <div>
+                  <div className="text-2xl font-bold text-[#1a1a1a] mb-1">
+                    {aiEstimate.currency === 'GBP' ? '\u00A3' : '\u20AC'}{aiEstimate.estimatedPriceMin.toFixed(0)} — {aiEstimate.currency === 'GBP' ? '\u00A3' : '\u20AC'}{aiEstimate.estimatedPriceMax.toFixed(0)}
+                  </div>
+                  <p className="text-xs text-slate-500 mb-2">Confidence: {aiEstimate.confidence}</p>
+                  <p className="text-xs text-slate-500">{aiEstimate.reasoning}</p>
+                </div>
+              )}
+              {!aiEstimate && !estimatingAI && (
+                <p className="text-xs text-slate-500">Get an instant AI-powered price estimate based on your cargo details and route.</p>
+              )}
+            </div>
+          )}
 
           {/* Summary */}
           <div className="bg-[#faf9f7] rounded-lg border border-[#e8e4de] p-6">
