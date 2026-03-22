@@ -1134,3 +1134,98 @@ model IntegrationOrder {
   @@index([apiKeyId])
   @@index([createdAt])
 }
+
+// ─── CRM ──────────────────────────────────────────────────────────────────────
+
+model CrmContact {
+  id          String   @id @default(cuid())
+  name        String
+  category    String              // e.g. "Provisioning", "Chandlery", "Yacht Agents"
+  country     String?
+  location    String?
+  website     String?
+  email       String?
+  email2      String?
+  phone       String?
+  phone2      String?
+  instagram   String?
+  notes       String?
+  priority    String   @default("medium")  // high, medium, low
+  source      String   @default("manual")  // manual, scraped, import
+  tags        String?                       // comma-separated tags
+  opted_out   Boolean  @default(false)
+  lastEmailed DateTime?
+  lastScraped DateTime?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  campaignRecipients CrmCampaignRecipient[]
+
+  @@index([category])
+  @@index([country])
+  @@index([priority])
+  @@index([source])
+}
+
+model CrmCampaign {
+  id          String   @id @default(cuid())
+  name        String
+  subject     String
+  htmlBody    String
+  textBody    String?
+  status      String   @default("draft")  // draft, sending, sent, failed
+  sentCount   Int      @default(0)
+  failedCount Int      @default(0)
+  filters     String?                     // JSON: category, country, priority filters used
+  sentAt      DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  recipients  CrmCampaignRecipient[]
+
+  @@index([status])
+}
+
+model CrmCampaignRecipient {
+  id         String   @id @default(cuid())
+  campaignId String
+  contactId  String
+  email      String
+  status     String   @default("pending")  // pending, sent, failed, bounced
+  sentAt     DateTime?
+  error      String?
+
+  campaign   CrmCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  contact    CrmContact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@unique([campaignId, contactId])
+  @@index([campaignId])
+  @@index([contactId])
+}
+
+model SocialPost {
+  id          String    @id @default(cuid())
+  platform    String                        // linkedin, instagram
+  type        String    @default("post")    // post, article, story, reel
+  content     String                        // Post text / article body
+  mediaUrl    String?                       // Image/video URL
+  hashtags    String?                       // Comma-separated hashtags
+  status      String    @default("draft")   // draft, scheduled, published, failed
+  scheduledAt DateTime?
+  publishedAt DateTime?
+  externalId  String?                       // ID from platform after publishing
+  externalUrl String?                       // Link to published post
+  impressions Int       @default(0)
+  likes       Int       @default(0)
+  comments    Int       @default(0)
+  shares      Int       @default(0)
+  clicks      Int       @default(0)
+  error       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([platform])
+  @@index([status])
+  @@index([scheduledAt])
+}
