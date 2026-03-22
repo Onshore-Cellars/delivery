@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     // Idempotency check — skip if we've already processed this event
     const eventId = event.id
     const existingLog = await prisma.auditLog.findFirst({
-      where: { action: 'STRIPE_WEBHOOK', details: { contains: eventId } }
+      where: { action: 'STRIPE_WEBHOOK', targetId: eventId }
     })
     if (existingLog) {
       return NextResponse.json({ received: true, duplicate: true })
@@ -34,6 +34,7 @@ export async function POST(request: NextRequest) {
     await prisma.auditLog.create({
       data: {
         action: 'STRIPE_WEBHOOK',
+        targetId: eventId,
         details: JSON.stringify({ eventId, type: event.type }),
       }
     })

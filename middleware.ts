@@ -27,21 +27,10 @@ export function middleware(request: NextRequest) {
 
   const response = NextResponse.next()
 
-  // --- 2. Security headers -------------------------------------------------
-  response.headers.set('X-Content-Type-Options', 'nosniff')
-  response.headers.set('X-Frame-Options', 'DENY')
-  response.headers.set('X-XSS-Protection', '1; mode=block')
-  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
-  response.headers.set(
-    'Permissions-Policy',
-    'camera=(), microphone=(), geolocation=(self)',
-  )
-  response.headers.set(
-    'Strict-Transport-Security',
-    'max-age=63072000; includeSubDomains; preload',
-  )
+  // Security headers are set in next.config.ts headers() which also
+  // includes the Content-Security-Policy. Avoid duplicating them here.
 
-  // --- 3. Forward client IP for downstream rate limiting -------------------
+  // --- 2. Forward client IP for downstream rate limiting -------------------
   // Edge middleware cannot import Node-only modules (the rate-limit Map lives
   // in the Node runtime), so we pass the IP via a header that API route
   // handlers can read when calling the rate limiter.

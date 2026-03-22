@@ -78,6 +78,7 @@ function RegisterForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!acceptedTerms) { setError('You must accept the Terms of Service'); return }
     if (!formData.role) { setError('Please select an account type'); return }
     if (formData.password.length < 8) { setError('Password must be at least 8 characters'); return }
     if (!/[A-Z]/.test(formData.password) || !/[a-z]/.test(formData.password) || !/[0-9]/.test(formData.password)) {

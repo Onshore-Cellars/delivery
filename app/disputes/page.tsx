@@ -87,6 +87,7 @@ export default function DisputesPage() {
 
   const handleCreate = async () => {
     if (!createForm.bookingId || !createForm.description) { setError('Booking ID and description are required'); return }
+    if (createForm.claimAmount && parseFloat(createForm.claimAmount) < 0) { setError('Claim amount cannot be negative'); return }
     setCreating(true)
     try {
       const res = await fetch('/api/disputes', {

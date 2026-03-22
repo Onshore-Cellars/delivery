@@ -69,6 +69,11 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'Cannot modify other admin users' }, { status: 403 })
     }
 
+    // Prevent admin from unsuspending themselves
+    if (decoded.userId === userId && user.suspended) {
+      return NextResponse.json({ error: 'Cannot modify your own account while suspended' }, { status: 403 })
+    }
+
     // Full edit mode: updates object provided
     if (updates && typeof updates === 'object') {
       const allowed = ['name', 'email', 'phone', 'company', 'role', 'verified', 'suspended', 'canCarry', 'canShip',
