@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { generateSecureToken } from '@/lib/auth'
-import { sendEmail, emailVerificationEmail } from '@/lib/email'
+import { emailVerificationEmail } from '@/lib/email'
+import { queueEmail } from '@/lib/email-queue'
 
 export async function POST(request: NextRequest) {
   try {
@@ -67,7 +68,7 @@ export async function POST(request: NextRequest) {
     const verifyLink = `${appUrl}/verify-email?token=${verifyToken}&email=${encodeURIComponent(email)}`
 
     const template = emailVerificationEmail({ name: user.name, verifyLink })
-    await sendEmail({ to: email, ...template })
+    await queueEmail({ to: email, ...template })
 
     return successResponse
   } catch (error) {

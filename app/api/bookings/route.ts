@@ -100,10 +100,13 @@ export async function POST(request: NextRequest) {
     // Check suspended status
     const currentUser = await prisma.user.findUnique({
       where: { id: decoded.userId },
-      select: { suspended: true, canShip: true },
+      select: { suspended: true, canShip: true, verified: true },
     })
     if (currentUser?.suspended) {
       return NextResponse.json({ error: 'Your account is suspended' }, { status: 403 })
+    }
+    if (!currentUser?.verified) {
+      return NextResponse.json({ error: 'Please verify your email before creating a booking' }, { status: 403 })
     }
 
     let body

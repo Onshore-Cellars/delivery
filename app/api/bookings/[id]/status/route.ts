@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { verifyToken, getTokenFromHeader } from '@/lib/auth'
 import { notifyStatusUpdate } from '@/lib/notifications'
-import { sendEmail, deliveryConfirmationEmail } from '@/lib/email'
+import { deliveryConfirmationEmail } from '@/lib/email'
+import { queueEmail } from '@/lib/email-queue'
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -65,6 +66,11 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     // Shippers can only cancel or dispute
     if (isShipper && !['CANCELLED', 'DISPUTED'].includes(status)) {
       return NextResponse.json({ error: 'Shippers can only cancel or dispute bookings' }, { status: 403 })
+    }
+
+    // Prevent shipper from cancelling after pickup — must raise a dispute instead
+    if (isShipper && status === 'CANCELLED' && ['PICKED_UP', 'IN_TRANSIT', 'CUSTOMS_HOLD'].includes(booking.status)) {
+      return NextResponse.json({ error: 'Cannot cancel after pickup. Please raise a dispute instead.' }, { status: 400 })
     }
 
     // Require payment before confirmation (unless admin overrides)
@@ -137,7 +143,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         }
       }
 
-      // Restore capacity
+      // Restore capacity (with overflow guard — never exceed total)
       if (isReturnLeg) {
         const updateData: Record<string, unknown> = {
           returnAvailableKg: { increment: booking.weightKg },
@@ -162,6 +168,26 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
           where: { id: booking.listingId },
           data: updateData,
         })
+      }
+
+      // Clamp capacity — ensure available never exceeds total after restore
+      const restored = await prisma.listing.findUnique({
+        where: { id: booking.listingId },
+        select: { totalCapacityKg: true, totalCapacityM3: true, availableKg: true, availableM3: true, returnAvailableKg: true, returnAvailableM3: true, returnTotalKg: true, returnTotalM3: true },
+      })
+      if (restored) {
+        const clamp: Record<string, number> = {}
+        if (restored.availableKg > restored.totalCapacityKg) clamp.availableKg = restored.totalCapacityKg
+        if (restored.availableM3 > restored.totalCapacityM3) clamp.availableM3 = restored.totalCapacityM3
+        if (restored.returnAvailableKg != null && restored.returnTotalKg != null && restored.returnAvailableKg > restored.returnTotalKg) {
+          clamp.returnAvailableKg = restored.returnTotalKg
+        }
+        if (restored.returnAvailableM3 != null && restored.returnTotalM3 != null && restored.returnAvailableM3 > restored.returnTotalM3) {
+          clamp.returnAvailableM3 = restored.returnTotalM3
+        }
+        if (Object.keys(clamp).length > 0) {
+          await prisma.listing.update({ where: { id: booking.listingId }, data: clamp })
+        }
       }
 
       // Record cancellation fee as a tracking event (don't overwrite platformFee)
@@ -274,7 +300,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
             hasSignature: !!signature,
             hasPhoto: !!photoUrl,
           })
-          await sendEmail({ to: shipper.email, ...emailData })
+          await queueEmail({ to: shipper.email, ...emailData })
         }
       } catch (emailErr) {
         console.error('Delivery confirmation email error:', emailErr)

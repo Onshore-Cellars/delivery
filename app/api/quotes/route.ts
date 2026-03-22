@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { verifyToken, getTokenFromHeader } from '@/lib/auth'
 import { createNotification } from '@/lib/notifications'
-import { sendEmail, quoteRequestEmail } from '@/lib/email'
+import { quoteRequestEmail } from '@/lib/email'
+import { queueEmail } from '@/lib/email-queue'
 
 export async function GET(request: NextRequest) {
   try {
@@ -101,7 +102,7 @@ export async function POST(request: NextRequest) {
             cargoDescription,
             weightKg: parseFloat(weightKg),
           })
-          await sendEmail({ to: provider.email, ...template })
+          await queueEmail({ to: provider.email, ...template })
         }
       }
     }
