@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma'
 import { constructWebhookEvent, calculatePlatformFee, calculateCarrierPayout } from '@/lib/stripe'
 import { createNotification } from '@/lib/notifications'
 import { sendEmail, paymentReceiptEmail, carrierPayoutEmail } from '@/lib/email'
+import { queueEmail } from '@/lib/email-queue'
 
 export async function POST(request: NextRequest) {
   try {
@@ -110,7 +111,7 @@ export async function POST(request: NextRequest) {
               paidAt: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
               invoiceUrl: `${appUrl}/api/bookings/${booking.id}/invoice/pdf`,
             })
-            await sendEmail({ to: booking.shipper.email, ...receiptEmail })
+            await queueEmail({ to: booking.shipper.email, ...receiptEmail })
           } catch (e) { console.error('Receipt email error:', e) }
 
           // Send carrier payout notification email
@@ -123,7 +124,7 @@ export async function POST(request: NextRequest) {
               payoutAmount: fmtMoney(booking.carrierPayout),
               deliveredAt: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
             })
-            await sendEmail({ to: booking.listing.carrier.email, ...payoutEmail })
+            await queueEmail({ to: booking.listing.carrier.email, ...payoutEmail })
           } catch (e) { console.error('Payout email error:', e) }
         }
         break
