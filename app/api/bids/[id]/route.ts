@@ -39,6 +39,11 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         return NextResponse.json({ error: 'Bid already processed' }, { status: 400 })
       }
 
+      // Validate bid currency matches listing currency
+      if (bid.currency !== bid.listing.currency) {
+        return NextResponse.json({ error: `Bid currency (${bid.currency}) does not match listing currency (${bid.listing.currency})` }, { status: 400 })
+      }
+
       const acceptAmount = bid.counterOffer ?? bid.amount
       const trackingCode = generateTrackingCode()
       const platformFee = calculatePlatformFee(acceptAmount)

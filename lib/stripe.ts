@@ -165,9 +165,10 @@ export function constructWebhookEvent(payload: string, signature: string): Strip
 }
 
 export function calculatePlatformFee(amount: number): number {
-  return amount * (PLATFORM_FEE_PERCENT / 100)
+  return Math.round(amount * (PLATFORM_FEE_PERCENT / 100) * 100) / 100
 }
 
 export function calculateCarrierPayout(amount: number): number {
-  return amount * (1 - PLATFORM_FEE_PERCENT / 100)
+  const fee = calculatePlatformFee(amount)
+  return Math.round((amount - fee) * 100) / 100
 }

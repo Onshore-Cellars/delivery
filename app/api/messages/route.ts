@@ -5,6 +5,8 @@ import { notifyNewMessage } from '@/lib/notifications'
 import { checkMessageForPII } from '@/lib/pii-filter'
 import { logAudit } from '@/lib/audit'
 import { translateText, type LanguageCode } from '@/lib/ai'
+import { createRateLimiter, getClientIP } from '@/lib/rate-limit'
+const messageLimiter = createRateLimiter({ interval: 60_000, limit: 30 })
 
 // GET conversations list
 export async function GET(request: NextRequest) {
@@ -54,6 +56,11 @@ export async function GET(request: NextRequest) {
 // POST — start new conversation or send message
 export async function POST(request: NextRequest) {
   try {
+    const ip = getClientIP(request)
+    const rl = messageLimiter.check(ip)
+    if (!rl.success) {
+      return NextResponse.json({ error: 'Sending too many messages. Please slow down.' }, { status: 429 })
+    }
     const token = getTokenFromHeader(request.headers.get('authorization'))
     if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     const decoded = verifyToken(token)

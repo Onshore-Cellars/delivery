@@ -24,7 +24,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     }
 
     // Must be in transit or picked up
-    if (!['PICKED_UP', 'IN_TRANSIT', 'CONFIRMED'].includes(booking.status)) {
+    if (!['PICKED_UP', 'IN_TRANSIT'].includes(booking.status)) {
       return NextResponse.json({ error: `Cannot submit POD for booking with status ${booking.status}` }, { status: 400 })
     }
 
@@ -33,6 +33,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     if (!signature && !photoUrl && !photoData) {
       return NextResponse.json({ error: 'At least a signature or photo is required' }, { status: 400 })
+    }
+
+    // Limit base64 data size to 5MB to prevent storage abuse
+    const MAX_BASE64_SIZE = 5 * 1024 * 1024
+    if (signature && typeof signature === 'string' && signature.length > MAX_BASE64_SIZE) {
+      return NextResponse.json({ error: 'Signature data too large (max 5MB)' }, { status: 400 })
+    }
+    if (photoData && typeof photoData === 'string' && photoData.length > MAX_BASE64_SIZE) {
+      return NextResponse.json({ error: 'Photo data too large (max 5MB)' }, { status: 400 })
     }
 
     // Update booking with POD data and mark as delivered
