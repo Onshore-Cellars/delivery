@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { verifyToken, getTokenFromHeader } from '@/lib/auth'
+import { checkListingForCircumvention } from '@/lib/pii-filter'
+import { logAudit } from '@/lib/audit'
 
 // GET single listing with full details
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -125,6 +127,23 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         } else {
           data[field] = body[field]
         }
+      }
+    }
+
+    // Check updated text fields for circumvention attempts
+    const textToCheck = [data.title, data.description, data.restrictedItems].filter(Boolean).join(' ')
+    if (textToCheck) {
+      const circumventionCheck = checkListingForCircumvention(textToCheck)
+      if (circumventionCheck.flagged) {
+        logAudit({
+          userId: decoded.userId,
+          action: 'LISTING_CIRCUMVENTION_FLAG',
+          details: { reason: circumventionCheck.reason, listingId: id },
+        }).catch(() => {})
+        return NextResponse.json(
+          { error: 'Your listing contains language that suggests off-platform transactions. All deliveries must be booked and paid through Onshore Delivery to ensure insurance coverage and payment protection.' },
+          { status: 400 },
+        )
       }
     }
 

@@ -502,6 +502,48 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
+        {/* Data Management */}
+        <div className="bg-white rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-6 sm:p-8">
+          <h2 className="font-bold text-[#1a1a1a] mb-2">Data Management</h2>
+          <p className="text-xs text-slate-400 mb-5">Export or delete your account data. See our <a href="/privacy" className="text-[#C6904D] hover:underline">privacy policy</a> for details.</p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button
+              onClick={async () => {
+                try {
+                  const res = await fetch('/api/profile/export', { headers: { Authorization: `Bearer ${token}` } })
+                  if (res.ok) {
+                    const blob = await res.blob()
+                    const url = URL.createObjectURL(blob)
+                    const a = document.createElement('a')
+                    a.href = url
+                    a.download = `onshore-data-export-${new Date().toISOString().slice(0,10)}.json`
+                    a.click()
+                    URL.revokeObjectURL(url)
+                    setSuccess('Data exported successfully')
+                  } else setError('Failed to export data')
+                } catch { setError('Failed to export data') }
+              }}
+              className="px-5 py-2.5 border border-[#e8e4de] rounded-lg text-sm font-semibold text-[#1a1a1a] hover:bg-[#faf9f7] transition-colors"
+            >
+              Export My Data
+            </button>
+            <button
+              onClick={async () => {
+                if (!confirm('Are you sure you want to delete your account? This action cannot be undone. All your data, bookings, and listings will be permanently removed.')) return
+                const confirmText = prompt('Type DELETE to confirm account deletion:')
+                if (confirmText !== 'DELETE') return
+                try {
+                  const res = await fetch('/api/profile/delete', { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } })
+                  if (res.ok) { alert('Your account has been deleted.'); window.location.href = '/' }
+                  else { const d = await res.json(); setError(d.error || 'Failed to delete account') }
+                } catch { setError('Failed to delete account') }
+              }}
+              className="px-5 py-2.5 border border-red-200 rounded-lg text-sm font-semibold text-red-600 hover:bg-red-50 transition-colors"
+            >
+              Delete Account
+            </button>
+          </div>
+        </div>
       </div>
   )
 }
