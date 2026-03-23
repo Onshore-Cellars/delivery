@@ -81,6 +81,7 @@ export async function POST(request: NextRequest) {
     const email = rawEmail.toLowerCase().trim()
     const user = await prisma.user.findUnique({ where: { email } })
     if (!user) {
+      console.warn(`[LOGIN] No account found for email: ${email}`)
       return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 })
     }
 
@@ -101,8 +102,15 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const valid = await verifyPassword(password, user.password)
+    let valid: boolean
+    try {
+      valid = await verifyPassword(password, user.password)
+    } catch (bcryptErr) {
+      console.error('[LOGIN] bcrypt compare error:', bcryptErr)
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    }
     if (!valid) {
+      console.warn(`[LOGIN] Password mismatch for: ${email} (hash starts: ${user.password.substring(0, 7)}...)`)
       recordFailedAttempt(user.id)
       return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 })
     }
