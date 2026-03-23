@@ -131,7 +131,7 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
                       <Link href="/listings/create" className={navLinkCls('/listings/create')}>
                         List Space
                       </Link>
-                      <Link href="/driver" className={`px-4 py-2 rounded text-xs font-medium uppercase tracking-wider transition-colors hover:no-underline ${isActive('/driver') ? 'bg-green-100 text-green-800' : 'text-green-700 hover:text-green-900 hover:bg-green-50'}`}>
+                      <Link href="/driver" className={`px-4 py-2 rounded text-xs font-medium uppercase tracking-wider transition-colors hover:no-underline ${isActive('/driver') ? isTransparentMode ? 'bg-green-500/20 text-green-300' : 'bg-green-100 text-green-800' : isTransparentMode ? 'text-green-300/80 hover:text-green-200 hover:bg-white/10' : 'text-green-700 hover:text-green-900 hover:bg-green-50'}`}>
                         Driver Mode
                       </Link>
                     </>
