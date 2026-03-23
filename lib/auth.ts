@@ -1,4 +1,4 @@
-import bcrypt from 'bcryptjs'
+import { hash, compare } from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import crypto from 'crypto'
 
@@ -24,11 +24,11 @@ export interface DecodedToken {
 }
 
 export async function hashPassword(password: string): Promise<string> {
-  return bcrypt.hash(password, SALT_ROUNDS)
+  return hash(password, SALT_ROUNDS)
 }
 
 export async function verifyPassword(password: string, hashedPassword: string): Promise<boolean> {
-  return bcrypt.compare(password, hashedPassword)
+  return compare(password, hashedPassword)
 }
 
 export function generateToken(payload: { userId: string; email: string; role: string }, expiresIn: string = '7d'): string {
