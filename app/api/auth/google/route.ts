@@ -25,12 +25,14 @@ async function verifyGoogleToken(idToken: string): Promise<GoogleTokenPayload | 
       return null
     }
 
-    if (!payload.email_verified) return null
+    // Google tokeninfo returns email_verified as a string "true"/"false"
+    const emailVerified = payload.email_verified === 'true' || payload.email_verified === true
+    if (!emailVerified) return null
 
     return {
       sub: payload.sub,
       email: payload.email,
-      email_verified: payload.email_verified === 'true' || payload.email_verified === true,
+      email_verified: emailVerified,
       name: payload.name || payload.email.split('@')[0],
       picture: payload.picture,
     }
