@@ -397,3 +397,333 @@ If the listing's origin is within the alert's radius of the alert's destination,
 Return JSON: { "matchScore": 0-100, "matchReasons": ["why it matches"], "isReturnLegOpportunity": boolean, "returnLegSavings": "~30-40% cheaper" or null }`
   )
 }
+// ─── CRM ASSISTANT ──────────────────────────────────────────────────────────
+
+export interface CrmAssistantResponse {
+  reply: string
+  actions?: CrmAction[]
+}
+
+export interface CrmAction {
+  type: 'draft_email' | 'draft_campaign' | 'suggest_contacts' | 'edit_signature' | 'segment_contacts' | 'draft_followup' | 'analyze_contacts'
+  label: string
+  data: Record<string, unknown>
+}
+
+export async function crmAssistant(
+  message: string,
+  context: {
+    contactCount: number
+    categories: string[]
+    recentCampaigns: string[]
+    signature?: string
+    selectedContacts?: Array<{ name: string; email?: string; phone?: string; category: string; priority: string; country?: string; notes?: string }>
+  }
+): Promise<CrmAssistantResponse | null> {
+  const systemPrompt = `You are the AI assistant for the Onshore Delivery CRM — a logistics and delivery platform serving the EU and UK.
+You help the admin manage contacts, draft emails, plan campaigns, and grow the business.
+
+CONTEXT:
+- Total contacts: ${context.contactCount}
+- Categories: ${context.categories.join(', ') || 'none yet'}
+- Recent campaigns: ${context.recentCampaigns.join(', ') || 'none yet'}
+- Email signature: ${context.signature || 'Not set'}
+${context.selectedContacts?.length ? `- Selected contacts: ${JSON.stringify(context.selectedContacts)}` : ''}
+
+CAPABILITIES — you can suggest these actions (the admin will approve before anything is sent):
+1. draft_email — Draft a personalized email. Include { subject, body, to } in data. Use {{name}} for personalization. Always include the signature.
+2. draft_campaign — Draft a bulk campaign. Include { name, subject, htmlBody, targetCategory, targetPriority } in data.
+3. suggest_contacts — Suggest which contacts to reach out to. Include { reason, filters } in data.
+4. edit_signature — Suggest a professional email signature. Include { html } in data.
+5. segment_contacts — Suggest contact segments/tags for better targeting. Include { segments } in data.
+6. draft_followup — Draft a follow-up email based on context. Include { subject, body } in data.
+7. analyze_contacts — Analyze the contact database and give insights. Include { insights } in data.
+
+RULES:
+- Be concise, professional, and action-oriented.
+- Always suggest specific actions the admin can approve/edit/send.
+- When drafting emails, write warm, professional copy. Not salesy — helpful and genuine.
+- Use the Onshore Delivery brand voice: professional, friendly, Mediterranean expertise.
+- If the admin asks to send something, draft it and present for approval — never claim you sent it.
+- For HTML emails, use simple inline styles. Keep it clean and professional.
+- The signature should be appended to all emails.
+
+Return JSON: { "reply": "your conversational response", "actions": [{ "type": "...", "label": "button label", "data": {...} }] }
+The reply is shown as chat text. Actions become buttons the admin can review and approve.`
+
+  return await askJSON<CrmAssistantResponse>(
+    message,
+    systemPrompt,
+    MODEL,
+    4096
+  )
+}
+
+// ─── AI CONTENT MODERATION ──────────────────────────────────────────────────
+
+export interface ModerationResult {
+  flagged: boolean
+  reason: string | null
+  severity: 'low' | 'medium' | 'high' | 'critical'
+  confidence: number
+  explanation: string
+  categories: string[]
+}
+
+export async function moderateContent(
+  content: string,
+  entityType: string,
+  context?: { userName?: string; conversationSubject?: string }
+): Promise<ModerationResult | null> {
+  const systemPrompt = `You are a content moderation AI for Onshore Delivery — a logistics and delivery platform for the EU and UK marine/yacht industry.
+
+Analyze the content for:
+1. **Profanity / Foul language** — swearing, slurs, offensive language
+2. **Platform circumvention** — attempts to arrange deals off-platform, share personal contact info to bypass fees
+3. **Scam indicators** — suspicious offers, phishing, too-good-to-be-true deals, advance fee requests
+4. **Harassment / Threats** — aggressive, threatening, or intimidating language
+5. **Spam** — irrelevant promotional content, repetitive messages
+6. **Fraud indicators** — fake documents, identity misrepresentation, payment fraud signals
+7. **Discriminatory content** — racism, sexism, or other discriminatory language
+
+Context: Entity type is "${entityType}".${context?.userName ? ` User: ${context.userName}.` : ''}${context?.conversationSubject ? ` Conversation: ${context.conversationSubject}.` : ''}
+
+IMPORTANT:
+- Be practical — normal business discussion about prices, routes, and logistics is fine
+- Legitimate phone/email sharing in listing descriptions by carriers is acceptable
+- Only flag genuinely problematic content
+- Score confidence 0.0 to 1.0
+
+Return JSON:
+{
+  "flagged": boolean,
+  "reason": "profanity" | "circumvention" | "scam" | "harassment" | "spam" | "fraud" | "discrimination" | null,
+  "severity": "low" | "medium" | "high" | "critical",
+  "confidence": 0.0-1.0,
+  "explanation": "brief explanation of why this was flagged or why it's clean",
+  "categories": ["list", "of", "matched", "categories"]
+}`
+
+  return await askJSON<ModerationResult>(content, systemPrompt, FAST_MODEL, 512)
+}
+
+// ─── AI NOTIFICATION TEMPLATE GENERATOR ─────────────────────────────────────
+
+export async function generateNotificationTemplate(
+  eventType: string,
+  channel: 'email' | 'push' | 'sms',
+  brandVoice?: string
+): Promise<{ subject?: string; htmlBody?: string; pushTitle?: string; pushBody?: string; smsBody?: string } | null> {
+  const systemPrompt = `You are a notification copywriter for Onshore Delivery — a logistics platform for the EU/UK.
+Brand voice: ${brandVoice || 'Professional, warm, Mediterranean expertise. Not salesy — helpful and genuine.'}
+
+Generate a notification template for the "${eventType}" event on the "${channel}" channel.
+Use template variables: {{userName}}, {{trackingCode}}, {{origin}}, {{destination}}, {{status}}, {{amount}}, {{date}}, {{itemDescription}}, {{carrierName}}, {{shipperName}}.
+
+Return JSON based on channel:
+- email: { "subject": "...", "htmlBody": "<html>..." }
+- push: { "pushTitle": "...", "pushBody": "..." }
+- sms: { "smsBody": "... (max 160 chars)" }`
+
+  return await askJSON(eventType, systemPrompt, FAST_MODEL, 2048)
+}
+
+// ─── AI SOCIAL POST GENERATOR ───────────────────────────────────────────────
+
+export interface GeneratedSocialPost {
+  content: string
+  hashtags: string
+  type: string
+  topic: string
+  reasoning: string
+  confidence: number
+}
+
+export async function generateSocialPost(
+  platform: string,
+  topic?: string,
+  tone?: string
+): Promise<GeneratedSocialPost | null> {
+  const systemPrompt = `You are a social media content creator for Onshore Delivery — a maritime logistics and delivery platform for the EU/UK yacht and marine industry.
+
+BRAND:
+- Professional, warm, Mediterranean expertise
+- Services: cargo delivery to yachts/marinas/shipyards, provisioning delivery, chandlery, spare parts
+- Routes across Mediterranean, UK south coast, Balearics, French Riviera, Adriatic, Greek islands
+- Audience: yacht owners, captains, crew, marine industry professionals, provisioning companies
+
+PLATFORM: ${platform}
+${platform === 'linkedin' ? 'Professional tone. Industry insights, company updates, thought leadership. 200-300 words.' : ''}
+${platform === 'instagram' ? 'Visual, engaging. Short punchy captions. Emoji use. 100-200 words. Include call-to-action.' : ''}
+
+TONE: ${tone || 'professional yet approachable'}
+${topic ? `TOPIC: ${topic}` : 'Choose a relevant topic for the marine logistics industry.'}
+
+Return JSON:
+{
+  "content": "the post text",
+  "hashtags": "#OnshoreDelivery #MarineLogistics ...",
+  "type": "post",
+  "topic": "brief topic label",
+  "reasoning": "why this post would perform well",
+  "confidence": 0.0-1.0
+}`
+
+  return await askJSON<GeneratedSocialPost>(
+    topic || 'Generate an engaging social media post',
+    systemPrompt,
+    MODEL,
+    2048
+  )
+}
+
+// ─── AI CAMPAIGN DRAFT GENERATOR ────────────────────────────────────────────
+
+export interface GeneratedCampaign {
+  name: string
+  subject: string
+  htmlBody: string
+  reasoning: string
+  confidence: number
+}
+
+export async function generateCampaignDraft(
+  goal: string,
+  targetCategory?: string,
+  context?: {
+    contactCount: number
+    categories: Array<{ name: string; count: number }>
+    recentCampaigns: Array<{ name: string; status: string; sentCount: number; subject: string }>
+    recentSocialPosts?: Array<{ platform: string; content: string; status: string }>
+  }
+): Promise<GeneratedCampaign | null> {
+  const systemPrompt = `You are an email marketing expert for Onshore Delivery — a maritime logistics platform for EU/UK yacht and marine industry.
+
+BRAND VOICE: Professional, warm, Mediterranean expertise. Not salesy — helpful and genuine.
+GOAL: ${goal}
+${targetCategory ? `TARGET AUDIENCE: ${targetCategory}` : ''}
+
+${context ? `CONTEXT:
+- ${context.contactCount} total contacts
+- Categories: ${context.categories.map(c => `${c.name} (${c.count})`).join(', ')}
+- Recent campaigns: ${context.recentCampaigns.map(c => `"${c.subject}" [${c.status}]`).join(', ') || 'none'}` : ''}
+
+Create an email campaign. Use {{name}} for personalization.
+Write clean HTML with inline styles. Use Onshore Delivery brand colors (#C6904D gold, #1d1d1f dark).
+Include a clear call-to-action button.
+
+Return JSON:
+{
+  "name": "campaign name",
+  "subject": "email subject line",
+  "htmlBody": "<html email body with inline styles>",
+  "reasoning": "why this campaign approach",
+  "confidence": 0.0-1.0
+}`
+
+  return await askJSON<GeneratedCampaign>(goal, systemPrompt, MODEL, 4096)
+}
+
+// ─── AI FOLLOW-UP SUGGESTIONS ───────────────────────────────────────────────
+
+export interface FollowUpSuggestions {
+  suggestions: Array<{
+    contactId: string
+    contactName: string
+    email: string
+    subject: string
+    body: string
+    reason: string
+    priority: 'high' | 'medium' | 'low'
+  }>
+}
+
+export async function generateFollowUpSuggestions(
+  contacts: Array<{
+    id: string; name: string; email: string | null; category: string
+    priority: string; country: string | null; notes: string | null; lastEmailed: Date | null
+  }>
+): Promise<FollowUpSuggestions | null> {
+  const systemPrompt = `You are a CRM assistant for Onshore Delivery — a maritime logistics platform.
+
+Analyze these contacts and suggest follow-up emails for the most important ones.
+Consider: priority, how long since last contact, their category, and any notes.
+
+Brand voice: Professional, warm, Mediterranean expertise.
+Use {{name}} placeholder — it will be replaced with the contact's actual name.
+Emails should be personalized based on their category and notes.
+
+Return JSON:
+{
+  "suggestions": [
+    {
+      "contactId": "id",
+      "contactName": "name",
+      "email": "email",
+      "subject": "email subject",
+      "body": "<html email body>",
+      "reason": "why follow up now",
+      "priority": "high|medium|low"
+    }
+  ]
+}`
+
+  const contactSummary = contacts
+    .filter(c => c.email)
+    .map(c => ({
+      id: c.id,
+      name: c.name,
+      email: c.email,
+      category: c.category,
+      priority: c.priority,
+      country: c.country,
+      notes: c.notes?.slice(0, 100),
+      lastEmailed: c.lastEmailed?.toISOString() || 'never',
+    }))
+
+  return await askJSON<FollowUpSuggestions>(
+    JSON.stringify(contactSummary),
+    systemPrompt,
+    MODEL,
+    4096
+  )
+}
+
+// ─── AI CONTACT DATABASE ANALYSIS ───────────────────────────────────────────
+
+export interface ContactAnalysis {
+  summary: string
+  insights: string[]
+  recommendations: string[]
+  segments: Array<{ name: string; description: string; filters: Record<string, string> }>
+  gaps: string[]
+}
+
+export async function analyzeContactDatabase(
+  context: {
+    contactCount: number
+    categories: Array<{ name: string; count: number }>
+    recentCampaigns: Array<{ name: string; status: string; sentCount: number; subject: string }>
+    recentSocialPosts?: Array<{ platform: string; content: string; status: string; impressions: number; likes: number }>
+  }
+): Promise<ContactAnalysis | null> {
+  const systemPrompt = `You are a CRM strategist for Onshore Delivery — a maritime logistics platform for the EU/UK yacht industry.
+
+Analyze the contact database and provide actionable insights.
+
+Return JSON:
+{
+  "summary": "brief overview of the database health",
+  "insights": ["insight 1", "insight 2", ...],
+  "recommendations": ["recommendation 1", ...],
+  "segments": [{ "name": "segment name", "description": "who's in this segment", "filters": { "category": "...", "priority": "..." } }],
+  "gaps": ["gap or missing opportunity 1", ...]
+}`
+
+  return await askJSON<ContactAnalysis>(
+    JSON.stringify(context),
+    systemPrompt,
+    MODEL,
+    4096
+  )
+}

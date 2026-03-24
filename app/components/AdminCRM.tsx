@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import DOMPurify from 'dompurify'
 
 interface CrmContact {
   id: string
@@ -40,13 +41,87 @@ interface FilterOption {
   count: number
 }
 
-type CrmView = 'contacts' | 'campaigns' | 'compose'
+type CrmView = 'contacts' | 'campaigns' | 'compose' | 'social' | 'queue' | 'ai' | 'inbox'
 
 // WhatsApp link helper
 function getWhatsAppUrl(phone: string, message?: string): string {
   const clean = phone.replace(/[^\d+]/g, '').replace(/^\+/, '')
   const base = `https://wa.me/${clean}`
   return message ? `${base}?text=${encodeURIComponent(message)}` : base
+}
+
+interface AiMessage {
+  role: 'user' | 'assistant'
+  content: string
+  actions?: AiAction[]
+}
+
+interface AiAction {
+  type: string
+  label: string
+  data: Record<string, unknown>
+}
+
+interface SocialPost {
+  id: string
+  platform: string
+  type: string
+  content: string
+  mediaUrl: string | null
+  hashtags: string | null
+  status: string
+  scheduledAt: string | null
+  publishedAt: string | null
+  externalUrl: string | null
+  impressions: number
+  likes: number
+  comments: number
+  shares: number
+  clicks: number
+  error: string | null
+  createdAt: string
+}
+
+interface AiQueueAction {
+  id: string
+  type: string
+  status: string
+  title: string
+  description: string | null
+  payload: string
+  result: string | null
+  aiModel: string | null
+  confidence: number | null
+  createdBy: string | null
+  reviewedBy: string | null
+  reviewedAt: string | null
+  executedAt: string | null
+  error: string | null
+  createdAt: string
+}
+
+interface CrmEmailItem {
+  id: string
+  messageId: string
+  folder: string
+  from: string
+  fromName: string | null
+  to: string
+  cc: string | null
+  subject: string
+  textBody: string | null
+  htmlBody: string | null
+  snippet: string | null
+  date: string
+  isRead: boolean
+  isStarred: boolean
+  isArchived: boolean
+  hasAttachments: boolean
+  attachments: string | null
+  inReplyTo: string | null
+  contactId: string | null
+  contact: { id: string; name: string; category: string; priority: string } | null
+  createdAt: string
 }
 
 export default function AdminCRM({ token }: { token: string }) {
@@ -82,10 +157,57 @@ export default function AdminCRM({ token }: { token: string }) {
   const [emailBody, setEmailBody] = useState('')
   const [emailSending, setEmailSending] = useState(false)
 
+  // Social posts state
+  const [socialPosts, setSocialPosts] = useState<SocialPost[]>([])
+  const [socialLoading, setSocialLoading] = useState(false)
+  const [socialStats, setSocialStats] = useState<{ total: number; engagement: { impressions: number; likes: number; comments: number; shares: number } } | null>(null)
+  const [socialPlatformFilter, setSocialPlatformFilter] = useState('')
+  const [socialStatusFilter, setSocialStatusFilter] = useState('')
+
+  // AI action queue state
+  const [aiActions, setAiActions] = useState<AiQueueAction[]>([])
+  const [aiQueueLoading, setAiQueueLoading] = useState(false)
+  const [aiQueueStats, setAiQueueStats] = useState<Record<string, number>>({})
+  const [aiQueueStatusFilter, setAiQueueStatusFilter] = useState('pending')
+  const [aiGenerating, setAiGenerating] = useState(false)
+  const [expandedAction, setExpandedAction] = useState<string | null>(null)
+  const [editingPayload, setEditingPayload] = useState<string | null>(null)
+  const [editPayloadText, setEditPayloadText] = useState('')
+
+  // AI chat state
+  const [aiMessages, setAiMessages] = useState<AiMessage[]>([])
+  const [aiInput, setAiInput] = useState('')
+  const [aiChatLoading, setAiChatLoading] = useState(false)
+  const chatEndRef = useRef<HTMLDivElement>(null)
+
+  // Inbox state
+  const [inboxEmails, setInboxEmails] = useState<CrmEmailItem[]>([])
+  const [inboxLoading, setInboxLoading] = useState(false)
+  const [inboxSyncing, setInboxSyncing] = useState(false)
+  const [inboxStats, setInboxStats] = useState<{ unread: number; starred: number; total: number }>({ unread: 0, starred: 0, total: 0 })
+  const [inboxPage, setInboxPage] = useState(1)
+  const [inboxTotalPages, setInboxTotalPages] = useState(1)
+  const [inboxSearch, setInboxSearch] = useState('')
+  const [inboxSearchInput, setInboxSearchInput] = useState('')
+  const [inboxFolder, setInboxFolder] = useState('INBOX')
+  const [inboxFilter, setInboxFilter] = useState<'all' | 'unread' | 'starred'>('all')
+  const [selectedEmail, setSelectedEmail] = useState<CrmEmailItem | null>(null)
+  const [showComposeEmail, setShowComposeEmail] = useState(false)
+  const [replyTo, setReplyTo] = useState<CrmEmailItem | null>(null)
+  const [composeEmailTo, setComposeEmailTo] = useState('')
+  const [composeEmailSubject, setComposeEmailSubject] = useState('')
+  const [composeEmailBody, setComposeEmailBody] = useState('')
+  const [composeEmailSending, setComposeEmailSending] = useState(false)
+
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
     setToast({ message, type })
     setTimeout(() => setToast(null), 3000)
   }
+
+  // Auto-scroll AI chat
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [aiMessages, aiChatLoading])
 
   // ─── Contact Fetching ─────────────────────────────────────────────────────
 
@@ -131,8 +253,198 @@ export default function AdminCRM({ token }: { token: string }) {
   }, [fetchContacts])
 
   useEffect(() => {
+    fetchCampaigns()
+  }, [fetchCampaigns])
+
+  useEffect(() => {
     if (view === 'campaigns') fetchCampaigns()
   }, [view, fetchCampaigns])
+
+  // ─── Social Posts Fetching ────────────────────────────────────────────────
+
+  const fetchSocialPosts = useCallback(async () => {
+    setSocialLoading(true)
+    try {
+      const params = new URLSearchParams()
+      if (socialPlatformFilter) params.set('platform', socialPlatformFilter)
+      if (socialStatusFilter) params.set('status', socialStatusFilter)
+
+      const res = await fetch(`/api/admin/crm/social?${params}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (!res.ok) throw new Error('Failed')
+      const data = await res.json()
+      setSocialPosts(data.posts)
+      setSocialStats(data.stats)
+    } catch {
+      showToast('Failed to load social posts', 'error')
+    } finally {
+      setSocialLoading(false)
+    }
+  }, [token, socialPlatformFilter, socialStatusFilter])
+
+  useEffect(() => {
+    if (view === 'social') fetchSocialPosts()
+  }, [view, fetchSocialPosts])
+
+  // ─── AI Queue Fetching ────────────────────────────────────────────────────
+
+  const fetchAiActions = useCallback(async () => {
+    setAiQueueLoading(true)
+    try {
+      const params = new URLSearchParams({ status: aiQueueStatusFilter })
+      const res = await fetch(`/api/admin/ai-actions?${params}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (!res.ok) throw new Error('Failed')
+      const data = await res.json()
+      setAiActions(data.actions)
+      setAiQueueStats(data.stats)
+    } catch {
+      showToast('Failed to load AI actions', 'error')
+    } finally {
+      setAiQueueLoading(false)
+    }
+  }, [token, aiQueueStatusFilter])
+
+  useEffect(() => {
+    if (view === 'queue') fetchAiActions()
+  }, [view, fetchAiActions])
+
+  // Fetch pending count on mount for the badge
+  const fetchAiQueuePendingCount = useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/ai-actions?status=pending&limit=1', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (!res.ok) return
+      const data = await res.json()
+      setAiQueueStats(data.stats)
+    } catch { /* ignore */ }
+  }, [token])
+
+  useEffect(() => {
+    fetchAiQueuePendingCount()
+  }, [fetchAiQueuePendingCount])
+
+  // ─── Inbox Fetching ───────────────────────────────────────────────────────
+
+  const fetchInboxEmails = useCallback(async () => {
+    setInboxLoading(true)
+    try {
+      const params = new URLSearchParams({ folder: inboxFolder, page: String(inboxPage), limit: '30' })
+      if (inboxSearch) params.set('search', inboxSearch)
+      if (inboxFilter === 'unread') params.set('unread', 'true')
+      if (inboxFilter === 'starred') params.set('starred', 'true')
+
+      const res = await fetch(`/api/admin/crm/emails?${params}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (!res.ok) throw new Error('Failed')
+      const data = await res.json()
+      setInboxEmails(data.emails)
+      setInboxStats(data.stats)
+      setInboxTotalPages(data.pagination.pages)
+    } catch {
+      showToast('Failed to load emails', 'error')
+    } finally {
+      setInboxLoading(false)
+    }
+  }, [token, inboxFolder, inboxPage, inboxSearch, inboxFilter])
+
+  useEffect(() => {
+    if (view === 'inbox') fetchInboxEmails()
+  }, [view, fetchInboxEmails])
+
+  // Fetch inbox unread count on mount for badge
+  const fetchInboxUnreadCount = useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/crm/emails?folder=INBOX&limit=1', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (!res.ok) return
+      const data = await res.json()
+      setInboxStats(data.stats)
+    } catch { /* ignore */ }
+  }, [token])
+
+  useEffect(() => {
+    fetchInboxUnreadCount()
+  }, [fetchInboxUnreadCount])
+
+  // Inbox search debounce
+  useEffect(() => {
+    const timer = setTimeout(() => { setInboxSearch(inboxSearchInput); setInboxPage(1) }, 300)
+    return () => clearTimeout(timer)
+  }, [inboxSearchInput])
+
+  const syncInbox = async () => {
+    setInboxSyncing(true)
+    try {
+      const res = await fetch('/api/admin/crm/emails/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ folder: inboxFolder, limit: 100 }),
+      })
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.error || 'Sync failed')
+      }
+      const data = await res.json()
+      showToast(`Synced ${data.result.synced} new email(s)`)
+      fetchInboxEmails()
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : 'Sync failed', 'error')
+    } finally {
+      setInboxSyncing(false)
+    }
+  }
+
+  const updateEmailFlags = async (ids: string[], updates: Record<string, boolean>) => {
+    try {
+      const res = await fetch('/api/admin/crm/emails', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ ids, updates }),
+      })
+      if (!res.ok) throw new Error('Failed')
+      fetchInboxEmails()
+    } catch {
+      showToast('Failed to update', 'error')
+    }
+  }
+
+  const sendComposeEmail = async () => {
+    if (!composeEmailTo || !composeEmailSubject || !composeEmailBody) {
+      showToast('Fill in to, subject and body', 'error')
+      return
+    }
+    setComposeEmailSending(true)
+    try {
+      const res = await fetch('/api/admin/crm/emails', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          to: composeEmailTo,
+          subject: composeEmailSubject,
+          textBody: composeEmailBody,
+          replyToMessageId: replyTo?.messageId || null,
+        }),
+      })
+      if (!res.ok) throw new Error('Failed')
+      showToast('Email sent')
+      setShowComposeEmail(false)
+      setReplyTo(null)
+      setComposeEmailTo('')
+      setComposeEmailSubject('')
+      setComposeEmailBody('')
+      fetchInboxEmails()
+    } catch {
+      showToast('Failed to send email', 'error')
+    } finally {
+      setComposeEmailSending(false)
+    }
+  }
 
   // ─── Contact CRUD ─────────────────────────────────────────────────────────
 
@@ -287,7 +599,118 @@ export default function AdminCRM({ token }: { token: string }) {
     }
   }
 
-  // ─── Toggle Selection ─────────────────────────────────────────────────────
+  // ─── AI Queue Actions ─────────────────────────────────────────────────────
+
+  const handleAiAction = async (id: string, reviewAction: 'approve' | 'reject') => {
+    setActionLoading(true)
+    try {
+      const res = await fetch('/api/admin/ai-actions', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ id, action: reviewAction }),
+      })
+      if (!res.ok) throw new Error('Failed')
+      showToast(reviewAction === 'approve' ? 'Action approved and executed' : 'Action rejected')
+      fetchAiActions()
+    } catch {
+      showToast(`Failed to ${reviewAction} action`, 'error')
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  const handleAiEditSave = async (id: string) => {
+    try {
+      const parsed = JSON.parse(editPayloadText)
+      const res = await fetch('/api/admin/ai-actions', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ id, action: 'edit', editedPayload: parsed }),
+      })
+      if (!res.ok) throw new Error('Failed')
+      showToast('Action updated')
+      setEditingPayload(null)
+      fetchAiActions()
+    } catch {
+      showToast('Invalid JSON or update failed', 'error')
+    }
+  }
+
+  const generateAiContent = async (generateType: string, params?: Record<string, unknown>) => {
+    setAiGenerating(true)
+    try {
+      const res = await fetch('/api/admin/ai-actions/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ generateType, params }),
+      })
+      if (!res.ok) throw new Error('Failed')
+      const data = await res.json()
+      showToast(`Generated ${data.count || 1} action(s) — review in AI Queue`)
+      setAiQueueStatusFilter('pending')
+      // Refresh queue stats for badge count
+      fetchAiQueuePendingCount()
+      if (view === 'queue') fetchAiActions()
+    } catch {
+      showToast('AI generation failed', 'error')
+    } finally {
+      setAiGenerating(false)
+    }
+  }
+
+  // ─── AI Chat ──────────────────────────────────────────────────────────────
+
+  const sendAiMessage = async () => {
+    if (!aiInput.trim() || aiChatLoading) return
+    const userMsg = aiInput.trim()
+    setAiInput('')
+    setAiMessages(prev => [...prev, { role: 'user', content: userMsg }])
+    setAiChatLoading(true)
+    try {
+      const res = await fetch('/api/admin/crm/ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          message: userMsg,
+          selectedContactIds: Array.from(selected),
+        }),
+      })
+      if (!res.ok) throw new Error('Failed')
+      const data = await res.json()
+      setAiMessages(prev => [...prev, {
+        role: 'assistant',
+        content: data.reply,
+        actions: data.actions,
+      }])
+    } catch {
+      setAiMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, I encountered an error. Please try again.' }])
+    } finally {
+      setAiChatLoading(false)
+    }
+  }
+
+  const executeAiChatAction = async (action: AiAction) => {
+    // Take AI chat action and put it in the queue for approval
+    setActionLoading(true)
+    try {
+      const res = await fetch('/api/admin/ai-actions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          type: action.type,
+          title: action.label,
+          description: `From AI assistant chat`,
+          payload: action.data,
+        }),
+      })
+      if (!res.ok) throw new Error('Failed')
+      showToast('Added to action queue for review')
+    } catch {
+      showToast('Failed to queue action', 'error')
+    } finally {
+      setActionLoading(false)
+    }
+  }
 
   const toggleSelect = (id: string) => {
     setSelected(prev => {
@@ -362,18 +785,26 @@ export default function AdminCRM({ token }: { token: string }) {
       </div>
 
       {/* Sub-navigation */}
-      <div className="flex gap-2">
-        {(['contacts', 'campaigns', 'compose'] as CrmView[]).map(v => (
+      <div className="flex gap-2 flex-wrap">
+        {([
+          { key: 'contacts', label: 'Contacts' },
+          { key: 'campaigns', label: 'Campaigns' },
+          { key: 'compose', label: 'Compose' },
+          { key: 'social', label: 'Social' },
+          { key: 'queue', label: `AI Queue${(aiQueueStats.pending || 0) > 0 ? ` (${aiQueueStats.pending})` : ''}` },
+          { key: 'inbox', label: `Inbox${inboxStats.unread > 0 ? ` (${inboxStats.unread})` : ''}` },
+          { key: 'ai', label: 'AI Chat' },
+        ] as { key: CrmView; label: string }[]).map(v => (
           <button
-            key={v}
-            onClick={() => setView(v)}
+            key={v.key}
+            onClick={() => setView(v.key)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-              view === v
+              view === v.key
                 ? 'bg-[#1d1d1f] text-white'
                 : 'text-slate-500 hover:text-[#1d1d1f] hover:bg-slate-50 border border-slate-200'
             }`}
           >
-            {v === 'contacts' ? 'Contacts' : v === 'campaigns' ? 'Campaigns' : 'Compose Email'}
+            {v.label}
           </button>
         ))}
       </div>
@@ -556,6 +987,26 @@ export default function AdminCRM({ token }: { token: string }) {
                     )}
                     <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${statusBadge(c.status)}`}>{c.status}</span>
                     <span className="text-xs text-slate-400">{new Date(c.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</span>
+                    <button
+                      onClick={async () => {
+                        if (!confirm(`Delete campaign "${c.name}"?`)) return
+                        try {
+                          const res = await fetch('/api/admin/crm/campaigns', {
+                            method: 'DELETE',
+                            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                            body: JSON.stringify({ ids: [c.id] }),
+                          })
+                          if (!res.ok) throw new Error('Failed')
+                          showToast('Campaign deleted')
+                          fetchCampaigns()
+                        } catch {
+                          showToast('Failed to delete campaign', 'error')
+                        }
+                      }}
+                      className="px-2 py-1 rounded text-xs font-medium text-red-600 hover:bg-red-50"
+                    >
+                      Del
+                    </button>
                   </div>
                 </div>
               ))}
@@ -623,6 +1074,41 @@ export default function AdminCRM({ token }: { token: string }) {
             <button onClick={() => setView('campaigns')} className="px-5 py-2.5 rounded-xl border border-slate-200 text-sm font-medium text-slate-600 hover:bg-slate-50">
               Cancel
             </button>
+            <button
+              onClick={async () => {
+                setActionLoading(true)
+                try {
+                  const res = await fetch('/api/admin/ai-actions/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                    body: JSON.stringify({
+                      generateType: 'campaign',
+                      params: {
+                        goal: campaignName || 'engage existing contacts',
+                        targetCategory: campaignCategory || undefined,
+                      },
+                    }),
+                  })
+                  if (!res.ok) throw new Error('Failed')
+                  const data = await res.json()
+                  const preview = data.preview
+                  if (preview) {
+                    if (preview.name && !campaignName) setCampaignName(preview.name)
+                    if (preview.subject) setCampaignSubject(preview.subject)
+                    if (preview.htmlBody) setCampaignHtml(preview.htmlBody)
+                    showToast('AI draft loaded — review and edit before sending')
+                  }
+                } catch {
+                  showToast('AI draft generation failed', 'error')
+                } finally {
+                  setActionLoading(false)
+                }
+              }}
+              disabled={actionLoading}
+              className="px-5 py-2.5 rounded-xl border border-indigo-300 text-indigo-600 text-sm font-medium hover:bg-indigo-50 disabled:opacity-50"
+            >
+              {actionLoading ? 'Generating...' : '✦ AI Draft'}
+            </button>
             <button onClick={() => sendCampaign(true)} disabled={actionLoading} className="px-5 py-2.5 rounded-xl border border-[#C6904D] text-[#C6904D] text-sm font-medium hover:bg-[#C6904D]/5 disabled:opacity-50">
               Save Draft
             </button>
@@ -634,6 +1120,841 @@ export default function AdminCRM({ token }: { token: string }) {
       )}
 
       {/* ═══════════════════ QUICK EMAIL MODAL ═══════════════════ */}
+
+      {/* ═══════════════════ SOCIAL POSTS VIEW ═══════════════════ */}
+      {view === 'social' && (
+        <div className="space-y-4">
+          {/* Social Stats */}
+          {socialStats && (
+            <div className="flex flex-wrap gap-4">
+              <div className="bg-white rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex-1 min-w-[120px]">
+                <div className="text-2xl font-bold text-[#1a1a1a]">{socialStats.total}</div>
+                <div className="text-xs text-slate-400 mt-0.5">Total Posts</div>
+              </div>
+              <div className="bg-white rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex-1 min-w-[120px]">
+                <div className="text-2xl font-bold text-[#1a1a1a]">{socialStats.engagement.impressions.toLocaleString()}</div>
+                <div className="text-xs text-slate-400 mt-0.5">Impressions</div>
+              </div>
+              <div className="bg-white rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex-1 min-w-[120px]">
+                <div className="text-2xl font-bold text-[#1a1a1a]">{socialStats.engagement.likes.toLocaleString()}</div>
+                <div className="text-xs text-slate-400 mt-0.5">Likes</div>
+              </div>
+              <div className="bg-white rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex-1 min-w-[120px]">
+                <div className="text-2xl font-bold text-[#1a1a1a]">{socialStats.engagement.shares.toLocaleString()}</div>
+                <div className="text-xs text-slate-400 mt-0.5">Shares</div>
+              </div>
+            </div>
+          )}
+
+          <div className="bg-white rounded-2xl border border-[#e8e4de] shadow-sm overflow-hidden">
+            {/* Toolbar */}
+            <div className="p-4 border-b border-slate-100 flex flex-wrap gap-3 items-center justify-between">
+              <div className="flex gap-2">
+                <select
+                  value={socialPlatformFilter}
+                  onChange={e => setSocialPlatformFilter(e.target.value)}
+                  className="px-3 py-2 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]"
+                >
+                  <option value="">All Platforms</option>
+                  <option value="linkedin">LinkedIn</option>
+                  <option value="instagram">Instagram</option>
+                </select>
+                <select
+                  value={socialStatusFilter}
+                  onChange={e => setSocialStatusFilter(e.target.value)}
+                  className="px-3 py-2 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]"
+                >
+                  <option value="">All Statuses</option>
+                  <option value="draft">Draft</option>
+                  <option value="scheduled">Scheduled</option>
+                  <option value="published">Published</option>
+                </select>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => generateAiContent('social_post', { platform: 'linkedin' })}
+                  disabled={aiGenerating}
+                  className="px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 disabled:opacity-50"
+                >
+                  {aiGenerating ? 'Generating...' : '✦ AI Generate Post'}
+                </button>
+                <button
+                  onClick={() => generateAiContent('social_batch', { count: 5 })}
+                  disabled={aiGenerating}
+                  className="px-4 py-2 rounded-lg bg-purple-600 text-white text-sm font-medium hover:bg-purple-700 disabled:opacity-50"
+                >
+                  {aiGenerating ? 'Generating...' : '✦ AI Generate Week'}
+                </button>
+              </div>
+            </div>
+
+            {/* Posts List */}
+            {socialLoading ? (
+              <div className="p-8 text-center text-slate-400 text-sm">Loading...</div>
+            ) : socialPosts.length === 0 ? (
+              <div className="p-8 text-center text-slate-400 text-sm">
+                No social posts yet. Use AI to generate your first batch.
+              </div>
+            ) : (
+              <div className="divide-y divide-slate-50">
+                {socialPosts.map(post => (
+                  <div key={post.id} className="p-4 hover:bg-slate-50/50">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1.5">
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${
+                            post.platform === 'linkedin' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-pink-50 text-pink-700 border-pink-200'
+                          }`}>
+                            {post.platform}
+                          </span>
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${
+                            post.status === 'published' ? 'bg-green-50 text-green-700 border-green-200' :
+                            post.status === 'scheduled' ? 'bg-amber-50 text-amber-700 border-amber-200' :
+                            post.status === 'failed' ? 'bg-red-50 text-red-700 border-red-200' :
+                            'bg-slate-50 text-slate-600 border-slate-200'
+                          }`}>
+                            {post.status}
+                          </span>
+                          {post.scheduledAt && (
+                            <span className="text-xs text-slate-400">
+                              Scheduled: {new Date(post.scheduledAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-[#1a1a1a] whitespace-pre-wrap line-clamp-3">{post.content}</p>
+                        {post.hashtags && (
+                          <p className="text-xs text-blue-500 mt-1">{post.hashtags}</p>
+                        )}
+                      </div>
+                      <div className="text-right text-xs text-slate-400 space-y-1 flex-shrink-0">
+                        {post.status === 'published' && (
+                          <>
+                            <div>{post.impressions.toLocaleString()} views</div>
+                            <div>{post.likes} likes · {post.comments} comments</div>
+                          </>
+                        )}
+                        <div>{new Date(post.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</div>
+                        <button
+                          onClick={async () => {
+                            if (!confirm('Delete this post?')) return
+                            try {
+                              const res = await fetch('/api/admin/crm/social', {
+                                method: 'DELETE',
+                                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                                body: JSON.stringify({ ids: [post.id] }),
+                              })
+                              if (!res.ok) throw new Error('Failed')
+                              showToast('Post deleted')
+                              fetchSocialPosts()
+                            } catch {
+                              showToast('Failed to delete post', 'error')
+                            }
+                          }}
+                          className="text-red-500 hover:text-red-700 font-medium"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ═══════════════════ AI ACTION QUEUE VIEW ═══════════════════ */}
+      {view === 'queue' && (
+        <div className="space-y-4">
+          {/* Queue Stats */}
+          <div className="flex flex-wrap gap-4">
+            {['pending', 'executed', 'rejected'].map(s => (
+              <div key={s} className="bg-white rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex-1 min-w-[120px]">
+                <div className="text-2xl font-bold text-[#1a1a1a]">{aiQueueStats[s] || 0}</div>
+                <div className="text-xs text-slate-400 mt-0.5 capitalize">{s}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-white rounded-2xl border border-[#e8e4de] shadow-sm overflow-hidden">
+            {/* Toolbar */}
+            <div className="p-4 border-b border-slate-100 flex flex-wrap gap-3 items-center justify-between">
+              <div className="flex gap-2">
+                <select
+                  value={aiQueueStatusFilter}
+                  onChange={e => setAiQueueStatusFilter(e.target.value)}
+                  className="px-3 py-2 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]"
+                >
+                  <option value="pending">Pending</option>
+                  <option value="executed">Executed</option>
+                  <option value="rejected">Rejected</option>
+                  <option value="all">All</option>
+                </select>
+              </div>
+              <div className="flex gap-2 flex-wrap">
+                <button
+                  onClick={() => generateAiContent('social_post', { platform: 'linkedin' })}
+                  disabled={aiGenerating}
+                  className="px-3 py-2 rounded-lg border border-slate-200 text-sm font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                >
+                  ✦ Social Post
+                </button>
+                <button
+                  onClick={() => generateAiContent('campaign', { goal: 'engage existing contacts' })}
+                  disabled={aiGenerating}
+                  className="px-3 py-2 rounded-lg border border-slate-200 text-sm font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                >
+                  ✦ Campaign
+                </button>
+                <button
+                  onClick={() => generateAiContent('followups')}
+                  disabled={aiGenerating}
+                  className="px-3 py-2 rounded-lg border border-slate-200 text-sm font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                >
+                  ✦ Follow-ups
+                </button>
+                <button
+                  onClick={() => generateAiContent('analyze')}
+                  disabled={aiGenerating}
+                  className="px-3 py-2 rounded-lg border border-slate-200 text-sm font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                >
+                  ✦ Analyze CRM
+                </button>
+                <button
+                  onClick={() => generateAiContent('social_batch', { count: 7 })}
+                  disabled={aiGenerating}
+                  className="px-3 py-2 rounded-lg bg-[#C6904D] text-white text-sm font-medium hover:bg-[#b07e3f] disabled:opacity-50"
+                >
+                  {aiGenerating ? 'Generating...' : '✦ Generate Week'}
+                </button>
+              </div>
+            </div>
+
+            {/* Actions List */}
+            {aiQueueLoading ? (
+              <div className="p-8 text-center text-slate-400 text-sm">Loading...</div>
+            ) : aiActions.length === 0 ? (
+              <div className="p-8 text-center text-slate-400 text-sm">
+                No {aiQueueStatusFilter === 'all' ? '' : aiQueueStatusFilter} actions. Use the buttons above to generate AI content.
+              </div>
+            ) : (
+              <div className="divide-y divide-slate-50">
+                {aiActions.map(action => {
+                  const isExpanded = expandedAction === action.id
+                  const isEditing = editingPayload === action.id
+                  let payload: Record<string, unknown> = {}
+                  try { payload = JSON.parse(action.payload) as Record<string, unknown> } catch { /* ignore */ }
+
+                  const payloadContent = String(payload.content || '')
+                  const payloadHashtags = payload.hashtags ? String(payload.hashtags) : ''
+                  const payloadPlatform = String(payload.platform || '')
+                  const payloadName = String(payload.name || '')
+                  const payloadSubject = String(payload.subject || '')
+                  const payloadHtmlBody = String(payload.htmlBody || '')
+                  const payloadBody = String(payload.body || '')
+                  const payloadContactName = String(payload.contactName || payload.to || '')
+                  const payloadSummary = String(payload.summary || '')
+                  const payloadInsights = Array.isArray(payload.insights) ? payload.insights.map(String) : []
+                  const payloadRecommendations = Array.isArray(payload.recommendations) ? payload.recommendations.map(String) : []
+
+                  return (
+                    <div key={action.id} className="p-4">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1 min-w-0 cursor-pointer" onClick={() => setExpandedAction(isExpanded ? null : action.id)}>
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${
+                              action.type.includes('social') ? 'bg-purple-50 text-purple-700 border-purple-200' :
+                              action.type.includes('campaign') ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                              action.type.includes('followup') ? 'bg-amber-50 text-amber-700 border-amber-200' :
+                              action.type.includes('analyze') ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                              'bg-slate-50 text-slate-600 border-slate-200'
+                            }`}>
+                              {action.type.replace(/_/g, ' ')}
+                            </span>
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${
+                              action.status === 'pending' ? 'bg-amber-50 text-amber-700 border-amber-200' :
+                              action.status === 'executed' ? 'bg-green-50 text-green-700 border-green-200' :
+                              action.status === 'rejected' ? 'bg-red-50 text-red-700 border-red-200' :
+                              'bg-slate-50 text-slate-600 border-slate-200'
+                            }`}>
+                              {action.status}
+                            </span>
+                            {action.confidence && (
+                              <span className="text-[10px] text-slate-400">{Math.round(action.confidence * 100)}% confidence</span>
+                            )}
+                          </div>
+                          <h4 className="font-medium text-sm text-[#1a1a1a]">{action.title}</h4>
+                          {action.description && (
+                            <p className="text-xs text-slate-500 mt-0.5">{action.description}</p>
+                          )}
+                        </div>
+                        <div className="flex gap-1.5 flex-shrink-0">
+                          {action.status === 'pending' && (
+                            <>
+                              <button
+                                onClick={() => handleAiAction(action.id, 'approve')}
+                                disabled={actionLoading}
+                                className="px-3 py-1.5 rounded-lg text-xs font-medium bg-green-600 text-white hover:bg-green-700 disabled:opacity-50"
+                              >
+                                ✓ Approve
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setEditingPayload(action.id)
+                                  setEditPayloadText(JSON.stringify(payload, null, 2))
+                                }}
+                                className="px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-200 text-slate-600 hover:bg-slate-50"
+                              >
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => handleAiAction(action.id, 'reject')}
+                                disabled={actionLoading}
+                                className="px-3 py-1.5 rounded-lg text-xs font-medium bg-red-50 text-red-600 hover:bg-red-100 disabled:opacity-50"
+                              >
+                                ✕ Reject
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Expanded Payload Preview */}
+                      {isExpanded && !isEditing && (
+                        <div className="mt-3 bg-slate-50 rounded-xl p-4 text-xs">
+                          {action.type === 'draft_social' && (
+                            <div className="space-y-2">
+                              <div className="flex gap-2">
+                                <span className="text-slate-500 font-medium">Platform:</span>
+                                <span className="capitalize">{payloadPlatform}</span>
+                              </div>
+                              <div>
+                                <span className="text-slate-500 font-medium block mb-1">Content:</span>
+                                <p className="text-sm text-[#1a1a1a] whitespace-pre-wrap">{payloadContent}</p>
+                              </div>
+                              {payloadHashtags && (
+                                <p className="text-blue-500">{payloadHashtags}</p>
+                              )}
+                            </div>
+                          )}
+                          {action.type === 'draft_campaign' && (
+                            <div className="space-y-2">
+                              <div><span className="text-slate-500 font-medium">Name:</span> {payloadName}</div>
+                              <div><span className="text-slate-500 font-medium">Subject:</span> {payloadSubject}</div>
+                              <div>
+                                <span className="text-slate-500 font-medium block mb-1">Email Preview:</span>
+                                <div className="border border-slate-200 rounded-lg p-3 bg-white text-sm max-h-60 overflow-y-auto" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(payloadHtmlBody) }} />
+                              </div>
+                            </div>
+                          )}
+                          {(action.type === 'suggest_followup' || action.type === 'draft_email') && (
+                            <div className="space-y-2">
+                              <div><span className="text-slate-500 font-medium">To:</span> {payloadContactName}</div>
+                              <div><span className="text-slate-500 font-medium">Subject:</span> {payloadSubject}</div>
+                              <div>
+                                <span className="text-slate-500 font-medium block mb-1">Body:</span>
+                                <div className="border border-slate-200 rounded-lg p-3 bg-white text-sm max-h-40 overflow-y-auto" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(payloadBody) }} />
+                              </div>
+                            </div>
+                          )}
+                          {action.type === 'analyze_contacts' && (
+                            <div className="space-y-2">
+                              {payloadSummary && <p className="text-sm text-[#1a1a1a]">{payloadSummary}</p>}
+                              {payloadInsights.length > 0 && (
+                                <div>
+                                  <span className="text-slate-500 font-medium block mb-1">Insights:</span>
+                                  <ul className="list-disc pl-4 space-y-1">
+                                    {payloadInsights.map((insight, i) => <li key={i}>{insight}</li>)}
+                                  </ul>
+                                </div>
+                              )}
+                              {payloadRecommendations.length > 0 && (
+                                <div>
+                                  <span className="text-slate-500 font-medium block mb-1">Recommendations:</span>
+                                  <ul className="list-disc pl-4 space-y-1">
+                                    {payloadRecommendations.map((rec, i) => <li key={i}>{rec}</li>)}
+                                  </ul>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                          {!['draft_social', 'draft_campaign', 'suggest_followup', 'draft_email', 'analyze_contacts'].includes(action.type) && (
+                            <pre className="whitespace-pre-wrap text-xs text-slate-600">{JSON.stringify(payload, null, 2)}</pre>
+                          )}
+                          {action.error && (
+                            <div className="mt-2 text-red-600 bg-red-50 rounded-lg px-3 py-2">Error: {action.error}</div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Edit Mode */}
+                      {isEditing && (
+                        <div className="mt-3 space-y-2">
+                          <textarea
+                            value={editPayloadText}
+                            onChange={e => setEditPayloadText(e.target.value)}
+                            rows={10}
+                            className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-mono outline-none focus:border-[#C6904D] resize-y"
+                          />
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleAiEditSave(action.id)}
+                              className="px-4 py-2 rounded-lg bg-[#C6904D] text-white text-xs font-medium hover:bg-[#b07e3f]"
+                            >
+                              Save Changes
+                            </button>
+                            <button
+                              onClick={() => setEditingPayload(null)}
+                              className="px-4 py-2 rounded-lg border border-slate-200 text-xs font-medium text-slate-600 hover:bg-slate-50"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ═══════════════════ INBOX VIEW ═══════════════════ */}
+      {view === 'inbox' && !selectedEmail && (
+        <div className="space-y-4">
+          {/* Inbox Stats */}
+          <div className="flex flex-wrap gap-4">
+            <div className="bg-white rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex-1 min-w-[120px]">
+              <div className="text-2xl font-bold text-[#1a1a1a]">{inboxStats.unread}</div>
+              <div className="text-xs text-slate-400 mt-0.5">Unread</div>
+            </div>
+            <div className="bg-white rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex-1 min-w-[120px]">
+              <div className="text-2xl font-bold text-[#1a1a1a]">{inboxStats.starred}</div>
+              <div className="text-xs text-slate-400 mt-0.5">Starred</div>
+            </div>
+            <div className="bg-white rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex-1 min-w-[120px]">
+              <div className="text-2xl font-bold text-[#1a1a1a]">{inboxStats.total}</div>
+              <div className="text-xs text-slate-400 mt-0.5">Total</div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl border border-[#e8e4de] shadow-sm overflow-hidden">
+            {/* Toolbar */}
+            <div className="p-4 border-b border-slate-100 space-y-3">
+              <div className="flex flex-wrap gap-3 items-center">
+                <div className="flex-1 min-w-[200px]">
+                  <input
+                    type="text"
+                    placeholder="Search emails..."
+                    value={inboxSearchInput}
+                    onChange={e => setInboxSearchInput(e.target.value)}
+                    className="w-full px-3.5 py-2 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10"
+                  />
+                </div>
+                <select
+                  value={inboxFolder}
+                  onChange={e => { setInboxFolder(e.target.value); setInboxPage(1) }}
+                  className="px-3 py-2 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]"
+                >
+                  <option value="INBOX">Inbox</option>
+                  <option value="Sent">Sent</option>
+                  <option value="all">All Mail</option>
+                </select>
+                <div className="flex gap-1">
+                  {(['all', 'unread', 'starred'] as const).map(f => (
+                    <button
+                      key={f}
+                      onClick={() => { setInboxFilter(f); setInboxPage(1) }}
+                      className={`px-3 py-2 rounded-lg text-xs font-medium capitalize transition-all ${
+                        inboxFilter === f
+                          ? 'bg-[#1d1d1f] text-white'
+                          : 'border border-slate-200 text-slate-500 hover:bg-slate-50'
+                      }`}
+                    >
+                      {f}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  onClick={syncInbox}
+                  disabled={inboxSyncing}
+                  className="px-4 py-2 rounded-lg bg-[#C6904D] text-white text-sm font-medium hover:bg-[#b07e3f] disabled:opacity-50"
+                >
+                  {inboxSyncing ? 'Syncing...' : '↻ Sync'}
+                </button>
+                <button
+                  onClick={() => {
+                    setShowComposeEmail(true)
+                    setReplyTo(null)
+                    setComposeEmailTo('')
+                    setComposeEmailSubject('')
+                    setComposeEmailBody('')
+                  }}
+                  className="px-4 py-2 rounded-lg bg-[#1d1d1f] text-white text-sm font-medium hover:bg-[#333]"
+                >
+                  + Compose
+                </button>
+              </div>
+            </div>
+
+            {/* Email List */}
+            {inboxLoading ? (
+              <div className="p-8 text-center text-slate-400 text-sm">Loading...</div>
+            ) : inboxEmails.length === 0 ? (
+              <div className="p-8 text-center text-slate-400 text-sm">
+                {inboxStats.total === 0 ? 'No emails yet. Click "Sync" to fetch from your mailbox.' : 'No emails match your filters.'}
+              </div>
+            ) : (
+              <div className="divide-y divide-slate-50">
+                {inboxEmails.map(email => (
+                  <div
+                    key={email.id}
+                    className={`px-4 py-3 hover:bg-slate-50/50 cursor-pointer flex items-start gap-3 ${!email.isRead ? 'bg-blue-50/30' : ''}`}
+                    onClick={async () => {
+                      setSelectedEmail(email)
+                      if (!email.isRead) {
+                        updateEmailFlags([email.id], { isRead: true })
+                      }
+                    }}
+                  >
+                    {/* Star */}
+                    <button
+                      onClick={e => {
+                        e.stopPropagation()
+                        updateEmailFlags([email.id], { isStarred: !email.isStarred })
+                      }}
+                      className={`mt-0.5 text-lg leading-none ${email.isStarred ? 'text-amber-400' : 'text-slate-200 hover:text-amber-300'}`}
+                    >
+                      ★
+                    </button>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className={`text-sm truncate ${!email.isRead ? 'font-semibold text-[#1a1a1a]' : 'text-slate-600'}`}>
+                          {email.folder === 'Sent' ? `To: ${email.to}` : (email.fromName || email.from)}
+                        </span>
+                        {email.contact && (
+                          <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-blue-50 text-blue-600 border border-blue-200">
+                            {email.contact.category}
+                          </span>
+                        )}
+                        {email.hasAttachments && (
+                          <span className="text-slate-400 text-xs">📎</span>
+                        )}
+                      </div>
+                      <div className={`text-sm truncate ${!email.isRead ? 'font-medium text-[#1a1a1a]' : 'text-slate-700'}`}>
+                        {email.subject}
+                      </div>
+                      <div className="text-xs text-slate-400 truncate mt-0.5">
+                        {email.snippet}
+                      </div>
+                    </div>
+
+                    <div className="text-xs text-slate-400 whitespace-nowrap flex-shrink-0">
+                      {new Date(email.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                      <div className="text-[10px]">{new Date(email.date).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Pagination */}
+            {inboxTotalPages > 1 && (
+              <div className="p-4 border-t border-slate-100 flex items-center justify-between">
+                <span className="text-xs text-slate-400">{inboxStats.total} emails</span>
+                <div className="flex gap-1">
+                  <button onClick={() => setInboxPage(p => Math.max(1, p - 1))} disabled={inboxPage === 1} className="px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-200 hover:bg-slate-50 disabled:opacity-40">Prev</button>
+                  <span className="px-3 py-1.5 text-xs text-slate-500">Page {inboxPage} of {inboxTotalPages}</span>
+                  <button onClick={() => setInboxPage(p => Math.min(inboxTotalPages, p + 1))} disabled={inboxPage === inboxTotalPages} className="px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-200 hover:bg-slate-50 disabled:opacity-40">Next</button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ═══════════════════ EMAIL DETAIL VIEW ═══════════════════ */}
+      {view === 'inbox' && selectedEmail && (
+        <div className="bg-white rounded-2xl border border-[#e8e4de] shadow-sm overflow-hidden">
+          {/* Header */}
+          <div className="p-4 border-b border-slate-100 flex items-center gap-3">
+            <button
+              onClick={() => setSelectedEmail(null)}
+              className="px-3 py-1.5 rounded-lg border border-slate-200 text-sm text-slate-600 hover:bg-slate-50"
+            >
+              ← Back
+            </button>
+            <div className="flex-1" />
+            <button
+              onClick={() => updateEmailFlags([selectedEmail.id], { isStarred: !selectedEmail.isStarred })}
+              className={`text-lg ${selectedEmail.isStarred ? 'text-amber-400' : 'text-slate-300 hover:text-amber-300'}`}
+            >
+              ★
+            </button>
+            <button
+              onClick={() => {
+                setReplyTo(selectedEmail)
+                setComposeEmailTo(selectedEmail.folder === 'Sent' ? selectedEmail.to : selectedEmail.from)
+                setComposeEmailSubject(selectedEmail.subject.startsWith('Re: ') ? selectedEmail.subject : `Re: ${selectedEmail.subject}`)
+                setComposeEmailBody(`\n\n---\nOn ${new Date(selectedEmail.date).toLocaleString('en-GB')}, ${selectedEmail.fromName || selectedEmail.from} wrote:\n> ${(selectedEmail.textBody || selectedEmail.snippet || '').split('\n').join('\n> ')}`)
+                setShowComposeEmail(true)
+              }}
+              className="px-4 py-1.5 rounded-lg bg-[#C6904D] text-white text-sm font-medium hover:bg-[#b07e3f]"
+            >
+              Reply
+            </button>
+            <button
+              onClick={() => {
+                updateEmailFlags([selectedEmail.id], { isArchived: true })
+                setSelectedEmail(null)
+                showToast('Email archived')
+              }}
+              className="px-3 py-1.5 rounded-lg border border-slate-200 text-sm text-slate-600 hover:bg-slate-50"
+            >
+              Archive
+            </button>
+          </div>
+
+          {/* Email Content */}
+          <div className="p-6 space-y-4">
+            <h2 className="text-xl font-bold text-[#1a1a1a]">{selectedEmail.subject}</h2>
+
+            <div className="flex items-start justify-between">
+              <div>
+                <div className="text-sm font-medium text-[#1a1a1a]">
+                  {selectedEmail.fromName || selectedEmail.from}
+                  {selectedEmail.fromName && (
+                    <span className="text-slate-400 font-normal ml-2">&lt;{selectedEmail.from}&gt;</span>
+                  )}
+                </div>
+                <div className="text-xs text-slate-400 mt-0.5">
+                  To: {selectedEmail.to}
+                  {selectedEmail.cc && <span> · CC: {selectedEmail.cc}</span>}
+                </div>
+                {selectedEmail.contact && (
+                  <div className="mt-1">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 text-blue-600 border border-blue-200">
+                      CRM: {selectedEmail.contact.name} — {selectedEmail.contact.category}
+                    </span>
+                  </div>
+                )}
+              </div>
+              <div className="text-xs text-slate-400">
+                {new Date(selectedEmail.date).toLocaleString('en-GB', {
+                  weekday: 'short', day: 'numeric', month: 'short', year: 'numeric',
+                  hour: '2-digit', minute: '2-digit',
+                })}
+              </div>
+            </div>
+
+            {selectedEmail.hasAttachments && selectedEmail.attachments && (
+              <div className="flex flex-wrap gap-2">
+                {(JSON.parse(selectedEmail.attachments) as { filename: string; contentType: string; size: number }[]).map((att, i) => (
+                  <div key={i} className="flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 bg-slate-50 text-xs text-slate-600">
+                    <span>📎</span>
+                    <span>{att.filename}</span>
+                    <span className="text-slate-400">({(att.size / 1024).toFixed(0)}KB)</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="border-t border-slate-100 pt-4">
+              {selectedEmail.htmlBody ? (
+                <div
+                  className="prose prose-sm max-w-none text-[#1a1a1a]"
+                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(selectedEmail.htmlBody) }}
+                />
+              ) : (
+                <pre className="text-sm text-[#1a1a1a] whitespace-pre-wrap font-sans">
+                  {selectedEmail.textBody || '(no content)'}
+                </pre>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ═══════════════════ COMPOSE EMAIL MODAL ═══════════════════ */}
+      {showComposeEmail && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setShowComposeEmail(false)}>
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg" onClick={e => e.stopPropagation()}>
+            <div className="p-6 border-b border-slate-100">
+              <h3 className="text-lg font-bold text-[#1a1a1a]">{replyTo ? 'Reply' : 'New Email'}</h3>
+              <p className="text-xs text-slate-400 mt-1">From: info@onshoredelivery.com</p>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-xs font-medium text-slate-500 mb-1">To</label>
+                <input
+                  type="email"
+                  value={composeEmailTo}
+                  onChange={e => setComposeEmailTo(e.target.value)}
+                  placeholder="recipient@example.com"
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-500 mb-1">Subject</label>
+                <input
+                  type="text"
+                  value={composeEmailSubject}
+                  onChange={e => setComposeEmailSubject(e.target.value)}
+                  placeholder="Email subject..."
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-500 mb-1">Message</label>
+                <textarea
+                  value={composeEmailBody}
+                  onChange={e => setComposeEmailBody(e.target.value)}
+                  rows={10}
+                  placeholder="Write your message..."
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 resize-y"
+                />
+              </div>
+            </div>
+            <div className="p-6 border-t border-slate-100 flex gap-3">
+              <button
+                onClick={() => setShowComposeEmail(false)}
+                className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-medium text-slate-600 hover:bg-slate-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={sendComposeEmail}
+                disabled={composeEmailSending || !composeEmailTo || !composeEmailSubject || !composeEmailBody}
+                className="flex-1 px-4 py-2.5 rounded-xl bg-[#C6904D] text-white text-sm font-medium hover:bg-[#b07e3f] disabled:opacity-50"
+              >
+                {composeEmailSending ? 'Sending...' : 'Send'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ═══════════════════ AI CHAT VIEW ═══════════════════ */}
+      {view === 'ai' && (
+        <div className="bg-white rounded-2xl border border-[#e8e4de] shadow-sm overflow-hidden flex flex-col" style={{ height: '600px' }}>
+          <div className="p-4 border-b border-slate-100">
+            <h3 className="text-sm font-semibold text-[#1a1a1a]">AI CRM Assistant</h3>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Ask me to draft emails, plan campaigns, analyze contacts, or generate social content. All actions require your approval.
+            </p>
+          </div>
+
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {aiMessages.length === 0 && (
+              <div className="text-center py-12 space-y-3">
+                <div className="text-4xl">✦</div>
+                <p className="text-sm text-slate-500">How can I help with your CRM today?</p>
+                <div className="flex flex-wrap gap-2 justify-center">
+                  {[
+                    'Draft an email campaign for yacht provisioning contacts',
+                    'Generate a LinkedIn post about our Mediterranean routes',
+                    'Which contacts should I follow up with?',
+                    'Analyze my contact database',
+                  ].map(suggestion => (
+                    <button
+                      key={suggestion}
+                      onClick={() => {
+                        setAiInput(suggestion)
+                        // Auto-send the suggestion
+                        setAiMessages(prev => [...prev, { role: 'user', content: suggestion }])
+                        setAiChatLoading(true)
+                        fetch('/api/admin/crm/ai', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                          body: JSON.stringify({ message: suggestion, selectedContactIds: [] }),
+                        })
+                          .then(r => r.ok ? r.json() : Promise.reject())
+                          .then(data => {
+                            setAiMessages(prev => [...prev, { role: 'assistant', content: data.reply, actions: data.actions }])
+                          })
+                          .catch(() => {
+                            setAiMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, I encountered an error. Please try again.' }])
+                          })
+                          .finally(() => { setAiChatLoading(false); setAiInput('') })
+                      }}
+                      className="px-3 py-1.5 rounded-lg border border-slate-200 text-xs text-slate-600 hover:bg-slate-50"
+                    >
+                      {suggestion}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {aiMessages.map((msg, i) => (
+              <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+                  msg.role === 'user'
+                    ? 'bg-[#1d1d1f] text-white'
+                    : 'bg-slate-50 text-[#1a1a1a]'
+                }`}>
+                  <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                  {msg.actions && msg.actions.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {msg.actions.map((action, j) => (
+                        <button
+                          key={j}
+                          onClick={() => executeAiChatAction(action)}
+                          disabled={actionLoading}
+                          className="px-3 py-1.5 rounded-lg bg-[#C6904D] text-white text-xs font-medium hover:bg-[#b07e3f] disabled:opacity-50"
+                        >
+                          {action.label} →
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+
+            {aiChatLoading && (
+              <div className="flex justify-start">
+                <div className="bg-slate-50 rounded-2xl px-4 py-3">
+                  <div className="flex gap-1">
+                    <div className="w-2 h-2 rounded-full bg-slate-300 animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <div className="w-2 h-2 rounded-full bg-slate-300 animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <div className="w-2 h-2 rounded-full bg-slate-300 animate-bounce" style={{ animationDelay: '300ms' }} />
+                  </div>
+                </div>
+              </div>
+            )}
+            <div ref={chatEndRef} />
+          </div>
+
+          {/* Input */}
+          <div className="p-4 border-t border-slate-100">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={aiInput}
+                onChange={e => setAiInput(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendAiMessage() } }}
+                placeholder="Ask the AI assistant..."
+                className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10"
+              />
+              <button
+                onClick={sendAiMessage}
+                disabled={aiChatLoading || !aiInput.trim()}
+                className="px-5 py-2.5 rounded-xl bg-[#1d1d1f] text-white text-sm font-medium hover:bg-[#333] disabled:opacity-50"
+              >
+                Send
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ═══════════════════ QUICK EMAIL MODAL (original) ═══════════════════ */}
       {emailModal && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setEmailModal(null)}>
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg" onClick={e => e.stopPropagation()}>

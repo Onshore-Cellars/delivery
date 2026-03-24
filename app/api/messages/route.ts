@@ -4,7 +4,7 @@ import { verifyToken, getTokenFromHeader } from '@/lib/auth'
 import { notifyNewMessage } from '@/lib/notifications'
 import { checkMessageForPII } from '@/lib/pii-filter'
 import { logAudit } from '@/lib/audit'
-import { translateText, type LanguageCode } from '@/lib/ai'
+import { translateText, type LanguageCode, moderateContent } from '@/lib/ai'
 import { createRateLimiter, getClientIP } from '@/lib/rate-limit'
 const messageLimiter = createRateLimiter({ interval: 60_000, limit: 30 })
 
@@ -170,6 +170,26 @@ export async function POST(request: NextRequest) {
       senderId: decoded.userId,
       preview: content.slice(0, 200),
     })
+
+    // AI moderation — async, non-blocking
+    moderateContent(content, 'message', { userName: decoded.userId })
+      .then(async (result) => {
+        if (result?.flagged) {
+          await prisma.moderationFlag.create({
+            data: {
+              entityType: 'message',
+              entityId: message.id,
+              userId: decoded.userId,
+              content: content.slice(0, 2000),
+              reason: result.reason || 'other',
+              severity: result.severity,
+              aiScore: result.confidence,
+              aiExplanation: result.explanation,
+            },
+          })
+        }
+      })
+      .catch((err) => console.error('AI moderation error:', err))
 
     return NextResponse.json({ message, conversationId: conversation.id }, { status: 201 })
   } catch (error) {

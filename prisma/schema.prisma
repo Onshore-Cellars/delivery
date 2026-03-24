@@ -1161,6 +1161,7 @@ model CrmContact {
   updatedAt   DateTime @updatedAt
 
   campaignRecipients CrmCampaignRecipient[]
+  emails             CrmEmail[]
 
   @@index([category])
   @@index([country])
@@ -1204,6 +1205,52 @@ model CrmCampaignRecipient {
   @@index([contactId])
 }
 
+// ─── NOTIFICATION TEMPLATES ───────────────────────────────────────────────
+
+model NotificationTemplate {
+  id          String           @id @default(cuid())
+  type        NotificationType
+  channel     String           @default("all") // email, push, sms, all
+  subject     String                           // Email subject (supports {{vars}})
+  htmlBody    String                           // Email HTML body
+  pushTitle   String?                          // Push notification title
+  pushBody    String?                          // Push notification body
+  smsBody     String?                          // SMS body (160 chars)
+  active      Boolean          @default(true)
+  updatedAt   DateTime         @updatedAt
+  createdAt   DateTime         @default(now())
+
+  @@unique([type, channel])
+  @@index([type])
+  @@index([active])
+}
+
+// ─── AI MODERATION ────────────────────────────────────────────────────────
+
+model ModerationFlag {
+  id          String   @id @default(cuid())
+  entityType  String              // message, listing, review, booking, profile
+  entityId    String              // ID of the flagged entity
+  userId      String?             // User who created the flagged content
+  content     String              // The flagged text
+  reason      String              // profanity, circumvention, scam, harassment, spam, other
+  severity    String   @default("medium") // low, medium, high, critical
+  aiScore     Float?              // AI confidence score 0-1
+  aiExplanation String?           // AI reasoning
+  status      String   @default("pending") // pending, reviewed, actioned, dismissed
+  reviewedBy  String?             // Admin who reviewed
+  reviewedAt  DateTime?
+  actionTaken String?             // warned, suspended, content_removed, none
+  metadata    String?             // JSON
+  createdAt   DateTime @default(now())
+
+  @@index([status])
+  @@index([entityType])
+  @@index([severity])
+  @@index([userId])
+  @@index([createdAt])
+}
+
 model SocialPost {
   id          String    @id @default(cuid())
   platform    String                        // linkedin, instagram
@@ -1228,4 +1275,71 @@ model SocialPost {
   @@index([platform])
   @@index([status])
   @@index([scheduledAt])
+}
+
+// ─── AI ACTION QUEUE ──────────────────────────────────────────────────────────
+// All AI-generated actions go here for admin approval before execution
+
+model AiAction {
+  id          String    @id @default(cuid())
+  type        String                        // draft_campaign, draft_social, draft_email, suggest_followup, auto_segment, auto_reply
+  status      String    @default("pending") // pending, approved, rejected, executed, failed
+  title       String                        // Short description shown in queue
+  description String?                       // AI explanation of what/why
+  payload     String                        // JSON: the full data for the action (email body, campaign data, social post, etc.)
+  result      String?                       // JSON: execution result after approval
+  aiModel     String?                       // Which AI model generated this
+  confidence  Float?                        // AI confidence 0-1
+  createdBy   String?                       // "ai" or admin userId who triggered
+  reviewedBy  String?                       // Admin who approved/rejected
+  reviewedAt  DateTime?
+  executedAt  DateTime?
+  error       String?
+  metadata    String?                       // JSON: extra context
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([status])
+  @@index([type])
+  @@index([createdAt])
+}
+
+// ─── CRM EMAILS (INBOX SYNC) ─────────────────────────────────────────────────
+// Cached copy of emails from IMAP for in-app management
+
+model CrmEmail {
+  id          String    @id @default(cuid())
+  messageId   String    @unique             // Email Message-ID header
+  folder      String    @default("INBOX")   // INBOX, Sent, Drafts, etc.
+  from        String                        // sender email
+  fromName    String?                       // sender display name
+  to          String                        // recipient(s), comma-separated
+  cc          String?
+  bcc         String?
+  replyTo     String?
+  subject     String
+  textBody    String?                       // plain text body
+  htmlBody    String?                       // HTML body
+  snippet     String?                       // first ~200 chars for preview
+  date        DateTime                      // email date
+  isRead      Boolean   @default(false)
+  isStarred   Boolean   @default(false)
+  isArchived  Boolean   @default(false)
+  hasAttachments Boolean @default(false)
+  attachments String?                       // JSON: [{filename, contentType, size}]
+  inReplyTo   String?                       // Message-ID of parent email
+  references  String?                       // Message-ID chain
+  contactId   String?                       // link to CrmContact if matched
+  contact     CrmContact? @relation(fields: [contactId], references: [id])
+  uid         Int?                          // IMAP UID for sync
+  flags       String?                       // IMAP flags
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([folder])
+  @@index([from])
+  @@index([date])
+  @@index([isRead])
+  @@index([contactId])
+  @@index([isArchived])
 }

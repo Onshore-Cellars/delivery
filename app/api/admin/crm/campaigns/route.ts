@@ -174,3 +174,32 @@ async function sendCampaignEmails(campaignId: string, subject: string, htmlBody:
     })
   }
 }
+
+// DELETE /api/admin/crm/campaigns — delete campaigns
+export async function DELETE(request: NextRequest) {
+  try {
+    const admin = requireAdmin(request)
+    if (!admin) return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
+
+    const body = await request.json()
+    const { ids } = body
+
+    if (!ids?.length) {
+      return NextResponse.json({ error: 'ids array required' }, { status: 400 })
+    }
+
+    // Delete recipients first (foreign key constraint)
+    await prisma.crmCampaignRecipient.deleteMany({
+      where: { campaignId: { in: ids } },
+    })
+
+    await prisma.crmCampaign.deleteMany({
+      where: { id: { in: ids } },
+    })
+
+    return NextResponse.json({ deleted: ids.length })
+  } catch (error) {
+    console.error('Campaigns DELETE error:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
