@@ -30,7 +30,7 @@ export default function CargoPackagingSelector({ onSelect, selectedId }: CargoPa
   const categories = {
     boxes: packagingTypes.filter(p => p.id.startsWith('box_') || p.id === 'multi_boxes'),
     pallets: packagingTypes.filter(p => p.id.startsWith('pallet_') || p.id === 'multi_pallets'),
-    other: packagingTypes.filter(p => ['crate', 'drum', 'loose', 'wine_case'].includes(p.id)),
+    other: packagingTypes.filter(p => ['crate', 'drum', 'envelope', 'tube', 'bag', 'ibc', 'loose', 'custom'].includes(p.id)),
   }
 
   const isPallet = selected?.id.startsWith('pallet_') ?? false

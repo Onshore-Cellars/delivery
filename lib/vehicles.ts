@@ -74,10 +74,14 @@ export const packagingTypes: PackagingType[] = [
   { id: 'multi_boxes', label: 'Multiple Boxes', description: 'Several boxes, specify quantity', defaultWeightKg: 50, defaultVolumeM3: 0.5 },
   { id: 'multi_pallets', label: 'Multiple Pallets', description: 'Several pallets, specify quantity', defaultWeightKg: 1000, defaultVolumeM3: 3.0 },
   // Other
-  { id: 'crate', label: 'Crate / Case', description: 'Wooden crate or shipping case', defaultWeightKg: 50, defaultVolumeM3: 0.3 },
-  { id: 'drum', label: 'Drum / Barrel', description: 'Barrel, drum, or keg', defaultWeightKg: 100, defaultVolumeM3: 0.2 },
+  { id: 'crate', label: 'Crate / Case', description: 'Wooden crate or shipping case', defaultWeightKg: 50, defaultVolumeM3: 0.3, lengthCm: 100, widthCm: 60, heightCm: 60 },
+  { id: 'drum', label: 'Drum / Barrel', description: 'Barrel, drum, or keg', defaultWeightKg: 100, defaultVolumeM3: 0.2, lengthCm: 60, widthCm: 60, heightCm: 90 },
+  { id: 'envelope', label: 'Envelope / Document', description: 'Letter, document, or flat parcel', defaultWeightKg: 1, defaultVolumeM3: 0.002, lengthCm: 35, widthCm: 25, heightCm: 3 },
+  { id: 'tube', label: 'Tube / Roll', description: 'Poster tube, rolled carpet, pipe', defaultWeightKg: 10, defaultVolumeM3: 0.02, lengthCm: 120, widthCm: 15, heightCm: 15 },
+  { id: 'bag', label: 'Bag / Sack', description: 'Sack, duffle bag, or soft package', defaultWeightKg: 20, defaultVolumeM3: 0.1, lengthCm: 60, widthCm: 40, heightCm: 40 },
+  { id: 'ibc', label: 'IBC Container', description: 'Intermediate bulk container (1000L)', defaultWeightKg: 1000, defaultVolumeM3: 1.0, lengthCm: 120, widthCm: 100, heightCm: 115 },
   { id: 'loose', label: 'Loose / Unpackaged', description: 'Furniture, equipment, oversized items', defaultWeightKg: 30, defaultVolumeM3: 0.5 },
-  { id: 'wine_case', label: 'Wine Case (12 bottles)', description: 'Standard 12-bottle wine case', defaultWeightKg: 18, defaultVolumeM3: 0.03, lengthCm: 50, widthCm: 33, heightCm: 18 },
+  { id: 'custom', label: 'Custom', description: 'Specify your own dimensions and weight', defaultWeightKg: 0, defaultVolumeM3: 0 },
 ]
 
 export function getPackagingById(id: string): PackagingType | undefined {
@@ -107,10 +111,13 @@ export const PACKAGE_DEFS: PackageDef[] = [
   { value: 'box-small',      label: 'Small Box',            defaultL: 30,  defaultW: 30,  defaultH: 30,  defaultKg: 5,   isPallet: false },
   { value: 'box-medium',     label: 'Medium Box',           defaultL: 50,  defaultW: 40,  defaultH: 40,  defaultKg: 15,  isPallet: false },
   { value: 'crate',          label: 'Crate',                defaultL: 100, defaultW: 60,  defaultH: 60,  defaultKg: 80,  isPallet: false },
-  { value: 'wine-case',      label: 'Wine Case (12 btl)',   defaultL: 50,  defaultW: 33,  defaultH: 18,  defaultKg: 18,  isPallet: false },
   { value: 'drum',           label: 'Barrel / Drum',        defaultL: 60,  defaultW: 60,  defaultH: 90,  defaultKg: 200, isPallet: false },
+  { value: 'envelope',       label: 'Envelope / Document',  defaultL: 35,  defaultW: 25,  defaultH: 3,   defaultKg: 1,   isPallet: false },
+  { value: 'tube',           label: 'Tube / Roll',          defaultL: 120, defaultW: 15,  defaultH: 15,  defaultKg: 10,  isPallet: false },
+  { value: 'bag',            label: 'Bag / Sack',           defaultL: 60,  defaultW: 40,  defaultH: 40,  defaultKg: 20,  isPallet: false },
+  { value: 'ibc',            label: 'IBC Container',        defaultL: 120, defaultW: 100, defaultH: 115, defaultKg: 1000,isPallet: false },
   { value: 'loose',          label: 'Loose Item',           defaultL: 0,   defaultW: 0,   defaultH: 0,   defaultKg: 0,   isPallet: false },
-  { value: 'oversized',      label: 'Oversized / Custom',   defaultL: 0,   defaultW: 0,   defaultH: 0,   defaultKg: 0,   isPallet: false },
+  { value: 'custom',         label: 'Custom Dimensions',    defaultL: 0,   defaultW: 0,   defaultH: 0,   defaultKg: 0,   isPallet: false },
 ]
 
 export function calcCubicMetres(l: number, w: number, h: number): number {
@@ -303,6 +310,121 @@ export const vehicleSpecs: VehicleSpec[] = [
   // ─── BOAT TRAILER ──────────────────────────────────────────────────────
   { make: 'Indespension', model: 'Boat Trailer 3.5t', type: 'Boat Trailer', maxPayloadKg: 2500, cargoVolumeM3: 0, cargoLengthCm: 800, cargoWidthCm: 250, cargoHeightCm: 0, fuelType: 'N/A' },
   { make: 'Brian James', model: 'A-Max Boat Trailer', type: 'Boat Trailer', maxPayloadKg: 3000, cargoVolumeM3: 0, cargoLengthCm: 900, cargoWidthCm: 260, cargoHeightCm: 0, fuelType: 'N/A' },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // ADDITIONAL EU/UK MAKES & MODELS
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // ─── OPEL (EU equivalent of Vauxhall) ──────────────────────────────────
+  // Small
+  { make: 'Opel', model: 'Combo Cargo L1', type: 'Small Van', maxPayloadKg: 650, cargoVolumeM3: 3.3, cargoLengthCm: 183, cargoWidthCm: 156, cargoHeightCm: 115, fuelType: 'Diesel' },
+  { make: 'Opel', model: 'Combo Cargo L2', type: 'Small Van', maxPayloadKg: 650, cargoVolumeM3: 3.9, cargoLengthCm: 213, cargoWidthCm: 156, cargoHeightCm: 115, fuelType: 'Diesel' },
+  { make: 'Opel', model: 'Combo-e Cargo Electric', type: 'Small Van', maxPayloadKg: 600, cargoVolumeM3: 3.3, cargoLengthCm: 183, cargoWidthCm: 156, cargoHeightCm: 115, fuelType: 'Electric' },
+  // Medium
+  { make: 'Opel', model: 'Vivaro L1', type: 'Medium Van', maxPayloadKg: 1200, cargoVolumeM3: 5.3, cargoLengthCm: 240, cargoWidthCm: 166, cargoHeightCm: 137, fuelType: 'Diesel' },
+  { make: 'Opel', model: 'Vivaro L2', type: 'Medium Van', maxPayloadKg: 1150, cargoVolumeM3: 6.1, cargoLengthCm: 280, cargoWidthCm: 166, cargoHeightCm: 137, fuelType: 'Diesel' },
+  { make: 'Opel', model: 'Vivaro-e Electric', type: 'Medium Van', maxPayloadKg: 1000, cargoVolumeM3: 5.3, cargoLengthCm: 240, cargoWidthCm: 166, cargoHeightCm: 137, fuelType: 'Electric' },
+  // Large
+  { make: 'Opel', model: 'Movano L2H2', type: 'Large Van', maxPayloadKg: 1400, cargoVolumeM3: 10.8, cargoLengthCm: 312, cargoWidthCm: 179, cargoHeightCm: 189, fuelType: 'Diesel' },
+  { make: 'Opel', model: 'Movano L3H2', type: 'Large Van', maxPayloadKg: 1350, cargoVolumeM3: 13.0, cargoLengthCm: 370, cargoWidthCm: 179, cargoHeightCm: 189, fuelType: 'Diesel' },
+  { make: 'Opel', model: 'Movano L3H3', type: 'Large Van', maxPayloadKg: 1300, cargoVolumeM3: 15.0, cargoLengthCm: 370, cargoWidthCm: 179, cargoHeightCm: 216, fuelType: 'Diesel' },
+  { make: 'Opel', model: 'Movano-e Electric', type: 'Large Van', maxPayloadKg: 1100, cargoVolumeM3: 13.0, cargoLengthCm: 370, cargoWidthCm: 179, cargoHeightCm: 189, fuelType: 'Electric' },
+
+  // ─── MERCEDES-BENZ CITAN (Small Van) ──────────────────────────────────
+  { make: 'Mercedes-Benz', model: 'Citan Panel Van', type: 'Small Van', maxPayloadKg: 615, cargoVolumeM3: 2.9, cargoLengthCm: 180, cargoWidthCm: 145, cargoHeightCm: 110, fuelType: 'Diesel' },
+  { make: 'Mercedes-Benz', model: 'Citan Long', type: 'Small Van', maxPayloadKg: 600, cargoVolumeM3: 3.3, cargoLengthCm: 210, cargoWidthCm: 145, cargoHeightCm: 110, fuelType: 'Diesel' },
+  { make: 'Mercedes-Benz', model: 'eCitan Electric', type: 'Small Van', maxPayloadKg: 490, cargoVolumeM3: 2.9, cargoLengthCm: 180, cargoWidthCm: 145, cargoHeightCm: 110, fuelType: 'Electric' },
+
+  // ─── RENAULT EXPRESS VAN ──────────────────────────────────────────────
+  { make: 'Renault', model: 'Express Van', type: 'Small Van', maxPayloadKg: 575, cargoVolumeM3: 2.5, cargoLengthCm: 165, cargoWidthCm: 140, cargoHeightCm: 108, fuelType: 'Diesel' },
+
+  // ─── HYUNDAI ──────────────────────────────────────────────────────────
+  { make: 'Hyundai', model: 'Staria Load SWB', type: 'Medium Van', maxPayloadKg: 1000, cargoVolumeM3: 5.0, cargoLengthCm: 240, cargoWidthCm: 160, cargoHeightCm: 130, fuelType: 'Diesel' },
+  { make: 'Hyundai', model: 'Staria Load LWB', type: 'Large Van', maxPayloadKg: 950, cargoVolumeM3: 6.5, cargoLengthCm: 290, cargoWidthCm: 160, cargoHeightCm: 130, fuelType: 'Diesel' },
+
+  // ─── LEVC (London EV Company) ─────────────────────────────────────────
+  { make: 'LEVC', model: 'VN5 Range Extender', type: 'Medium Van', maxPayloadKg: 830, cargoVolumeM3: 5.5, cargoLengthCm: 246, cargoWidthCm: 156, cargoHeightCm: 131, fuelType: 'Electric' },
+
+  // ─── DFSK (EU-available electric vans) ────────────────────────────────
+  { make: 'DFSK', model: 'EC35 Electric', type: 'Small Van', maxPayloadKg: 945, cargoVolumeM3: 4.8, cargoLengthCm: 224, cargoWidthCm: 157, cargoHeightCm: 132, fuelType: 'Electric' },
+
+  // ─── PIAGGIO (Micro/city vans) ────────────────────────────────────────
+  { make: 'Piaggio', model: 'Porter Electric', type: 'Small Van', maxPayloadKg: 530, cargoVolumeM3: 2.5, cargoLengthCm: 170, cargoWidthCm: 140, cargoHeightCm: 105, fuelType: 'Electric' },
+  { make: 'Piaggio', model: 'Porter NP6 Diesel', type: 'Small Van', maxPayloadKg: 630, cargoVolumeM3: 3.0, cargoLengthCm: 198, cargoWidthCm: 142, cargoHeightCm: 108, fuelType: 'Diesel' },
+
+  // ─── KGM (formerly SsangYong) ─────────────────────────────────────────
+  { make: 'KGM', model: 'Musso Pickup', type: 'Pickup Truck', maxPayloadKg: 1085, cargoVolumeM3: 1.4, cargoLengthCm: 150, cargoWidthCm: 151, cargoHeightCm: 49, fuelType: 'Diesel' },
+  { make: 'KGM', model: 'Musso Grand Pickup', type: 'Pickup Truck', maxPayloadKg: 1060, cargoVolumeM3: 1.6, cargoLengthCm: 165, cargoWidthCm: 151, cargoHeightCm: 49, fuelType: 'Diesel' },
+
+  // ─── MAXUS (additional models) ────────────────────────────────────────
+  { make: 'MAXUS', model: 'eDeliver 7 L2H2 Electric', type: 'Large Van', maxPayloadKg: 1150, cargoVolumeM3: 11.0, cargoLengthCm: 338, cargoWidthCm: 180, cargoHeightCm: 188, fuelType: 'Electric' },
+  { make: 'MAXUS', model: 'eDeliver 7 L3H3 Electric', type: 'Large Van', maxPayloadKg: 1050, cargoVolumeM3: 14.7, cargoLengthCm: 395, cargoWidthCm: 180, cargoHeightCm: 210, fuelType: 'Electric' },
+  { make: 'MAXUS', model: 'T90EV Electric Pickup', type: 'Pickup Truck', maxPayloadKg: 1000, cargoVolumeM3: 1.5, cargoLengthCm: 153, cargoWidthCm: 155, cargoHeightCm: 50, fuelType: 'Electric' },
+
+  // ─── TOYOTA (additional) ──────────────────────────────────────────────
+  { make: 'Toyota', model: 'Proace Max L3H2', type: 'Large Van', maxPayloadKg: 1400, cargoVolumeM3: 13.0, cargoLengthCm: 370, cargoWidthCm: 183, cargoHeightCm: 180, fuelType: 'Diesel' },
+  { make: 'Toyota', model: 'Proace Max L4H3', type: 'Large Van', maxPayloadKg: 1250, cargoVolumeM3: 17.0, cargoLengthCm: 434, cargoWidthCm: 183, cargoHeightCm: 210, fuelType: 'Diesel' },
+  { make: 'Toyota', model: 'Proace Max Electric', type: 'Large Van', maxPayloadKg: 1050, cargoVolumeM3: 13.0, cargoLengthCm: 370, cargoWidthCm: 183, cargoHeightCm: 180, fuelType: 'Electric' },
+  { make: 'Toyota', model: 'Proace City Electric', type: 'Small Van', maxPayloadKg: 600, cargoVolumeM3: 3.3, cargoLengthCm: 183, cargoWidthCm: 156, cargoHeightCm: 115, fuelType: 'Electric' },
+
+  // ─── FORD (additional) ────────────────────────────────────────────────
+  { make: 'Ford', model: 'Transit L2H3', type: 'Large Van', maxPayloadKg: 1450, cargoVolumeM3: 11.0, cargoLengthCm: 299, cargoWidthCm: 178, cargoHeightCm: 215, fuelType: 'Diesel' },
+  { make: 'Ford', model: 'Transit Custom PHEV', type: 'Medium Van', maxPayloadKg: 950, cargoVolumeM3: 5.8, cargoLengthCm: 252, cargoWidthCm: 170, cargoHeightCm: 137, fuelType: 'Hybrid' },
+  { make: 'Ford', model: 'Ranger Raptor', type: 'Pickup Truck', maxPayloadKg: 620, cargoVolumeM3: 1.5, cargoLengthCm: 156, cargoWidthCm: 154, cargoHeightCm: 51, fuelType: 'Diesel' },
+
+  // ─── VOLKSWAGEN (additional) ──────────────────────────────────────────
+  { make: 'Volkswagen', model: 'Transporter T7 SWB', type: 'Medium Van', maxPayloadKg: 1100, cargoVolumeM3: 5.8, cargoLengthCm: 272, cargoWidthCm: 170, cargoHeightCm: 140, fuelType: 'Diesel' },
+  { make: 'Volkswagen', model: 'Transporter T7 LWB', type: 'Medium Van', maxPayloadKg: 1050, cargoVolumeM3: 6.7, cargoLengthCm: 292, cargoWidthCm: 170, cargoHeightCm: 140, fuelType: 'Diesel' },
+
+  // ─── RENAULT (additional) ─────────────────────────────────────────────
+  { make: 'Renault', model: 'Master L4H2', type: 'Large Van', maxPayloadKg: 1300, cargoVolumeM3: 15.5, cargoLengthCm: 430, cargoWidthCm: 179, cargoHeightCm: 189, fuelType: 'Diesel' },
+  { make: 'Renault', model: 'Master L4H3', type: 'Large Van', maxPayloadKg: 1250, cargoVolumeM3: 17.0, cargoLengthCm: 430, cargoWidthCm: 179, cargoHeightCm: 216, fuelType: 'Diesel' },
+  { make: 'Renault', model: 'Kangoo Maxi', type: 'Small Van', maxPayloadKg: 600, cargoVolumeM3: 3.9, cargoLengthCm: 213, cargoWidthCm: 145, cargoHeightCm: 115, fuelType: 'Diesel' },
+  { make: 'Renault', model: 'Kangoo E-Tech Maxi Electric', type: 'Small Van', maxPayloadKg: 550, cargoVolumeM3: 3.9, cargoLengthCm: 213, cargoWidthCm: 145, cargoHeightCm: 115, fuelType: 'Electric' },
+
+  // ─── CITROEN (additional) ─────────────────────────────────────────────
+  { make: 'Citroen', model: 'Relay L4H2', type: 'Large Van', maxPayloadKg: 1300, cargoVolumeM3: 15.0, cargoLengthCm: 434, cargoWidthCm: 183, cargoHeightCm: 180, fuelType: 'Diesel' },
+  { make: 'Citroen', model: 'Relay L4H3', type: 'Large Van', maxPayloadKg: 1250, cargoVolumeM3: 17.0, cargoLengthCm: 434, cargoWidthCm: 183, cargoHeightCm: 210, fuelType: 'Diesel' },
+  { make: 'Citroen', model: 'Berlingo Electric', type: 'Small Van', maxPayloadKg: 600, cargoVolumeM3: 3.3, cargoLengthCm: 183, cargoWidthCm: 156, cargoHeightCm: 115, fuelType: 'Electric' },
+
+  // ─── PEUGEOT (additional) ─────────────────────────────────────────────
+  { make: 'Peugeot', model: 'Partner Electric', type: 'Small Van', maxPayloadKg: 600, cargoVolumeM3: 3.3, cargoLengthCm: 183, cargoWidthCm: 156, cargoHeightCm: 115, fuelType: 'Electric' },
+
+  // ─── FIAT (additional) ────────────────────────────────────────────────
+  { make: 'Fiat', model: 'Ducato L3H3', type: 'Large Van', maxPayloadKg: 1300, cargoVolumeM3: 15.0, cargoLengthCm: 370, cargoWidthCm: 183, cargoHeightCm: 210, fuelType: 'Diesel' },
+  { make: 'Fiat', model: 'Scudo L2', type: 'Medium Van', maxPayloadKg: 1100, cargoVolumeM3: 6.1, cargoLengthCm: 282, cargoWidthCm: 165, cargoHeightCm: 134, fuelType: 'Diesel' },
+
+  // ─── NISSAN (additional) ──────────────────────────────────────────────
+  { make: 'Nissan', model: 'Interstar L2H2', type: 'Large Van', maxPayloadKg: 1400, cargoVolumeM3: 10.8, cargoLengthCm: 312, cargoWidthCm: 179, cargoHeightCm: 189, fuelType: 'Diesel' },
+  { make: 'Nissan', model: 'Interstar L3H2', type: 'Large Van', maxPayloadKg: 1350, cargoVolumeM3: 13.0, cargoLengthCm: 370, cargoWidthCm: 179, cargoHeightCm: 189, fuelType: 'Diesel' },
+  { make: 'Nissan', model: 'Interstar-e Electric', type: 'Large Van', maxPayloadKg: 1100, cargoVolumeM3: 13.0, cargoLengthCm: 370, cargoWidthCm: 179, cargoHeightCm: 189, fuelType: 'Electric' },
+
+  // ─── VAUXHALL (additional) ────────────────────────────────────────────
+  { make: 'Vauxhall', model: 'Combo L2', type: 'Small Van', maxPayloadKg: 650, cargoVolumeM3: 3.9, cargoLengthCm: 213, cargoWidthCm: 156, cargoHeightCm: 115, fuelType: 'Diesel' },
+  { make: 'Vauxhall', model: 'Movano L4H2', type: 'Large Van', maxPayloadKg: 1300, cargoVolumeM3: 15.5, cargoLengthCm: 430, cargoWidthCm: 179, cargoHeightCm: 189, fuelType: 'Diesel' },
+  { make: 'Vauxhall', model: 'Movano L4H3', type: 'Large Van', maxPayloadKg: 1250, cargoVolumeM3: 17.0, cargoLengthCm: 430, cargoWidthCm: 179, cargoHeightCm: 216, fuelType: 'Diesel' },
+
+  // ─── IVECO (additional) ───────────────────────────────────────────────
+  { make: 'Iveco', model: 'Daily 35S L2H2', type: 'Large Van', maxPayloadKg: 1600, cargoVolumeM3: 10.8, cargoLengthCm: 310, cargoWidthCm: 180, cargoHeightCm: 190, fuelType: 'Diesel' },
+  { make: 'Iveco', model: 'Daily 50C Box 5.2t', type: 'Box Truck', maxPayloadKg: 2700, cargoVolumeM3: 20.0, cargoLengthCm: 430, cargoWidthCm: 215, cargoHeightCm: 220, fuelType: 'Diesel' },
+  { make: 'Iveco', model: 'Daily Natural Power CNG', type: 'Large Van', maxPayloadKg: 1400, cargoVolumeM3: 12.0, cargoLengthCm: 357, cargoWidthCm: 180, cargoHeightCm: 190, fuelType: 'CNG' },
+
+  // ─── MAN (additional) ─────────────────────────────────────────────────
+  { make: 'MAN', model: 'TGE L2H2', type: 'Large Van', maxPayloadKg: 1350, cargoVolumeM3: 10.7, cargoLengthCm: 310, cargoWidthCm: 183, cargoHeightCm: 190, fuelType: 'Diesel' },
+  { make: 'MAN', model: 'TGE L3H3', type: 'Large Van', maxPayloadKg: 1350, cargoVolumeM3: 14.4, cargoLengthCm: 347, cargoWidthCm: 183, cargoHeightCm: 210, fuelType: 'Diesel' },
+
+  // ─── DAF (additional) ─────────────────────────────────────────────────
+  { make: 'DAF', model: 'LF 7.5t Curtain-side', type: 'Curtain-side', maxPayloadKg: 3500, cargoVolumeM3: 28.0, cargoLengthCm: 490, cargoWidthCm: 240, cargoHeightCm: 235, fuelType: 'Diesel' },
+  { make: 'DAF', model: 'LF Electric 7.5t Box', type: 'Box Truck', maxPayloadKg: 3000, cargoVolumeM3: 28.0, cargoLengthCm: 490, cargoWidthCm: 240, cargoHeightCm: 235, fuelType: 'Electric' },
+
+  // ─── TIPPER TRUCKS ────────────────────────────────────────────────────
+  { make: 'Ford', model: 'Transit Tipper', type: 'Tipper Truck', maxPayloadKg: 1500, cargoVolumeM3: 4.0, cargoLengthCm: 300, cargoWidthCm: 200, cargoHeightCm: 40, fuelType: 'Diesel' },
+  { make: 'Iveco', model: 'Daily Tipper 3.5t', type: 'Tipper Truck', maxPayloadKg: 1600, cargoVolumeM3: 5.0, cargoLengthCm: 330, cargoWidthCm: 210, cargoHeightCm: 40, fuelType: 'Diesel' },
+  { make: 'Mercedes-Benz', model: 'Sprinter Tipper', type: 'Tipper Truck', maxPayloadKg: 1400, cargoVolumeM3: 4.5, cargoLengthCm: 310, cargoWidthCm: 200, cargoHeightCm: 40, fuelType: 'Diesel' },
+
+  // ─── CARGO BIKES ──────────────────────────────────────────────────────
+  { make: 'Urban Arrow', model: 'Cargo L', type: 'Cargo Bike', maxPayloadKg: 250, cargoVolumeM3: 0.6, cargoLengthCm: 90, cargoWidthCm: 60, cargoHeightCm: 60, fuelType: 'Electric' },
+  { make: 'Riese & Muller', model: 'Packster 70', type: 'Cargo Bike', maxPayloadKg: 200, cargoVolumeM3: 0.4, cargoLengthCm: 80, cargoWidthCm: 55, cargoHeightCm: 50, fuelType: 'Electric' },
 ]
 
 // Helper: Get unique makes

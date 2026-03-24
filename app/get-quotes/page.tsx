@@ -289,9 +289,9 @@ export default function GetQuotesPage() {
                     { type: 'box', label: '+ Box' },
                     { type: 'pallet', label: '+ Pallet' },
                     { type: 'half-pallet', label: '+ Half Pallet' },
-                    { type: 'wine-case', label: '+ Wine Case' },
-                    { type: 'crate', label: '+ Crate' },
                     { type: 'euro-pallet', label: '+ Euro Pallet' },
+                    { type: 'crate', label: '+ Crate' },
+                    { type: 'envelope', label: '+ Envelope' },
                   ].map(btn => (
                     <button
                       key={btn.type}
@@ -374,9 +374,9 @@ export default function GetQuotesPage() {
                     { type: 'half-pallet', label: '+ Half Pallet' },
                     { type: 'quarter-pallet', label: '+ Quarter Pallet' },
                     { type: 'euro-pallet', label: '+ Euro Pallet' },
-                    { type: 'wine-case', label: '+ Wine Case' },
                     { type: 'crate', label: '+ Crate' },
                     { type: 'drum', label: '+ Drum' },
+                    { type: 'custom', label: '+ Custom' },
                   ].map(btn => (
                     <button
                       key={btn.type}

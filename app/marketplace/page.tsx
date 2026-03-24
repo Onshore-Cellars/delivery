@@ -119,10 +119,13 @@ const PACKAGE_PRESETS: Record<string, { label: string; lengthCm: number; widthCm
   'uk-pallet': { label: 'Full Pallet UK (120×100cm)', lengthCm: 120, widthCm: 100, heightCm: 150, weightKg: 600, group: 'Pallets' },
   'industrial-pallet': { label: 'Industrial Pallet (120×120cm)', lengthCm: 120, widthCm: 120, heightCm: 150, weightKg: 800, group: 'Pallets' },
   // Other
-  'wine-case': { label: 'Wine Case (12 bottles)', lengthCm: 50, widthCm: 33, heightCm: 18, weightKg: 18, group: 'Other' },
   'crate': { label: 'Shipping Crate', lengthCm: 100, widthCm: 60, heightCm: 60, weightKg: 50, group: 'Other' },
   'drum': { label: 'Drum / Barrel', lengthCm: 60, widthCm: 60, heightCm: 90, weightKg: 100, group: 'Other' },
   'tube': { label: 'Tube / Roll', lengthCm: 120, widthCm: 15, heightCm: 15, weightKg: 10, group: 'Other' },
+  'envelope': { label: 'Envelope / Document', lengthCm: 35, widthCm: 25, heightCm: 3, weightKg: 1, group: 'Other' },
+  'bag': { label: 'Bag / Sack', lengthCm: 60, widthCm: 40, heightCm: 40, weightKg: 20, group: 'Other' },
+  'ibc': { label: 'IBC Container', lengthCm: 120, widthCm: 100, heightCm: 115, weightKg: 1000, group: 'Other' },
+  'custom': { label: 'Custom Dimensions', lengthCm: 0, widthCm: 0, heightCm: 0, weightKg: 0, group: 'Other' },
 }
 
 const ITEMS_PER_PAGE = 10
