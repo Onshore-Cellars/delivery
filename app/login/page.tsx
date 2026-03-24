@@ -28,6 +28,7 @@ export default function LoginPage() {
   const [showRoleSelect, setShowRoleSelect] = useState(false)
   const [pendingGoogleToken, setPendingGoogleToken] = useState<string | null>(null)
   const [googleReady, setGoogleReady] = useState(false)
+  const [googleLoading, setGoogleLoading] = useState(!!process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID)
 
   const handleGoogleResponse = useCallback(async (response: { credential: string }) => {
     setError('')
@@ -74,12 +75,13 @@ export default function LoginPage() {
           window.google.accounts.id.renderButton(btnEl, { theme: 'outline', size: 'large', width: '100%', text: 'signin_with', shape: 'pill' })
         }
         setGoogleReady(true)
+        setGoogleLoading(false)
       }
     }
-    script.onerror = () => setGoogleReady(false)
+    script.onerror = () => { setGoogleReady(false); setGoogleLoading(false) }
     document.head.appendChild(script)
     // If script hasn't loaded after 5s, show fallback
-    const timeout = setTimeout(() => { if (!window.google?.accounts?.id) setGoogleReady(false) }, 5000)
+    const timeout = setTimeout(() => { if (!window.google?.accounts?.id) { setGoogleReady(false); setGoogleLoading(false) } }, 5000)
     return () => { script.remove(); clearTimeout(timeout) }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -163,7 +165,12 @@ export default function LoginPage() {
           {process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID && (
             <div id="google-signin-btn" className={`flex justify-center ${googleReady ? '' : 'hidden'}`} />
           )}
-          {!googleReady && (
+          {googleLoading && !googleReady && (
+            <div className="flex justify-center py-3">
+              <svg className="animate-spin h-5 w-5 text-slate-300" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+            </div>
+          )}
+          {!googleLoading && !googleReady && (
             <div className="text-center">
               <p className="text-xs text-slate-400 mb-2">Google sign-in is not available right now</p>
               <p className="text-xs text-slate-400">Please use email and password to sign in</p>
