@@ -58,7 +58,7 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
   const navLinkCls = (href: string) => `px-4 py-2 rounded text-xs font-medium uppercase tracking-wider transition-colors hover:no-underline ${
     isActive(href)
       ? isTransparentMode ? 'bg-white/20 text-white' : 'bg-slate-100 text-[#1a1a1a]'
-      : isTransparentMode ? 'text-white/70 hover:text-white hover:bg-white/10' : 'text-slate-600 hover:text-[#1a1a1a] hover:bg-slate-50'
+      : isTransparentMode ? 'text-white hover:text-white hover:bg-white/15' : 'text-slate-600 hover:text-[#1a1a1a] hover:bg-slate-50'
   }`
 
   // Bottom tab items for mobile
@@ -150,7 +150,7 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
                       className={`px-3 py-2 rounded text-xs font-medium uppercase tracking-wider transition-colors ${
                         moreMenuOpen || ['/analytics','/insurance','/disputes','/earnings','/vehicles','/quotes','/reviews'].includes(pathname)
                           ? isTransparentMode ? 'bg-white/20 text-white' : 'bg-slate-100 text-[#1a1a1a]'
-                          : isTransparentMode ? 'text-white/70 hover:text-white hover:bg-white/10' : 'text-slate-600 hover:text-[#1a1a1a] hover:bg-slate-50'
+                          : isTransparentMode ? 'text-white hover:text-white hover:bg-white/15' : 'text-slate-600 hover:text-[#1a1a1a] hover:bg-slate-50'
                       }`}
                       aria-label="More pages"
                     >
@@ -225,8 +225,8 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
                 </>
               ) : (
                 <>
-                  <div className={`w-px h-6 mx-2 ${isTransparentMode ? 'bg-white/20' : 'bg-slate-200'}`} />
-                  <Link href="/login" className={`px-4 py-2 rounded text-sm font-medium transition-colors hover:no-underline ${isTransparentMode ? 'text-white/70 hover:text-white hover:bg-white/10' : 'text-slate-600 hover:text-[#1a1a1a] hover:bg-slate-50'}`}>
+                  <div className={`w-px h-6 mx-2 ${isTransparentMode ? 'bg-white/40' : 'bg-slate-200'}`} />
+                  <Link href="/login" className={`px-4 py-2 rounded text-sm font-medium transition-colors hover:no-underline ${isTransparentMode ? 'text-white hover:text-white hover:bg-white/15' : 'text-slate-600 hover:text-[#1a1a1a] hover:bg-slate-50'}`}>
                     Sign In
                   </Link>
                   <Link href="/register" className="bg-[#C6904D] text-white text-xs font-semibold uppercase tracking-wider px-5 py-2.5 rounded-sm hover:bg-[#b07d3f] hover:no-underline transition-all">
