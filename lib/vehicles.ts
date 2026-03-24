@@ -119,13 +119,19 @@ export function calcCubicMetres(l: number, w: number, h: number): number {
 }
 
 export const vehicleSpecs: VehicleSpec[] = [
-  // ─── SMALL VANS ────────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SMALL VANS / CAR-DERIVED VANS (under 2.0t GVW typically)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // Ford
+  { make: 'Ford', model: 'Transit Courier', type: 'Small Van', maxPayloadKg: 560, cargoVolumeM3: 2.3, cargoLengthCm: 160, cargoWidthCm: 148, cargoHeightCm: 112, fuelType: 'Diesel' },
+  { make: 'Ford', model: 'Transit Courier EV', type: 'Small Van', maxPayloadKg: 490, cargoVolumeM3: 2.3, cargoLengthCm: 160, cargoWidthCm: 148, cargoHeightCm: 112, fuelType: 'Electric' },
   { make: 'Ford', model: 'Transit Connect L1', type: 'Small Van', maxPayloadKg: 625, cargoVolumeM3: 2.9, cargoLengthCm: 180, cargoWidthCm: 155, cargoHeightCm: 120, fuelType: 'Diesel' },
   { make: 'Ford', model: 'Transit Connect L2', type: 'Small Van', maxPayloadKg: 600, cargoVolumeM3: 3.6, cargoLengthCm: 213, cargoWidthCm: 155, cargoHeightCm: 120, fuelType: 'Diesel' },
-  { make: 'Ford', model: 'Transit Courier', type: 'Small Van', maxPayloadKg: 560, cargoVolumeM3: 2.3, cargoLengthCm: 160, cargoWidthCm: 148, cargoHeightCm: 112, fuelType: 'Diesel' },
-  { make: 'Volkswagen', model: 'Caddy', type: 'Small Van', maxPayloadKg: 700, cargoVolumeM3: 3.2, cargoLengthCm: 187, cargoWidthCm: 155, cargoHeightCm: 113, fuelType: 'Diesel' },
-  { make: 'Volkswagen', model: 'Caddy Maxi', type: 'Small Van', maxPayloadKg: 700, cargoVolumeM3: 4.2, cargoLengthCm: 218, cargoWidthCm: 155, cargoHeightCm: 113, fuelType: 'Diesel' },
+
+  // Volkswagen
   { make: 'Volkswagen', model: 'Caddy Cargo', type: 'Small Van', maxPayloadKg: 720, cargoVolumeM3: 3.3, cargoLengthCm: 190, cargoWidthCm: 155, cargoHeightCm: 113, fuelType: 'Diesel' },
+  { make: 'Volkswagen', model: 'Caddy Cargo Maxi', type: 'Small Van', maxPayloadKg: 700, cargoVolumeM3: 4.2, cargoLengthCm: 218, cargoWidthCm: 155, cargoHeightCm: 113, fuelType: 'Diesel' },
   { make: 'Renault', model: 'Kangoo', type: 'Small Van', maxPayloadKg: 650, cargoVolumeM3: 3.3, cargoLengthCm: 183, cargoWidthCm: 145, cargoHeightCm: 115, fuelType: 'Diesel' },
   { make: 'Renault', model: 'Kangoo E-Tech Electric', type: 'Small Van', maxPayloadKg: 600, cargoVolumeM3: 3.3, cargoLengthCm: 183, cargoWidthCm: 145, cargoHeightCm: 115, fuelType: 'Electric' },
   { make: 'Peugeot', model: 'Partner', type: 'Small Van', maxPayloadKg: 650, cargoVolumeM3: 3.3, cargoLengthCm: 183, cargoWidthCm: 156, cargoHeightCm: 115, fuelType: 'Diesel' },

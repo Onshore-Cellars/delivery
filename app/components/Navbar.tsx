@@ -57,8 +57,8 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
   const isTransparentMode = transparent && !scrolled
   const navLinkCls = (href: string) => `px-4 py-2 rounded text-xs font-medium uppercase tracking-wider transition-colors hover:no-underline ${
     isActive(href)
-      ? isTransparentMode ? 'bg-white/20 text-white' : 'bg-stone-100 text-[#1d1916]'
-      : isTransparentMode ? 'text-white/70 hover:text-white hover:bg-white/10' : 'text-stone-600 hover:text-[#1d1916] hover:bg-stone-50'
+      ? isTransparentMode ? 'bg-white/20 text-white font-semibold' : 'bg-stone-100 text-[#1d1916]'
+      : isTransparentMode ? 'text-white hover:text-white/80 hover:bg-white/10' : 'text-stone-600 hover:text-[#1d1916] hover:bg-stone-50'
   }`
 
   // Bottom tab items for mobile
@@ -99,11 +99,9 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2.5 hover:no-underline">
               <Image src="/logo.png" alt="Onshore Deliver" width={36} height={36} className="rounded-sm" />
-              {transparent && (
-                <span className={`text-lg font-semibold tracking-wide transition-colors duration-300 ${isTransparentMode ? 'text-white' : 'text-[#1d1916]'}`} style={{ fontFamily: 'var(--font-display)' }}>
-                  Onshore
-                </span>
-              )}
+              <span className={`text-lg font-semibold tracking-wide transition-colors duration-300 ${isTransparentMode ? 'text-white' : 'text-[#1d1916]'}`} style={{ fontFamily: 'var(--font-display)' }}>
+                Onshore
+              </span>
             </Link>
 
             {/* Desktop nav */}
@@ -149,8 +147,8 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
                       onBlur={() => setTimeout(() => setMoreMenuOpen(false), 150)}
                       className={`px-3 py-2 rounded text-xs font-medium uppercase tracking-wider transition-colors ${
                         moreMenuOpen || ['/analytics','/insurance','/disputes','/earnings','/vehicles','/quotes','/reviews'].includes(pathname)
-                          ? isTransparentMode ? 'bg-white/20 text-white' : 'bg-stone-100 text-[#1d1916]'
-                          : isTransparentMode ? 'text-white/70 hover:text-white hover:bg-white/10' : 'text-stone-600 hover:text-[#1d1916] hover:bg-stone-50'
+                          ? isTransparentMode ? 'bg-white/20 text-white font-semibold' : 'bg-stone-100 text-[#1d1916]'
+                          : isTransparentMode ? 'text-white hover:text-white/80 hover:bg-white/10' : 'text-stone-600 hover:text-[#1d1916] hover:bg-stone-50'
                       }`}
                       aria-label="More pages"
                     >
@@ -177,7 +175,7 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
 
                   {/* Notifications */}
                   <Link href="/notifications" className={`relative p-2 rounded transition-colors ${isTransparentMode ? 'hover:bg-white/10' : 'hover:bg-stone-50'}`} title="Notifications" aria-label="Notifications">
-                    <svg className={`w-5 h-5 ${isTransparentMode ? 'text-white/70' : 'text-stone-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className={`w-5 h-5 ${isTransparentMode ? 'text-white' : 'text-stone-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                     </svg>
                     {unreadNotifs > 0 && (
@@ -189,7 +187,7 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
 
                   {/* Messages */}
                   <Link href="/messages" className={`relative p-2 rounded transition-colors ${isTransparentMode ? 'hover:bg-white/10' : 'hover:bg-stone-50'}`} title="Messages" aria-label="Messages">
-                    <svg className={`w-5 h-5 ${isTransparentMode ? 'text-white/70' : 'text-stone-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className={`w-5 h-5 ${isTransparentMode ? 'text-white' : 'text-stone-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                     </svg>
                     {unreadMessages > 0 && (
@@ -226,7 +224,7 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
               ) : (
                 <>
                   <div className={`w-px h-6 mx-2 ${isTransparentMode ? 'bg-white/20' : 'bg-stone-200'}`} />
-                  <Link href="/login" className={`px-4 py-2 rounded text-sm font-medium transition-colors hover:no-underline ${isTransparentMode ? 'text-white/70 hover:text-white hover:bg-white/10' : 'text-stone-600 hover:text-[#1d1916] hover:bg-stone-50'}`}>
+                  <Link href="/login" className={`px-4 py-2 rounded text-sm font-medium transition-colors hover:no-underline ${isTransparentMode ? 'text-white hover:text-white/80 hover:bg-white/10' : 'text-stone-600 hover:text-[#1d1916] hover:bg-stone-50'}`}>
                     Sign In
                   </Link>
                   <Link href="/register" className="bg-[#C6904D] text-white text-xs font-semibold uppercase tracking-wider px-5 py-2.5 rounded-sm hover:bg-[#B07D3A] hover:no-underline transition-all">
