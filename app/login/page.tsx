@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useAuth } from '../components/AuthProvider'
@@ -43,6 +43,9 @@ export default function LoginPage() {
     finally { setLoading(false) }
   }, [googleSignIn])
 
+  const handleGoogleResponseRef = useRef(handleGoogleResponse)
+  handleGoogleResponseRef.current = handleGoogleResponse
+
   const handleRoleSelect = async (role: string) => {
     if (!pendingGoogleToken) return
     setError('')
@@ -62,7 +65,10 @@ export default function LoginPage() {
     script.defer = true
     script.onload = () => {
       if (window.google?.accounts?.id) {
-        window.google.accounts.id.initialize({ client_id: clientId, callback: handleGoogleResponse })
+        window.google.accounts.id.initialize({
+          client_id: clientId,
+          callback: (response: { credential: string }) => handleGoogleResponseRef.current(response),
+        })
         const btnEl = document.getElementById('google-signin-btn')
         if (btnEl) {
           window.google.accounts.id.renderButton(btnEl, { theme: 'outline', size: 'large', width: '100%', text: 'signin_with', shape: 'pill' })
@@ -72,10 +78,10 @@ export default function LoginPage() {
     }
     script.onerror = () => setGoogleReady(false)
     document.head.appendChild(script)
-    // If script hasn't loaded after 3s, show fallback
-    const timeout = setTimeout(() => { if (!window.google?.accounts?.id) setGoogleReady(false) }, 3000)
+    // If script hasn't loaded after 5s, show fallback
+    const timeout = setTimeout(() => { if (!window.google?.accounts?.id) setGoogleReady(false) }, 5000)
     return () => { script.remove(); clearTimeout(timeout) }
-  }, [handleGoogleResponse])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

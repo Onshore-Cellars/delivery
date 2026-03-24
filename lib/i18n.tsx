@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react'
+import { createContext, useContext, useState, useCallback, ReactNode, useEffect, useRef } from 'react'
 
 // ─── TRANSLATIONS ─────────────────────────────────────────────────────────────
 
@@ -467,6 +467,9 @@ const I18nContext = createContext<I18nContextType>({
 
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>('en')
+  const [aiTranslations, setAiTranslations] = useState<Record<string, string>>({})
+  const pendingKeys = useRef<Set<string>>(new Set())
+  const batchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     const supported: Locale[] = ['en','fr','es','it','el','nl','de','pt','tr','hr','ar']
@@ -479,6 +482,57 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
+  // Clear AI translations when locale changes
+  useEffect(() => {
+    setAiTranslations({})
+    pendingKeys.current.clear()
+  }, [locale])
+
+  // Batch AI translation for missing keys
+  const requestAiTranslation = useCallback((key: string, englishText: string) => {
+    if (locale === 'en') return
+    const cacheKey = `${locale}:${key}`
+    if (aiTranslations[cacheKey] || pendingKeys.current.has(cacheKey)) return
+
+    pendingKeys.current.add(cacheKey)
+
+    if (batchTimeout.current) clearTimeout(batchTimeout.current)
+    batchTimeout.current = setTimeout(async () => {
+      const keys = Array.from(pendingKeys.current)
+      if (keys.length === 0) return
+
+      // Extract English texts for the pending keys
+      const textsToTranslate = keys.map(k => {
+        const origKey = k.split(':').slice(1).join(':')
+        return translations.en[origKey] || origKey
+      })
+
+      try {
+        const res = await fetch('/api/ai/translate/batch', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ texts: textsToTranslate.slice(0, 50), targetLang: locale }),
+        })
+        if (res.ok) {
+          const data = await res.json()
+          if (data.translations && data.translations.length === keys.slice(0, 50).length) {
+            setAiTranslations(prev => {
+              const next = { ...prev }
+              keys.slice(0, 50).forEach((k, i) => {
+                next[k] = data.translations[i]
+              })
+              return next
+            })
+          }
+        }
+      } catch {
+        // Silently fail — English fallback is fine
+      }
+
+      keys.forEach(k => pendingKeys.current.delete(k))
+    }, 500)
+  }, [locale, aiTranslations])
+
   const setLocale = useCallback((l: Locale) => {
     setLocaleState(l)
     localStorage.setItem('od_locale', l)
@@ -486,14 +540,31 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const t = useCallback((key: string, params?: Record<string, string | number>) => {
-    let str = translations[locale]?.[key] || translations.en[key] || key
-    if (params) {
+    // 1. Try static dictionary for current locale
+    let str = translations[locale]?.[key]
+
+    // 2. Try AI-translated cache
+    if (!str) {
+      const cacheKey = `${locale}:${key}`
+      str = aiTranslations[cacheKey]
+    }
+
+    // 3. Fall back to English
+    if (!str) {
+      str = translations.en[key] || key
+      // Request AI translation for missing key (non-English)
+      if (locale !== 'en' && translations.en[key]) {
+        requestAiTranslation(key, translations.en[key])
+      }
+    }
+
+    if (params && str) {
       Object.entries(params).forEach(([k, v]) => {
-        str = str.replace(`{${k}}`, String(v))
+        str = str!.replace(`{${k}}`, String(v))
       })
     }
-    return str
-  }, [locale])
+    return str || key
+  }, [locale, aiTranslations, requestAiTranslation])
 
   return (
     <I18nContext.Provider value={{ locale, setLocale, t }}>

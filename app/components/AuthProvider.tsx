@@ -108,7 +108,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     router.push('/dashboard')
   }
 
-  const googleSignIn = async (idToken: string, role?: string): Promise<{ needsRole?: boolean }> => {
+  const googleSignIn = useCallback(async (idToken: string, role?: string): Promise<{ needsRole?: boolean }> => {
     const res = await fetch('/api/auth/google', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -125,7 +125,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(data.user)
     router.push('/dashboard')
     return {}
-  }
+  }, [router])
 
   const logout = () => {
     localStorage.removeItem('yh_token')
