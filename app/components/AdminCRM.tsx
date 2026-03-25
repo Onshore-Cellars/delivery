@@ -834,7 +834,7 @@ export default function AdminCRM({ token }: { token: string }) {
           cc: composeEmailCC || undefined,
           bcc: composeEmailBCC || undefined,
           subject: composeEmailSubject,
-          textBody: composeEmailBody + (emailSignature ? `\n\n${emailSignature.replace(/<[^>]+>/g, '')}` : ''),
+          textBody: composeEmailBody + (emailSignature ? `\n\n${DOMPurify.sanitize(emailSignature, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] })}` : ''),
           replyToMessageId: replyTo?.messageId || null,
         }),
       })
@@ -931,7 +931,7 @@ export default function AdminCRM({ token }: { token: string }) {
         body: JSON.stringify({
           to: emailModal.email,
           subject: emailSubject,
-          body: emailBody + (emailSignature ? `\n\n${emailSignature.replace(/<[^>]+>/g, '')}` : ''),
+          body: emailBody + (emailSignature ? `\n\n${DOMPurify.sanitize(emailSignature, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] })}` : ''),
           contactName: emailModal.name,
         }),
       })

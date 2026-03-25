@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useAuth } from '../components/AuthProvider'
 import PortAutocomplete from '../components/PortAutocomplete'
+import AddressAutocomplete from '../components/AddressAutocomplete'
 import CargoImageUpload from '../components/CargoImageUpload'
 import Link from 'next/link'
 
@@ -58,9 +59,13 @@ interface BookingForm {
   cargoImages: string[]
   specialHandling: string
   pickupAddress: string
+  pickupCity: string
+  pickupCountry: string
   pickupContact: string
   pickupPhone: string
   deliveryAddress: string
+  deliveryCity: string
+  deliveryCountry: string
   deliveryContact: string
   deliveryPhone: string
   deliveryNotes: string
@@ -192,8 +197,8 @@ export default function MarketplacePage() {
     itemCount: '1', declaredValue: '',
     cargoLengthCm: '', cargoWidthCm: '', cargoHeightCm: '',
     cargoImages: [],
-    specialHandling: '', pickupAddress: '', pickupContact: '', pickupPhone: '',
-    deliveryAddress: '', deliveryContact: '', deliveryPhone: '', deliveryNotes: '', deliveryTimeWindow: '',
+    specialHandling: '', pickupAddress: '', pickupCity: '', pickupCountry: '', pickupContact: '', pickupPhone: '',
+    deliveryAddress: '', deliveryCity: '', deliveryCountry: '', deliveryContact: '', deliveryPhone: '', deliveryNotes: '', deliveryTimeWindow: '',
     yachtName: '', yachtMMSI: '', berthNumber: '', marinaName: '', routeDirection: 'outbound',
   })
   const [bookingLoading, setBookingLoading] = useState(false)
@@ -1320,7 +1325,13 @@ export default function MarketplacePage() {
                 <div className="pt-3 border-t border-slate-100">
                   <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Pickup Details</p>
                   <div className="space-y-3">
-                    <input type="text" className={inputClass} placeholder="Pickup address" value={bookingForm.pickupAddress} onChange={(e) => setBookingForm({ ...bookingForm, pickupAddress: e.target.value })} />
+                    <AddressAutocomplete
+                      value={bookingForm.pickupAddress}
+                      onChange={(val) => setBookingForm({ ...bookingForm, pickupAddress: val })}
+                      onSelect={(addr) => setBookingForm((prev) => ({ ...prev, pickupAddress: addr.display, pickupCity: addr.city || '', pickupCountry: addr.country || '' }))}
+                      placeholder="Pickup address"
+                      className={inputClass}
+                    />
                     <div className="grid grid-cols-2 gap-3">
                       <input type="text" className={inputClass} placeholder="Contact name" value={bookingForm.pickupContact} onChange={(e) => setBookingForm({ ...bookingForm, pickupContact: e.target.value })} />
                       <input type="tel" className={inputClass} placeholder="Phone" value={bookingForm.pickupPhone} onChange={(e) => setBookingForm({ ...bookingForm, pickupPhone: e.target.value })} />
@@ -1332,7 +1343,13 @@ export default function MarketplacePage() {
                 <div className="pt-3 border-t border-slate-100">
                   <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Delivery Details</p>
                   <div className="space-y-3">
-                    <input type="text" className={inputClass} placeholder="Delivery address (marina, port, etc.)" value={bookingForm.deliveryAddress} onChange={(e) => setBookingForm({ ...bookingForm, deliveryAddress: e.target.value })} />
+                    <AddressAutocomplete
+                      value={bookingForm.deliveryAddress}
+                      onChange={(val) => setBookingForm({ ...bookingForm, deliveryAddress: val })}
+                      onSelect={(addr) => setBookingForm((prev) => ({ ...prev, deliveryAddress: addr.display, deliveryCity: addr.city || '', deliveryCountry: addr.country || '' }))}
+                      placeholder="Delivery address (marina, port, etc.)"
+                      className={inputClass}
+                    />
                     <div className="grid grid-cols-2 gap-3">
                       <input type="text" className={inputClass} placeholder="Contact name" value={bookingForm.deliveryContact} onChange={(e) => setBookingForm({ ...bookingForm, deliveryContact: e.target.value })} />
                       <input type="tel" className={inputClass} placeholder="Phone" value={bookingForm.deliveryPhone} onChange={(e) => setBookingForm({ ...bookingForm, deliveryPhone: e.target.value })} />

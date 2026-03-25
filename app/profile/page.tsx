@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '../components/AuthProvider'
 import AvatarUpload from '../components/AvatarUpload'
+import AddressAutocomplete from '../components/AddressAutocomplete'
 
 interface ProfileData {
   id: string; email: string; name: string; role: string
@@ -196,6 +197,22 @@ export default function ProfilePage() {
                   ['name', 'Full Name', 'text'],
                   ['phone', 'Phone', 'tel'],
                   ['company', 'Company', 'text'],
+                ].map(([key, label, type]) => (
+                  <div key={key}>
+                    <label className="block text-sm font-medium text-[#1a1a1a] mb-1">{label}</label>
+                    <input type={type} className="w-full px-4 py-3 sm:py-2.5 rounded-lg border border-slate-200 text-base sm:text-sm text-[#1a1a1a] focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 outline-none" value={(form[key] as string) || ''} onChange={e => setForm({...form, [key]: e.target.value})} />
+                  </div>
+                ))}
+                <div>
+                  <AddressAutocomplete
+                    label="Address"
+                    value={(form.address as string) || ''}
+                    onChange={val => setForm(f => ({...f, address: val}))}
+                    onSelect={addr => setForm(f => ({...f, address: addr.display, ...(addr.city ? { city: addr.city } : {}), ...(addr.country ? { country: addr.country } : {})}))}
+                    placeholder="Start typing an address..."
+                  />
+                </div>
+                {[
                   ['city', 'City', 'text'],
                   ['country', 'Country', 'text'],
                   ['website', 'Website', 'url'],

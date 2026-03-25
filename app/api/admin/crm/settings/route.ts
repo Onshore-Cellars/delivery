@@ -1,22 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
-import jwt from 'jsonwebtoken'
 import prisma from '@/lib/prisma'
+import { verifyToken, getTokenFromHeader } from '@/lib/auth'
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
-
-function verifyAdmin(req: NextRequest) {
-  const auth = req.headers.get('authorization')
-  if (!auth?.startsWith('Bearer ')) return null
-  try {
-    const decoded = jwt.verify(auth.slice(7), JWT_SECRET) as { userId: string; role: string }
-    if (decoded.role !== 'ADMIN') return null
-    return decoded
-  } catch { return null }
+function requireAdmin(request: NextRequest) {
+  const token = getTokenFromHeader(request.headers.get('authorization'))
+  if (!token) return null
+  const decoded = verifyToken(token)
+  if (!decoded || decoded.role !== 'ADMIN') return null
+  return decoded
 }
 
 // Store CRM settings as an AiAction with type 'crm_settings'
 export async function GET(req: NextRequest) {
-  const admin = verifyAdmin(req)
+  const admin = requireAdmin(req)
   if (!admin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   try {
@@ -51,7 +47,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const admin = verifyAdmin(req)
+  const admin = requireAdmin(req)
   if (!admin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   try {
