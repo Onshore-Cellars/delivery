@@ -41,7 +41,7 @@ interface FilterOption {
   count: number
 }
 
-type CrmView = 'contacts' | 'campaigns' | 'compose' | 'social' | 'queue' | 'ai' | 'inbox'
+type CrmView = 'contacts' | 'campaigns' | 'campaign-detail' | 'compose' | 'social' | 'queue' | 'ai' | 'inbox' | 'activity' | 'create-post' | 'settings' | 'templates'
 
 // WhatsApp link helper
 function getWhatsAppUrl(phone: string, message?: string): string {
@@ -124,6 +124,24 @@ interface CrmEmailItem {
   createdAt: string
 }
 
+interface CampaignRecipient {
+  id: string
+  contactId: string
+  status: string
+  sentAt: string | null
+  error: string | null
+  contact: { name: string; email: string | null; category: string; priority: string }
+}
+
+interface EmailTemplate {
+  id: string
+  name: string
+  subject: string
+  body: string
+  category: string | null
+  createdAt: string
+}
+
 export default function AdminCRM({ token }: { token: string }) {
   const [view, setView] = useState<CrmView>('contacts')
   const [contacts, setContacts] = useState<CrmContact[]>([])
@@ -198,6 +216,66 @@ export default function AdminCRM({ token }: { token: string }) {
   const [composeEmailSubject, setComposeEmailSubject] = useState('')
   const [composeEmailBody, setComposeEmailBody] = useState('')
   const [composeEmailSending, setComposeEmailSending] = useState(false)
+  const [composeEmailCC, setComposeEmailCC] = useState('')
+  const [composeEmailBCC, setComposeEmailBCC] = useState('')
+
+  // Email view mode (HTML vs Text)
+  const [emailViewMode, setEmailViewMode] = useState<'html' | 'text'>('html')
+
+  // Contact detail panel
+  const [detailContact, setDetailContact] = useState<CrmContact | null>(null)
+
+  // Activity log state
+  const [activityLogs, setActivityLogs] = useState<{ id: string; action: string; userId: string | null; targetId: string | null; details: string | null; ipAddress: string | null; createdAt: string; user?: { name: string | null; email: string; role: string } | null }[]>([])
+  const [activityLoading, setActivityLoading] = useState(false)
+  const [activityPage, setActivityPage] = useState(1)
+  const [activityTotalPages, setActivityTotalPages] = useState(1)
+  const [activityStats, setActivityStats] = useState<{ total: number; today: number; thisWeek: number }>({ total: 0, today: 0, thisWeek: 0 })
+
+  // Social post create form state
+  const [newPostPlatform, setNewPostPlatform] = useState('linkedin')
+  const [newPostType, setNewPostType] = useState('post')
+  const [newPostContent, setNewPostContent] = useState('')
+  const [newPostHashtags, setNewPostHashtags] = useState('')
+  const [newPostMediaUrl, setNewPostMediaUrl] = useState('')
+  const [newPostSchedule, setNewPostSchedule] = useState('')
+  const [newPostSaving, setNewPostSaving] = useState(false)
+
+  // Campaign preview toggle
+  const [campaignPreviewMode, setCampaignPreviewMode] = useState(false)
+
+  // Email signature
+  const [emailSignature, setEmailSignature] = useState('<p>Best regards,<br/>Onshore Delivery Team</p>')
+  const [signatureLoaded, setSignatureLoaded] = useState(false)
+
+  // CSV Import
+  const [csvImporting, setCsvImporting] = useState(false)
+  const csvInputRef = useRef<HTMLInputElement>(null)
+
+  // Campaign detail state
+  const [campaignDetail, setCampaignDetail] = useState<(CrmCampaign & { htmlBody?: string; textBody?: string }) | null>(null)
+  const [campaignRecipients, setCampaignRecipients] = useState<CampaignRecipient[]>([])
+  const [campaignDetailLoading, setCampaignDetailLoading] = useState(false)
+
+  // Campaign scheduling
+  const [campaignScheduleAt, setCampaignScheduleAt] = useState('')
+
+  // Email templates state
+  const [emailTemplates, setEmailTemplates] = useState<EmailTemplate[]>([])
+  const [templatesLoading, setTemplatesLoading] = useState(false)
+  const [showTemplateForm, setShowTemplateForm] = useState(false)
+  const [newTemplateName, setNewTemplateName] = useState('')
+  const [newTemplateSubject, setNewTemplateSubject] = useState('')
+  const [newTemplateBody, setNewTemplateBody] = useState('')
+  const [newTemplateCategory, setNewTemplateCategory] = useState('')
+
+  // Bulk email selection
+  const [selectedEmails, setSelectedEmails] = useState<Set<string>>(new Set())
+
+  // Contact autocomplete for compose
+  const [composeContactSearch, setComposeContactSearch] = useState('')
+  const [composeContactResults, setComposeContactResults] = useState<CrmContact[]>([])
+  const [showContactDropdown, setShowContactDropdown] = useState(false)
 
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
     setToast({ message, type })
@@ -378,6 +456,333 @@ export default function AdminCRM({ token }: { token: string }) {
     return () => clearTimeout(timer)
   }, [inboxSearchInput])
 
+  // ─── Activity Log Fetching ──────────────────────────────────────────────
+  const fetchActivityLogs = useCallback(async () => {
+    setActivityLoading(true)
+    try {
+      const params = new URLSearchParams({ page: String(activityPage), limit: '50' })
+      const res = await fetch(`/api/admin/crm/activity?${params}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (!res.ok) throw new Error('Failed')
+      const data = await res.json()
+      setActivityLogs(data.logs)
+      setActivityTotalPages(data.pagination.pages)
+      setActivityStats(data.stats)
+    } catch {
+      showToast('Failed to load activity logs', 'error')
+    } finally {
+      setActivityLoading(false)
+    }
+  }, [token, activityPage])
+
+  useEffect(() => {
+    if (view === 'activity') fetchActivityLogs()
+  }, [view, fetchActivityLogs])
+
+  // ─── Settings / Signature Fetch ─────────────────────────────────────────
+  useEffect(() => {
+    if (signatureLoaded) return
+    fetch('/api/admin/crm/settings', { headers: { Authorization: `Bearer ${token}` } })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data?.settings?.emailSignature) setEmailSignature(data.settings.emailSignature)
+        setSignatureLoaded(true)
+      })
+      .catch(() => setSignatureLoaded(true))
+  }, [token, signatureLoaded])
+
+  // ─── CSV Import Handler ─────────────────────────────────────────────────
+  const handleCSVImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setCsvImporting(true)
+    try {
+      const text = await file.text()
+      const lines = text.split('\n').filter(l => l.trim())
+      if (lines.length < 2) { showToast('CSV must have a header row and at least one data row', 'error'); return }
+      const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, '').toLowerCase())
+      const nameIdx = headers.findIndex(h => h === 'name' || h === 'company' || h === 'contact')
+      const emailIdx = headers.findIndex(h => h === 'email' || h === 'email address')
+      const phoneIdx = headers.findIndex(h => h === 'phone' || h === 'telephone' || h === 'mobile')
+      const categoryIdx = headers.findIndex(h => h === 'category' || h === 'type' || h === 'industry')
+      const countryIdx = headers.findIndex(h => h === 'country' || h === 'region')
+      const websiteIdx = headers.findIndex(h => h === 'website' || h === 'url')
+      if (nameIdx === -1) { showToast('CSV must have a "Name" column', 'error'); return }
+
+      let imported = 0
+      let failed = 0
+      for (let i = 1; i < lines.length; i++) {
+        const cols = lines[i].match(/("([^"]*)"|[^,]*)/g)?.map(c => c.replace(/^"|"$/g, '').trim()) || []
+        const name = cols[nameIdx]
+        if (!name) continue
+        try {
+          const res = await fetch('/api/admin/crm', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({
+              name,
+              category: (categoryIdx >= 0 ? cols[categoryIdx] : '') || 'Imported',
+              email: emailIdx >= 0 ? cols[emailIdx] : '',
+              phone: phoneIdx >= 0 ? cols[phoneIdx] : '',
+              country: countryIdx >= 0 ? cols[countryIdx] : '',
+              website: websiteIdx >= 0 ? cols[websiteIdx] : '',
+              source: 'import',
+              priority: 'medium',
+            }),
+          })
+          if (res.ok) imported++
+          else failed++
+        } catch { failed++ }
+      }
+      showToast(`Imported ${imported} contacts${failed > 0 ? `, ${failed} failed` : ''}`)
+      fetchContacts()
+    } catch {
+      showToast('Failed to parse CSV file', 'error')
+    } finally {
+      setCsvImporting(false)
+      if (csvInputRef.current) csvInputRef.current.value = ''
+    }
+  }
+
+  // ─── Manual Social Post Creation ────────────────────────────────────────
+  const createSocialPost = async () => {
+    if (!newPostContent.trim()) { showToast('Post content is required', 'error'); return }
+    setNewPostSaving(true)
+    try {
+      const res = await fetch('/api/admin/crm/social', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          platform: newPostPlatform,
+          type: newPostType,
+          content: newPostContent,
+          hashtags: newPostHashtags || null,
+          mediaUrl: newPostMediaUrl || null,
+          status: newPostSchedule ? 'scheduled' : 'draft',
+          scheduledAt: newPostSchedule || null,
+        }),
+      })
+      if (!res.ok) throw new Error('Failed')
+      showToast('Post created')
+      setNewPostContent('')
+      setNewPostHashtags('')
+      setNewPostMediaUrl('')
+      setNewPostSchedule('')
+      setView('social')
+      fetchSocialPosts()
+    } catch {
+      showToast('Failed to create post', 'error')
+    } finally {
+      setNewPostSaving(false)
+    }
+  }
+
+  // ─── Save Email Signature ───────────────────────────────────────────────
+  const saveSignature = async () => {
+    try {
+      const res = await fetch('/api/admin/crm/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ settings: { emailSignature } }),
+      })
+      if (!res.ok) throw new Error('Failed')
+      showToast('Signature saved')
+    } catch {
+      showToast('Failed to save signature', 'error')
+    }
+  }
+
+  // ─── Campaign Detail ─────────────────────────────────────────────────
+  const fetchCampaignDetail = useCallback(async (id: string) => {
+    setCampaignDetailLoading(true)
+    try {
+      const res = await fetch(`/api/admin/crm/campaigns?id=${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (!res.ok) throw new Error('Failed')
+      const data = await res.json()
+      setCampaignDetail(data.campaign)
+      setCampaignRecipients(data.recipients)
+    } catch {
+      showToast('Failed to load campaign details', 'error')
+    } finally {
+      setCampaignDetailLoading(false)
+    }
+  }, [token])
+
+  useEffect(() => {
+    if (view === 'campaign-detail' && campaignDetail?.id) {
+      fetchCampaignDetail(campaignDetail.id)
+    }
+  }, [view])
+
+  const cloneCampaign = async (id: string) => {
+    setActionLoading(true)
+    try {
+      const res = await fetch('/api/admin/crm/campaigns', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ clone: id }),
+      })
+      if (!res.ok) throw new Error('Failed')
+      showToast('Campaign cloned as draft')
+      fetchCampaigns()
+      setView('campaigns')
+    } catch {
+      showToast('Failed to clone campaign', 'error')
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  const resendFailed = async (id: string) => {
+    if (!confirm('Resend to all failed/bounced recipients?')) return
+    setActionLoading(true)
+    try {
+      const res = await fetch('/api/admin/crm/campaigns', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ resendFailed: id }),
+      })
+      if (!res.ok) throw new Error('Failed')
+      const data = await res.json()
+      showToast(`Resending to ${data.resetCount || 0} recipient(s)`)
+      if (campaignDetail?.id === id) fetchCampaignDetail(id)
+      fetchCampaigns()
+    } catch {
+      showToast('Failed to resend', 'error')
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  // ─── Email Templates ───────────────────────────────────────────────────
+  const fetchEmailTemplates = useCallback(async () => {
+    setTemplatesLoading(true)
+    try {
+      const res = await fetch('/api/admin/crm/email-templates', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (!res.ok) throw new Error('Failed')
+      const data = await res.json()
+      setEmailTemplates(data.templates)
+    } catch {
+      showToast('Failed to load templates', 'error')
+    } finally {
+      setTemplatesLoading(false)
+    }
+  }, [token])
+
+  useEffect(() => {
+    if (view === 'templates') fetchEmailTemplates()
+  }, [view, fetchEmailTemplates])
+
+  const saveEmailTemplate = async () => {
+    if (!newTemplateName || !newTemplateSubject || !newTemplateBody) {
+      showToast('Fill in name, subject and body', 'error')
+      return
+    }
+    try {
+      const res = await fetch('/api/admin/crm/email-templates', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ name: newTemplateName, subject: newTemplateSubject, body: newTemplateBody, category: newTemplateCategory || 'General' }),
+      })
+      if (!res.ok) throw new Error('Failed')
+      showToast('Template saved')
+      setShowTemplateForm(false)
+      setNewTemplateName('')
+      setNewTemplateSubject('')
+      setNewTemplateBody('')
+      setNewTemplateCategory('')
+      fetchEmailTemplates()
+    } catch {
+      showToast('Failed to save template', 'error')
+    }
+  }
+
+  const deleteEmailTemplate = async (ids: string[]) => {
+    if (!confirm('Delete template(s)?')) return
+    try {
+      const res = await fetch('/api/admin/crm/email-templates', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ ids }),
+      })
+      if (!res.ok) throw new Error('Failed')
+      showToast('Template deleted')
+      fetchEmailTemplates()
+    } catch {
+      showToast('Failed to delete template', 'error')
+    }
+  }
+
+  const applyTemplate = (tpl: EmailTemplate) => {
+    setEmailSubject(tpl.subject)
+    setEmailBody(tpl.body)
+    showToast(`Template "${tpl.name}" applied`)
+  }
+
+  // ─── Contact Autocomplete for Compose ───────────────────────────────
+  useEffect(() => {
+    if (!composeContactSearch || composeContactSearch.length < 2) {
+      setComposeContactResults([])
+      setShowContactDropdown(false)
+      return
+    }
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/admin/crm?search=${encodeURIComponent(composeContactSearch)}&limit=8`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        if (!res.ok) return
+        const data = await res.json()
+        setComposeContactResults(data.contacts)
+        setShowContactDropdown(true)
+      } catch { /* ignore */ }
+    }, 200)
+    return () => clearTimeout(timer)
+  }, [composeContactSearch, token])
+
+  // ─── Bulk Email Actions ─────────────────────────────────────────────
+  const toggleEmailSelect = (id: string) => {
+    setSelectedEmails(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  const bulkEmailAction = async (action: 'archive' | 'delete' | 'read' | 'star') => {
+    const ids = Array.from(selectedEmails)
+    if (ids.length === 0) return
+    try {
+      if (action === 'delete') {
+        if (!confirm(`Delete ${ids.length} email(s)?`)) return
+        const res = await fetch('/api/admin/crm/emails', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ ids }),
+        })
+        if (!res.ok) throw new Error('Failed')
+        showToast(`Deleted ${ids.length} email(s)`)
+      } else {
+        const updates: Record<string, boolean> = {}
+        if (action === 'archive') updates.isArchived = true
+        if (action === 'read') updates.isRead = true
+        if (action === 'star') updates.isStarred = true
+        await updateEmailFlags(ids, updates)
+        showToast(`Updated ${ids.length} email(s)`)
+      }
+      setSelectedEmails(new Set())
+      fetchInboxEmails()
+    } catch {
+      showToast('Bulk action failed', 'error')
+    }
+  }
+
   const syncInbox = async () => {
     setInboxSyncing(true)
     try {
@@ -426,8 +831,10 @@ export default function AdminCRM({ token }: { token: string }) {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({
           to: composeEmailTo,
+          cc: composeEmailCC || undefined,
+          bcc: composeEmailBCC || undefined,
           subject: composeEmailSubject,
-          textBody: composeEmailBody,
+          textBody: composeEmailBody + (emailSignature ? `\n\n${emailSignature.replace(/<[^>]+>/g, '')}` : ''),
           replyToMessageId: replyTo?.messageId || null,
         }),
       })
@@ -436,6 +843,8 @@ export default function AdminCRM({ token }: { token: string }) {
       setShowComposeEmail(false)
       setReplyTo(null)
       setComposeEmailTo('')
+      setComposeEmailCC('')
+      setComposeEmailBCC('')
       setComposeEmailSubject('')
       setComposeEmailBody('')
       fetchInboxEmails()
@@ -522,7 +931,7 @@ export default function AdminCRM({ token }: { token: string }) {
         body: JSON.stringify({
           to: emailModal.email,
           subject: emailSubject,
-          body: emailBody,
+          body: emailBody + (emailSignature ? `\n\n${emailSignature.replace(/<[^>]+>/g, '')}` : ''),
           contactName: emailModal.name,
         }),
       })
@@ -577,7 +986,7 @@ export default function AdminCRM({ token }: { token: string }) {
         body: JSON.stringify({
           name: campaignName,
           subject: campaignSubject,
-          htmlBody: campaignHtml,
+          htmlBody: emailSignature ? `${campaignHtml}<br/><br/>${emailSignature}` : campaignHtml,
           filters,
           send: !asDraft,
         }),
@@ -784,29 +1193,36 @@ export default function AdminCRM({ token }: { token: string }) {
         </div>
       </div>
 
-      {/* Sub-navigation */}
-      <div className="flex gap-2 flex-wrap">
-        {([
-          { key: 'contacts', label: 'Contacts' },
-          { key: 'campaigns', label: 'Campaigns' },
-          { key: 'compose', label: 'Compose' },
-          { key: 'social', label: 'Social' },
-          { key: 'queue', label: `AI Queue${(aiQueueStats.pending || 0) > 0 ? ` (${aiQueueStats.pending})` : ''}` },
-          { key: 'inbox', label: `Inbox${inboxStats.unread > 0 ? ` (${inboxStats.unread})` : ''}` },
-          { key: 'ai', label: 'AI Chat' },
-        ] as { key: CrmView; label: string }[]).map(v => (
-          <button
-            key={v.key}
-            onClick={() => setView(v.key)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-              view === v.key
-                ? 'bg-[#1d1d1f] text-white'
-                : 'text-slate-500 hover:text-[#1d1d1f] hover:bg-slate-50 border border-slate-200'
-            }`}
-          >
-            {v.label}
-          </button>
-        ))}
+      {/* Sub-navigation — grouped */}
+      <div className="space-y-2">
+        {/* Primary nav */}
+        <div className="flex gap-1.5 flex-wrap overflow-x-auto pb-1 -mx-1 px-1">
+          {([
+            { key: 'contacts', label: 'Contacts', icon: '👥' },
+            { key: 'inbox', label: `Inbox${inboxStats.unread > 0 ? ` (${inboxStats.unread})` : ''}`, icon: '📥' },
+            { key: 'campaigns', label: 'Campaigns', icon: '📧' },
+            { key: 'compose', label: 'Compose', icon: '✏️' },
+            { key: 'social', label: 'Social', icon: '📱' },
+            { key: 'create-post', label: '+ Post', icon: '' },
+            { key: 'queue', label: `AI Queue${(aiQueueStats.pending || 0) > 0 ? ` (${aiQueueStats.pending})` : ''}`, icon: '🤖' },
+            { key: 'ai', label: 'AI Chat', icon: '✦' },
+            { key: 'templates', label: 'Templates', icon: '📄' },
+            { key: 'activity', label: 'Activity Log', icon: '📋' },
+            { key: 'settings', label: 'Settings', icon: '⚙️' },
+          ] as { key: CrmView; label: string; icon: string }[]).map(v => (
+            <button
+              key={v.key}
+              onClick={() => setView(v.key)}
+              className={`px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
+                view === v.key
+                  ? 'bg-[#1d1d1f] text-white shadow-sm'
+                  : 'text-slate-500 hover:text-[#1d1d1f] hover:bg-slate-50 border border-slate-200'
+              }`}
+            >
+              <span className="hidden sm:inline mr-1">{v.icon}</span>{v.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* ═══════════════════ CONTACTS VIEW ═══════════════════ */}
@@ -855,8 +1271,17 @@ export default function AdminCRM({ token }: { token: string }) {
                 className="px-4 py-2 rounded-lg border border-slate-200 text-sm font-medium text-slate-600 hover:bg-slate-50"
                 title="Export CSV"
               >
-                ↓ CSV
+                ↓ Export
               </button>
+              <button
+                onClick={() => csvInputRef.current?.click()}
+                disabled={csvImporting}
+                className="px-4 py-2 rounded-lg border border-slate-200 text-sm font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                title="Import CSV"
+              >
+                {csvImporting ? 'Importing...' : '↑ Import'}
+              </button>
+              <input ref={csvInputRef} type="file" accept=".csv" onChange={handleCSVImport} className="hidden" />
             </div>
 
             {/* Bulk Actions */}
@@ -900,7 +1325,7 @@ export default function AdminCRM({ token }: { token: string }) {
                         <input type="checkbox" checked={selected.has(c.id)} onChange={() => toggleSelect(c.id)} className="rounded border-slate-300" />
                       </td>
                       <td className="px-4 py-3">
-                        <div className="font-medium text-[#1a1a1a]">{c.name}</div>
+                        <div className="font-medium text-[#1a1a1a] cursor-pointer hover:text-[#C6904D] transition-colors" onClick={() => setDetailContact(c)}>{c.name}</div>
                         {c.website && <div className="text-xs text-slate-400 truncate max-w-[200px]">{c.website}</div>}
                       </td>
                       <td className="px-4 py-3">
@@ -927,7 +1352,7 @@ export default function AdminCRM({ token }: { token: string }) {
                           )}
                           {c.email && (
                             <button
-                              onClick={() => { setEmailModal(c); setEmailSubject(''); setEmailBody('') }}
+                              onClick={() => { setEmailModal(c); setEmailSubject(''); setEmailBody(''); if (emailTemplates.length === 0) fetchEmailTemplates() }}
                               className="px-2 py-1 rounded text-xs font-medium text-indigo-600 hover:bg-indigo-50"
                               title="Send Email"
                             >
@@ -974,39 +1399,48 @@ export default function AdminCRM({ token }: { token: string }) {
           ) : (
             <div className="divide-y divide-slate-50">
               {campaigns.map(c => (
-                <div key={c.id} className="px-4 py-3 hover:bg-slate-50/50 flex items-center justify-between">
-                  <div>
-                    <div className="font-medium text-[#1a1a1a] text-sm">{c.name}</div>
-                    <div className="text-xs text-slate-400 mt-0.5">
-                      {c.subject} &middot; {c._count.recipients} recipients
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    {c.sentCount > 0 && (
-                      <span className="text-xs text-slate-500">{c.sentCount} sent{c.failedCount > 0 ? `, ${c.failedCount} failed` : ''}</span>
-                    )}
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${statusBadge(c.status)}`}>{c.status}</span>
-                    <span className="text-xs text-slate-400">{new Date(c.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</span>
-                    <button
-                      onClick={async () => {
-                        if (!confirm(`Delete campaign "${c.name}"?`)) return
-                        try {
-                          const res = await fetch('/api/admin/crm/campaigns', {
-                            method: 'DELETE',
-                            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-                            body: JSON.stringify({ ids: [c.id] }),
-                          })
-                          if (!res.ok) throw new Error('Failed')
-                          showToast('Campaign deleted')
-                          fetchCampaigns()
-                        } catch {
-                          showToast('Failed to delete campaign', 'error')
-                        }
-                      }}
-                      className="px-2 py-1 rounded text-xs font-medium text-red-600 hover:bg-red-50"
+                <div key={c.id} className="px-4 py-3 hover:bg-slate-50/50">
+                  <div className="flex items-center justify-between">
+                    <div
+                      className="cursor-pointer flex-1"
+                      onClick={() => { setCampaignDetail(c as typeof campaignDetail); setView('campaign-detail') }}
                     >
-                      Del
-                    </button>
+                      <div className="font-medium text-[#1a1a1a] text-sm hover:text-[#C6904D] transition-colors">{c.name}</div>
+                      <div className="text-xs text-slate-400 mt-0.5">
+                        {c.subject} &middot; {c._count.recipients} recipients
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {c.sentCount > 0 && (
+                        <span className="text-xs text-slate-500">{c.sentCount} sent{c.failedCount > 0 ? `, ${c.failedCount} failed` : ''}</span>
+                      )}
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${statusBadge(c.status)}`}>{c.status}</span>
+                      <span className="text-xs text-slate-400">{new Date(c.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</span>
+                      <button onClick={() => cloneCampaign(c.id)} disabled={actionLoading} className="px-2 py-1 rounded text-xs font-medium text-blue-600 hover:bg-blue-50" title="Clone">Clone</button>
+                      {c.failedCount > 0 && (
+                        <button onClick={() => resendFailed(c.id)} disabled={actionLoading} className="px-2 py-1 rounded text-xs font-medium text-amber-600 hover:bg-amber-50" title="Resend failed">Retry</button>
+                      )}
+                      <button
+                        onClick={async () => {
+                          if (!confirm(`Delete campaign "${c.name}"?`)) return
+                          try {
+                            const res = await fetch('/api/admin/crm/campaigns', {
+                              method: 'DELETE',
+                              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                              body: JSON.stringify({ ids: [c.id] }),
+                            })
+                            if (!res.ok) throw new Error('Failed')
+                            showToast('Campaign deleted')
+                            fetchCampaigns()
+                          } catch {
+                            showToast('Failed to delete campaign', 'error')
+                          }
+                        }}
+                        className="px-2 py-1 rounded text-xs font-medium text-red-600 hover:bg-red-50"
+                      >
+                        Del
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -1060,17 +1494,45 @@ export default function AdminCRM({ token }: { token: string }) {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-slate-500 mb-1">Email Body (HTML)</label>
-            <textarea
-              value={campaignHtml}
-              onChange={e => setCampaignHtml(e.target.value)}
-              rows={12}
-              placeholder={`<h2>Hello {{name}},</h2>\n<p>We're excited to announce new delivery routes across the Mediterranean...</p>`}
-              className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 font-mono resize-y"
-            />
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-xs font-medium text-slate-500">Email Body (HTML)</label>
+              <button
+                type="button"
+                onClick={() => setCampaignPreviewMode(!campaignPreviewMode)}
+                className={`px-3 py-1 rounded-lg text-xs font-medium transition-all ${
+                  campaignPreviewMode ? 'bg-[#1d1d1f] text-white' : 'border border-slate-200 text-slate-500 hover:bg-slate-50'
+                }`}
+              >
+                {campaignPreviewMode ? 'Edit HTML' : 'Preview'}
+              </button>
+            </div>
+            {campaignPreviewMode ? (
+              <div className="w-full min-h-[300px] p-4 rounded-xl border border-slate-200 bg-white overflow-auto">
+                <div
+                  className="prose prose-sm max-w-none"
+                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(campaignHtml.replace(/\{\{name\}\}/g, 'John Smith')) }}
+                />
+              </div>
+            ) : (
+              <textarea
+                value={campaignHtml}
+                onChange={e => setCampaignHtml(e.target.value)}
+                rows={12}
+                placeholder={`<h2>Hello {{name}},</h2>\n<p>We're excited to announce new delivery routes across the Mediterranean...</p>`}
+                className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 font-mono resize-y"
+              />
+            )}
           </div>
 
-          <div className="flex gap-3">
+          {/* Schedule field */}
+          <div>
+            <label className="block text-xs font-medium text-slate-500 mb-1">Schedule Send (optional)</label>
+            <input type="datetime-local" value={campaignScheduleAt} onChange={e => setCampaignScheduleAt(e.target.value)}
+              className="w-full sm:w-auto px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D]" />
+            {campaignScheduleAt && <span className="text-xs text-slate-400 ml-2">Campaign will be sent at this time</span>}
+          </div>
+
+          <div className="flex gap-3 flex-wrap">
             <button onClick={() => setView('campaigns')} className="px-5 py-2.5 rounded-xl border border-slate-200 text-sm font-medium text-slate-600 hover:bg-slate-50">
               Cancel
             </button>
@@ -1158,6 +1620,8 @@ export default function AdminCRM({ token }: { token: string }) {
                   <option value="">All Platforms</option>
                   <option value="linkedin">LinkedIn</option>
                   <option value="instagram">Instagram</option>
+                  <option value="twitter">Twitter / X</option>
+                  <option value="facebook">Facebook</option>
                 </select>
                 <select
                   value={socialStatusFilter}
@@ -1170,7 +1634,13 @@ export default function AdminCRM({ token }: { token: string }) {
                   <option value="published">Published</option>
                 </select>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-wrap">
+                <button
+                  onClick={() => setView('create-post')}
+                  className="px-4 py-2 rounded-lg bg-[#C6904D] text-white text-sm font-medium hover:bg-[#b07e3f]"
+                >
+                  + Create Post
+                </button>
                 <button
                   onClick={() => generateAiContent('social_post', { platform: 'linkedin' })}
                   disabled={aiGenerating}
@@ -1234,6 +1704,22 @@ export default function AdminCRM({ token }: { token: string }) {
                           </>
                         )}
                         <div>{new Date(post.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</div>
+                        {post.status === 'draft' && (
+                          <button
+                            onClick={() => {
+                              setNewPostPlatform(post.platform)
+                              setNewPostType(post.type)
+                              setNewPostContent(post.content)
+                              setNewPostHashtags(post.hashtags || '')
+                              setNewPostMediaUrl(post.mediaUrl || '')
+                              setNewPostSchedule(post.scheduledAt ? new Date(post.scheduledAt).toISOString().slice(0, 16) : '')
+                              setView('create-post')
+                            }}
+                            className="text-blue-500 hover:text-blue-700 font-medium"
+                          >
+                            Edit
+                          </button>
+                        )}
                         <button
                           onClick={async () => {
                             if (!confirm('Delete this post?')) return
@@ -1590,6 +2076,8 @@ export default function AdminCRM({ token }: { token: string }) {
                     setShowComposeEmail(true)
                     setReplyTo(null)
                     setComposeEmailTo('')
+                    setComposeEmailCC('')
+                    setComposeEmailBCC('')
                     setComposeEmailSubject('')
                     setComposeEmailBody('')
                   }}
@@ -1599,6 +2087,18 @@ export default function AdminCRM({ token }: { token: string }) {
                 </button>
               </div>
             </div>
+
+            {/* Bulk email actions bar */}
+            {selectedEmails.size > 0 && (
+              <div className="px-4 py-2 border-b border-slate-100 bg-blue-50 flex items-center gap-3">
+                <span className="text-xs font-medium text-blue-700">{selectedEmails.size} selected</span>
+                <button onClick={() => bulkEmailAction('read')} className="px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-700 hover:bg-blue-200">Mark Read</button>
+                <button onClick={() => bulkEmailAction('star')} className="px-2 py-1 rounded text-xs font-medium bg-amber-100 text-amber-700 hover:bg-amber-200">Star</button>
+                <button onClick={() => bulkEmailAction('archive')} className="px-2 py-1 rounded text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200">Archive</button>
+                <button onClick={() => bulkEmailAction('delete')} className="px-2 py-1 rounded text-xs font-medium bg-red-600 text-white hover:bg-red-700 ml-auto">Delete</button>
+                <button onClick={() => setSelectedEmails(new Set())} className="px-2 py-1 rounded text-xs font-medium text-slate-500 hover:bg-slate-100">Clear</button>
+              </div>
+            )}
 
             {/* Email List */}
             {inboxLoading ? (
@@ -1612,14 +2112,23 @@ export default function AdminCRM({ token }: { token: string }) {
                 {inboxEmails.map(email => (
                   <div
                     key={email.id}
-                    className={`px-4 py-3 hover:bg-slate-50/50 cursor-pointer flex items-start gap-3 ${!email.isRead ? 'bg-blue-50/30' : ''}`}
+                    className={`px-4 py-3 hover:bg-slate-50/50 cursor-pointer flex items-start gap-3 ${!email.isRead ? 'bg-blue-50/30' : ''} ${selectedEmails.has(email.id) ? 'bg-blue-50/60' : ''}`}
                     onClick={async () => {
                       setSelectedEmail(email)
+                      setEmailViewMode('html')
                       if (!email.isRead) {
                         updateEmailFlags([email.id], { isRead: true })
                       }
                     }}
                   >
+                    {/* Checkbox */}
+                    <input
+                      type="checkbox"
+                      checked={selectedEmails.has(email.id)}
+                      onChange={e => { e.stopPropagation(); toggleEmailSelect(email.id) }}
+                      onClick={e => e.stopPropagation()}
+                      className="rounded border-slate-300 mt-1"
+                    />
                     {/* Star */}
                     <button
                       onClick={e => {
@@ -1643,6 +2152,9 @@ export default function AdminCRM({ token }: { token: string }) {
                         )}
                         {email.hasAttachments && (
                           <span className="text-slate-400 text-xs">📎</span>
+                        )}
+                        {email.inReplyTo && (
+                          <span className="text-slate-300 text-[10px] font-medium">thread</span>
                         )}
                       </div>
                       <div className={`text-sm truncate ${!email.isRead ? 'font-medium text-[#1a1a1a]' : 'text-slate-700'}`}>
@@ -1690,7 +2202,11 @@ export default function AdminCRM({ token }: { token: string }) {
             </button>
             <div className="flex-1" />
             <button
-              onClick={() => updateEmailFlags([selectedEmail.id], { isStarred: !selectedEmail.isStarred })}
+              onClick={() => {
+                const newStarred = !selectedEmail.isStarred
+                setSelectedEmail({ ...selectedEmail, isStarred: newStarred })
+                updateEmailFlags([selectedEmail.id], { isStarred: newStarred })
+              }}
               className={`text-lg ${selectedEmail.isStarred ? 'text-amber-400' : 'text-slate-300 hover:text-amber-300'}`}
             >
               ★
@@ -1699,6 +2215,8 @@ export default function AdminCRM({ token }: { token: string }) {
               onClick={() => {
                 setReplyTo(selectedEmail)
                 setComposeEmailTo(selectedEmail.folder === 'Sent' ? selectedEmail.to : selectedEmail.from)
+                setComposeEmailCC('')
+                setComposeEmailBCC('')
                 setComposeEmailSubject(selectedEmail.subject.startsWith('Re: ') ? selectedEmail.subject : `Re: ${selectedEmail.subject}`)
                 setComposeEmailBody(`\n\n---\nOn ${new Date(selectedEmail.date).toLocaleString('en-GB')}, ${selectedEmail.fromName || selectedEmail.from} wrote:\n> ${(selectedEmail.textBody || selectedEmail.snippet || '').split('\n').join('\n> ')}`)
                 setShowComposeEmail(true)
@@ -1706,6 +2224,41 @@ export default function AdminCRM({ token }: { token: string }) {
               className="px-4 py-1.5 rounded-lg bg-[#C6904D] text-white text-sm font-medium hover:bg-[#b07e3f]"
             >
               Reply
+            </button>
+            <button
+              onClick={() => {
+                setReplyTo(null)
+                setComposeEmailTo('')
+                setComposeEmailCC('')
+                setComposeEmailBCC('')
+                setComposeEmailSubject(selectedEmail.subject.startsWith('Fwd: ') ? selectedEmail.subject : `Fwd: ${selectedEmail.subject}`)
+                setComposeEmailBody(`\n\n--- Forwarded message ---\nFrom: ${selectedEmail.fromName || selectedEmail.from}\nDate: ${new Date(selectedEmail.date).toLocaleString('en-GB')}\nSubject: ${selectedEmail.subject}\nTo: ${selectedEmail.to}\n\n${selectedEmail.textBody || selectedEmail.snippet || ''}`)
+                setShowComposeEmail(true)
+              }}
+              className="px-3 py-1.5 rounded-lg border border-slate-200 text-sm text-slate-600 hover:bg-slate-50"
+            >
+              Forward
+            </button>
+            <button
+              onClick={async () => {
+                if (!confirm('Delete this email?')) return
+                try {
+                  const res = await fetch('/api/admin/crm/emails', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                    body: JSON.stringify({ ids: [selectedEmail.id] }),
+                  })
+                  if (!res.ok) throw new Error('Failed')
+                  showToast('Email deleted')
+                  setSelectedEmail(null)
+                  fetchInboxEmails()
+                } catch {
+                  showToast('Failed to delete email', 'error')
+                }
+              }}
+              className="px-3 py-1.5 rounded-lg border border-red-200 text-sm text-red-600 hover:bg-red-50"
+            >
+              Delete
             </button>
             <button
               onClick={() => {
@@ -1764,7 +2317,28 @@ export default function AdminCRM({ token }: { token: string }) {
             )}
 
             <div className="border-t border-slate-100 pt-4">
-              {selectedEmail.htmlBody ? (
+              {/* HTML / Text toggle */}
+              {selectedEmail.htmlBody && selectedEmail.textBody && (
+                <div className="flex gap-1 mb-3">
+                  <button
+                    onClick={() => setEmailViewMode('html')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                      emailViewMode === 'html' ? 'bg-[#1d1d1f] text-white' : 'border border-slate-200 text-slate-500 hover:bg-slate-50'
+                    }`}
+                  >
+                    HTML View
+                  </button>
+                  <button
+                    onClick={() => setEmailViewMode('text')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                      emailViewMode === 'text' ? 'bg-[#1d1d1f] text-white' : 'border border-slate-200 text-slate-500 hover:bg-slate-50'
+                    }`}
+                  >
+                    Text View
+                  </button>
+                </div>
+              )}
+              {emailViewMode === 'html' && selectedEmail.htmlBody ? (
                 <div
                   className="prose prose-sm max-w-none text-[#1a1a1a]"
                   dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(selectedEmail.htmlBody) }}
@@ -1787,16 +2361,60 @@ export default function AdminCRM({ token }: { token: string }) {
               <h3 className="text-lg font-bold text-[#1a1a1a]">{replyTo ? 'Reply' : 'New Email'}</h3>
               <p className="text-xs text-slate-400 mt-1">From: info@onshoredelivery.com</p>
             </div>
-            <div className="p-6 space-y-4">
-              <div>
+            <div className="p-6 space-y-3">
+              <div className="relative">
                 <label className="block text-xs font-medium text-slate-500 mb-1">To</label>
                 <input
                   type="email"
                   value={composeEmailTo}
-                  onChange={e => setComposeEmailTo(e.target.value)}
-                  placeholder="recipient@example.com"
+                  onChange={e => { setComposeEmailTo(e.target.value); setComposeContactSearch(e.target.value) }}
+                  onFocus={() => { if (composeContactResults.length > 0) setShowContactDropdown(true) }}
+                  onBlur={() => setTimeout(() => setShowContactDropdown(false), 200)}
+                  placeholder="Type name or email to search contacts..."
                   className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10"
                 />
+                {showContactDropdown && composeContactResults.length > 0 && (
+                  <div className="absolute z-10 top-full mt-1 w-full bg-white border border-slate-200 rounded-xl shadow-lg max-h-48 overflow-y-auto">
+                    {composeContactResults.filter(c => c.email).map(c => (
+                      <button
+                        key={c.id}
+                        type="button"
+                        className="w-full text-left px-3 py-2 hover:bg-slate-50 text-sm border-b border-slate-50 last:border-0"
+                        onMouseDown={e => {
+                          e.preventDefault()
+                          setComposeEmailTo(c.email || '')
+                          setShowContactDropdown(false)
+                          setComposeContactSearch('')
+                        }}
+                      >
+                        <div className="font-medium text-[#1a1a1a]">{c.name}</div>
+                        <div className="text-xs text-slate-400">{c.email} &middot; {c.category}</div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-slate-500 mb-1">CC</label>
+                  <input
+                    type="text"
+                    value={composeEmailCC}
+                    onChange={e => setComposeEmailCC(e.target.value)}
+                    placeholder="cc@example.com"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-500 mb-1">BCC</label>
+                  <input
+                    type="text"
+                    value={composeEmailBCC}
+                    onChange={e => setComposeEmailBCC(e.target.value)}
+                    placeholder="bcc@example.com"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D]"
+                  />
+                </div>
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-500 mb-1">Subject</label>
@@ -1813,11 +2431,17 @@ export default function AdminCRM({ token }: { token: string }) {
                 <textarea
                   value={composeEmailBody}
                   onChange={e => setComposeEmailBody(e.target.value)}
-                  rows={10}
+                  rows={8}
                   placeholder="Write your message..."
                   className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 resize-y"
                 />
               </div>
+              {emailSignature && (
+                <div className="border-t border-slate-100 pt-2">
+                  <div className="text-[10px] text-slate-400 mb-1">Signature (auto-appended)</div>
+                  <div className="text-xs text-slate-500 bg-slate-50 rounded-lg px-3 py-2" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(emailSignature) }} />
+                </div>
+              )}
             </div>
             <div className="p-6 border-t border-slate-100 flex gap-3">
               <button
@@ -1963,6 +2587,17 @@ export default function AdminCRM({ token }: { token: string }) {
               <p className="text-xs text-slate-400 mt-1">To: {emailModal.name} &lt;{emailModal.email}&gt;</p>
             </div>
             <div className="p-6 space-y-4">
+              {/* Template picker */}
+              {emailTemplates.length > 0 && (
+                <div>
+                  <label className="block text-xs font-medium text-slate-500 mb-1">Quick Template</label>
+                  <div className="flex gap-1 flex-wrap">
+                    {emailTemplates.map(tpl => (
+                      <button key={tpl.id} onClick={() => applyTemplate(tpl)} className="px-2 py-1 rounded-lg border border-slate-200 text-xs text-slate-600 hover:bg-slate-50 hover:border-[#C6904D]">{tpl.name}</button>
+                    ))}
+                  </div>
+                </div>
+              )}
               <div>
                 <label className="block text-xs font-medium text-slate-500 mb-1">Subject</label>
                 <input
@@ -1983,6 +2618,12 @@ export default function AdminCRM({ token }: { token: string }) {
                   className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 resize-y"
                 />
               </div>
+              {emailSignature && (
+                <div className="border-t border-slate-100 pt-2">
+                  <div className="text-[10px] text-slate-400 mb-1">Signature (auto-appended)</div>
+                  <div className="text-xs text-slate-500 bg-slate-50 rounded-lg px-3 py-2" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(emailSignature) }} />
+                </div>
+              )}
               {emailModal.phone && (
                 <div className="flex items-center gap-2 bg-green-50 rounded-lg px-3 py-2 text-xs text-green-700">
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
@@ -2002,6 +2643,547 @@ export default function AdminCRM({ token }: { token: string }) {
               >
                 {emailSending ? 'Sending...' : 'Send Email'}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ═══════════════════ CAMPAIGN DETAIL VIEW ═══════════════════ */}
+      {view === 'campaign-detail' && campaignDetail && (
+        <div className="space-y-4">
+          <div className="bg-white rounded-2xl border border-[#e8e4de] shadow-sm overflow-hidden">
+            <div className="p-4 border-b border-slate-100 flex items-center justify-between gap-3">
+              <button onClick={() => setView('campaigns')} className="px-3 py-1.5 rounded-lg border border-slate-200 text-sm text-slate-600 hover:bg-slate-50">← Back</button>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm font-semibold text-[#1a1a1a] truncate">{campaignDetail.name}</h3>
+                <div className="text-xs text-slate-400">{campaignDetail.subject}</div>
+              </div>
+              <div className="flex gap-2">
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${statusBadge(campaignDetail.status)}`}>{campaignDetail.status}</span>
+                <button onClick={() => cloneCampaign(campaignDetail.id)} disabled={actionLoading} className="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-blue-600 hover:bg-blue-50">Clone</button>
+                {campaignDetail.failedCount > 0 && (
+                  <button onClick={() => resendFailed(campaignDetail.id)} disabled={actionLoading} className="px-3 py-1.5 rounded-lg bg-amber-500 text-white text-xs font-medium hover:bg-amber-600">Retry {campaignDetail.failedCount} Failed</button>
+                )}
+              </div>
+            </div>
+
+            {/* Stats */}
+            <div className="p-4 border-b border-slate-100 flex flex-wrap gap-4">
+              <div className="flex-1 min-w-[100px] text-center">
+                <div className="text-xl font-bold text-[#1a1a1a]">{campaignDetail._count?.recipients || campaignRecipients.length}</div>
+                <div className="text-[10px] text-slate-400">Recipients</div>
+              </div>
+              <div className="flex-1 min-w-[100px] text-center">
+                <div className="text-xl font-bold text-green-600">{campaignDetail.sentCount}</div>
+                <div className="text-[10px] text-slate-400">Sent</div>
+              </div>
+              <div className="flex-1 min-w-[100px] text-center">
+                <div className="text-xl font-bold text-red-600">{campaignDetail.failedCount}</div>
+                <div className="text-[10px] text-slate-400">Failed</div>
+              </div>
+              <div className="flex-1 min-w-[100px] text-center">
+                <div className="text-xl font-bold text-slate-400">{campaignRecipients.filter(r => r.status === 'pending').length}</div>
+                <div className="text-[10px] text-slate-400">Pending</div>
+              </div>
+            </div>
+
+            {/* Campaign body preview */}
+            {(campaignDetail as { htmlBody?: string }).htmlBody && (
+              <div className="p-4 border-b border-slate-100">
+                <div className="text-xs font-medium text-slate-500 mb-2">Email Preview</div>
+                <div className="border border-slate-200 rounded-xl p-4 bg-white max-h-60 overflow-y-auto prose prose-sm max-w-none"
+                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize((campaignDetail as { htmlBody?: string }).htmlBody || '') }} />
+              </div>
+            )}
+
+            {/* Recipients list */}
+            <div className="p-4">
+              <div className="text-xs font-medium text-slate-500 mb-2">Recipients</div>
+              {campaignDetailLoading ? (
+                <div className="text-center text-slate-400 text-sm py-4">Loading...</div>
+              ) : campaignRecipients.length === 0 ? (
+                <div className="text-center text-slate-400 text-sm py-4">No recipients found.</div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs">
+                    <thead>
+                      <tr className="border-b border-slate-100 bg-slate-50/50">
+                        <th className="px-3 py-2 text-left font-medium text-slate-500">Contact</th>
+                        <th className="px-3 py-2 text-left font-medium text-slate-500">Email</th>
+                        <th className="px-3 py-2 text-left font-medium text-slate-500">Category</th>
+                        <th className="px-3 py-2 text-left font-medium text-slate-500">Status</th>
+                        <th className="px-3 py-2 text-left font-medium text-slate-500">Sent At</th>
+                        <th className="px-3 py-2 text-left font-medium text-slate-500">Error</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {campaignRecipients.map(r => (
+                        <tr key={r.id} className="border-b border-slate-50 hover:bg-slate-50/50">
+                          <td className="px-3 py-2 font-medium text-[#1a1a1a]">{r.contact.name}</td>
+                          <td className="px-3 py-2 text-slate-500">{r.contact.email || '—'}</td>
+                          <td className="px-3 py-2"><span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-blue-50 text-blue-600 border border-blue-200">{r.contact.category}</span></td>
+                          <td className="px-3 py-2">
+                            <span className={`px-1.5 py-0.5 rounded text-[9px] font-semibold border ${
+                              r.status === 'sent' ? 'bg-green-50 text-green-700 border-green-200' :
+                              r.status === 'failed' || r.status === 'bounced' ? 'bg-red-50 text-red-700 border-red-200' :
+                              'bg-slate-50 text-slate-600 border-slate-200'
+                            }`}>{r.status}</span>
+                          </td>
+                          <td className="px-3 py-2 text-slate-400">{r.sentAt ? new Date(r.sentAt).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '—'}</td>
+                          <td className="px-3 py-2 text-red-500 truncate max-w-[200px]" title={r.error || ''}>{r.error || ''}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ═══════════════════ TEMPLATES VIEW ═══════════════════ */}
+      {view === 'templates' && (
+        <div className="space-y-4">
+          <div className="bg-white rounded-2xl border border-[#e8e4de] shadow-sm overflow-hidden">
+            <div className="p-4 border-b border-slate-100 flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-[#1a1a1a]">Email Templates</h3>
+              <button onClick={() => setShowTemplateForm(!showTemplateForm)} className="px-4 py-2 rounded-lg bg-[#C6904D] text-white text-sm font-medium hover:bg-[#b07e3f]">
+                {showTemplateForm ? 'Cancel' : '+ New Template'}
+              </button>
+            </div>
+
+            {/* New template form */}
+            {showTemplateForm && (
+              <div className="p-4 border-b border-slate-100 space-y-3 bg-slate-50/50">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-slate-500 mb-1">Template Name *</label>
+                    <input type="text" value={newTemplateName} onChange={e => setNewTemplateName(e.target.value)} placeholder="e.g. Follow-up"
+                      className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-500 mb-1">Category</label>
+                    <input type="text" value={newTemplateCategory} onChange={e => setNewTemplateCategory(e.target.value)} placeholder="e.g. Sales, Support"
+                      className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]" />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-500 mb-1">Subject Line *</label>
+                  <input type="text" value={newTemplateSubject} onChange={e => setNewTemplateSubject(e.target.value)} placeholder="e.g. Following up on {{name}}"
+                    className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-500 mb-1">Body *</label>
+                  <textarea value={newTemplateBody} onChange={e => setNewTemplateBody(e.target.value)} rows={6}
+                    placeholder={`Hi {{name}},\n\nJust wanted to follow up on...`}
+                    className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D] resize-y" />
+                </div>
+                <button onClick={saveEmailTemplate} disabled={!newTemplateName || !newTemplateSubject || !newTemplateBody}
+                  className="px-4 py-2 rounded-lg bg-[#1d1d1f] text-white text-sm font-medium hover:bg-[#333] disabled:opacity-50">
+                  Save Template
+                </button>
+              </div>
+            )}
+
+            {/* Templates list */}
+            {templatesLoading ? (
+              <div className="p-8 text-center text-slate-400 text-sm">Loading...</div>
+            ) : emailTemplates.length === 0 ? (
+              <div className="p-8 text-center text-slate-400 text-sm">
+                No templates yet. Create one to speed up your email workflow.
+              </div>
+            ) : (
+              <div className="divide-y divide-slate-50">
+                {emailTemplates.map(tpl => (
+                  <div key={tpl.id} className="p-4 hover:bg-slate-50/50">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-medium text-sm text-[#1a1a1a]">{tpl.name}</span>
+                          {tpl.category && (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">{tpl.category}</span>
+                          )}
+                        </div>
+                        <div className="text-xs text-slate-500">Subject: {tpl.subject}</div>
+                        <div className="text-xs text-slate-400 mt-1 line-clamp-2">{tpl.body}</div>
+                      </div>
+                      <div className="flex gap-1.5 flex-shrink-0">
+                        <button
+                          onClick={() => {
+                            setComposeEmailSubject(tpl.subject)
+                            setComposeEmailBody(tpl.body)
+                            setShowComposeEmail(true)
+                            showToast(`Loaded "${tpl.name}" into compose`)
+                          }}
+                          className="px-2 py-1 rounded text-xs font-medium text-indigo-600 hover:bg-indigo-50"
+                        >
+                          Use
+                        </button>
+                        <button onClick={() => deleteEmailTemplate([tpl.id])} className="px-2 py-1 rounded text-xs font-medium text-red-600 hover:bg-red-50">Del</button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ═══════════════════ ACTIVITY LOG VIEW ═══════════════════ */}
+      {view === 'activity' && (
+        <div className="space-y-4">
+          <div className="flex flex-wrap gap-4">
+            <div className="bg-white rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex-1 min-w-[120px]">
+              <div className="text-2xl font-bold text-[#1a1a1a]">{activityStats.total.toLocaleString()}</div>
+              <div className="text-xs text-slate-400 mt-0.5">Total Events</div>
+            </div>
+            <div className="bg-white rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex-1 min-w-[120px]">
+              <div className="text-2xl font-bold text-[#1a1a1a]">{activityStats.today}</div>
+              <div className="text-xs text-slate-400 mt-0.5">Today</div>
+            </div>
+            <div className="bg-white rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex-1 min-w-[120px]">
+              <div className="text-2xl font-bold text-[#1a1a1a]">{activityStats.thisWeek}</div>
+              <div className="text-xs text-slate-400 mt-0.5">This Week</div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl border border-[#e8e4de] shadow-sm overflow-hidden">
+            <div className="p-4 border-b border-slate-100 flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-[#1a1a1a]">Activity Log</h3>
+              <button onClick={fetchActivityLogs} className="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-600 hover:bg-slate-50">
+                Refresh
+              </button>
+            </div>
+
+            {activityLoading ? (
+              <div className="p-8 text-center text-slate-400 text-sm">Loading...</div>
+            ) : activityLogs.length === 0 ? (
+              <div className="p-8 text-center text-slate-400 text-sm">No activity logs found.</div>
+            ) : (
+              <div className="divide-y divide-slate-50">
+                {activityLogs.map(log => {
+                  const actionColors: Record<string, string> = {
+                    USER_SUSPENDED: 'bg-red-50 text-red-700 border-red-200',
+                    BOOKING_CANCELLED: 'bg-orange-50 text-orange-700 border-orange-200',
+                    DISPUTE_REFUND: 'bg-purple-50 text-purple-700 border-purple-200',
+                    CIRCUMVENTION_FLAG: 'bg-amber-50 text-amber-700 border-amber-200',
+                  }
+                  const color = actionColors[log.action] || 'bg-slate-50 text-slate-600 border-slate-200'
+                  let details: Record<string, unknown> = {}
+                  try { if (log.details) details = JSON.parse(log.details) as Record<string, unknown> } catch { /* ignore */ }
+
+                  return (
+                    <div key={log.id} className="px-4 py-3 hover:bg-slate-50/50">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${color}`}>
+                              {log.action.replace(/_/g, ' ')}
+                            </span>
+                            {log.user && (
+                              <span className="text-xs text-slate-500">
+                                by {log.user.name || log.user.email}
+                              </span>
+                            )}
+                          </div>
+                          {log.targetId && (
+                            <div className="text-xs text-slate-400">Target: {log.targetId}</div>
+                          )}
+                          {Object.keys(details).length > 0 && (
+                            <div className="text-xs text-slate-500 mt-1 bg-slate-50 rounded-lg px-3 py-2 max-h-20 overflow-y-auto">
+                              {Object.entries(details).map(([k, v]) => (
+                                <div key={k}><span className="font-medium">{k}:</span> {String(v)}</div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        <div className="text-xs text-slate-400 whitespace-nowrap flex-shrink-0">
+                          {new Date(log.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                          <div className="text-[10px]">{new Date(log.createdAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}</div>
+                          {log.ipAddress && <div className="text-[10px] text-slate-300 mt-0.5">{log.ipAddress}</div>}
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+
+            {activityTotalPages > 1 && (
+              <div className="p-4 border-t border-slate-100 flex items-center justify-between">
+                <span className="text-xs text-slate-400">{activityStats.total.toLocaleString()} events</span>
+                <div className="flex gap-1">
+                  <button onClick={() => setActivityPage(p => Math.max(1, p - 1))} disabled={activityPage === 1} className="px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-200 hover:bg-slate-50 disabled:opacity-40">Prev</button>
+                  <span className="px-3 py-1.5 text-xs text-slate-500">Page {activityPage} of {activityTotalPages}</span>
+                  <button onClick={() => setActivityPage(p => Math.min(activityTotalPages, p + 1))} disabled={activityPage === activityTotalPages} className="px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-200 hover:bg-slate-50 disabled:opacity-40">Next</button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ═══════════════════ CREATE POST VIEW ═══════════════════ */}
+      {view === 'create-post' && (
+        <div className="bg-white rounded-2xl border border-[#e8e4de] shadow-sm p-6 space-y-5">
+          <h3 className="text-lg font-bold text-[#1a1a1a]">Create Social Post</h3>
+          <p className="text-xs text-slate-400 -mt-3">Manually create a social media post or schedule it for later.</p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-xs font-medium text-slate-500 mb-1">Platform</label>
+              <select value={newPostPlatform} onChange={e => setNewPostPlatform(e.target.value)}
+                className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D]">
+                <option value="linkedin">LinkedIn</option>
+                <option value="instagram">Instagram</option>
+                <option value="twitter">Twitter / X</option>
+                <option value="facebook">Facebook</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-500 mb-1">Type</label>
+              <select value={newPostType} onChange={e => setNewPostType(e.target.value)}
+                className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D]">
+                <option value="post">Post</option>
+                <option value="article">Article</option>
+                <option value="story">Story</option>
+                <option value="reel">Reel</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-500 mb-1">Schedule (optional)</label>
+              <input type="datetime-local" value={newPostSchedule} onChange={e => setNewPostSchedule(e.target.value)}
+                className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D]" />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-slate-500 mb-1">Content</label>
+            <textarea
+              value={newPostContent}
+              onChange={e => setNewPostContent(e.target.value)}
+              rows={6}
+              placeholder="Write your post content..."
+              className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 resize-y"
+            />
+            <div className="text-[10px] text-slate-400 mt-1 text-right">{newPostContent.length} characters</div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-medium text-slate-500 mb-1">Hashtags</label>
+              <input type="text" value={newPostHashtags} onChange={e => setNewPostHashtags(e.target.value)}
+                placeholder="#delivery #maritime #logistics"
+                className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D]" />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-500 mb-1">Media URL (optional)</label>
+              <input type="text" value={newPostMediaUrl} onChange={e => setNewPostMediaUrl(e.target.value)}
+                placeholder="https://..."
+                className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D]" />
+            </div>
+          </div>
+
+          <div className="flex gap-3">
+            <button onClick={() => setView('social')} className="px-5 py-2.5 rounded-xl border border-slate-200 text-sm font-medium text-slate-600 hover:bg-slate-50">
+              Cancel
+            </button>
+            <button onClick={createSocialPost} disabled={newPostSaving || !newPostContent.trim()}
+              className="px-5 py-2.5 rounded-xl bg-[#C6904D] text-white text-sm font-medium hover:bg-[#b07e3f] disabled:opacity-50">
+              {newPostSaving ? 'Creating...' : newPostSchedule ? 'Schedule Post' : 'Save as Draft'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ═══════════════════ SETTINGS VIEW ═══════════════════ */}
+      {view === 'settings' && (
+        <div className="space-y-6">
+          {/* Email Signature */}
+          <div className="bg-white rounded-2xl border border-[#e8e4de] shadow-sm p-6 space-y-4">
+            <h3 className="text-sm font-semibold text-[#1a1a1a]">Email Signature</h3>
+            <p className="text-xs text-slate-400 -mt-2">This signature is automatically appended to all outgoing emails.</p>
+            <textarea
+              value={emailSignature}
+              onChange={e => setEmailSignature(e.target.value)}
+              rows={5}
+              placeholder="<p>Best regards,<br/>Your Name</p>"
+              className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 font-mono resize-y"
+            />
+            <div className="flex items-start gap-4">
+              <div className="flex-1">
+                <div className="text-xs font-medium text-slate-500 mb-1">Preview:</div>
+                <div className="border border-slate-200 rounded-lg px-3 py-2 bg-slate-50 text-sm" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(emailSignature) }} />
+              </div>
+              <button onClick={saveSignature} className="px-5 py-2.5 rounded-xl bg-[#C6904D] text-white text-sm font-medium hover:bg-[#b07e3f]">
+                Save Signature
+              </button>
+            </div>
+          </div>
+
+          {/* Quick Info */}
+          <div className="bg-white rounded-2xl border border-[#e8e4de] shadow-sm p-6 space-y-4">
+            <h3 className="text-sm font-semibold text-[#1a1a1a]">CRM Configuration</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+              <div className="bg-slate-50 rounded-xl px-4 py-3">
+                <div className="text-xs text-slate-400 mb-1">Default From</div>
+                <div className="font-medium text-[#1a1a1a]">info@onshoredelivery.com</div>
+              </div>
+              <div className="bg-slate-50 rounded-xl px-4 py-3">
+                <div className="text-xs text-slate-400 mb-1">IMAP Sync</div>
+                <div className="font-medium text-[#1a1a1a]">Configured</div>
+              </div>
+              <div className="bg-slate-50 rounded-xl px-4 py-3">
+                <div className="text-xs text-slate-400 mb-1">Total Contacts</div>
+                <div className="font-medium text-[#1a1a1a]">{totalContacts.toLocaleString()}</div>
+              </div>
+              <div className="bg-slate-50 rounded-xl px-4 py-3">
+                <div className="text-xs text-slate-400 mb-1">Campaigns Sent</div>
+                <div className="font-medium text-[#1a1a1a]">{campaigns.filter(c => c.status === 'sent').length}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ═══════════════════ CONTACT DETAIL PANEL ═══════════════════ */}
+      {detailContact && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex justify-end" onClick={() => setDetailContact(null)}>
+          <div className="bg-white w-full max-w-md h-full overflow-y-auto shadow-2xl animate-in slide-in-from-right" onClick={e => e.stopPropagation()}>
+            <div className="p-6 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white z-10">
+              <h3 className="text-lg font-bold text-[#1a1a1a]">Contact Details</h3>
+              <div className="flex gap-2">
+                <button onClick={() => { setEditContact(detailContact); setDetailContact(null) }} className="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-blue-600 hover:bg-blue-50">Edit</button>
+                <button onClick={() => setDetailContact(null)} className="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-600 hover:bg-slate-50">Close</button>
+              </div>
+            </div>
+            <div className="p-6 space-y-5">
+              {/* Name & Priority */}
+              <div>
+                <div className="text-2xl font-bold text-[#1a1a1a]">{detailContact.name}</div>
+                <div className="flex items-center gap-2 mt-2">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">{detailContact.category}</span>
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${priorityBadge(detailContact.priority)}`}>{detailContact.priority}</span>
+                  <span className="text-[10px] text-slate-400">{detailContact.source}</span>
+                  <button
+                    onClick={async () => {
+                      try {
+                        const res = await fetch('/api/admin/crm', {
+                          method: 'PATCH',
+                          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                          body: JSON.stringify({ id: detailContact.id, updates: { opted_out: !detailContact.opted_out } }),
+                        })
+                        if (!res.ok) throw new Error('Failed')
+                        setDetailContact({ ...detailContact, opted_out: !detailContact.opted_out })
+                        showToast(detailContact.opted_out ? 'Opted back in' : 'Opted out')
+                        fetchContacts()
+                      } catch { showToast('Failed to update', 'error') }
+                    }}
+                    className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border cursor-pointer transition-colors ${
+                      detailContact.opted_out ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100' : 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100'
+                    }`}
+                  >
+                    {detailContact.opted_out ? 'Opted Out (click to opt in)' : 'Subscribed (click to opt out)'}
+                  </button>
+                </div>
+              </div>
+
+              {/* Contact Info */}
+              <div className="space-y-3">
+                <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Contact Information</h4>
+                {detailContact.email && (
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 text-xs">@</div>
+                    <div>
+                      <div className="text-sm text-[#1a1a1a]">{detailContact.email}</div>
+                      {detailContact.email2 && <div className="text-xs text-slate-400">{detailContact.email2}</div>}
+                    </div>
+                    <button onClick={() => { setEmailModal(detailContact); setDetailContact(null) }} className="ml-auto px-2 py-1 rounded text-xs text-indigo-600 hover:bg-indigo-50">Send</button>
+                  </div>
+                )}
+                {detailContact.phone && (
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center text-green-600 text-xs">P</div>
+                    <div>
+                      <div className="text-sm text-[#1a1a1a]">{detailContact.phone}</div>
+                      {detailContact.phone2 && <div className="text-xs text-slate-400">{detailContact.phone2}</div>}
+                    </div>
+                    <a href={getWhatsAppUrl(detailContact.phone, `Hi ${detailContact.name}, `)} target="_blank" rel="noopener noreferrer" className="ml-auto px-2 py-1 rounded text-xs text-green-600 hover:bg-green-50">WhatsApp</a>
+                  </div>
+                )}
+                {detailContact.website && (
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-600 text-xs">W</div>
+                    <a href={detailContact.website.startsWith('http') ? detailContact.website : `https://${detailContact.website}`} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:underline truncate">{detailContact.website}</a>
+                  </div>
+                )}
+                {detailContact.instagram && (
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-pink-50 flex items-center justify-center text-pink-600 text-xs">IG</div>
+                    <span className="text-sm text-[#1a1a1a]">{detailContact.instagram}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Location */}
+              {(detailContact.country || detailContact.location) && (
+                <div className="space-y-2">
+                  <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Location</h4>
+                  <div className="bg-slate-50 rounded-xl px-4 py-3">
+                    {detailContact.location && <div className="text-sm text-[#1a1a1a]">{detailContact.location}</div>}
+                    {detailContact.country && <div className="text-xs text-slate-500">{detailContact.country}</div>}
+                  </div>
+                </div>
+              )}
+
+              {/* Tags */}
+              {detailContact.tags && (
+                <div className="space-y-2">
+                  <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Tags</h4>
+                  <div className="flex flex-wrap gap-1">
+                    {detailContact.tags.split(',').map((tag, i) => (
+                      <span key={i} className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-100 text-slate-600">{tag.trim()}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Notes */}
+              {detailContact.notes && (
+                <div className="space-y-2">
+                  <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Notes</h4>
+                  <div className="bg-slate-50 rounded-xl px-4 py-3 text-sm text-slate-600 whitespace-pre-wrap">{detailContact.notes}</div>
+                </div>
+              )}
+
+              {/* Timestamps */}
+              <div className="space-y-2">
+                <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Activity</h4>
+                <div className="bg-slate-50 rounded-xl px-4 py-3 text-xs text-slate-500 space-y-1">
+                  <div>Created: {new Date(detailContact.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                  {detailContact.lastEmailed && <div>Last Emailed: {new Date(detailContact.lastEmailed).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</div>}
+                </div>
+              </div>
+
+              {/* Quick Actions */}
+              <div className="space-y-2">
+                <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Actions</h4>
+                <div className="flex flex-wrap gap-2">
+                  {detailContact.email && (
+                    <button onClick={() => { setEmailModal(detailContact); setDetailContact(null) }} className="px-3 py-2 rounded-lg bg-indigo-600 text-white text-xs font-medium hover:bg-indigo-700">
+                      Send Email
+                    </button>
+                  )}
+                  <button onClick={() => { setEditContact(detailContact); setDetailContact(null) }} className="px-3 py-2 rounded-lg border border-slate-200 text-xs font-medium text-slate-600 hover:bg-slate-50">
+                    Edit Contact
+                  </button>
+                  <button onClick={() => { deleteContacts([detailContact.id]); setDetailContact(null) }} className="px-3 py-2 rounded-lg border border-red-200 text-xs font-medium text-red-600 hover:bg-red-50">
+                    Delete
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>

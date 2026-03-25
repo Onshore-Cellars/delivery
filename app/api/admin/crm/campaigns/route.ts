@@ -11,11 +11,37 @@ function requireAdmin(request: NextRequest) {
   return decoded
 }
 
-// GET /api/admin/crm/campaigns — list campaigns
+// GET /api/admin/crm/campaigns — list campaigns, or fetch single campaign with recipients
 export async function GET(request: NextRequest) {
   try {
     const admin = requireAdmin(request)
     if (!admin) return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
+
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get('id')
+
+    // Single campaign with full recipient details
+    if (id) {
+      const campaign = await prisma.crmCampaign.findUnique({
+        where: { id },
+      })
+
+      if (!campaign) {
+        return NextResponse.json({ error: 'Campaign not found' }, { status: 404 })
+      }
+
+      const recipients = await prisma.crmCampaignRecipient.findMany({
+        where: { campaignId: id },
+        include: {
+          contact: {
+            select: { name: true, email: true, category: true, priority: true },
+          },
+        },
+        orderBy: { sentAt: 'desc' },
+      })
+
+      return NextResponse.json({ campaign, recipients })
+    }
 
     const campaigns = await prisma.crmCampaign.findMany({
       orderBy: { createdAt: 'desc' },
@@ -38,7 +64,76 @@ export async function POST(request: NextRequest) {
     if (!admin) return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
 
     const body = await request.json()
-    const { name, subject, htmlBody, textBody, filters, send } = body
+    const { name, subject, htmlBody, textBody, filters, send, clone, resendFailed } = body
+
+    // Clone an existing campaign as a new draft
+    if (clone) {
+      const original = await prisma.crmCampaign.findUnique({ where: { id: clone } })
+      if (!original) {
+        return NextResponse.json({ error: 'Campaign to clone not found' }, { status: 404 })
+      }
+
+      const cloned = await prisma.crmCampaign.create({
+        data: {
+          name: `${original.name} (Copy)`,
+          subject: original.subject,
+          htmlBody: original.htmlBody,
+          textBody: original.textBody,
+          filters: (original.filters as Record<string, unknown>) || {},
+          status: 'draft',
+        },
+      })
+
+      // Duplicate recipients as pending
+      const originalRecipients = await prisma.crmCampaignRecipient.findMany({
+        where: { campaignId: original.id },
+        select: { contactId: true, email: true },
+      })
+
+      if (originalRecipients.length > 0) {
+        await prisma.crmCampaignRecipient.createMany({
+          data: originalRecipients.map(r => ({
+            campaignId: cloned.id,
+            contactId: r.contactId,
+            email: r.email,
+            status: 'pending',
+          })),
+        })
+      }
+
+      return NextResponse.json({
+        campaign: cloned,
+        recipientCount: originalRecipients.length,
+      }, { status: 201 })
+    }
+
+    // Resend to failed/bounced recipients of an existing campaign
+    if (resendFailed) {
+      const campaign = await prisma.crmCampaign.findUnique({ where: { id: resendFailed } })
+      if (!campaign) {
+        return NextResponse.json({ error: 'Campaign not found' }, { status: 404 })
+      }
+
+      // Reset failed/bounced recipients to pending
+      await prisma.crmCampaignRecipient.updateMany({
+        where: {
+          campaignId: campaign.id,
+          status: { in: ['failed', 'bounced'] },
+        },
+        data: { status: 'pending', error: null, sentAt: null },
+      })
+
+      // Update campaign status
+      await prisma.crmCampaign.update({
+        where: { id: campaign.id },
+        data: { status: 'sending' },
+      })
+
+      // Send in background
+      sendCampaignEmails(campaign.id, campaign.subject, campaign.htmlBody, campaign.textBody || undefined)
+
+      return NextResponse.json({ campaign, message: 'Resending to failed recipients' })
+    }
 
     if (!name || !subject || !htmlBody) {
       return NextResponse.json({ error: 'Name, subject, and htmlBody are required' }, { status: 400 })
