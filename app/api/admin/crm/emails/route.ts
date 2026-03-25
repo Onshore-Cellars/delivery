@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
     if (!admin) return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
 
     const body = await request.json()
-    const { to, subject, htmlBody, textBody, replyToMessageId } = body
+    const { to, cc, bcc, subject, htmlBody, textBody, replyToMessageId } = body
 
     if (!to || !subject || (!htmlBody && !textBody)) {
       return NextResponse.json({ error: 'to, subject, and body are required' }, { status: 400 })
@@ -97,12 +97,16 @@ export async function POST(request: NextRequest) {
         })()
       : undefined
 
-    const success = await sendEmail({
+    const emailOptions: { to: string; cc?: string; bcc?: string; subject: string; html: string; text?: string } = {
       to: String(to).trim(),
       subject: String(subject).trim(),
       html: safeHtml || textBody || '',
       text: textBody,
-    })
+    }
+    if (cc) emailOptions.cc = String(cc).trim()
+    if (bcc) emailOptions.bcc = String(bcc).trim()
+
+    const success = await sendEmail(emailOptions)
 
     if (!success) {
       return NextResponse.json({ error: 'Failed to send email' }, { status: 500 })
@@ -116,8 +120,9 @@ export async function POST(request: NextRequest) {
         messageId,
         folder: 'Sent',
         from: process.env.EMAIL_FROM || 'info@onshoredelivery.com',
-        fromName: 'Onshore Deliver',
+        fromName: 'Onshore Delivery',
         to: String(to).trim(),
+        cc: cc ? String(cc).trim() : null,
         subject: String(subject).trim(),
         textBody: textBody || null,
         htmlBody: safeHtml || null,
