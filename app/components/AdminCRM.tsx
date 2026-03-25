@@ -41,7 +41,7 @@ interface FilterOption {
   count: number
 }
 
-type CrmView = 'contacts' | 'campaigns' | 'compose' | 'social' | 'queue' | 'ai' | 'inbox' | 'activity' | 'create-post' | 'settings'
+type CrmView = 'contacts' | 'campaigns' | 'campaign-detail' | 'compose' | 'social' | 'queue' | 'ai' | 'inbox' | 'activity' | 'create-post' | 'settings' | 'templates'
 
 // WhatsApp link helper
 function getWhatsAppUrl(phone: string, message?: string): string {
@@ -121,6 +121,24 @@ interface CrmEmailItem {
   inReplyTo: string | null
   contactId: string | null
   contact: { id: string; name: string; category: string; priority: string } | null
+  createdAt: string
+}
+
+interface CampaignRecipient {
+  id: string
+  contactId: string
+  status: string
+  sentAt: string | null
+  error: string | null
+  contact: { name: string; email: string | null; category: string; priority: string }
+}
+
+interface EmailTemplate {
+  id: string
+  name: string
+  subject: string
+  body: string
+  category: string | null
   createdAt: string
 }
 
@@ -233,6 +251,31 @@ export default function AdminCRM({ token }: { token: string }) {
   // CSV Import
   const [csvImporting, setCsvImporting] = useState(false)
   const csvInputRef = useRef<HTMLInputElement>(null)
+
+  // Campaign detail state
+  const [campaignDetail, setCampaignDetail] = useState<(CrmCampaign & { htmlBody?: string; textBody?: string }) | null>(null)
+  const [campaignRecipients, setCampaignRecipients] = useState<CampaignRecipient[]>([])
+  const [campaignDetailLoading, setCampaignDetailLoading] = useState(false)
+
+  // Campaign scheduling
+  const [campaignScheduleAt, setCampaignScheduleAt] = useState('')
+
+  // Email templates state
+  const [emailTemplates, setEmailTemplates] = useState<EmailTemplate[]>([])
+  const [templatesLoading, setTemplatesLoading] = useState(false)
+  const [showTemplateForm, setShowTemplateForm] = useState(false)
+  const [newTemplateName, setNewTemplateName] = useState('')
+  const [newTemplateSubject, setNewTemplateSubject] = useState('')
+  const [newTemplateBody, setNewTemplateBody] = useState('')
+  const [newTemplateCategory, setNewTemplateCategory] = useState('')
+
+  // Bulk email selection
+  const [selectedEmails, setSelectedEmails] = useState<Set<string>>(new Set())
+
+  // Contact autocomplete for compose
+  const [composeContactSearch, setComposeContactSearch] = useState('')
+  const [composeContactResults, setComposeContactResults] = useState<CrmContact[]>([])
+  const [showContactDropdown, setShowContactDropdown] = useState(false)
 
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
     setToast({ message, type })
@@ -547,6 +590,196 @@ export default function AdminCRM({ token }: { token: string }) {
       showToast('Signature saved')
     } catch {
       showToast('Failed to save signature', 'error')
+    }
+  }
+
+  // ─── Campaign Detail ─────────────────────────────────────────────────
+  const fetchCampaignDetail = useCallback(async (id: string) => {
+    setCampaignDetailLoading(true)
+    try {
+      const res = await fetch(`/api/admin/crm/campaigns?id=${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (!res.ok) throw new Error('Failed')
+      const data = await res.json()
+      setCampaignDetail(data.campaign)
+      setCampaignRecipients(data.recipients)
+    } catch {
+      showToast('Failed to load campaign details', 'error')
+    } finally {
+      setCampaignDetailLoading(false)
+    }
+  }, [token])
+
+  useEffect(() => {
+    if (view === 'campaign-detail' && campaignDetail?.id) {
+      fetchCampaignDetail(campaignDetail.id)
+    }
+  }, [view])
+
+  const cloneCampaign = async (id: string) => {
+    setActionLoading(true)
+    try {
+      const res = await fetch('/api/admin/crm/campaigns', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ clone: id }),
+      })
+      if (!res.ok) throw new Error('Failed')
+      showToast('Campaign cloned as draft')
+      fetchCampaigns()
+      setView('campaigns')
+    } catch {
+      showToast('Failed to clone campaign', 'error')
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  const resendFailed = async (id: string) => {
+    if (!confirm('Resend to all failed/bounced recipients?')) return
+    setActionLoading(true)
+    try {
+      const res = await fetch('/api/admin/crm/campaigns', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ resendFailed: id }),
+      })
+      if (!res.ok) throw new Error('Failed')
+      const data = await res.json()
+      showToast(`Resending to ${data.resetCount || 0} recipient(s)`)
+      if (campaignDetail?.id === id) fetchCampaignDetail(id)
+      fetchCampaigns()
+    } catch {
+      showToast('Failed to resend', 'error')
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  // ─── Email Templates ───────────────────────────────────────────────────
+  const fetchEmailTemplates = useCallback(async () => {
+    setTemplatesLoading(true)
+    try {
+      const res = await fetch('/api/admin/crm/email-templates', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (!res.ok) throw new Error('Failed')
+      const data = await res.json()
+      setEmailTemplates(data.templates)
+    } catch {
+      showToast('Failed to load templates', 'error')
+    } finally {
+      setTemplatesLoading(false)
+    }
+  }, [token])
+
+  useEffect(() => {
+    if (view === 'templates') fetchEmailTemplates()
+  }, [view, fetchEmailTemplates])
+
+  const saveEmailTemplate = async () => {
+    if (!newTemplateName || !newTemplateSubject || !newTemplateBody) {
+      showToast('Fill in name, subject and body', 'error')
+      return
+    }
+    try {
+      const res = await fetch('/api/admin/crm/email-templates', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ name: newTemplateName, subject: newTemplateSubject, body: newTemplateBody, category: newTemplateCategory || 'General' }),
+      })
+      if (!res.ok) throw new Error('Failed')
+      showToast('Template saved')
+      setShowTemplateForm(false)
+      setNewTemplateName('')
+      setNewTemplateSubject('')
+      setNewTemplateBody('')
+      setNewTemplateCategory('')
+      fetchEmailTemplates()
+    } catch {
+      showToast('Failed to save template', 'error')
+    }
+  }
+
+  const deleteEmailTemplate = async (ids: string[]) => {
+    if (!confirm('Delete template(s)?')) return
+    try {
+      const res = await fetch('/api/admin/crm/email-templates', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ ids }),
+      })
+      if (!res.ok) throw new Error('Failed')
+      showToast('Template deleted')
+      fetchEmailTemplates()
+    } catch {
+      showToast('Failed to delete template', 'error')
+    }
+  }
+
+  const applyTemplate = (tpl: EmailTemplate) => {
+    setEmailSubject(tpl.subject)
+    setEmailBody(tpl.body)
+    showToast(`Template "${tpl.name}" applied`)
+  }
+
+  // ─── Contact Autocomplete for Compose ───────────────────────────────
+  useEffect(() => {
+    if (!composeContactSearch || composeContactSearch.length < 2) {
+      setComposeContactResults([])
+      setShowContactDropdown(false)
+      return
+    }
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/admin/crm?search=${encodeURIComponent(composeContactSearch)}&limit=8`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        if (!res.ok) return
+        const data = await res.json()
+        setComposeContactResults(data.contacts)
+        setShowContactDropdown(true)
+      } catch { /* ignore */ }
+    }, 200)
+    return () => clearTimeout(timer)
+  }, [composeContactSearch, token])
+
+  // ─── Bulk Email Actions ─────────────────────────────────────────────
+  const toggleEmailSelect = (id: string) => {
+    setSelectedEmails(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  const bulkEmailAction = async (action: 'archive' | 'delete' | 'read' | 'star') => {
+    const ids = Array.from(selectedEmails)
+    if (ids.length === 0) return
+    try {
+      if (action === 'delete') {
+        if (!confirm(`Delete ${ids.length} email(s)?`)) return
+        const res = await fetch('/api/admin/crm/emails', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ ids }),
+        })
+        if (!res.ok) throw new Error('Failed')
+        showToast(`Deleted ${ids.length} email(s)`)
+      } else {
+        const updates: Record<string, boolean> = {}
+        if (action === 'archive') updates.isArchived = true
+        if (action === 'read') updates.isRead = true
+        if (action === 'star') updates.isStarred = true
+        await updateEmailFlags(ids, updates)
+        showToast(`Updated ${ids.length} email(s)`)
+      }
+      setSelectedEmails(new Set())
+      fetchInboxEmails()
+    } catch {
+      showToast('Bulk action failed', 'error')
     }
   }
 
@@ -973,6 +1206,7 @@ export default function AdminCRM({ token }: { token: string }) {
             { key: 'create-post', label: '+ Post', icon: '' },
             { key: 'queue', label: `AI Queue${(aiQueueStats.pending || 0) > 0 ? ` (${aiQueueStats.pending})` : ''}`, icon: '🤖' },
             { key: 'ai', label: 'AI Chat', icon: '✦' },
+            { key: 'templates', label: 'Templates', icon: '📄' },
             { key: 'activity', label: 'Activity Log', icon: '📋' },
             { key: 'settings', label: 'Settings', icon: '⚙️' },
           ] as { key: CrmView; label: string; icon: string }[]).map(v => (
@@ -1118,7 +1352,7 @@ export default function AdminCRM({ token }: { token: string }) {
                           )}
                           {c.email && (
                             <button
-                              onClick={() => { setEmailModal(c); setEmailSubject(''); setEmailBody('') }}
+                              onClick={() => { setEmailModal(c); setEmailSubject(''); setEmailBody(''); if (emailTemplates.length === 0) fetchEmailTemplates() }}
                               className="px-2 py-1 rounded text-xs font-medium text-indigo-600 hover:bg-indigo-50"
                               title="Send Email"
                             >
@@ -1165,39 +1399,48 @@ export default function AdminCRM({ token }: { token: string }) {
           ) : (
             <div className="divide-y divide-slate-50">
               {campaigns.map(c => (
-                <div key={c.id} className="px-4 py-3 hover:bg-slate-50/50 flex items-center justify-between">
-                  <div>
-                    <div className="font-medium text-[#1a1a1a] text-sm">{c.name}</div>
-                    <div className="text-xs text-slate-400 mt-0.5">
-                      {c.subject} &middot; {c._count.recipients} recipients
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    {c.sentCount > 0 && (
-                      <span className="text-xs text-slate-500">{c.sentCount} sent{c.failedCount > 0 ? `, ${c.failedCount} failed` : ''}</span>
-                    )}
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${statusBadge(c.status)}`}>{c.status}</span>
-                    <span className="text-xs text-slate-400">{new Date(c.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</span>
-                    <button
-                      onClick={async () => {
-                        if (!confirm(`Delete campaign "${c.name}"?`)) return
-                        try {
-                          const res = await fetch('/api/admin/crm/campaigns', {
-                            method: 'DELETE',
-                            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-                            body: JSON.stringify({ ids: [c.id] }),
-                          })
-                          if (!res.ok) throw new Error('Failed')
-                          showToast('Campaign deleted')
-                          fetchCampaigns()
-                        } catch {
-                          showToast('Failed to delete campaign', 'error')
-                        }
-                      }}
-                      className="px-2 py-1 rounded text-xs font-medium text-red-600 hover:bg-red-50"
+                <div key={c.id} className="px-4 py-3 hover:bg-slate-50/50">
+                  <div className="flex items-center justify-between">
+                    <div
+                      className="cursor-pointer flex-1"
+                      onClick={() => { setCampaignDetail(c as typeof campaignDetail); setView('campaign-detail') }}
                     >
-                      Del
-                    </button>
+                      <div className="font-medium text-[#1a1a1a] text-sm hover:text-[#C6904D] transition-colors">{c.name}</div>
+                      <div className="text-xs text-slate-400 mt-0.5">
+                        {c.subject} &middot; {c._count.recipients} recipients
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {c.sentCount > 0 && (
+                        <span className="text-xs text-slate-500">{c.sentCount} sent{c.failedCount > 0 ? `, ${c.failedCount} failed` : ''}</span>
+                      )}
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${statusBadge(c.status)}`}>{c.status}</span>
+                      <span className="text-xs text-slate-400">{new Date(c.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</span>
+                      <button onClick={() => cloneCampaign(c.id)} disabled={actionLoading} className="px-2 py-1 rounded text-xs font-medium text-blue-600 hover:bg-blue-50" title="Clone">Clone</button>
+                      {c.failedCount > 0 && (
+                        <button onClick={() => resendFailed(c.id)} disabled={actionLoading} className="px-2 py-1 rounded text-xs font-medium text-amber-600 hover:bg-amber-50" title="Resend failed">Retry</button>
+                      )}
+                      <button
+                        onClick={async () => {
+                          if (!confirm(`Delete campaign "${c.name}"?`)) return
+                          try {
+                            const res = await fetch('/api/admin/crm/campaigns', {
+                              method: 'DELETE',
+                              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                              body: JSON.stringify({ ids: [c.id] }),
+                            })
+                            if (!res.ok) throw new Error('Failed')
+                            showToast('Campaign deleted')
+                            fetchCampaigns()
+                          } catch {
+                            showToast('Failed to delete campaign', 'error')
+                          }
+                        }}
+                        className="px-2 py-1 rounded text-xs font-medium text-red-600 hover:bg-red-50"
+                      >
+                        Del
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -1281,7 +1524,15 @@ export default function AdminCRM({ token }: { token: string }) {
             )}
           </div>
 
-          <div className="flex gap-3">
+          {/* Schedule field */}
+          <div>
+            <label className="block text-xs font-medium text-slate-500 mb-1">Schedule Send (optional)</label>
+            <input type="datetime-local" value={campaignScheduleAt} onChange={e => setCampaignScheduleAt(e.target.value)}
+              className="w-full sm:w-auto px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D]" />
+            {campaignScheduleAt && <span className="text-xs text-slate-400 ml-2">Campaign will be sent at this time</span>}
+          </div>
+
+          <div className="flex gap-3 flex-wrap">
             <button onClick={() => setView('campaigns')} className="px-5 py-2.5 rounded-xl border border-slate-200 text-sm font-medium text-slate-600 hover:bg-slate-50">
               Cancel
             </button>
@@ -1837,6 +2088,18 @@ export default function AdminCRM({ token }: { token: string }) {
               </div>
             </div>
 
+            {/* Bulk email actions bar */}
+            {selectedEmails.size > 0 && (
+              <div className="px-4 py-2 border-b border-slate-100 bg-blue-50 flex items-center gap-3">
+                <span className="text-xs font-medium text-blue-700">{selectedEmails.size} selected</span>
+                <button onClick={() => bulkEmailAction('read')} className="px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-700 hover:bg-blue-200">Mark Read</button>
+                <button onClick={() => bulkEmailAction('star')} className="px-2 py-1 rounded text-xs font-medium bg-amber-100 text-amber-700 hover:bg-amber-200">Star</button>
+                <button onClick={() => bulkEmailAction('archive')} className="px-2 py-1 rounded text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200">Archive</button>
+                <button onClick={() => bulkEmailAction('delete')} className="px-2 py-1 rounded text-xs font-medium bg-red-600 text-white hover:bg-red-700 ml-auto">Delete</button>
+                <button onClick={() => setSelectedEmails(new Set())} className="px-2 py-1 rounded text-xs font-medium text-slate-500 hover:bg-slate-100">Clear</button>
+              </div>
+            )}
+
             {/* Email List */}
             {inboxLoading ? (
               <div className="p-8 text-center text-slate-400 text-sm">Loading...</div>
@@ -1849,7 +2112,7 @@ export default function AdminCRM({ token }: { token: string }) {
                 {inboxEmails.map(email => (
                   <div
                     key={email.id}
-                    className={`px-4 py-3 hover:bg-slate-50/50 cursor-pointer flex items-start gap-3 ${!email.isRead ? 'bg-blue-50/30' : ''}`}
+                    className={`px-4 py-3 hover:bg-slate-50/50 cursor-pointer flex items-start gap-3 ${!email.isRead ? 'bg-blue-50/30' : ''} ${selectedEmails.has(email.id) ? 'bg-blue-50/60' : ''}`}
                     onClick={async () => {
                       setSelectedEmail(email)
                       setEmailViewMode('html')
@@ -1858,6 +2121,14 @@ export default function AdminCRM({ token }: { token: string }) {
                       }
                     }}
                   >
+                    {/* Checkbox */}
+                    <input
+                      type="checkbox"
+                      checked={selectedEmails.has(email.id)}
+                      onChange={e => { e.stopPropagation(); toggleEmailSelect(email.id) }}
+                      onClick={e => e.stopPropagation()}
+                      className="rounded border-slate-300 mt-1"
+                    />
                     {/* Star */}
                     <button
                       onClick={e => {
@@ -1881,6 +2152,9 @@ export default function AdminCRM({ token }: { token: string }) {
                         )}
                         {email.hasAttachments && (
                           <span className="text-slate-400 text-xs">📎</span>
+                        )}
+                        {email.inReplyTo && (
+                          <span className="text-slate-300 text-[10px] font-medium">thread</span>
                         )}
                       </div>
                       <div className={`text-sm truncate ${!email.isRead ? 'font-medium text-[#1a1a1a]' : 'text-slate-700'}`}>
@@ -2088,15 +2362,37 @@ export default function AdminCRM({ token }: { token: string }) {
               <p className="text-xs text-slate-400 mt-1">From: info@onshoredelivery.com</p>
             </div>
             <div className="p-6 space-y-3">
-              <div>
+              <div className="relative">
                 <label className="block text-xs font-medium text-slate-500 mb-1">To</label>
                 <input
                   type="email"
                   value={composeEmailTo}
-                  onChange={e => setComposeEmailTo(e.target.value)}
-                  placeholder="recipient@example.com"
+                  onChange={e => { setComposeEmailTo(e.target.value); setComposeContactSearch(e.target.value) }}
+                  onFocus={() => { if (composeContactResults.length > 0) setShowContactDropdown(true) }}
+                  onBlur={() => setTimeout(() => setShowContactDropdown(false), 200)}
+                  placeholder="Type name or email to search contacts..."
                   className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10"
                 />
+                {showContactDropdown && composeContactResults.length > 0 && (
+                  <div className="absolute z-10 top-full mt-1 w-full bg-white border border-slate-200 rounded-xl shadow-lg max-h-48 overflow-y-auto">
+                    {composeContactResults.filter(c => c.email).map(c => (
+                      <button
+                        key={c.id}
+                        type="button"
+                        className="w-full text-left px-3 py-2 hover:bg-slate-50 text-sm border-b border-slate-50 last:border-0"
+                        onMouseDown={e => {
+                          e.preventDefault()
+                          setComposeEmailTo(c.email || '')
+                          setShowContactDropdown(false)
+                          setComposeContactSearch('')
+                        }}
+                      >
+                        <div className="font-medium text-[#1a1a1a]">{c.name}</div>
+                        <div className="text-xs text-slate-400">{c.email} &middot; {c.category}</div>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
@@ -2291,6 +2587,17 @@ export default function AdminCRM({ token }: { token: string }) {
               <p className="text-xs text-slate-400 mt-1">To: {emailModal.name} &lt;{emailModal.email}&gt;</p>
             </div>
             <div className="p-6 space-y-4">
+              {/* Template picker */}
+              {emailTemplates.length > 0 && (
+                <div>
+                  <label className="block text-xs font-medium text-slate-500 mb-1">Quick Template</label>
+                  <div className="flex gap-1 flex-wrap">
+                    {emailTemplates.map(tpl => (
+                      <button key={tpl.id} onClick={() => applyTemplate(tpl)} className="px-2 py-1 rounded-lg border border-slate-200 text-xs text-slate-600 hover:bg-slate-50 hover:border-[#C6904D]">{tpl.name}</button>
+                    ))}
+                  </div>
+                </div>
+              )}
               <div>
                 <label className="block text-xs font-medium text-slate-500 mb-1">Subject</label>
                 <input
@@ -2337,6 +2644,189 @@ export default function AdminCRM({ token }: { token: string }) {
                 {emailSending ? 'Sending...' : 'Send Email'}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ═══════════════════ CAMPAIGN DETAIL VIEW ═══════════════════ */}
+      {view === 'campaign-detail' && campaignDetail && (
+        <div className="space-y-4">
+          <div className="bg-white rounded-2xl border border-[#e8e4de] shadow-sm overflow-hidden">
+            <div className="p-4 border-b border-slate-100 flex items-center justify-between gap-3">
+              <button onClick={() => setView('campaigns')} className="px-3 py-1.5 rounded-lg border border-slate-200 text-sm text-slate-600 hover:bg-slate-50">← Back</button>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm font-semibold text-[#1a1a1a] truncate">{campaignDetail.name}</h3>
+                <div className="text-xs text-slate-400">{campaignDetail.subject}</div>
+              </div>
+              <div className="flex gap-2">
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${statusBadge(campaignDetail.status)}`}>{campaignDetail.status}</span>
+                <button onClick={() => cloneCampaign(campaignDetail.id)} disabled={actionLoading} className="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-blue-600 hover:bg-blue-50">Clone</button>
+                {campaignDetail.failedCount > 0 && (
+                  <button onClick={() => resendFailed(campaignDetail.id)} disabled={actionLoading} className="px-3 py-1.5 rounded-lg bg-amber-500 text-white text-xs font-medium hover:bg-amber-600">Retry {campaignDetail.failedCount} Failed</button>
+                )}
+              </div>
+            </div>
+
+            {/* Stats */}
+            <div className="p-4 border-b border-slate-100 flex flex-wrap gap-4">
+              <div className="flex-1 min-w-[100px] text-center">
+                <div className="text-xl font-bold text-[#1a1a1a]">{campaignDetail._count?.recipients || campaignRecipients.length}</div>
+                <div className="text-[10px] text-slate-400">Recipients</div>
+              </div>
+              <div className="flex-1 min-w-[100px] text-center">
+                <div className="text-xl font-bold text-green-600">{campaignDetail.sentCount}</div>
+                <div className="text-[10px] text-slate-400">Sent</div>
+              </div>
+              <div className="flex-1 min-w-[100px] text-center">
+                <div className="text-xl font-bold text-red-600">{campaignDetail.failedCount}</div>
+                <div className="text-[10px] text-slate-400">Failed</div>
+              </div>
+              <div className="flex-1 min-w-[100px] text-center">
+                <div className="text-xl font-bold text-slate-400">{campaignRecipients.filter(r => r.status === 'pending').length}</div>
+                <div className="text-[10px] text-slate-400">Pending</div>
+              </div>
+            </div>
+
+            {/* Campaign body preview */}
+            {(campaignDetail as { htmlBody?: string }).htmlBody && (
+              <div className="p-4 border-b border-slate-100">
+                <div className="text-xs font-medium text-slate-500 mb-2">Email Preview</div>
+                <div className="border border-slate-200 rounded-xl p-4 bg-white max-h-60 overflow-y-auto prose prose-sm max-w-none"
+                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize((campaignDetail as { htmlBody?: string }).htmlBody || '') }} />
+              </div>
+            )}
+
+            {/* Recipients list */}
+            <div className="p-4">
+              <div className="text-xs font-medium text-slate-500 mb-2">Recipients</div>
+              {campaignDetailLoading ? (
+                <div className="text-center text-slate-400 text-sm py-4">Loading...</div>
+              ) : campaignRecipients.length === 0 ? (
+                <div className="text-center text-slate-400 text-sm py-4">No recipients found.</div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs">
+                    <thead>
+                      <tr className="border-b border-slate-100 bg-slate-50/50">
+                        <th className="px-3 py-2 text-left font-medium text-slate-500">Contact</th>
+                        <th className="px-3 py-2 text-left font-medium text-slate-500">Email</th>
+                        <th className="px-3 py-2 text-left font-medium text-slate-500">Category</th>
+                        <th className="px-3 py-2 text-left font-medium text-slate-500">Status</th>
+                        <th className="px-3 py-2 text-left font-medium text-slate-500">Sent At</th>
+                        <th className="px-3 py-2 text-left font-medium text-slate-500">Error</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {campaignRecipients.map(r => (
+                        <tr key={r.id} className="border-b border-slate-50 hover:bg-slate-50/50">
+                          <td className="px-3 py-2 font-medium text-[#1a1a1a]">{r.contact.name}</td>
+                          <td className="px-3 py-2 text-slate-500">{r.contact.email || '—'}</td>
+                          <td className="px-3 py-2"><span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-blue-50 text-blue-600 border border-blue-200">{r.contact.category}</span></td>
+                          <td className="px-3 py-2">
+                            <span className={`px-1.5 py-0.5 rounded text-[9px] font-semibold border ${
+                              r.status === 'sent' ? 'bg-green-50 text-green-700 border-green-200' :
+                              r.status === 'failed' || r.status === 'bounced' ? 'bg-red-50 text-red-700 border-red-200' :
+                              'bg-slate-50 text-slate-600 border-slate-200'
+                            }`}>{r.status}</span>
+                          </td>
+                          <td className="px-3 py-2 text-slate-400">{r.sentAt ? new Date(r.sentAt).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '—'}</td>
+                          <td className="px-3 py-2 text-red-500 truncate max-w-[200px]" title={r.error || ''}>{r.error || ''}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ═══════════════════ TEMPLATES VIEW ═══════════════════ */}
+      {view === 'templates' && (
+        <div className="space-y-4">
+          <div className="bg-white rounded-2xl border border-[#e8e4de] shadow-sm overflow-hidden">
+            <div className="p-4 border-b border-slate-100 flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-[#1a1a1a]">Email Templates</h3>
+              <button onClick={() => setShowTemplateForm(!showTemplateForm)} className="px-4 py-2 rounded-lg bg-[#C6904D] text-white text-sm font-medium hover:bg-[#b07e3f]">
+                {showTemplateForm ? 'Cancel' : '+ New Template'}
+              </button>
+            </div>
+
+            {/* New template form */}
+            {showTemplateForm && (
+              <div className="p-4 border-b border-slate-100 space-y-3 bg-slate-50/50">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-slate-500 mb-1">Template Name *</label>
+                    <input type="text" value={newTemplateName} onChange={e => setNewTemplateName(e.target.value)} placeholder="e.g. Follow-up"
+                      className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-500 mb-1">Category</label>
+                    <input type="text" value={newTemplateCategory} onChange={e => setNewTemplateCategory(e.target.value)} placeholder="e.g. Sales, Support"
+                      className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]" />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-500 mb-1">Subject Line *</label>
+                  <input type="text" value={newTemplateSubject} onChange={e => setNewTemplateSubject(e.target.value)} placeholder="e.g. Following up on {{name}}"
+                    className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D]" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-500 mb-1">Body *</label>
+                  <textarea value={newTemplateBody} onChange={e => setNewTemplateBody(e.target.value)} rows={6}
+                    placeholder={`Hi {{name}},\n\nJust wanted to follow up on...`}
+                    className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#C6904D] resize-y" />
+                </div>
+                <button onClick={saveEmailTemplate} disabled={!newTemplateName || !newTemplateSubject || !newTemplateBody}
+                  className="px-4 py-2 rounded-lg bg-[#1d1d1f] text-white text-sm font-medium hover:bg-[#333] disabled:opacity-50">
+                  Save Template
+                </button>
+              </div>
+            )}
+
+            {/* Templates list */}
+            {templatesLoading ? (
+              <div className="p-8 text-center text-slate-400 text-sm">Loading...</div>
+            ) : emailTemplates.length === 0 ? (
+              <div className="p-8 text-center text-slate-400 text-sm">
+                No templates yet. Create one to speed up your email workflow.
+              </div>
+            ) : (
+              <div className="divide-y divide-slate-50">
+                {emailTemplates.map(tpl => (
+                  <div key={tpl.id} className="p-4 hover:bg-slate-50/50">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-medium text-sm text-[#1a1a1a]">{tpl.name}</span>
+                          {tpl.category && (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">{tpl.category}</span>
+                          )}
+                        </div>
+                        <div className="text-xs text-slate-500">Subject: {tpl.subject}</div>
+                        <div className="text-xs text-slate-400 mt-1 line-clamp-2">{tpl.body}</div>
+                      </div>
+                      <div className="flex gap-1.5 flex-shrink-0">
+                        <button
+                          onClick={() => {
+                            setComposeEmailSubject(tpl.subject)
+                            setComposeEmailBody(tpl.body)
+                            setShowComposeEmail(true)
+                            showToast(`Loaded "${tpl.name}" into compose`)
+                          }}
+                          className="px-2 py-1 rounded text-xs font-medium text-indigo-600 hover:bg-indigo-50"
+                        >
+                          Use
+                        </button>
+                        <button onClick={() => deleteEmailTemplate([tpl.id])} className="px-2 py-1 rounded text-xs font-medium text-red-600 hover:bg-red-50">Del</button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}
