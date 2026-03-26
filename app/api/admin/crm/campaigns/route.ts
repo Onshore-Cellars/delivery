@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
           subject: original.subject,
           htmlBody: original.htmlBody,
           textBody: original.textBody,
-          filters: (original.filters as Record<string, unknown>) || {},
+          filters: original.filters || null,
           status: 'draft',
         },
       })
