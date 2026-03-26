@@ -64,6 +64,14 @@ const ELECTRIC_CONSUMPTION: Record<string, number> = {
   'Small Van': 20,
   'Medium Van': 25,
   'Large Van': 30,
+  'Sprinter': 30,
+  'Luton Van': 35,
+  'Refrigerated Van': 35,   // fridge compressor adds ~5kWh/100km
+  'Refrigerated Truck': 55,
+  'Tail Lift Van': 32,
+  'Box Truck': 50,
+  'Pickup Truck': 25,
+  'Cargo Bike': 1,
   'default': 25,
 }
 
