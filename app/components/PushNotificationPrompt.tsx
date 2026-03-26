@@ -72,16 +72,16 @@ export default function PushNotificationPrompt({ token }: PushNotificationPrompt
 
   return (
     <div className="fixed bottom-24 md:bottom-6 left-4 right-4 md:left-auto md:right-6 z-50 md:w-80 animate-slideUp">
-      <div className="bg-[#162E3D] rounded-xl shadow-2xl border border-white/[0.08] p-4">
+      <div className="bg-[#162E3D] rounded-xl shadow-2xl border border-[#e8e4de] p-4">
         <div className="flex items-start gap-3">
           <div className="w-10 h-10 rounded-full bg-[#FF6A2A]/10 flex items-center justify-center flex-shrink-0">
             <svg className="w-5 h-5 text-[#FF6A2A]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
           </div>
           <div className="flex-1">
-            <h4 className="text-sm font-semibold text-[#F7F9FB]">Stay Updated</h4>
+            <h4 className="text-sm font-semibold text-[#1a1a1a]">Stay Updated</h4>
             <p className="text-xs text-[#6B7C86] mt-0.5">Get notified about delivery updates, new messages, and bids.</p>
           </div>
-          <button onClick={handleDismiss} className="text-[#6B7C86] hover:text-[#9AADB8] p-1">
+          <button onClick={handleDismiss} className="text-slate-400 hover:text-[#9AADB8] p-1">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
         </div>

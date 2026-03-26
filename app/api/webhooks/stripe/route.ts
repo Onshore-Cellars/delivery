@@ -46,8 +46,13 @@ export async function POST(request: NextRequest) {
 
         if (bookingId) {
           // Fetch booking first to calculate fees, then update in one query
-          const existingBooking = await prisma.booking.findUnique({ where: { id: bookingId }, select: { totalPrice: true } })
+          const existingBooking = await prisma.booking.findUnique({ where: { id: bookingId }, select: { totalPrice: true, status: true, paymentStatus: true } })
           const totalPrice = existingBooking?.totalPrice ?? 0
+
+          // Only confirm bookings that are still in a valid pre-confirmed state
+          if (!existingBooking || !['PENDING', 'CONFIRMED'].includes(existingBooking.status) || existingBooking.paymentStatus === 'PAID') {
+            break
+          }
 
           const booking = await prisma.booking.update({
             where: { id: bookingId },
@@ -174,11 +179,13 @@ export async function POST(request: NextRequest) {
             include: { listing: { select: { carrierId: true } } }
           })
           if (booking) {
-            // Update booking status
-            await prisma.booking.update({
-              where: { id: booking.id },
-              data: { status: 'DISPUTED' }
-            })
+            // Only transition to DISPUTED if not already in a terminal state
+            if (!['CANCELLED', 'COMPLETED', 'DISPUTED'].includes(booking.status as string)) {
+              await prisma.booking.update({
+                where: { id: booking.id },
+                data: { status: 'DISPUTED' }
+              })
+            }
             // Create dispute record
             await prisma.dispute.create({
               data: {
@@ -277,7 +284,7 @@ export async function POST(request: NextRequest) {
             await prisma.dispute.updateMany({
               where: { bookingId: booking.id, status: 'OPEN' },
               data: {
-                status: won ? 'RESOLVED' : 'RESOLVED',
+                status: won ? 'RESOLVED' : 'ESCALATED',
                 resolution: won ? 'Dispute resolved in platform\'s favor' : 'Dispute lost — refund issued by Stripe',
                 resolvedAt: new Date(),
               },

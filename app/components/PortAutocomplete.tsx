@@ -48,7 +48,7 @@ const typeLabels: Record<string, { label: string; color: string }> = {
   port: { label: 'Port', color: 'bg-indigo-100 text-indigo-700' },
   marina: { label: 'Marina', color: 'bg-emerald-100 text-emerald-700' },
   shipyard: { label: 'Shipyard', color: 'bg-[#FF6A2A]/15 text-[#FF6A2A]' },
-  address: { label: 'Address', color: 'bg-[#102535] text-[#9AADB8]' },
+  address: { label: 'Address', color: 'bg-slate-100 text-[#9AADB8]' },
 }
 
 export default function PortAutocomplete({
@@ -243,7 +243,7 @@ export default function PortAutocomplete({
   }, [])
 
   const defaultInputCls =
-    'w-full px-4 py-2.5 rounded-lg border border-white/[0.08] bg-[#162E3D] text-sm text-[#F7F9FB] focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10 outline-none transition-all placeholder:text-[#6B7C86]'
+    'w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-900 focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10 outline-none transition-all'
 
   return (
     <div ref={wrapperRef} className="relative">
@@ -270,7 +270,7 @@ export default function PortAutocomplete({
         <ul
           ref={listRef}
           role="listbox"
-          className="absolute z-50 mt-1 w-full max-h-72 overflow-y-auto rounded-xl border border-white/[0.08] bg-[#162E3D] shadow-lg py-1"
+          className="absolute z-50 mt-1 w-full max-h-72 overflow-y-auto rounded-xl border border-slate-200 bg-[#162E3D] shadow-lg py-1"
         >
           {results.map((result, i) => (
             <li
@@ -280,11 +280,11 @@ export default function PortAutocomplete({
               onMouseDown={(e) => { e.preventDefault(); selectResult(result) }}
               onMouseEnter={() => setHighlightIndex(i)}
               className={`px-4 py-2.5 cursor-pointer flex items-center justify-between gap-2 transition-colors ${
-                i === highlightIndex ? 'bg-[#FF6A2A]/10' : 'hover:bg-[#162E3D]'
+                i === highlightIndex ? 'bg-[#FF6A2A]/10' : 'hover:bg-slate-50'
               }`}
             >
               <div className="min-w-0">
-                <div className="text-sm font-medium text-[#F7F9FB] truncate">{result.display}</div>
+                <div className="text-sm font-medium text-slate-900 truncate">{result.display}</div>
                 <div className="text-xs text-[#6B7C86] truncate">{result.sub}</div>
               </div>
               <span className={`flex-shrink-0 px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide ${result.tagColor}`}>
@@ -293,7 +293,7 @@ export default function PortAutocomplete({
             </li>
           ))}
           {googleLoading && (
-            <li className="px-4 py-2 text-xs text-[#6B7C86] flex items-center gap-2">
+            <li className="px-4 py-2 text-xs text-slate-400 flex items-center gap-2">
               <svg className="w-3 h-3 animate-spin" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
               Searching addresses...
             </li>

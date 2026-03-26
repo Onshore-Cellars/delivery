@@ -176,7 +176,7 @@ export default function AddressAutocomplete({
           onFocus={() => results.length > 0 && setOpen(true)}
           placeholder={placeholder}
           autoComplete="off"
-          className="w-full px-4 py-3 rounded border border-white/[0.08] text-sm text-[#F7F9FB] focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10 outline-none pr-10"
+          className="w-full px-4 py-3 rounded border border-[rgba(255,255,255,0.08)] text-sm text-[#F7F9FB] focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10 outline-none pr-10"
         />
         <div className="absolute right-3 top-1/2 -translate-y-1/2">
           {loading ? (
@@ -188,13 +188,13 @@ export default function AddressAutocomplete({
       </div>
 
       {open && (predictions.length > 0 || results.length > 0) && (
-        <div className="absolute z-50 w-full mt-1 bg-[#162E3D] rounded-lg shadow-lg border border-white/[0.08] overflow-hidden max-h-64 overflow-y-auto">
+        <div className="absolute z-50 w-full mt-1 bg-[#162E3D] rounded-lg shadow-lg border border-[rgba(255,255,255,0.08)] overflow-hidden max-h-64 overflow-y-auto">
           {predictions.length > 0 ? predictions.map((pred, i) => (
             <button
               key={pred.placeId || i}
               type="button"
               onClick={() => selectGooglePlace(pred)}
-              className="w-full text-left px-4 py-3 hover:bg-[#162E3D] transition-colors border-b border-white/[0.06] last:border-0"
+              className="w-full text-left px-4 py-3 hover:bg-[#102535] transition-colors border-b border-[rgba(255,255,255,0.04)] last:border-0"
             >
               <div className="flex items-start gap-2.5">
                 <svg className="w-4 h-4 text-[#FF6A2A] mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
@@ -209,7 +209,7 @@ export default function AddressAutocomplete({
               key={i}
               type="button"
               onClick={() => handleSelect(result)}
-              className="w-full text-left px-4 py-3 hover:bg-[#162E3D] transition-colors border-b border-white/[0.06] last:border-0"
+              className="w-full text-left px-4 py-3 hover:bg-[#102535] transition-colors border-b border-[rgba(255,255,255,0.04)] last:border-0"
             >
               <div className="flex items-start gap-2.5">
                 <svg className="w-4 h-4 text-[#FF6A2A] mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>

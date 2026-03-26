@@ -4,21 +4,21 @@ import ClientLayout from "./components/ClientLayout"
 
 export const metadata: Metadata = {
   title: {
-    default: "Onshore Deliver — Delivery Logistics Marketplace",
-    template: "%s | Onshore Deliver",
+    default: "ON.SHORE Delivery — Marine-Grade Logistics",
+    template: "%s | ON.SHORE Delivery",
   },
-  description: "The marketplace for delivery logistics. Carriers share van space to ports and marinas. Book space for provisions, equipment, and supplies. Simple, premium, reliable.",
-  keywords: ["delivery logistics", "marine delivery", "port delivery", "maritime transport", "van space sharing", "yacht provisions", "marine supplies"],
+  description: "Marine-grade logistics infrastructure for high-value environments. Consolidate deliveries to ports and marinas. Premium, precise, reliable.",
+  keywords: ["marine logistics", "yacht delivery", "port delivery", "maritime transport", "marine-grade logistics", "yacht provisions", "marine supplies"],
   openGraph: {
     type: "website",
-    siteName: "Onshore Deliver",
-    title: "Onshore Deliver — Delivery Logistics Marketplace",
-    description: "Share van space. Book deliveries to ports and marinas. Simple, premium, reliable.",
+    siteName: "ON.SHORE Delivery",
+    title: "ON.SHORE Delivery — Marine-Grade Logistics",
+    description: "Marine-grade logistics infrastructure. Consolidate deliveries to ports and marinas.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Onshore Deliver",
-    description: "Delivery logistics marketplace for marine and yacht supplies.",
+    title: "ON.SHORE Delivery",
+    description: "Marine-grade logistics infrastructure for high-value environments.",
   },
   robots: { index: true, follow: true },
 }

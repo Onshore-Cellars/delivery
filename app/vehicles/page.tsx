@@ -134,23 +134,23 @@ export default function VehiclesPage() {
     </div>
   )
 
-  const inputClass = 'w-full px-3 py-2 rounded-lg border border-white/[0.08] text-sm focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10 outline-none'
+  const inputClass = 'w-full px-3 py-2 rounded-lg border border-[rgba(255,255,255,0.08)] text-sm focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10 outline-none'
 
   return (
     <div id="main-content" className="min-h-screen bg-[#102535] py-8 px-4">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-[#F7F9FB]" style={{ fontFamily: 'var(--font-display)' }}>My Vehicles</h1>
-          <button onClick={() => setShowAdd(!showAdd)} className="px-4 py-2 bg-[#1d1916] text-white rounded-lg text-sm font-semibold hover:bg-[#2C2520] transition-colors">
+          <button onClick={() => setShowAdd(!showAdd)} className="px-4 py-2 bg-[#F7F9FB] text-white rounded-lg text-sm font-semibold hover:bg-[#102535] transition-colors">
             {showAdd ? 'Cancel' : '+ Add Vehicle'}
           </button>
         </div>
 
-        {error && <div className="mb-4 p-3 bg-red-500/10 border border-red-200 rounded-lg text-sm text-red-600 flex justify-between"><span>{error}</span><button onClick={() => setError('')} className="text-red-400">&times;</button></div>}
-        {success && <div className="mb-4 p-3 bg-[#9ED36A]/10 border border-[#9ED36A]/20 rounded-lg text-sm text-[#9ED36A] flex justify-between"><span>{success}</span><button onClick={() => setSuccess('')} className="text-green-400">&times;</button></div>}
+        {error && <div className="mb-4 p-3 bg-red-500/10 border border-red-200 rounded-lg text-sm text-red-400 flex justify-between"><span>{error}</span><button onClick={() => setError('')} className="text-red-400">&times;</button></div>}
+        {success && <div className="mb-4 p-3 bg-[#9ED36A]/10 border border-green-200 rounded-lg text-sm text-[#9ED36A] flex justify-between"><span>{success}</span><button onClick={() => setSuccess('')} className="text-green-400">&times;</button></div>}
 
         {showAdd && (
-          <div className="bg-[#162E3D] rounded-lg border border-white/[0.08] p-5 mb-6">
+          <div className="bg-[#162E3D] rounded-lg border border-[rgba(255,255,255,0.08)] p-5 mb-6">
             <h2 className="font-semibold text-[#F7F9FB] mb-4">Add Vehicle</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
               <select className={inputClass} value={addForm.vehicleType} onChange={e => setAddForm({...addForm, vehicleType: e.target.value, make: '', model: '', maxPayloadKg: '', cargoVolumeM3: ''})}>
@@ -168,23 +168,23 @@ export default function VehiclesPage() {
               <input className={inputClass} placeholder="Payload (kg)" type="number" value={addForm.maxPayloadKg} onChange={e => setAddForm({...addForm, maxPayloadKg: e.target.value})} />
               <input className={inputClass} placeholder="Volume (m³)" type="number" step="0.1" value={addForm.cargoVolumeM3} onChange={e => setAddForm({...addForm, cargoVolumeM3: e.target.value})} />
             </div>
-            <button onClick={handleAdd} disabled={saving} className="px-4 py-2 bg-[#1d1916] text-white rounded-lg text-sm font-semibold disabled:opacity-50">
+            <button onClick={handleAdd} disabled={saving} className="px-4 py-2 bg-[#F7F9FB] text-white rounded-lg text-sm font-semibold disabled:opacity-50">
               {saving ? 'Saving...' : 'Add Vehicle'}
             </button>
           </div>
         )}
 
         {loading ? (
-          <div className="space-y-4">{[1,2].map(i => <div key={i} className="h-28 bg-[#162E3D] rounded-lg border border-white/[0.08] animate-pulse" />)}</div>
+          <div className="space-y-4">{[1,2].map(i => <div key={i} className="h-28 bg-[#162E3D] rounded-lg border border-[rgba(255,255,255,0.08)] animate-pulse" />)}</div>
         ) : vehicles.length === 0 ? (
-          <div className="text-center py-16 bg-[#162E3D] rounded-lg border border-white/[0.08]">
+          <div className="text-center py-16 bg-[#162E3D] rounded-lg border border-[rgba(255,255,255,0.08)]">
             <p className="text-[#6B7C86] mb-4">No vehicles added yet</p>
             <button onClick={() => setShowAdd(true)} className="text-[#FF6A2A] font-medium hover:underline">Add your first vehicle</button>
           </div>
         ) : (
           <div className="space-y-4">
             {vehicles.map(v => (
-              <div key={v.id} className="bg-[#162E3D] rounded-lg border border-white/[0.08] p-5">
+              <div key={v.id} className="bg-[#162E3D] rounded-lg border border-[rgba(255,255,255,0.08)] p-5">
                 {editingId === v.id ? (
                   <div>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
@@ -195,8 +195,8 @@ export default function VehiclesPage() {
                       <input className={inputClass} type="number" step="0.1" value={editForm.cargoVolumeM3 || ''} onChange={e => setEditForm({...editForm, cargoVolumeM3: parseFloat(e.target.value) || undefined})} placeholder="Volume m³" />
                     </div>
                     <div className="flex gap-2">
-                      <button onClick={() => handleSave(v.id)} disabled={saving} className="px-3 py-1.5 bg-[#1d1916] text-white rounded text-xs font-medium disabled:opacity-50">{saving ? 'Saving...' : 'Save'}</button>
-                      <button onClick={() => setEditingId(null)} className="px-3 py-1.5 border border-white/[0.08] rounded text-xs font-medium">Cancel</button>
+                      <button onClick={() => handleSave(v.id)} disabled={saving} className="px-3 py-1.5 bg-[#F7F9FB] text-white rounded text-xs font-medium disabled:opacity-50">{saving ? 'Saving...' : 'Save'}</button>
+                      <button onClick={() => setEditingId(null)} className="px-3 py-1.5 border border-[rgba(255,255,255,0.08)] rounded text-xs font-medium">Cancel</button>
                     </div>
                   </div>
                 ) : (
@@ -205,9 +205,9 @@ export default function VehiclesPage() {
                       <div className="flex items-center gap-2">
                         <span className="font-semibold text-[#F7F9FB]">{v.make} {v.model}</span>
                         {v.year && <span className="text-xs text-[#6B7C86]">({v.year})</span>}
-                        <span className="px-2 py-0.5 bg-[#102535] rounded text-xs text-[#6B7C86]">{v.vehicleType}</span>
+                        <span className="px-2 py-0.5 bg-white/10 rounded text-xs text-[#6B7C86]">{v.vehicleType}</span>
                         {v.verified && <span className="px-2 py-0.5 bg-[#9ED36A]/15 text-[#9ED36A] rounded text-xs">Verified</span>}
-                        {!v.active && <span className="px-2 py-0.5 bg-red-100 text-red-600 rounded text-xs">Inactive</span>}
+                        {!v.active && <span className="px-2 py-0.5 bg-red-100 text-red-400 rounded text-xs">Inactive</span>}
                       </div>
                       <div className="flex flex-wrap gap-3 text-xs text-[#6B7C86] mt-2">
                         {v.registrationPlate && <span>Reg: {v.registrationPlate}</span>}
@@ -223,8 +223,8 @@ export default function VehiclesPage() {
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <button onClick={() => { setEditingId(v.id); setEditForm(v) }} className="px-3 py-1.5 border border-white/[0.08] rounded text-xs font-medium text-[#F7F9FB] hover:bg-[#162E3D]">Edit</button>
-                      <button onClick={() => handleDelete(v.id)} className="px-3 py-1.5 border border-red-200 rounded text-xs font-medium text-red-500 hover:bg-red-500/10">Delete</button>
+                      <button onClick={() => { setEditingId(v.id); setEditForm(v) }} className="px-3 py-1.5 border border-[rgba(255,255,255,0.08)] rounded text-xs font-medium text-[#F7F9FB] hover:bg-[#102535]">Edit</button>
+                      <button onClick={() => handleDelete(v.id)} className="px-3 py-1.5 border border-red-200 rounded text-xs font-medium text-red-500 hover:bg-red-500/100/10">Delete</button>
                     </div>
                   </div>
                 )}

@@ -83,11 +83,11 @@ export default function AvatarUpload({ currentUrl, name, token, onUpload }: Avat
   return (
     <div>
       <div className="relative group">
-        <div className="w-16 h-16 rounded-2xl overflow-hidden bg-[#102535] flex items-center justify-center shadow-sm">
+        <div className="w-16 h-16 rounded-2xl overflow-hidden bg-[#f5f3f0] flex items-center justify-center shadow-sm">
           {preview ? (
             <img src={preview} alt={name} className="w-full h-full object-cover" />
           ) : (
-            <span className="text-xl font-bold text-[#F7F9FB]">{initials}</span>
+            <span className="text-xl font-bold text-[#1a1a1a]">{initials}</span>
           )}
           {uploading && (
             <div className="absolute inset-0 bg-black/30 rounded-2xl flex items-center justify-center">
@@ -100,14 +100,14 @@ export default function AvatarUpload({ currentUrl, name, token, onUpload }: Avat
           type="button"
           onClick={() => fileRef.current?.click()}
           disabled={uploading}
-          className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-[#FF6A2A] text-white flex items-center justify-center shadow-md hover:bg-[#E85A1E] transition-colors disabled:opacity-50"
+          className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-[#FF6A2A] text-white flex items-center justify-center shadow-md hover:bg-[#b07d3f] transition-colors disabled:opacity-50"
         >
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
         </button>
 
         <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
       </div>
-      {error && <p className="text-xs text-red-600 mt-1.5">{error}</p>}
+      {error && <p className="text-xs text-red-400 mt-1.5">{error}</p>}
     </div>
   )
 }

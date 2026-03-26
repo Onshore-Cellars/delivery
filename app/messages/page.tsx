@@ -188,23 +188,23 @@ export default function MessagesPage() {
     <div className="page-container">
         <div className="mb-6">
           <p className="text-[11px] font-semibold text-[#FF6A2A] uppercase tracking-[0.15em] mb-1">Communication</p>
-          <h1 className="text-xl sm:text-2xl font-semibold text-[#F7F9FB] tracking-[-0.02em]">Messages</h1>
+          <h1 className="text-xl sm:text-2xl font-semibold text-[#1a1a1a] tracking-[-0.02em]">Messages</h1>
         </div>
 
         {error && (
           <div className="mb-4 px-4 py-3 rounded-lg bg-red-500/10 border border-red-200">
-            <p className="text-sm text-red-400 font-medium">{error}</p>
+            <p className="text-sm text-red-700 font-medium">{error}</p>
           </div>
         )}
 
-        <div className="bg-[#162E3D] rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-white/[0.08] overflow-hidden" style={{ height: 'calc(100vh - 220px)' }}>
+        <div className="bg-[#162E3D] rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] overflow-hidden" style={{ height: 'calc(100vh - 220px)' }}>
           <div className="flex h-full">
             {/* Conversation list */}
-            <div className={`${activeConv ? 'hidden md:block' : ''} w-full md:w-80 border-r border-white/[0.06] overflow-y-auto`}>
+            <div className={`${activeConv ? 'hidden md:block' : ''} w-full md:w-80 border-r border-slate-100 overflow-y-auto`}>
               {loading ? (
                 <div className="p-4 space-y-3">{[1,2,3].map(i => <div key={i} className="loading-shimmer h-16 rounded-lg" />)}</div>
               ) : conversations.length === 0 ? (
-                <div className="p-8 text-center text-[#6B7C86] text-sm">No conversations yet</div>
+                <div className="p-8 text-center text-slate-400 text-sm">No conversations yet</div>
               ) : (
                 conversations.map(conv => {
                   const other = getOther(conv)
@@ -213,16 +213,16 @@ export default function MessagesPage() {
                     <button
                       key={conv.id}
                       onClick={() => setActiveConv(conv.id)}
-                      className={`w-full text-left px-4 py-3 border-b border-slate-50 hover:bg-[#162E3D] transition-colors ${activeConv === conv.id ? 'bg-[#102535]' : ''}`}
+                      className={`w-full text-left px-4 py-3 border-b border-slate-50 hover:bg-slate-50 transition-colors ${activeConv === conv.id ? 'bg-[#f5f5f7]' : ''}`}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-[#102535] flex items-center justify-center flex-shrink-0">
-                          <span className="text-xs font-semibold text-[#F7F9FB]">{other.name.split(' ').map(n => n[0]).join('')}</span>
+                        <div className="w-10 h-10 rounded-full bg-[#f5f5f7] flex items-center justify-center flex-shrink-0">
+                          <span className="text-xs font-semibold text-[#1a1a1a]">{other.name.split(' ').map(n => n[0]).join('')}</span>
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between">
-                            <span className="font-semibold text-[#F7F9FB] text-sm truncate">{other.name}</span>
-                            {lastMsg && <span className="text-xs text-[#6B7C86] flex-shrink-0">{formatTime(lastMsg.createdAt)}</span>}
+                            <span className="font-semibold text-[#1a1a1a] text-sm truncate">{other.name}</span>
+                            {lastMsg && <span className="text-xs text-slate-400 flex-shrink-0">{formatTime(lastMsg.createdAt)}</span>}
                           </div>
                           <div className="flex items-center justify-between mt-0.5">
                             <span className="text-xs text-[#6B7C86] truncate">{lastMsg?.content || conv.subject || 'New conversation'}</span>
@@ -243,27 +243,27 @@ export default function MessagesPage() {
               {activeConv && otherUser ? (
                 <>
                   {/* Chat header */}
-                  <div className="px-4 py-3 border-b border-white/[0.06] flex items-center justify-between">
+                  <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <button onClick={() => setActiveConv(null)} className="md:hidden p-1 hover:bg-[#162E3D] rounded">
+                      <button onClick={() => setActiveConv(null)} className="md:hidden p-1 hover:bg-slate-100 rounded">
                         <svg className="w-5 h-5 text-[#6B7C86]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                       </button>
-                      <div className="w-8 h-8 rounded-full bg-[#102535] flex items-center justify-center">
-                        <span className="text-xs font-semibold text-[#F7F9FB]">{otherUser.name.split(' ').map(n => n[0]).join('')}</span>
+                      <div className="w-8 h-8 rounded-full bg-[#f5f5f7] flex items-center justify-center">
+                        <span className="text-xs font-semibold text-[#1a1a1a]">{otherUser.name.split(' ').map(n => n[0]).join('')}</span>
                       </div>
                       <div>
-                        <div className="font-semibold text-[#F7F9FB] text-sm">{otherUser.name}</div>
-                        <div className="text-xs text-[#6B7C86]">{otherUser.role.replace('_', ' ')}{otherUser.company && ` at ${otherUser.company}`}</div>
+                        <div className="font-semibold text-[#1a1a1a] text-sm">{otherUser.name}</div>
+                        <div className="text-xs text-slate-400">{otherUser.role.replace('_', ' ')}{otherUser.company && ` at ${otherUser.company}`}</div>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
                       {otherUser.phone && (
-                        <a href={`tel:${otherUser.phone}`} className="p-2 hover:bg-[#162E3D] rounded-lg transition-colors" title="Call">
+                        <a href={`tel:${otherUser.phone}`} className="p-2 hover:bg-slate-100 rounded-lg transition-colors" title="Call">
                           <svg className="w-4 h-4 text-[#6B7C86]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
                         </a>
                       )}
                       {otherUser.email && (
-                        <a href={`mailto:${otherUser.email}`} className="p-2 hover:bg-[#162E3D] rounded-lg transition-colors" title="Email">
+                        <a href={`mailto:${otherUser.email}`} className="p-2 hover:bg-slate-100 rounded-lg transition-colors" title="Email">
                           <svg className="w-4 h-4 text-[#6B7C86]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                         </a>
                       )}
@@ -286,34 +286,34 @@ export default function MessagesPage() {
                             <div className={`px-4 py-2.5 rounded-2xl text-sm ${
                               isMine
                                 ? 'bg-[#1d1d1f] text-white rounded-br-md'
-                                : 'bg-[#102535] text-[#F7F9FB] rounded-bl-md'
+                                : 'bg-slate-100 text-[#1a1a1a] rounded-bl-md'
                             }`}>
                               <p className="whitespace-pre-wrap">{msg.content}</p>
                               {isVisible && translation && (
                                 <p className={`whitespace-pre-wrap italic mt-1.5 pt-1.5 border-t text-xs ${
-                                  isMine ? 'border-white/10 text-white/70' : 'border-white/[0.08] text-[#6B7C86]'
+                                  isMine ? 'border-white/10 text-white/70' : 'border-slate-200 text-[#6B7C86]'
                                 }`}>{translation}</p>
                               )}
-                              <div className={`text-[10px] mt-1 ${isMine ? 'text-white/50' : 'text-[#6B7C86]'}`}>
+                              <div className={`text-[10px] mt-1 ${isMine ? 'text-white/50' : 'text-slate-400'}`}>
                                 {formatTime(msg.createdAt)}
                               </div>
                             </div>
                             <div className={`mt-0.5 ${isMine ? 'text-right' : 'text-left'}`}>
                               {isTranslating ? (
-                                <span className="text-xs text-[#6B7C86] inline-flex items-center gap-1">
+                                <span className="text-xs text-slate-400 inline-flex items-center gap-1">
                                   <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
                                   Translating...
                                 </span>
                               ) : serverTrans ? (
-                                <button onClick={() => toggleTranslation(msg.id)} className="text-xs text-[#6B7C86] hover:text-[#FF6A2A] transition-colors">
+                                <button onClick={() => toggleTranslation(msg.id)} className="text-xs text-slate-400 hover:text-[#FF6A2A] transition-colors">
                                   {isVisible ? 'Hide translation' : 'Show translation'}
                                 </button>
                               ) : cachedTrans ? (
-                                <button onClick={() => toggleTranslation(msg.id)} className="text-xs text-[#6B7C86] hover:text-[#FF6A2A] transition-colors">
+                                <button onClick={() => toggleTranslation(msg.id)} className="text-xs text-slate-400 hover:text-[#FF6A2A] transition-colors">
                                   {isVisible ? 'Hide translation' : 'Show translation'}
                                 </button>
                               ) : (
-                                <button onClick={() => translateMessage(msg)} className="text-xs text-[#6B7C86] hover:text-[#FF6A2A] transition-colors">
+                                <button onClick={() => translateMessage(msg)} className="text-xs text-slate-400 hover:text-[#FF6A2A] transition-colors">
                                   Translate
                                 </button>
                               )}
@@ -326,11 +326,11 @@ export default function MessagesPage() {
                   </div>
 
                   {/* Input */}
-                  <form onSubmit={sendMessage} className="p-4 border-t border-white/[0.06]">
+                  <form onSubmit={sendMessage} className="p-4 border-t border-slate-100">
                     <div className="flex gap-2">
                       <input
                         type="text"
-                        className="flex-1 px-4 py-2.5 rounded-xl border border-white/[0.08] text-sm text-[#F7F9FB] focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10 outline-none"
+                        className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-[#1a1a1a] focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10 outline-none"
                         placeholder="Type a message..."
                         value={newMessage}
                         onChange={e => setNewMessage(e.target.value)}
@@ -342,7 +342,7 @@ export default function MessagesPage() {
                   </form>
                 </>
               ) : (
-                <div className="flex-1 flex items-center justify-center text-[#6B7C86] text-sm">
+                <div className="flex-1 flex items-center justify-center text-slate-400 text-sm">
                   Select a conversation to start messaging
                 </div>
               )}

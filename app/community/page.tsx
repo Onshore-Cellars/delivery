@@ -28,9 +28,9 @@ const CATEGORIES = [
 
 const CATEGORY_COLORS: Record<string, string> = {
   routes: 'bg-indigo-50 text-indigo-700',
-  wanted: 'bg-red-500/10 text-red-600',
+  wanted: 'bg-red-500/10 text-red-400',
   ports: 'bg-sky-50 text-sky-700',
-  customs: 'bg-[#FF6A2A]/10 text-[#9a7039]',
+  customs: 'bg-[#FF6A2A]/10 text-[#FF6A2A]',
   tips: 'bg-[#9ED36A]/10 text-[#9ED36A]',
 }
 
@@ -103,13 +103,13 @@ export default function CommunityPage() {
     return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
   }
 
-  const inputClass = "w-full px-4 py-3 rounded border border-white/[0.08] bg-[#162E3D] text-[15px] text-[#F7F9FB] placeholder:text-[#9a9a9a] focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10 transition-all outline-none"
+  const inputClass = "w-full px-4 py-3 rounded border border-[#e8e4de] bg-[#162E3D] text-[15px] text-[#1a1a1a] placeholder:text-[#9a9a9a] focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10 transition-all outline-none"
 
   return (
     <div className="page-container">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-3">
         <div>
-          <h1 className="text-xl sm:text-2xl font-light text-[#F7F9FB] tracking-wide" style={{ fontFamily: 'var(--font-display)' }}>
+          <h1 className="text-xl sm:text-2xl font-light text-[#1a1a1a] tracking-wide" style={{ fontFamily: 'var(--font-display)' }}>
             Community
           </h1>
           <p className="text-sm text-[#6B7C86] mt-1">Connect with carriers, suppliers, and yacht crews across the Mediterranean.</p>
@@ -123,25 +123,25 @@ export default function CommunityPage() {
 
       {error && (
         <div className="mb-6 px-4 py-3 rounded-lg bg-red-500/10 border border-red-200">
-          <p className="text-sm text-red-400 font-medium">{error}</p>
+          <p className="text-sm text-red-700 font-medium">{error}</p>
         </div>
       )}
 
       {/* New post form */}
       {showNewPost && (
-        <form onSubmit={handleSubmit} className="bg-[#162E3D] rounded-lg border border-white/[0.08] p-6 mb-6 space-y-4">
+        <form onSubmit={handleSubmit} className="bg-[#162E3D] rounded-lg border border-[#e8e4de] p-6 mb-6 space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-[#F7F9FB] mb-2">Title</label>
+            <label className="block text-sm font-semibold text-[#1a1a1a] mb-2">Title</label>
             <input type="text" required className={inputClass} placeholder="What's on your mind?" value={newPost.title} onChange={(e) => setNewPost({ ...newPost, title: e.target.value })} />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-[#F7F9FB] mb-2">Category</label>
+            <label className="block text-sm font-semibold text-[#1a1a1a] mb-2">Category</label>
             <select className={inputClass + " appearance-none"} value={newPost.category} onChange={(e) => setNewPost({ ...newPost, category: e.target.value })}>
               {CATEGORIES.filter(c => c.value).map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
             </select>
           </div>
           <div>
-            <label className="block text-sm font-semibold text-[#F7F9FB] mb-2">Content</label>
+            <label className="block text-sm font-semibold text-[#1a1a1a] mb-2">Content</label>
             <textarea required className={inputClass + " min-h-[120px] resize-none"} placeholder="Share your thoughts, ask questions, or offer advice..." value={newPost.content} onChange={(e) => setNewPost({ ...newPost, content: e.target.value })} />
           </div>
           <button type="submit" disabled={submitting} className="btn-primary !text-sm !py-2.5 disabled:opacity-50">
@@ -159,7 +159,7 @@ export default function CommunityPage() {
             className={`px-4 py-2 rounded text-xs font-medium uppercase tracking-wider whitespace-nowrap transition-colors ${
               category === c.value
                 ? 'bg-[#FF6A2A] text-white'
-                : 'bg-[#102535] text-[#6B7C86] hover:text-[#F7F9FB]'
+                : 'bg-[#f5f3f0] text-[#6B7C86] hover:text-[#1a1a1a]'
             }`}
           >
             {c.label}
@@ -173,8 +173,8 @@ export default function CommunityPage() {
           {[1, 2, 3].map(i => <div key={i} className="loading-shimmer h-32 rounded-lg" />)}
         </div>
       ) : posts.length === 0 ? (
-        <div className="bg-[#162E3D] rounded-lg border border-white/[0.08] p-12 text-center">
-          <p className="text-[#F7F9FB] font-semibold mb-2">No posts yet</p>
+        <div className="bg-[#162E3D] rounded-lg border border-[#e8e4de] p-12 text-center">
+          <p className="text-[#1a1a1a] font-semibold mb-2">No posts yet</p>
           <p className="text-sm text-[#6B7C86] mb-4">Be the first to start a discussion!</p>
           {user && (
             <button onClick={() => setShowNewPost(true)} className="btn-primary !text-sm !py-2.5 !px-5">
@@ -185,7 +185,7 @@ export default function CommunityPage() {
       ) : (
         <div className="space-y-3">
           {posts.map(post => (
-            <div key={post.id} className={`bg-[#162E3D] rounded-lg border ${post.pinned ? 'border-[#C6904D]/30' : 'border-white/[0.08]'} p-5 hover:shadow-sm transition-shadow`}>
+            <div key={post.id} className={`bg-[#162E3D] rounded-lg border ${post.pinned ? 'border-[#FF6A2A]/30' : 'border-[#e8e4de]'} p-5 hover:shadow-sm transition-shadow`}>
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-2 flex-wrap">
@@ -196,17 +196,17 @@ export default function CommunityPage() {
                       {post.category}
                     </span>
                   </div>
-                  <h3 className="font-semibold text-[#F7F9FB] text-base mb-1">{post.title}</h3>
+                  <h3 className="font-semibold text-[#1a1a1a] text-base mb-1">{post.title}</h3>
                   <p className="text-sm text-[#6B7C86] line-clamp-2">{post.content}</p>
                 </div>
               </div>
               <div className="flex items-center justify-between mt-4 pt-3 border-t border-[#f5f3f0]">
-                <div className="flex items-center gap-4 text-xs text-[#6B7C86]">
+                <div className="flex items-center gap-4 text-xs text-slate-400">
                   <span className="font-medium text-[#9AADB8]">{post.author?.name}</span>
                   {post.author?.company && <span>{post.author.company}</span>}
                   <span>{formatDate(post.createdAt)}</span>
                 </div>
-                <div className="flex items-center gap-3 text-xs text-[#6B7C86]">
+                <div className="flex items-center gap-3 text-xs text-slate-400">
                   <span className="flex items-center gap-1">
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
                     {post.likes}

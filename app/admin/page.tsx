@@ -102,18 +102,18 @@ const statusColors: Record<string, string> = {
   PICKED_UP: 'bg-cyan-50 text-cyan-700 border-cyan-200',
   IN_TRANSIT: 'bg-indigo-50 text-indigo-700 border-indigo-200',
   CUSTOMS_HOLD: 'bg-orange-50 text-orange-700 border-orange-200',
-  DELIVERED: 'bg-[#102535] text-[#9AADB8] border-white/[0.08]',
-  CANCELLED: 'bg-red-500/10 text-red-400 border-red-200',
+  DELIVERED: 'bg-slate-100 text-[#9AADB8] border-slate-200',
+  CANCELLED: 'bg-red-500/10 text-red-700 border-red-200',
   DISPUTED: 'bg-rose-50 text-rose-700 border-rose-200',
 }
 
 const listingStatusColors: Record<string, string> = {
-  DRAFT: 'bg-[#102535] text-[#9AADB8] border-white/[0.08]',
+  DRAFT: 'bg-slate-50 text-[#9AADB8] border-slate-200',
   ACTIVE: 'bg-emerald-50 text-emerald-700 border-emerald-200',
   FULL: 'bg-[#FF6A2A]/10 text-[#FF6A2A] border-[#FF6A2A]/20',
   IN_TRANSIT: 'bg-indigo-50 text-indigo-700 border-indigo-200',
-  COMPLETED: 'bg-[#102535] text-[#9AADB8] border-white/[0.08]',
-  CANCELLED: 'bg-red-500/10 text-red-400 border-red-200',
+  COMPLETED: 'bg-slate-100 text-[#9AADB8] border-slate-200',
+  CANCELLED: 'bg-red-500/10 text-red-700 border-red-200',
 }
 
 const paymentStatusColors: Record<string, string> = {
@@ -121,7 +121,7 @@ const paymentStatusColors: Record<string, string> = {
   PROCESSING: 'bg-indigo-50 text-indigo-700 border-indigo-200',
   PAID: 'bg-emerald-50 text-emerald-700 border-emerald-200',
   REFUNDED: 'bg-purple-50 text-purple-700 border-purple-200',
-  FAILED: 'bg-red-500/10 text-red-400 border-red-200',
+  FAILED: 'bg-red-500/10 text-red-700 border-red-200',
 }
 
 const TAB_CONFIG: { key: TabKey; label: string; icon: string }[] = [
@@ -675,7 +675,7 @@ export default function AdminPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
             <p className="text-[11px] font-semibold text-[#FF6A2A] uppercase tracking-[0.15em] mb-1">Administration</p>
-            <h1 className="text-xl sm:text-2xl font-semibold text-[#F7F9FB] tracking-[-0.02em]">Admin Panel</h1>
+            <h1 className="text-xl sm:text-2xl font-semibold text-[#1d1d1f] tracking-[-0.02em]">Admin Panel</h1>
             <p className="text-sm text-[#6B7C86] mt-1">Platform management and analytics</p>
           </div>
           <div className="flex items-center gap-3">
@@ -686,9 +686,9 @@ export default function AdminPage() {
                 placeholder="Search users, bookings, listings..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                className="pl-9 pr-4 py-2.5 w-full sm:w-72 rounded-xl border border-white/[0.08] bg-[#162E3D] text-sm focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10 outline-none"
+                className="pl-9 pr-4 py-2.5 w-full sm:w-72 rounded-xl border border-slate-200 bg-[#162E3D] text-sm focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10 outline-none"
               />
-              <svg className="absolute left-3 top-2.5 w-4 h-4 text-[#6B7C86]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
@@ -697,7 +697,7 @@ export default function AdminPage() {
 
         {/* Tabs */}
         <div className="overflow-x-auto -mx-5 px-5 sm:mx-0 sm:px-0 mb-8">
-          <div className="flex gap-1 bg-[#162E3D] rounded-xl p-1 shadow-sm border border-white/[0.06] w-fit min-w-full sm:min-w-0">
+          <div className="flex gap-1 bg-[#162E3D] rounded-xl p-1 shadow-sm border border-slate-100 w-fit min-w-full sm:min-w-0">
           {TAB_CONFIG.map(t => (
             <button
               key={t.key}
@@ -705,7 +705,7 @@ export default function AdminPage() {
               className={`px-5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 whitespace-nowrap ${
                 tab === t.key
                   ? 'bg-[#1d1d1f] text-white shadow-sm'
-                  : 'text-[#6B7C86] hover:text-[#F7F9FB] hover:bg-[#162E3D]'
+                  : 'text-[#6B7C86] hover:text-[#1d1d1f] hover:bg-slate-50'
               }`}
             >
               <TabIcon name={t.icon} className="w-4 h-4" />
@@ -725,10 +725,10 @@ export default function AdminPage() {
             {tab === 'overview' && stats && (
               <div className="space-y-8">
                 {/* AI Insights */}
-                <div className="bg-[#162E3D] rounded-xl shadow-sm border border-white/[0.06] p-6">
+                <div className="bg-[#162E3D] rounded-xl shadow-sm border border-slate-100 p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div>
-                      <h3 className="text-sm font-semibold text-[#F7F9FB]">AI Insights</h3>
+                      <h3 className="text-sm font-semibold text-[#1d1d1f]">AI Insights</h3>
                       <p className="text-xs text-[#6B7C86] mt-0.5">AI-powered analysis of platform data</p>
                     </div>
                     <button
@@ -749,33 +749,33 @@ export default function AdminPage() {
 
                   {aiInsights && (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                      <div className="rounded-lg border border-white/[0.06] p-4">
-                        <h4 className="text-xs font-semibold text-[#6B7C86] uppercase tracking-wider mb-3">Highlights</h4>
+                      <div className="rounded-lg border border-slate-100 p-4">
+                        <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Highlights</h4>
                         <ul className="space-y-2">
                           {aiInsights.highlights.map((item, i) => (
-                            <li key={i} className="flex items-start gap-2 text-sm text-[#9AADB8]">
+                            <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
                               <span className="mt-1.5 h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
                               {item}
                             </li>
                           ))}
                         </ul>
                       </div>
-                      <div className="rounded-lg border border-white/[0.06] p-4">
-                        <h4 className="text-xs font-semibold text-[#6B7C86] uppercase tracking-wider mb-3">Anomalies</h4>
+                      <div className="rounded-lg border border-slate-100 p-4">
+                        <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Anomalies</h4>
                         <ul className="space-y-2">
                           {aiInsights.anomalies.map((item, i) => (
-                            <li key={i} className="flex items-start gap-2 text-sm text-[#9AADB8]">
+                            <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
                               <span className="mt-1.5 h-2 w-2 rounded-full bg-[#FF6A2A]/100 shrink-0" />
                               {item}
                             </li>
                           ))}
                         </ul>
                       </div>
-                      <div className="rounded-lg border border-white/[0.06] p-4">
-                        <h4 className="text-xs font-semibold text-[#6B7C86] uppercase tracking-wider mb-3">Recommendations</h4>
+                      <div className="rounded-lg border border-slate-100 p-4">
+                        <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Recommendations</h4>
                         <ul className="space-y-2">
                           {aiInsights.recommendations.map((item, i) => (
-                            <li key={i} className="flex items-start gap-2 text-sm text-[#9AADB8]">
+                            <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
                               <span className="mt-1.5 h-2 w-2 rounded-full bg-[#0071e3] shrink-0" />
                               {item}
                             </li>
@@ -788,36 +788,36 @@ export default function AdminPage() {
 
                 {/* Primary Stats Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div className="bg-[#162E3D] rounded-xl shadow-sm border border-white/[0.06] p-5">
+                  <div className="bg-[#162E3D] rounded-xl shadow-sm border border-slate-100 p-5">
                     <div className="flex items-center justify-between">
-                      <div className="text-xs font-semibold text-[#6B7C86] uppercase tracking-wider">Total Revenue</div>
+                      <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Revenue</div>
                       <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600 text-sm font-bold">&euro;</div>
                     </div>
-                    <div className="mt-2 text-3xl font-semibold text-[#F7F9FB]">{formatCurrency(stats.revenue.total)}</div>
+                    <div className="mt-2 text-3xl font-semibold text-[#1d1d1f]">{formatCurrency(stats.revenue.total)}</div>
                     <div className="mt-2 text-xs text-[#6B7C86]">Platform lifetime revenue</div>
                   </div>
-                  <div className="bg-[#162E3D] rounded-xl shadow-sm border border-white/[0.06] p-5">
+                  <div className="bg-[#162E3D] rounded-xl shadow-sm border border-slate-100 p-5">
                     <div className="flex items-center justify-between">
-                      <div className="text-xs font-semibold text-[#6B7C86] uppercase tracking-wider">Active Listings</div>
-                      <div className="w-8 h-8 rounded-lg bg-[#102535] flex items-center justify-center text-[#9AADB8] text-sm font-bold">#</div>
+                      <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Active Listings</div>
+                      <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-[#9AADB8] text-sm font-bold">#</div>
                     </div>
-                    <div className="mt-2 text-3xl font-semibold text-[#F7F9FB]">{stats.listings.active}</div>
+                    <div className="mt-2 text-3xl font-semibold text-[#1d1d1f]">{stats.listings.active}</div>
                     <div className="mt-2 text-xs text-[#6B7C86]">{stats.listings.total} total listings</div>
                   </div>
-                  <div className="bg-[#162E3D] rounded-xl shadow-sm border border-white/[0.06] p-5">
+                  <div className="bg-[#162E3D] rounded-xl shadow-sm border border-slate-100 p-5">
                     <div className="flex items-center justify-between">
-                      <div className="text-xs font-semibold text-[#6B7C86] uppercase tracking-wider">Pending Bookings</div>
+                      <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Pending Bookings</div>
                       <div className="w-8 h-8 rounded-lg bg-[#FF6A2A]/10 flex items-center justify-center text-[#FF6A2A] text-sm font-bold">!</div>
                     </div>
-                    <div className="mt-2 text-3xl font-semibold text-[#F7F9FB]">{stats.bookings.pending}</div>
+                    <div className="mt-2 text-3xl font-semibold text-[#1d1d1f]">{stats.bookings.pending}</div>
                     <div className="mt-2 text-xs text-[#6B7C86]">{stats.bookings.confirmed} confirmed &middot; {stats.bookings.total} total</div>
                   </div>
-                  <div className="bg-[#162E3D] rounded-xl shadow-sm border border-white/[0.06] p-5">
+                  <div className="bg-[#162E3D] rounded-xl shadow-sm border border-slate-100 p-5">
                     <div className="flex items-center justify-between">
-                      <div className="text-xs font-semibold text-[#6B7C86] uppercase tracking-wider">New Users (This Week)</div>
+                      <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">New Users (This Week)</div>
                       <div className="w-8 h-8 rounded-lg bg-violet-50 flex items-center justify-center text-violet-600 text-sm font-bold">+</div>
                     </div>
-                    <div className="mt-2 text-3xl font-semibold text-[#F7F9FB]">{newUsersThisWeek}</div>
+                    <div className="mt-2 text-3xl font-semibold text-[#1d1d1f]">{newUsersThisWeek}</div>
                     <div className="mt-2 text-xs text-[#6B7C86]">{stats.users.total} total users</div>
                   </div>
                 </div>
@@ -826,15 +826,15 @@ export default function AdminPage() {
                 <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
                   {[
                     { label: 'Two-Way Listings', value: stats.listings.twoWay || 0, color: 'text-[#FF6A2A]' },
-                    { label: 'MMSI Bookings', value: stats.bookings.withMMSI || 0, color: 'text-[#9AADB8]' },
+                    { label: 'MMSI Bookings', value: stats.bookings.withMMSI || 0, color: 'text-slate-700' },
                     { label: 'Return Leg Bookings', value: stats.bookings.returnLegs || 0, color: 'text-violet-600' },
                     { label: 'In Transit', value: stats.bookings.inTransit || 0, color: 'text-cyan-600' },
                     { label: 'Pending Docs', value: stats.documents?.pending || 0, color: 'text-[#FF6A2A]' },
                     { label: 'Vehicles', value: stats.vehicles?.total || 0, color: 'text-[#9AADB8]' },
                   ].map(item => (
-                    <div key={item.label} className="bg-[#162E3D] rounded-xl shadow-sm border border-white/[0.06] p-4 text-center">
+                    <div key={item.label} className="bg-[#162E3D] rounded-xl shadow-sm border border-slate-100 p-4 text-center">
                       <div className={`text-2xl font-bold ${item.color}`}>{item.value}</div>
-                      <div className="text-[10px] text-[#6B7C86] font-medium uppercase tracking-wider mt-1">{item.label}</div>
+                      <div className="text-[10px] text-slate-400 font-medium uppercase tracking-wider mt-1">{item.label}</div>
                     </div>
                   ))}
                 </div>
@@ -842,15 +842,15 @@ export default function AdminPage() {
                 {/* Row: Revenue Chart + Breakdown Cards */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   {/* Revenue Bar Chart */}
-                  <div className="lg:col-span-2 bg-[#162E3D] rounded-xl shadow-sm border border-white/[0.06] p-6">
-                    <h2 className="font-semibold text-[#F7F9FB] mb-4">Revenue by Month</h2>
+                  <div className="lg:col-span-2 bg-[#162E3D] rounded-xl shadow-sm border border-slate-100 p-6">
+                    <h2 className="font-semibold text-[#1d1d1f] mb-4">Revenue by Month</h2>
                     {revenueByMonth.length === 0 ? (
-                      <div className="text-center text-[#6B7C86] text-sm py-12">No revenue data yet</div>
+                      <div className="text-center text-slate-400 text-sm py-12">No revenue data yet</div>
                     ) : (
                       <div className="flex items-end gap-3 h-48">
                         {revenueByMonth.map((m, i) => (
                           <div key={i} className="flex-1 flex flex-col items-center gap-2">
-                            <div className="text-xs font-medium text-[#F7F9FB]">{formatCurrency(m.total)}</div>
+                            <div className="text-xs font-medium text-[#1d1d1f]">{formatCurrency(m.total)}</div>
                             <div className="w-full relative flex items-end" style={{ height: '140px' }}>
                               <div
                                 className="w-full rounded-t-lg transition-all duration-500"
@@ -870,32 +870,32 @@ export default function AdminPage() {
                   {/* Breakdowns */}
                   <div className="space-y-4">
                     {/* Users by Role */}
-                    <div className="bg-[#162E3D] rounded-xl shadow-sm border border-white/[0.06] p-5">
-                      <h3 className="text-sm font-semibold text-[#F7F9FB] mb-3">Users by Role</h3>
+                    <div className="bg-[#162E3D] rounded-xl shadow-sm border border-slate-100 p-5">
+                      <h3 className="text-sm font-semibold text-[#1d1d1f] mb-3">Users by Role</h3>
                       <div className="space-y-2">
                         {Object.entries(usersByRole).map(([role, count]) => (
                           <div key={role} className="flex items-center justify-between">
                             <span className="text-xs text-[#9AADB8]">{role.replace('_', ' ')}</span>
-                            <span className="text-xs font-semibold text-[#F7F9FB] bg-[#102535] px-2 py-0.5 rounded-full">{count}</span>
+                            <span className="text-xs font-semibold text-[#1d1d1f] bg-slate-100 px-2 py-0.5 rounded-full">{count}</span>
                           </div>
                         ))}
                       </div>
                     </div>
 
                     {/* Bookings by Status */}
-                    <div className="bg-[#162E3D] rounded-xl shadow-sm border border-white/[0.06] p-5">
-                      <h3 className="text-sm font-semibold text-[#F7F9FB] mb-3">Bookings by Status</h3>
+                    <div className="bg-[#162E3D] rounded-xl shadow-sm border border-slate-100 p-5">
+                      <h3 className="text-sm font-semibold text-[#1d1d1f] mb-3">Bookings by Status</h3>
                       <div className="space-y-2">
                         {Object.entries(bookingsByStatus).map(([status, count]) => (
                           <div key={status} className="flex items-center justify-between">
-                            <span className={`text-xs px-2 py-0.5 rounded-full border ${statusColors[status] || 'bg-[#102535] text-[#9AADB8] border-white/[0.08]'}`}>
+                            <span className={`text-xs px-2 py-0.5 rounded-full border ${statusColors[status] || 'bg-slate-50 text-[#9AADB8] border-slate-200'}`}>
                               {status.replace('_', ' ')}
                             </span>
-                            <span className="text-xs font-semibold text-[#F7F9FB]">{count}</span>
+                            <span className="text-xs font-semibold text-[#1d1d1f]">{count}</span>
                           </div>
                         ))}
                         {Object.keys(bookingsByStatus).length === 0 && (
-                          <div className="text-xs text-[#6B7C86]">No bookings yet</div>
+                          <div className="text-xs text-slate-400">No bookings yet</div>
                         )}
                       </div>
                     </div>
@@ -903,36 +903,36 @@ export default function AdminPage() {
                 </div>
 
                 {/* Recent Bookings (on Overview) */}
-                <div className="bg-[#162E3D] rounded-xl shadow-sm border border-white/[0.06] overflow-hidden">
-                  <div className="px-6 py-4 border-b border-white/[0.06] flex items-center justify-between">
-                    <h2 className="font-semibold text-[#F7F9FB]">Recent Bookings</h2>
+                <div className="bg-[#162E3D] rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+                  <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                    <h2 className="font-semibold text-[#1d1d1f]">Recent Bookings</h2>
                     <button
                       onClick={() => setTab('bookings')}
-                      className="text-xs text-[#F7F9FB] hover:text-[#F7F9FB] font-medium"
+                      className="text-xs text-[#1d1d1f] hover:text-[#1d1d1f] font-medium"
                     >
                       View all &rarr;
                     </button>
                   </div>
                   <div className="divide-y divide-slate-100">
                     {allBookings.slice(0, 5).map(b => (
-                      <div key={b.id} className="px-6 py-3 flex items-center justify-between hover:bg-[#162E3D]">
+                      <div key={b.id} className="px-6 py-3 flex items-center justify-between hover:bg-slate-50">
                         <div>
                           <div className="flex items-center gap-2">
                             <span className={`badge border ${statusColors[b.status] || ''}`}>{b.status.replace(/_/g, ' ')}</span>
-                            <span className="text-sm font-medium text-[#F7F9FB]">{b.listing.title}</span>
+                            <span className="text-sm font-medium text-[#1d1d1f]">{b.listing.title}</span>
                           </div>
-                          <div className="text-xs text-[#6B7C86] mt-0.5">
+                          <div className="text-xs text-slate-400 mt-0.5">
                             {b.shipper.name} &middot; {b.listing.originPort} &rarr; {b.listing.destinationPort}
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="text-sm font-semibold text-[#F7F9FB]">{formatCurrency(b.totalPrice)}</div>
-                          <div className="text-xs text-[#6B7C86]">{formatDate(b.createdAt)}</div>
+                          <div className="text-sm font-semibold text-[#1d1d1f]">{formatCurrency(b.totalPrice)}</div>
+                          <div className="text-xs text-slate-400">{formatDate(b.createdAt)}</div>
                         </div>
                       </div>
                     ))}
                     {allBookings.length === 0 && (
-                      <div className="p-8 text-center text-[#6B7C86] text-sm">No bookings yet</div>
+                      <div className="p-8 text-center text-slate-400 text-sm">No bookings yet</div>
                     )}
                   </div>
                 </div>
@@ -943,7 +943,7 @@ export default function AdminPage() {
             {tab === 'users' && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h2 className="font-semibold text-[#F7F9FB]">All Users ({filteredUsers.length})</h2>
+                  <h2 className="font-semibold text-[#1d1d1f]">All Users ({filteredUsers.length})</h2>
                   <button
                     onClick={() => exportCSV('users')}
                     className="px-4 py-2 bg-[#1d1d1f] text-white text-xs font-medium rounded-lg hover:bg-[#1d1d1f] transition-colors"
@@ -951,11 +951,11 @@ export default function AdminPage() {
                     Export CSV
                   </button>
                 </div>
-                <div className="bg-[#162E3D] rounded-xl shadow-sm border border-white/[0.06] overflow-hidden">
+                <div className="bg-[#162E3D] rounded-xl shadow-sm border border-slate-100 overflow-hidden">
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="bg-[#102535] text-left">
+                        <tr className="bg-slate-50 text-left">
                           <th className="px-6 py-3 font-medium text-[#6B7C86]">Name</th>
                           <th className="px-6 py-3 font-medium text-[#6B7C86]">Email</th>
                           <th className="px-6 py-3 font-medium text-[#6B7C86]">Role</th>
@@ -969,11 +969,11 @@ export default function AdminPage() {
                       </thead>
                       <tbody className="divide-y divide-slate-100">
                         {filteredUsers.map(u => (
-                          <tr key={u.id} className="hover:bg-[#162E3D]">
-                            <td className="px-6 py-3 font-medium text-[#F7F9FB]">{u.name}</td>
+                          <tr key={u.id} className="hover:bg-slate-50">
+                            <td className="px-6 py-3 font-medium text-[#1d1d1f]">{u.name}</td>
                             <td className="px-6 py-3 text-[#9AADB8]">{u.email}</td>
                             <td className="px-6 py-3">
-                              <span className="badge bg-[#102535] text-[#F7F9FB] border border-white/[0.08]">
+                              <span className="badge bg-[#f5f5f7] text-[#1d1d1f] border border-[#d2d2d7]">
                                 {u.role.replace('_', ' ')}
                               </span>
                             </td>
@@ -987,7 +987,7 @@ export default function AdminPage() {
                             </td>
                             <td className="px-6 py-3 text-[#9AADB8] text-center">{u._count.listings}</td>
                             <td className="px-6 py-3 text-[#9AADB8] text-center">{u._count.bookings}</td>
-                            <td className="px-6 py-3 text-[#6B7C86]">{formatDate(u.createdAt)}</td>
+                            <td className="px-6 py-3 text-slate-400">{formatDate(u.createdAt)}</td>
                             <td className="px-6 py-3">
                               {u.role !== 'ADMIN' && (
                                 <div className="flex gap-1">
@@ -1003,7 +1003,7 @@ export default function AdminPage() {
                                     <button
                                       onClick={() => handleUserAction(u.id, 'suspend')}
                                       disabled={actionLoading === `${u.id}-suspend`}
-                                      className="px-2.5 py-1 text-xs font-medium rounded-md bg-red-500/10 text-red-400 border border-red-200 hover:bg-red-100 transition-colors disabled:opacity-50"
+                                      className="px-2.5 py-1 text-xs font-medium rounded-md bg-red-500/10 text-red-700 border border-red-200 hover:bg-red-100 transition-colors disabled:opacity-50"
                                     >
                                       {actionLoading === `${u.id}-suspend` ? '...' : 'Suspend'}
                                     </button>
@@ -1024,7 +1024,7 @@ export default function AdminPage() {
                         ))}
                         {filteredUsers.length === 0 && (
                           <tr>
-                            <td colSpan={9} className="px-6 py-8 text-center text-[#6B7C86] text-sm">
+                            <td colSpan={9} className="px-6 py-8 text-center text-slate-400 text-sm">
                               {searchQuery ? 'No users match your search' : 'No users found'}
                             </td>
                           </tr>
@@ -1040,7 +1040,7 @@ export default function AdminPage() {
             {tab === 'bookings' && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h2 className="font-semibold text-[#F7F9FB]">All Bookings ({filteredBookings.length})</h2>
+                  <h2 className="font-semibold text-[#1d1d1f]">All Bookings ({filteredBookings.length})</h2>
                   <button
                     onClick={() => exportCSV('bookings')}
                     className="px-4 py-2 bg-[#1d1d1f] text-white text-xs font-medium rounded-lg hover:bg-[#1d1d1f] transition-colors"
@@ -1048,10 +1048,10 @@ export default function AdminPage() {
                     Export CSV
                   </button>
                 </div>
-                <div className="bg-[#162E3D] rounded-xl shadow-sm border border-white/[0.06] overflow-hidden">
+                <div className="bg-[#162E3D] rounded-xl shadow-sm border border-slate-100 overflow-hidden">
                   <div className="divide-y divide-slate-100">
                     {filteredBookings.map(b => (
-                      <div key={b.id} className="px-6 py-4 hover:bg-[#162E3D]">
+                      <div key={b.id} className="px-6 py-4 hover:bg-slate-50">
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1 flex-wrap">
@@ -1061,18 +1061,18 @@ export default function AdminPage() {
                                   Pay: {b.paymentStatus}
                                 </span>
                               )}
-                              <span className="font-medium text-[#F7F9FB]">{b.listing.title}</span>
+                              <span className="font-medium text-[#1d1d1f]">{b.listing.title}</span>
                             </div>
-                            <div className="text-xs text-[#6B7C86]">
+                            <div className="text-xs text-slate-400">
                               Shipper: {b.shipper.name}{b.shipper.company && ` (${b.shipper.company})`} &middot;
                               {b.listing.originPort} &rarr; {b.listing.destinationPort}
                             </div>
-                            <div className="text-xs text-[#6B7C86] mt-0.5">
+                            <div className="text-xs text-slate-400 mt-0.5">
                               ID: {b.id.slice(0, 12)}... &middot; {formatDateTime(b.createdAt)}
                             </div>
                           </div>
                           <div className="text-right shrink-0">
-                            <div className="font-semibold text-[#F7F9FB]">{formatCurrency(b.totalPrice)}</div>
+                            <div className="font-semibold text-[#1d1d1f]">{formatCurrency(b.totalPrice)}</div>
                             {/* Actions */}
                             <div className="flex gap-1 mt-2 justify-end flex-wrap">
                               {b.status === 'PENDING' && (
@@ -1106,7 +1106,7 @@ export default function AdminPage() {
                                 <button
                                   onClick={() => handleBookingStatus(b.id, 'DELIVERED')}
                                   disabled={!!actionLoading}
-                                  className="px-2 py-1 text-xs font-medium rounded-md bg-[#102535] text-[#9AADB8] border border-white/[0.08] hover:bg-slate-200 disabled:opacity-50"
+                                  className="px-2 py-1 text-xs font-medium rounded-md bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200 disabled:opacity-50"
                                 >
                                   Delivered
                                 </button>
@@ -1115,7 +1115,7 @@ export default function AdminPage() {
                                 <button
                                   onClick={() => handleBookingStatus(b.id, 'CANCELLED')}
                                   disabled={!!actionLoading}
-                                  className="px-2 py-1 text-xs font-medium rounded-md bg-red-500/10 text-red-400 border border-red-200 hover:bg-red-100 disabled:opacity-50"
+                                  className="px-2 py-1 text-xs font-medium rounded-md bg-red-500/10 text-red-700 border border-red-200 hover:bg-red-100 disabled:opacity-50"
                                 >
                                   Cancel
                                 </button>
@@ -1144,7 +1144,7 @@ export default function AdminPage() {
                       </div>
                     ))}
                     {filteredBookings.length === 0 && (
-                      <div className="p-8 text-center text-[#6B7C86] text-sm">
+                      <div className="p-8 text-center text-slate-400 text-sm">
                         {searchQuery ? 'No bookings match your search' : 'No bookings yet'}
                       </div>
                     )}
@@ -1157,7 +1157,7 @@ export default function AdminPage() {
             {tab === 'listings' && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h2 className="font-semibold text-[#F7F9FB]">All Listings ({filteredListings.length})</h2>
+                  <h2 className="font-semibold text-[#1d1d1f]">All Listings ({filteredListings.length})</h2>
                   <button
                     onClick={() => exportCSV('listings')}
                     className="px-4 py-2 bg-[#1d1d1f] text-white text-xs font-medium rounded-lg hover:bg-[#1d1d1f] transition-colors"
@@ -1165,11 +1165,11 @@ export default function AdminPage() {
                     Export CSV
                   </button>
                 </div>
-                <div className="bg-[#162E3D] rounded-xl shadow-sm border border-white/[0.06] overflow-hidden">
+                <div className="bg-[#162E3D] rounded-xl shadow-sm border border-slate-100 overflow-hidden">
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="bg-[#102535] text-left">
+                        <tr className="bg-slate-50 text-left">
                           <th className="px-6 py-3 font-medium text-[#6B7C86]">Title</th>
                           <th className="px-6 py-3 font-medium text-[#6B7C86]">Route</th>
                           <th className="px-6 py-3 font-medium text-[#6B7C86]">Carrier</th>
@@ -1183,18 +1183,18 @@ export default function AdminPage() {
                       </thead>
                       <tbody className="divide-y divide-slate-100">
                         {filteredListings.map(l => (
-                          <tr key={l.id} className="hover:bg-[#162E3D]">
-                            <td className="px-6 py-3 font-medium text-[#F7F9FB] max-w-[200px] truncate">{l.title}</td>
+                          <tr key={l.id} className="hover:bg-slate-50">
+                            <td className="px-6 py-3 font-medium text-[#1d1d1f] max-w-[200px] truncate">{l.title}</td>
                             <td className="px-6 py-3 text-[#9AADB8] text-xs">
                               {l.originPort} &rarr; {l.destinationPort}
                             </td>
                             <td className="px-6 py-3 text-[#9AADB8]">{l.carrier?.name || '-'}</td>
                             <td className="px-6 py-3">
-                              <span className={`badge border ${listingStatusColors[l.status] || 'bg-[#102535] text-[#9AADB8] border-white/[0.08]'}`}>
+                              <span className={`badge border ${listingStatusColors[l.status] || 'bg-slate-50 text-[#9AADB8] border-slate-200'}`}>
                                 {l.status}
                               </span>
                             </td>
-                            <td className="px-6 py-3 text-[#6B7C86] text-xs">{l.departureDate ? formatDate(l.departureDate) : '-'}</td>
+                            <td className="px-6 py-3 text-slate-400 text-xs">{l.departureDate ? formatDate(l.departureDate) : '-'}</td>
                             <td className="px-6 py-3 text-[#9AADB8] text-xs">
                               {l.availableKg?.toLocaleString() || '?'} / {l.totalCapacityKg?.toLocaleString() || '?'} kg
                             </td>
@@ -1203,7 +1203,7 @@ export default function AdminPage() {
                               {l.featured ? (
                                 <span className="badge bg-[#FF6A2A]/10 text-[#FF6A2A] border border-[#FF6A2A]/20">Featured</span>
                               ) : (
-                                <span className="text-xs text-[#6B7C86]">-</span>
+                                <span className="text-xs text-slate-400">-</span>
                               )}
                             </td>
                             <td className="px-6 py-3">
@@ -1213,7 +1213,7 @@ export default function AdminPage() {
                                   disabled={actionLoading === `listing-${l.id}`}
                                   className={`px-2.5 py-1 text-xs font-medium rounded-md border transition-colors disabled:opacity-50 ${
                                     l.featured
-                                      ? 'bg-[#102535] text-[#9AADB8] border-white/[0.08] hover:bg-[#162E3D]'
+                                      ? 'bg-slate-50 text-[#9AADB8] border-slate-200 hover:bg-slate-100'
                                       : 'bg-[#FF6A2A]/10 text-[#FF6A2A] border-[#FF6A2A]/20 hover:bg-[#FF6A2A]/15'
                                   }`}
                                 >
@@ -1234,7 +1234,7 @@ export default function AdminPage() {
                         ))}
                         {filteredListings.length === 0 && (
                           <tr>
-                            <td colSpan={9} className="px-6 py-8 text-center text-[#6B7C86] text-sm">
+                            <td colSpan={9} className="px-6 py-8 text-center text-slate-400 text-sm">
                               {searchQuery ? 'No listings match your search' : 'No listings found'}
                             </td>
                           </tr>
@@ -1250,32 +1250,32 @@ export default function AdminPage() {
             {tab === 'documents' && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h2 className="font-semibold text-[#F7F9FB]">Document Verification ({allDocuments.length})</h2>
+                  <h2 className="font-semibold text-[#1d1d1f]">Document Verification ({allDocuments.length})</h2>
                 </div>
-                <div className="bg-[#162E3D] rounded-xl shadow-sm border border-white/[0.06] overflow-hidden">
+                <div className="bg-[#162E3D] rounded-xl shadow-sm border border-slate-100 overflow-hidden">
                   <div className="divide-y divide-slate-100">
                     {allDocuments.map(doc => (
-                      <div key={doc.id} className="px-6 py-4 hover:bg-[#162E3D]">
+                      <div key={doc.id} className="px-6 py-4 hover:bg-slate-50">
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1 flex-wrap">
                               <span className={`badge border ${
                                 doc.status === 'VERIFIED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
-                                doc.status === 'REJECTED' ? 'bg-red-500/10 text-red-400 border-red-200' :
-                                doc.status === 'EXPIRED' ? 'bg-[#102535] text-[#9AADB8] border-white/[0.08]' :
+                                doc.status === 'REJECTED' ? 'bg-red-500/10 text-red-700 border-red-200' :
+                                doc.status === 'EXPIRED' ? 'bg-slate-100 text-[#9AADB8] border-slate-200' :
                                 'bg-[#FF6A2A]/10 text-[#FF6A2A] border-[#FF6A2A]/20'
                               }`}>{doc.status}</span>
-                              <span className="badge bg-[#102535] text-[#F7F9FB] border border-white/[0.08]">
+                              <span className="badge bg-[#f5f5f7] text-[#1d1d1f] border border-[#d2d2d7]">
                                 {doc.type.replace(/_/g, ' ')}
                               </span>
-                              <span className="font-medium text-[#F7F9FB]">{doc.name}</span>
+                              <span className="font-medium text-[#1d1d1f]">{doc.name}</span>
                             </div>
-                            <div className="text-xs text-[#6B7C86]">
+                            <div className="text-xs text-slate-400">
                               {doc.user.name} ({doc.user.email})
                               {doc.user.company && ` \u2014 ${doc.user.company}`}
                               {' \u2014 '}{doc.user.role.replace('_', ' ')}
                             </div>
-                            <div className="text-xs text-[#6B7C86] mt-0.5">
+                            <div className="text-xs text-slate-400 mt-0.5">
                               Uploaded: {formatDateTime(doc.createdAt)}
                               {doc.reviewNotes && <span className="text-red-500 ml-2">Note: {doc.reviewNotes}</span>}
                             </div>
@@ -1296,7 +1296,7 @@ export default function AdminPage() {
                                     handleDocumentAction(doc.id, 'reject', reason || undefined)
                                   }}
                                   disabled={actionLoading === `doc-${doc.id}`}
-                                  className="px-3 py-1.5 text-xs font-medium rounded-md bg-red-500/10 text-red-400 border border-red-200 hover:bg-red-100 disabled:opacity-50"
+                                  className="px-3 py-1.5 text-xs font-medium rounded-md bg-red-500/10 text-red-700 border border-red-200 hover:bg-red-100 disabled:opacity-50"
                                 >
                                   Reject
                                 </button>
@@ -1307,7 +1307,7 @@ export default function AdminPage() {
                       </div>
                     ))}
                     {allDocuments.length === 0 && (
-                      <div className="p-8 text-center text-[#6B7C86] text-sm">No documents uploaded yet</div>
+                      <div className="p-8 text-center text-slate-400 text-sm">No documents uploaded yet</div>
                     )}
                   </div>
                 </div>
@@ -1317,37 +1317,37 @@ export default function AdminPage() {
             {/* ═══════════════════ NOTIFICATIONS TAB ═══════════════════ */}
             {tab === 'notifications' && (
               <div className="space-y-6">
-                <h2 className="font-semibold text-[#F7F9FB]">Broadcast Notification</h2>
-                <div className="bg-[#162E3D] rounded-xl shadow-sm border border-white/[0.06] p-6">
+                <h2 className="font-semibold text-[#1d1d1f]">Broadcast Notification</h2>
+                <div className="bg-[#162E3D] rounded-xl shadow-sm border border-slate-100 p-6">
                   <form onSubmit={handleBroadcast} className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Title *</label>
+                      <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Title *</label>
                       <input
                         type="text"
                         required
                         value={broadcastTitle}
                         onChange={e => setBroadcastTitle(e.target.value)}
                         placeholder="e.g. System Maintenance Notice"
-                        className="w-full px-4 py-2.5 rounded-lg border border-white/[0.08] text-sm outline-none focus:border-[#1E6F8F]"
+                        className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A]"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Message *</label>
+                      <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Message *</label>
                       <textarea
                         required
                         rows={3}
                         value={broadcastMessage}
                         onChange={e => setBroadcastMessage(e.target.value)}
                         placeholder="Your message to users..."
-                        className="w-full px-4 py-2.5 rounded-lg border border-white/[0.08] text-sm outline-none focus:border-[#1E6F8F] resize-none"
+                        className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] resize-none"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Target Audience</label>
+                      <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Target Audience</label>
                       <select
                         value={broadcastRole}
                         onChange={e => setBroadcastRole(e.target.value)}
-                        className="w-full px-4 py-2.5 rounded-lg border border-white/[0.08] text-sm outline-none focus:border-[#1E6F8F]"
+                        className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A]"
                       >
                         <option value="">All Users</option>
                         <option value="CARRIER">Carriers Only</option>
@@ -1366,36 +1366,36 @@ export default function AdminPage() {
                   </form>
                 </div>
 
-                <div className="bg-[#162E3D] rounded-xl shadow-sm border border-white/[0.06] p-6">
-                  <h3 className="font-semibold text-[#F7F9FB] mb-3">Quick Actions</h3>
+                <div className="bg-[#162E3D] rounded-xl shadow-sm border border-slate-100 p-6">
+                  <h3 className="font-semibold text-[#1d1d1f] mb-3">Quick Actions</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <button
                       onClick={() => { setBroadcastTitle('Scheduled Maintenance'); setBroadcastMessage('We will be performing scheduled maintenance. The platform may be briefly unavailable. Thank you for your patience.') }}
-                      className="text-left p-3 rounded-lg border border-white/[0.08] hover:bg-[#162E3D] transition-colors"
+                      className="text-left p-3 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors"
                     >
-                      <div className="text-sm font-medium text-[#F7F9FB]">Maintenance Notice</div>
-                      <div className="text-xs text-[#6B7C86] mt-0.5">Notify all users of planned downtime</div>
+                      <div className="text-sm font-medium text-[#1d1d1f]">Maintenance Notice</div>
+                      <div className="text-xs text-slate-400 mt-0.5">Notify all users of planned downtime</div>
                     </button>
                     <button
                       onClick={() => { setBroadcastTitle('New Feature: Two-Way Routes'); setBroadcastMessage('You can now list space for both outbound and return journeys! List your spare capacity on the way back and earn more from every trip.'); setBroadcastRole('CARRIER') }}
-                      className="text-left p-3 rounded-lg border border-white/[0.08] hover:bg-[#162E3D] transition-colors"
+                      className="text-left p-3 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors"
                     >
-                      <div className="text-sm font-medium text-[#F7F9FB]">Two-Way Routes Update</div>
-                      <div className="text-xs text-[#6B7C86] mt-0.5">Tell carriers about return leg listings</div>
+                      <div className="text-sm font-medium text-[#1d1d1f]">Two-Way Routes Update</div>
+                      <div className="text-xs text-slate-400 mt-0.5">Tell carriers about return leg listings</div>
                     </button>
                     <button
                       onClick={() => { setBroadcastTitle('Verify Your Documents'); setBroadcastMessage('Please ensure your insurance, driving licence, and port access permits are uploaded and up to date. Unverified accounts may have limited access.'); setBroadcastRole('CARRIER') }}
-                      className="text-left p-3 rounded-lg border border-white/[0.08] hover:bg-[#162E3D] transition-colors"
+                      className="text-left p-3 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors"
                     >
-                      <div className="text-sm font-medium text-[#F7F9FB]">Document Reminder</div>
-                      <div className="text-xs text-[#6B7C86] mt-0.5">Remind carriers to upload documents</div>
+                      <div className="text-sm font-medium text-[#1d1d1f]">Document Reminder</div>
+                      <div className="text-xs text-slate-400 mt-0.5">Remind carriers to upload documents</div>
                     </button>
                     <button
                       onClick={() => { setBroadcastTitle('Welcome to Onshore Deliver'); setBroadcastMessage('Thanks for joining! Browse available routes, book deliveries, and track your shipments in real-time. Need help? Visit our support page.') }}
-                      className="text-left p-3 rounded-lg border border-white/[0.08] hover:bg-[#162E3D] transition-colors"
+                      className="text-left p-3 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors"
                     >
-                      <div className="text-sm font-medium text-[#F7F9FB]">Welcome Message</div>
-                      <div className="text-xs text-[#6B7C86] mt-0.5">Send a welcome to all users</div>
+                      <div className="text-sm font-medium text-[#1d1d1f]">Welcome Message</div>
+                      <div className="text-xs text-slate-400 mt-0.5">Send a welcome to all users</div>
                     </button>
                   </div>
                 </div>
@@ -1405,11 +1405,11 @@ export default function AdminPage() {
             {/* ═══════════════════ ACTIVITY TAB ═══════════════════ */}
             {tab === 'activity' && (
               <div className="space-y-4">
-                <h2 className="font-semibold text-[#F7F9FB]">Recent Activity</h2>
-                <div className="bg-[#162E3D] rounded-xl shadow-sm border border-white/[0.06] overflow-hidden">
+                <h2 className="font-semibold text-[#1d1d1f]">Recent Activity</h2>
+                <div className="bg-[#162E3D] rounded-xl shadow-sm border border-slate-100 overflow-hidden">
                   <div className="divide-y divide-slate-100">
                     {activityFeed.map(item => (
-                      <div key={item.id} className="px-6 py-4 hover:bg-[#162E3D] flex items-start gap-4">
+                      <div key={item.id} className="px-6 py-4 hover:bg-slate-50 flex items-start gap-4">
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5 ${
                           item.type === 'booking'
                             ? 'bg-indigo-50 text-indigo-600'
@@ -1421,20 +1421,20 @@ export default function AdminPage() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-sm font-medium text-[#F7F9FB]">{item.title}</span>
+                            <span className="text-sm font-medium text-[#1d1d1f]">{item.title}</span>
                             {item.meta && (
-                              <span className={`badge border text-xs ${statusColors[item.meta] || 'bg-[#102535] text-[#9AADB8] border-white/[0.08]'}`}>
+                              <span className={`badge border text-xs ${statusColors[item.meta] || 'bg-slate-50 text-[#9AADB8] border-slate-200'}`}>
                                 {item.meta.replace(/_/g, ' ')}
                               </span>
                             )}
                           </div>
                           <div className="text-xs text-[#6B7C86] mt-0.5">{item.description}</div>
                         </div>
-                        <div className="text-xs text-[#6B7C86] shrink-0">{formatDateTime(item.timestamp)}</div>
+                        <div className="text-xs text-slate-400 shrink-0">{formatDateTime(item.timestamp)}</div>
                       </div>
                     ))}
                     {activityFeed.length === 0 && (
-                      <div className="p-8 text-center text-[#6B7C86] text-sm">No activity yet</div>
+                      <div className="p-8 text-center text-slate-400 text-sm">No activity yet</div>
                     )}
                   </div>
                 </div>
@@ -1452,49 +1452,49 @@ export default function AdminPage() {
         {tab === 'settings' && (
           <div className="space-y-6">
             {/* Platform Settings */}
-            <div className="bg-[#162E3D] rounded-2xl border border-white/[0.08] shadow-sm p-6">
-              <h3 className="text-lg font-bold text-[#F7F9FB] mb-1">Platform Settings</h3>
-              <p className="text-xs text-[#6B7C86] mb-6">Manage platform configuration and email templates.</p>
+            <div className="bg-[#162E3D] rounded-2xl border border-[#e8e4de] shadow-sm p-6">
+              <h3 className="text-lg font-bold text-[#1a1a1a] mb-1">Platform Settings</h3>
+              <p className="text-xs text-slate-400 mb-6">Manage platform configuration and email templates.</p>
 
               <div className="space-y-6">
                 {/* Company Info */}
                 <div>
-                  <h4 className="text-sm font-semibold text-[#F7F9FB] mb-3">Company Information</h4>
+                  <h4 className="text-sm font-semibold text-[#1a1a1a] mb-3">Company Information</h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-medium text-[#6B7C86] mb-1">Company Name</label>
-                      <input type="text" defaultValue="Onshore Deliver" className="w-full px-3 py-2 rounded-lg border border-white/[0.08] text-sm" readOnly />
+                      <input type="text" defaultValue="Onshore Deliver" className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm" readOnly />
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-[#6B7C86] mb-1">Support Email</label>
-                      <input type="text" defaultValue="info@onshoredelivery.com" className="w-full px-3 py-2 rounded-lg border border-white/[0.08] text-sm" readOnly />
+                      <input type="text" defaultValue="info@onshoredelivery.com" className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm" readOnly />
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-[#6B7C86] mb-1">Platform Fee (%)</label>
-                      <input type="text" defaultValue="10%" className="w-full px-3 py-2 rounded-lg border border-white/[0.08] text-sm" readOnly />
+                      <input type="text" defaultValue="10%" className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm" readOnly />
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-[#6B7C86] mb-1">Default Currency</label>
-                      <input type="text" defaultValue="EUR" className="w-full px-3 py-2 rounded-lg border border-white/[0.08] text-sm" readOnly />
+                      <input type="text" defaultValue="EUR" className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm" readOnly />
                     </div>
                   </div>
                 </div>
 
                 {/* Cancellation Policy */}
-                <div className="border-t border-white/[0.06] pt-6">
-                  <h4 className="text-sm font-semibold text-[#F7F9FB] mb-3">Cancellation Policy</h4>
-                  <div className="bg-[#102535] rounded-xl p-4 text-sm text-[#9AADB8] space-y-1.5">
+                <div className="border-t border-slate-100 pt-6">
+                  <h4 className="text-sm font-semibold text-[#1a1a1a] mb-3">Cancellation Policy</h4>
+                  <div className="bg-slate-50 rounded-xl p-4 text-sm text-[#9AADB8] space-y-1.5">
                     <div className="flex justify-between"><span>More than 7 days before departure</span><span className="font-semibold text-[#9ED36A]">No fee</span></div>
                     <div className="flex justify-between"><span>3-7 days before departure</span><span className="font-semibold text-[#FF6A2A]">10% fee</span></div>
                     <div className="flex justify-between"><span>1-3 days before departure</span><span className="font-semibold text-orange-700">25% fee</span></div>
-                    <div className="flex justify-between"><span>Less than 24 hours</span><span className="font-semibold text-red-400">50% fee</span></div>
+                    <div className="flex justify-between"><span>Less than 24 hours</span><span className="font-semibold text-red-700">50% fee</span></div>
                   </div>
                 </div>
 
                 {/* Email Templates */}
-                <div className="border-t border-white/[0.06] pt-6">
-                  <h4 className="text-sm font-semibold text-[#F7F9FB] mb-3">Email Templates</h4>
-                  <p className="text-xs text-[#6B7C86] mb-4">These templates are sent automatically for platform events.</p>
+                <div className="border-t border-slate-100 pt-6">
+                  <h4 className="text-sm font-semibold text-[#1a1a1a] mb-3">Email Templates</h4>
+                  <p className="text-xs text-slate-400 mb-4">These templates are sent automatically for platform events.</p>
                   <div className="space-y-2">
                     {[
                       { name: 'Welcome Email', trigger: 'On user registration', status: 'Active' },
@@ -1511,20 +1511,20 @@ export default function AdminPage() {
                       { name: 'Carrier Payout', trigger: 'On payout sent to carrier', status: 'Active' },
                       { name: 'Document Status', trigger: 'On document verified/rejected', status: 'Active' },
                     ].map(t => (
-                      <div key={t.name} className="flex items-center justify-between px-4 py-3 rounded-lg bg-[#102535] hover:bg-[#162E3D] transition-colors">
+                      <div key={t.name} className="flex items-center justify-between px-4 py-3 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors">
                         <div>
-                          <span className="text-sm font-medium text-[#F7F9FB]">{t.name}</span>
-                          <span className="text-xs text-[#6B7C86] ml-2">{t.trigger}</span>
+                          <span className="text-sm font-medium text-[#1a1a1a]">{t.name}</span>
+                          <span className="text-xs text-slate-400 ml-2">{t.trigger}</span>
                         </div>
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#9ED36A]/10 text-[#9ED36A] border border-[#9ED36A]/20">{t.status}</span>
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#9ED36A]/10 text-[#9ED36A] border border-green-200">{t.status}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
                 {/* Notification Types */}
-                <div className="border-t border-white/[0.06] pt-6">
-                  <h4 className="text-sm font-semibold text-[#F7F9FB] mb-3">Notification Events</h4>
+                <div className="border-t border-slate-100 pt-6">
+                  <h4 className="text-sm font-semibold text-[#1a1a1a] mb-3">Notification Events</h4>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     {[
                       'Booking Created', 'Booking Confirmed', 'Status Update', 'Booking Cancelled',
@@ -1535,28 +1535,28 @@ export default function AdminPage() {
                       'Document Verified', 'Document Rejected',
                       'Route Started', 'ETA Update', 'Driver Arrived', 'Return Route Available',
                     ].map(n => (
-                      <div key={n} className="px-3 py-2 rounded-lg bg-[#102535] text-xs font-medium text-[#9AADB8]">{n}</div>
+                      <div key={n} className="px-3 py-2 rounded-lg bg-slate-50 text-xs font-medium text-[#9AADB8]">{n}</div>
                     ))}
                   </div>
                 </div>
 
                 {/* Admin Accounts */}
-                <div className="border-t border-white/[0.06] pt-6">
-                  <h4 className="text-sm font-semibold text-[#F7F9FB] mb-3">Admin Access</h4>
+                <div className="border-t border-slate-100 pt-6">
+                  <h4 className="text-sm font-semibold text-[#1a1a1a] mb-3">Admin Access</h4>
                   <div className="space-y-2">
-                    <div className="flex items-center justify-between px-4 py-3 rounded-lg bg-[#102535]">
+                    <div className="flex items-center justify-between px-4 py-3 rounded-lg bg-slate-50">
                       <div>
-                        <span className="text-sm font-medium text-[#F7F9FB]">edward@onshorecellars.com</span>
-                        <span className="text-xs text-[#6B7C86] ml-2">Primary Admin</span>
+                        <span className="text-sm font-medium text-[#1a1a1a]">edward@onshorecellars.com</span>
+                        <span className="text-xs text-slate-400 ml-2">Primary Admin</span>
                       </div>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#FF6A2A]/10 text-[#FF6A2A] border border-[#C6904D]/20">ADMIN</span>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#FF6A2A]/10 text-[#FF6A2A] border border-[#FF6A2A]/20">ADMIN</span>
                     </div>
-                    <div className="flex items-center justify-between px-4 py-3 rounded-lg bg-[#102535]">
+                    <div className="flex items-center justify-between px-4 py-3 rounded-lg bg-slate-50">
                       <div>
-                        <span className="text-sm font-medium text-[#F7F9FB]">info@onshoredelivery.com</span>
-                        <span className="text-xs text-[#6B7C86] ml-2">Support Admin</span>
+                        <span className="text-sm font-medium text-[#1a1a1a]">info@onshoredelivery.com</span>
+                        <span className="text-xs text-slate-400 ml-2">Support Admin</span>
                       </div>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#FF6A2A]/10 text-[#FF6A2A] border border-[#C6904D]/20">ADMIN</span>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#FF6A2A]/10 text-[#FF6A2A] border border-[#FF6A2A]/20">ADMIN</span>
                     </div>
                   </div>
                 </div>
@@ -1572,36 +1572,36 @@ export default function AdminPage() {
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setEditUser(null)} />
           <div className="relative bg-[#162E3D] rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 m-4">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-[#F7F9FB]">Edit User</h3>
-              <button onClick={() => setEditUser(null)} className="p-1 rounded-lg hover:bg-[#162E3D]">
-                <svg className="w-5 h-5 text-[#6B7C86]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              <h3 className="text-lg font-semibold text-[#1d1d1f]">Edit User</h3>
+              <button onClick={() => setEditUser(null)} className="p-1 rounded-lg hover:bg-slate-100">
+                <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Name</label>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Name</label>
                 <input type="text" value={editUserForm.name as string || ''} onChange={e => setEditUserForm(prev => ({ ...prev, name: e.target.value }))}
-                  className="w-full px-3 py-2.5 rounded-xl border border-white/[0.08] text-sm outline-none focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10" />
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Email</label>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Email</label>
                 <input type="email" value={editUserForm.email as string || ''} onChange={e => setEditUserForm(prev => ({ ...prev, email: e.target.value }))}
-                  className="w-full px-3 py-2.5 rounded-xl border border-white/[0.08] text-sm outline-none focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10" />
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Phone</label>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Phone</label>
                 <input type="text" value={editUserForm.phone as string || ''} onChange={e => setEditUserForm(prev => ({ ...prev, phone: e.target.value }))}
-                  className="w-full px-3 py-2.5 rounded-xl border border-white/[0.08] text-sm outline-none focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10" />
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Company</label>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Company</label>
                 <input type="text" value={editUserForm.company as string || ''} onChange={e => setEditUserForm(prev => ({ ...prev, company: e.target.value }))}
-                  className="w-full px-3 py-2.5 rounded-xl border border-white/[0.08] text-sm outline-none focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10" />
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Role</label>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Role</label>
                 <select value={editUserForm.role as string || ''} onChange={e => setEditUserForm(prev => ({ ...prev, role: e.target.value }))}
-                  className="w-full px-3 py-2.5 rounded-xl border border-white/[0.08] text-sm outline-none focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10">
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10">
                   <option value="CARRIER">Carrier</option>
                   <option value="SUPPLIER">Supplier</option>
                   <option value="YACHT_OWNER">Yacht Owner</option>
@@ -1610,36 +1610,36 @@ export default function AdminPage() {
                 </select>
               </div>
               <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-[#F7F9FB]">Verified</label>
+                <label className="text-sm font-medium text-[#1d1d1f]">Verified</label>
                 <button type="button" onClick={() => setEditUserForm(prev => ({ ...prev, verified: !prev.verified }))}
                   className={`relative w-11 h-6 rounded-full transition-colors ${editUserForm.verified ? 'bg-emerald-500' : 'bg-slate-300'}`}>
                   <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-[#162E3D] rounded-full shadow transition-transform ${editUserForm.verified ? 'translate-x-5' : ''}`} />
                 </button>
               </div>
               <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-[#F7F9FB]">Suspended</label>
+                <label className="text-sm font-medium text-[#1d1d1f]">Suspended</label>
                 <button type="button" onClick={() => setEditUserForm(prev => ({ ...prev, suspended: !prev.suspended }))}
                   className={`relative w-11 h-6 rounded-full transition-colors ${editUserForm.suspended ? 'bg-red-500/100' : 'bg-slate-300'}`}>
                   <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-[#162E3D] rounded-full shadow transition-transform ${editUserForm.suspended ? 'translate-x-5' : ''}`} />
                 </button>
               </div>
               <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-[#F7F9FB]">Can Carry</label>
+                <label className="text-sm font-medium text-[#1d1d1f]">Can Carry</label>
                 <button type="button" onClick={() => setEditUserForm(prev => ({ ...prev, canCarry: !prev.canCarry }))}
                   className={`relative w-11 h-6 rounded-full transition-colors ${editUserForm.canCarry ? 'bg-emerald-500' : 'bg-slate-300'}`}>
                   <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-[#162E3D] rounded-full shadow transition-transform ${editUserForm.canCarry ? 'translate-x-5' : ''}`} />
                 </button>
               </div>
               <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-[#F7F9FB]">Can Ship</label>
+                <label className="text-sm font-medium text-[#1d1d1f]">Can Ship</label>
                 <button type="button" onClick={() => setEditUserForm(prev => ({ ...prev, canShip: !prev.canShip }))}
                   className={`relative w-11 h-6 rounded-full transition-colors ${editUserForm.canShip ? 'bg-emerald-500' : 'bg-slate-300'}`}>
                   <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-[#162E3D] rounded-full shadow transition-transform ${editUserForm.canShip ? 'translate-x-5' : ''}`} />
                 </button>
               </div>
             </div>
-            <div className="flex gap-3 mt-6 pt-4 border-t border-white/[0.06]">
-              <button onClick={() => setEditUser(null)} className="flex-1 px-4 py-2.5 rounded-xl border border-white/[0.08] text-sm font-medium text-[#9AADB8] hover:bg-[#162E3D]">Cancel</button>
+            <div className="flex gap-3 mt-6 pt-4 border-t border-slate-100">
+              <button onClick={() => setEditUser(null)} className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-medium text-[#9AADB8] hover:bg-slate-50">Cancel</button>
               <button onClick={handleEditUser} disabled={!!actionLoading} className="flex-1 px-4 py-2.5 rounded-xl bg-[#1d1d1f] text-white text-sm font-medium hover:bg-[#333] disabled:opacity-50">
                 {actionLoading ? 'Saving...' : 'Save Changes'}
               </button>
@@ -1654,21 +1654,21 @@ export default function AdminPage() {
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setEditListing(null)} />
           <div className="relative bg-[#162E3D] rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 m-4">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-[#F7F9FB]">Edit Listing</h3>
-              <button onClick={() => setEditListing(null)} className="p-1 rounded-lg hover:bg-[#162E3D]">
-                <svg className="w-5 h-5 text-[#6B7C86]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              <h3 className="text-lg font-semibold text-[#1d1d1f]">Edit Listing</h3>
+              <button onClick={() => setEditListing(null)} className="p-1 rounded-lg hover:bg-slate-100">
+                <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Title</label>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Title</label>
                 <input type="text" value={editListingForm.title as string || ''} onChange={e => setEditListingForm(prev => ({ ...prev, title: e.target.value }))}
-                  className="w-full px-3 py-2.5 rounded-xl border border-white/[0.08] text-sm outline-none focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10" />
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Status</label>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Status</label>
                 <select value={editListingForm.status as string || ''} onChange={e => setEditListingForm(prev => ({ ...prev, status: e.target.value }))}
-                  className="w-full px-3 py-2.5 rounded-xl border border-white/[0.08] text-sm outline-none focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10">
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10">
                   <option value="DRAFT">Draft</option>
                   <option value="ACTIVE">Active</option>
                   <option value="FULL">Full</option>
@@ -1678,75 +1678,75 @@ export default function AdminPage() {
                 </select>
               </div>
               <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-[#F7F9FB]">Featured</label>
+                <label className="text-sm font-medium text-[#1d1d1f]">Featured</label>
                 <button type="button" onClick={() => setEditListingForm(prev => ({ ...prev, featured: !prev.featured }))}
                   className={`relative w-11 h-6 rounded-full transition-colors ${editListingForm.featured ? 'bg-[#FF6A2A]/100' : 'bg-slate-300'}`}>
                   <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-[#162E3D] rounded-full shadow transition-transform ${editListingForm.featured ? 'translate-x-5' : ''}`} />
                 </button>
               </div>
               <div>
-                <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Origin Port</label>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Origin Port</label>
                 <input type="text" value={editListingForm.originPort as string || ''} onChange={e => setEditListingForm(prev => ({ ...prev, originPort: e.target.value }))}
-                  className="w-full px-3 py-2.5 rounded-xl border border-white/[0.08] text-sm outline-none focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10" />
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Destination Port</label>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Destination Port</label>
                 <input type="text" value={editListingForm.destinationPort as string || ''} onChange={e => setEditListingForm(prev => ({ ...prev, destinationPort: e.target.value }))}
-                  className="w-full px-3 py-2.5 rounded-xl border border-white/[0.08] text-sm outline-none focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10" />
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Departure Date</label>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Departure Date</label>
                 <input type="date" value={editListingForm.departureDate as string || ''} onChange={e => setEditListingForm(prev => ({ ...prev, departureDate: e.target.value }))}
-                  className="w-full px-3 py-2.5 rounded-xl border border-white/[0.08] text-sm outline-none focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10" />
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Total Capacity (kg)</label>
+                  <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Total Capacity (kg)</label>
                   <input type="number" value={editListingForm.totalCapacityKg as number || ''} onChange={e => setEditListingForm(prev => ({ ...prev, totalCapacityKg: e.target.value ? Number(e.target.value) : '' }))}
-                    className="w-full px-3 py-2.5 rounded-xl border border-white/[0.08] text-sm outline-none focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10" />
+                    className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Available (kg)</label>
+                  <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Available (kg)</label>
                   <input type="number" value={editListingForm.availableKg as number || ''} onChange={e => setEditListingForm(prev => ({ ...prev, availableKg: e.target.value ? Number(e.target.value) : '' }))}
-                    className="w-full px-3 py-2.5 rounded-xl border border-white/[0.08] text-sm outline-none focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10" />
+                    className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10" />
                 </div>
               </div>
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Price/kg</label>
+                  <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Price/kg</label>
                   <input type="number" step="0.01" value={editListingForm.pricePerKg as number || ''} onChange={e => setEditListingForm(prev => ({ ...prev, pricePerKg: e.target.value ? Number(e.target.value) : '' }))}
-                    className="w-full px-3 py-2.5 rounded-xl border border-white/[0.08] text-sm outline-none focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10" />
+                    className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Price/m3</label>
+                  <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Price/m3</label>
                   <input type="number" step="0.01" value={editListingForm.pricePerM3 as number || ''} onChange={e => setEditListingForm(prev => ({ ...prev, pricePerM3: e.target.value ? Number(e.target.value) : '' }))}
-                    className="w-full px-3 py-2.5 rounded-xl border border-white/[0.08] text-sm outline-none focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10" />
+                    className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Flat Rate</label>
+                  <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Flat Rate</label>
                   <input type="number" step="0.01" value={editListingForm.flatRate as number || ''} onChange={e => setEditListingForm(prev => ({ ...prev, flatRate: e.target.value ? Number(e.target.value) : '' }))}
-                    className="w-full px-3 py-2.5 rounded-xl border border-white/[0.08] text-sm outline-none focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10" />
+                    className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10" />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Currency</label>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Currency</label>
                 <select value={editListingForm.currency as string || 'EUR'} onChange={e => setEditListingForm(prev => ({ ...prev, currency: e.target.value }))}
-                  className="w-full px-3 py-2.5 rounded-xl border border-white/[0.08] text-sm outline-none focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10">
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10">
                   <option value="EUR">EUR</option>
                   <option value="USD">USD</option>
                   <option value="GBP">GBP</option>
                 </select>
               </div>
               <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-[#F7F9FB]">Bidding Enabled</label>
+                <label className="text-sm font-medium text-[#1d1d1f]">Bidding Enabled</label>
                 <button type="button" onClick={() => setEditListingForm(prev => ({ ...prev, biddingEnabled: !prev.biddingEnabled }))}
                   className={`relative w-11 h-6 rounded-full transition-colors ${editListingForm.biddingEnabled ? 'bg-emerald-500' : 'bg-slate-300'}`}>
                   <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-[#162E3D] rounded-full shadow transition-transform ${editListingForm.biddingEnabled ? 'translate-x-5' : ''}`} />
                 </button>
               </div>
             </div>
-            <div className="flex gap-3 mt-6 pt-4 border-t border-white/[0.06]">
-              <button onClick={() => setEditListing(null)} className="flex-1 px-4 py-2.5 rounded-xl border border-white/[0.08] text-sm font-medium text-[#9AADB8] hover:bg-[#162E3D]">Cancel</button>
+            <div className="flex gap-3 mt-6 pt-4 border-t border-slate-100">
+              <button onClick={() => setEditListing(null)} className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-medium text-[#9AADB8] hover:bg-slate-50">Cancel</button>
               <button onClick={handleEditListing} disabled={!!actionLoading} className="flex-1 px-4 py-2.5 rounded-xl bg-[#1d1d1f] text-white text-sm font-medium hover:bg-[#333] disabled:opacity-50">
                 {actionLoading ? 'Saving...' : 'Save Changes'}
               </button>
@@ -1761,16 +1761,16 @@ export default function AdminPage() {
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setEditBooking(null)} />
           <div className="relative bg-[#162E3D] rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 m-4">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-[#F7F9FB]">Edit Booking</h3>
-              <button onClick={() => setEditBooking(null)} className="p-1 rounded-lg hover:bg-[#162E3D]">
-                <svg className="w-5 h-5 text-[#6B7C86]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              <h3 className="text-lg font-semibold text-[#1d1d1f]">Edit Booking</h3>
+              <button onClick={() => setEditBooking(null)} className="p-1 rounded-lg hover:bg-slate-100">
+                <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Status</label>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Status</label>
                 <select value={editBookingForm.status as string || ''} onChange={e => setEditBookingForm(prev => ({ ...prev, status: e.target.value }))}
-                  className="w-full px-3 py-2.5 rounded-xl border border-white/[0.08] text-sm outline-none focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10">
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10">
                   <option value="QUOTE_REQUESTED">Quote Requested</option>
                   <option value="QUOTED">Quoted</option>
                   <option value="PENDING">Pending</option>
@@ -1784,9 +1784,9 @@ export default function AdminPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Payment Status</label>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Payment Status</label>
                 <select value={editBookingForm.paymentStatus as string || ''} onChange={e => setEditBookingForm(prev => ({ ...prev, paymentStatus: e.target.value }))}
-                  className="w-full px-3 py-2.5 rounded-xl border border-white/[0.08] text-sm outline-none focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10">
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10">
                   <option value="PENDING">Pending</option>
                   <option value="PROCESSING">Processing</option>
                   <option value="PAID">Paid</option>
@@ -1795,50 +1795,50 @@ export default function AdminPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Total Price</label>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Total Price</label>
                 <input type="number" step="0.01" value={editBookingForm.totalPrice as number || ''} onChange={e => setEditBookingForm(prev => ({ ...prev, totalPrice: e.target.value ? Number(e.target.value) : '' }))}
-                  className="w-full px-3 py-2.5 rounded-xl border border-white/[0.08] text-sm outline-none focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10" />
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Cargo Description</label>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Cargo Description</label>
                 <textarea rows={2} value={editBookingForm.cargoDescription as string || ''} onChange={e => setEditBookingForm(prev => ({ ...prev, cargoDescription: e.target.value }))}
-                  className="w-full px-3 py-2.5 rounded-xl border border-white/[0.08] text-sm outline-none focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10 resize-none" />
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10 resize-none" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Weight (kg)</label>
+                  <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Weight (kg)</label>
                   <input type="number" step="0.01" value={editBookingForm.weightKg as number || ''} onChange={e => setEditBookingForm(prev => ({ ...prev, weightKg: e.target.value ? Number(e.target.value) : '' }))}
-                    className="w-full px-3 py-2.5 rounded-xl border border-white/[0.08] text-sm outline-none focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10" />
+                    className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Volume (m3)</label>
+                  <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Volume (m3)</label>
                   <input type="number" step="0.01" value={editBookingForm.volumeM3 as number || ''} onChange={e => setEditBookingForm(prev => ({ ...prev, volumeM3: e.target.value ? Number(e.target.value) : '' }))}
-                    className="w-full px-3 py-2.5 rounded-xl border border-white/[0.08] text-sm outline-none focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10" />
+                    className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10" />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Pickup Address</label>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Pickup Address</label>
                 <input type="text" value={editBookingForm.pickupAddress as string || ''} onChange={e => setEditBookingForm(prev => ({ ...prev, pickupAddress: e.target.value }))}
-                  className="w-full px-3 py-2.5 rounded-xl border border-white/[0.08] text-sm outline-none focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10" />
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Delivery Address</label>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Delivery Address</label>
                 <input type="text" value={editBookingForm.deliveryAddress as string || ''} onChange={e => setEditBookingForm(prev => ({ ...prev, deliveryAddress: e.target.value }))}
-                  className="w-full px-3 py-2.5 rounded-xl border border-white/[0.08] text-sm outline-none focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10" />
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Delivery Notes</label>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Delivery Notes</label>
                 <textarea rows={2} value={editBookingForm.deliveryNotes as string || ''} onChange={e => setEditBookingForm(prev => ({ ...prev, deliveryNotes: e.target.value }))}
-                  className="w-full px-3 py-2.5 rounded-xl border border-white/[0.08] text-sm outline-none focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10 resize-none" />
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10 resize-none" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Admin Notes</label>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-1">Admin Notes</label>
                 <textarea rows={2} value={editBookingForm.adminNotes as string || ''} onChange={e => setEditBookingForm(prev => ({ ...prev, adminNotes: e.target.value }))}
-                  className="w-full px-3 py-2.5 rounded-xl border border-white/[0.08] text-sm outline-none focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10 resize-none" />
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10 resize-none" />
               </div>
             </div>
-            <div className="flex gap-3 mt-6 pt-4 border-t border-white/[0.06]">
-              <button onClick={() => setEditBooking(null)} className="flex-1 px-4 py-2.5 rounded-xl border border-white/[0.08] text-sm font-medium text-[#9AADB8] hover:bg-[#162E3D]">Cancel</button>
+            <div className="flex gap-3 mt-6 pt-4 border-t border-slate-100">
+              <button onClick={() => setEditBooking(null)} className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-medium text-[#9AADB8] hover:bg-slate-50">Cancel</button>
               <button onClick={handleEditBooking} disabled={!!actionLoading} className="flex-1 px-4 py-2.5 rounded-xl bg-[#1d1d1f] text-white text-sm font-medium hover:bg-[#333] disabled:opacity-50">
                 {actionLoading ? 'Saving...' : 'Save Changes'}
               </button>

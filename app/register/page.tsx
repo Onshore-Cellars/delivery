@@ -112,7 +112,7 @@ function RegisterForm() {
     { value: 'CREW', label: 'Crew', desc: 'Work on yachts, order supplies' },
   ]
 
-  const inputClass = "w-full px-4 py-3.5 rounded-xl border border-white/[0.08] bg-[#162E3D] text-[#F7F9FB] text-[15px] placeholder:text-[#6B7C86] focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10 transition-all outline-none"
+  const inputClass = "w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-[#162E3D] text-[#1a1a1a] text-[15px] placeholder:text-slate-400 focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10 transition-all outline-none"
 
   return (
     <div className="flex flex-col bg-[#162E3D]">
@@ -121,22 +121,22 @@ function RegisterForm() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 mb-10 hover:no-underline">
             <Image src="/logo.png" alt="Onshore Deliver" width={32} height={32} className="rounded-sm" />
-            <span className="text-lg font-semibold text-[#F7F9FB] tracking-wide" style={{ fontFamily: 'var(--font-display)' }}>Onshore</span>
+            <span className="text-lg font-semibold text-[#1a1a1a] tracking-wide" style={{ fontFamily: 'var(--font-display)' }}>Onshore</span>
           </Link>
 
-          <h1 className="text-2xl sm:text-3xl font-light text-[#F7F9FB] tracking-wide" style={{ fontFamily: 'var(--font-display)' }}>Create your account</h1>
+          <h1 className="text-2xl sm:text-3xl font-light text-[#1a1a1a] tracking-wide" style={{ fontFamily: 'var(--font-display)' }}>Create your account</h1>
           <p className="mt-2 text-sm sm:text-base text-[#6B7C86]">Join the delivery logistics marketplace.</p>
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-5">
             {error && (
-              <div className="px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/15" role="alert">
-                <p className="text-sm text-red-400">{error}</p>
+              <div className="px-4 py-3 rounded-xl bg-red-500/10 border border-red-100" role="alert">
+                <p className="text-sm text-red-700">{error}</p>
               </div>
             )}
 
             {/* What do you need? */}
             <div>
-              <label className="block text-sm font-semibold text-[#F7F9FB] mb-3">What do you need?</label>
+              <label className="block text-sm font-semibold text-[#1a1a1a] mb-3">What do you need?</label>
               <div className="grid grid-cols-2 gap-2.5">
                 {capabilities.map((cap) => {
                   const active = formData[cap.key as 'canCarry' | 'canShip']
@@ -152,12 +152,12 @@ function RegisterForm() {
                         setFormData(updated)
                       }}
                       className={`relative flex items-center gap-3 p-4 rounded-xl border-2 transition-all text-left ${
-                        active ? 'border-[#C6904D] bg-[#FF6A2A]/10' : 'border-white/[0.08] hover:border-white/[0.1] bg-[#162E3D]'
+                        active ? 'border-[#FF6A2A] bg-[#FF6A2A]/10' : 'border-slate-200 hover:border-slate-300 bg-[#162E3D]'
                       }`}
                     >
-                      <div className={`flex-shrink-0 ${active ? 'text-[#FF6A2A]' : 'text-[#6B7C86]'}`}>{cap.icon}</div>
+                      <div className={`flex-shrink-0 ${active ? 'text-[#FF6A2A]' : 'text-slate-400'}`}>{cap.icon}</div>
                       <div>
-                        <span className={`text-sm font-bold block ${active ? 'text-[#9a7039]' : 'text-[#9AADB8]'}`}>{cap.label}</span>
+                        <span className={`text-sm font-bold block ${active ? 'text-[#FF6A2A]' : 'text-slate-700'}`}>{cap.label}</span>
                         <span className="text-[11px] text-[#6B7C86] leading-tight">{cap.desc}</span>
                       </div>
                       {active && (
@@ -169,12 +169,12 @@ function RegisterForm() {
                   )
                 })}
               </div>
-              <p className="text-[11px] text-[#6B7C86] mt-2">Select both if you deliver AND need deliveries. You can change this later.</p>
+              <p className="text-[11px] text-slate-400 mt-2">Select both if you deliver AND need deliveries. You can change this later.</p>
             </div>
 
             {/* Role / account type */}
             <div>
-              <label className="block text-sm font-semibold text-[#F7F9FB] mb-3">Account type</label>
+              <label className="block text-sm font-semibold text-[#1a1a1a] mb-3">Account type</label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {roles.map((role) => (
                   <button
@@ -183,11 +183,11 @@ function RegisterForm() {
                     onClick={() => setFormData({ ...formData, role: role.value })}
                     className={`relative flex flex-col text-center p-3 rounded-xl border-2 transition-all ${
                       formData.role === role.value
-                        ? 'border-[#C6904D] bg-[#FF6A2A]/10'
-                        : 'border-white/[0.08] hover:border-white/[0.1] bg-[#162E3D]'
+                        ? 'border-[#FF6A2A] bg-[#FF6A2A]/10'
+                        : 'border-slate-200 hover:border-slate-300 bg-[#162E3D]'
                     }`}
                   >
-                    <span className={`text-xs font-bold block leading-tight ${formData.role === role.value ? 'text-[#9a7039]' : 'text-[#9AADB8]'}`}>
+                    <span className={`text-xs font-bold block leading-tight ${formData.role === role.value ? 'text-[#FF6A2A]' : 'text-slate-700'}`}>
                       {role.label}
                     </span>
                     <span className="text-[10px] text-[#6B7C86] mt-1 leading-tight hidden sm:block">{role.desc}</span>
@@ -197,23 +197,23 @@ function RegisterForm() {
             </div>
 
             <div>
-              <label htmlFor="name" className="block text-sm font-semibold text-[#F7F9FB] mb-2">Full Name</label>
+              <label htmlFor="name" className="block text-sm font-semibold text-[#1a1a1a] mb-2">Full Name</label>
               <input id="name" name="name" type="text" required className={inputClass} placeholder="John Smith" value={formData.name} onChange={handleChange} />
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-semibold text-[#F7F9FB] mb-2">Email</label>
+              <label htmlFor="email" className="block text-sm font-semibold text-[#1a1a1a] mb-2">Email</label>
               <input id="email" name="email" type="email" required autoComplete="email" className={inputClass} placeholder="you@company.com" value={formData.email} onChange={handleChange} />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-semibold text-[#F7F9FB] mb-2">Password</label>
+              <label htmlFor="password" className="block text-sm font-semibold text-[#1a1a1a] mb-2">Password</label>
               <div className="relative">
                 <input id="password" name="password" type={showPassword ? 'text' : 'password'} required autoComplete="new-password" minLength={8} className={`${inputClass} !pr-12`} placeholder="Min 8 chars, upper + lower + number" value={formData.password} onChange={handleChange} />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[#6B7C86] hover:text-[#9AADB8] transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-[#9AADB8] transition-colors"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? (
@@ -227,17 +227,17 @@ function RegisterForm() {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label htmlFor="company" className="block text-sm font-semibold text-[#F7F9FB] mb-2">Company</label>
+                <label htmlFor="company" className="block text-sm font-semibold text-[#1a1a1a] mb-2">Company</label>
                 <input id="company" name="company" type="text" className={inputClass} placeholder="Optional" value={formData.company} onChange={handleChange} />
               </div>
               <div>
-                <label htmlFor="phone" className="block text-sm font-semibold text-[#F7F9FB] mb-2">Phone</label>
+                <label htmlFor="phone" className="block text-sm font-semibold text-[#1a1a1a] mb-2">Phone</label>
                 <input id="phone" name="phone" type="tel" className={inputClass} placeholder="Optional" value={formData.phone} onChange={handleChange} />
               </div>
             </div>
 
             <label className="flex items-start gap-2.5 cursor-pointer">
-              <input type="checkbox" checked={acceptedTerms} onChange={e => setAcceptedTerms(e.target.checked)} className="mt-0.5 w-4 h-4 rounded border-white/[0.1] text-[#FF6A2A] focus:ring-[#1E6F8F]" />
+              <input type="checkbox" checked={acceptedTerms} onChange={e => setAcceptedTerms(e.target.checked)} className="mt-0.5 w-4 h-4 rounded border-slate-300 text-[#FF6A2A] focus:ring-[#FF6A2A]" />
               <span className="text-sm text-[#9AADB8]">
                 I agree to the <Link href="/terms" className="text-[#FF6A2A] underline">Terms of Service</Link> and <Link href="/privacy" className="text-[#FF6A2A] underline">Privacy Policy</Link>
               </span>
@@ -254,14 +254,14 @@ function RegisterForm() {
           </form>
 
           <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/[0.08]" /></div>
-            <div className="relative flex justify-center text-xs"><span className="bg-[#162E3D] px-3 text-[#6B7C86] uppercase tracking-wider font-medium">or</span></div>
+            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-[#e8e4de]" /></div>
+            <div className="relative flex justify-center text-xs"><span className="bg-[#162E3D] px-3 text-slate-400 uppercase tracking-wider font-medium">or</span></div>
           </div>
 
           {process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ? (
             pendingGoogleToken ? (
               <button onClick={handleGoogleWithRole} disabled={loading || !formData.role}
-                className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded border border-white/[0.08] bg-[#162E3D] text-sm font-medium text-[#F7F9FB] hover:bg-[#162E3D] transition-colors disabled:opacity-50">
+                className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded border border-[#e8e4de] bg-[#162E3D] text-sm font-medium text-[#1a1a1a] hover:bg-[#faf9f7] transition-colors disabled:opacity-50">
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />
                   <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
@@ -277,7 +277,7 @@ function RegisterForm() {
             <button
               type="button"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded border border-white/[0.08] bg-[#162E3D] text-sm font-medium text-[#F7F9FB] hover:bg-[#162E3D] transition-colors disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded border border-[#e8e4de] bg-[#162E3D] text-sm font-medium text-[#1a1a1a] hover:bg-[#faf9f7] transition-colors disabled:opacity-50"
               onClick={() => setError('Google sign-in requires configuration. Please use email/password.')}
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -292,7 +292,7 @@ function RegisterForm() {
 
           <p className="mt-8 text-center text-sm text-[#6B7C86]">
             Already have an account?{' '}
-            <Link href="/login" className="font-semibold text-[#FF6A2A] hover:text-[#E85A1E]">Sign in</Link>
+            <Link href="/login" className="font-semibold text-[#FF6A2A] hover:text-[#b07d3f]">Sign in</Link>
           </p>
         </div>
       </div>

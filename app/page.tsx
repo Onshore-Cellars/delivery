@@ -5,69 +5,82 @@ import Image from 'next/image'
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[#162E3D]">
+    <div className="min-h-screen bg-[#0B1F2A]">
       {/* ─── HERO ─── */}
-      <section className="relative bg-gradient-to-br from-[#1d1916] via-[#2C2520] to-[#1d1916] overflow-hidden">
-        {/* Background grid */}
-        <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '32px 32px' }} />
-        {/* Background glow */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-[#FF6A2A]/10 rounded-full blur-[120px]" />
+      <section className="relative overflow-hidden">
+        {/* Background effects */}
+        <div className="absolute inset-0 pointer-events-none" style={{
+          background: 'radial-gradient(ellipse 70% 60% at 80% 30%, rgba(30,111,143,0.18) 0%, transparent 70%), radial-gradient(ellipse 40% 40% at 10% 80%, rgba(255,106,42,0.07) 0%, transparent 60%)'
+        }} />
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '32px 32px' }} />
 
         <div className="relative site-container pt-36 sm:pt-48 pb-24 sm:pb-32">
           {/* Eyebrow */}
-          <div className="animate-fade-up inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#162E3D]/[0.07] border border-white/10 mb-10">
-            <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-            <span className="text-xs font-semibold text-stone-300 tracking-wide uppercase">Now serving 50+ ports</span>
+          <div className="animate-fade-up flex items-center gap-3 mb-8">
+            <span className="font-[family-name:var(--font-mono)] text-[11px] tracking-[0.2em] uppercase text-[#268CB5]">Marine-Grade Logistics</span>
+            <div className="flex-1 max-w-[200px] h-px bg-[#1E6F8F]/30" />
           </div>
 
-          <h1 className="animate-fade-up text-[1.75rem] sm:text-[2.75rem] md:text-[3.5rem] leading-[1.1] font-light text-white tracking-wide max-w-2xl" style={{ fontFamily: 'var(--font-display)' }}>
-            One van, not five.{' '}
-            <span className="gradient-text">Smarter deliveries.</span>
+          <h1 className="animate-fade-up font-[family-name:var(--font-display)] text-[2.5rem] sm:text-[4rem] md:text-[5.5rem] leading-[0.95] font-light text-[#F7F9FB] tracking-[-0.01em] max-w-3xl">
+            ON.SHORE<br />
+            <em className="text-[#268CB5] italic">Delivery</em>
           </h1>
 
-          <p className="animate-fade-up mt-6 text-[15px] sm:text-lg text-[#6B7C86] max-w-lg leading-relaxed" style={{ animationDelay: '80ms' }}>
+          <div className="animate-fade-up mt-8 flex items-center gap-4" style={{ animationDelay: '80ms' }}>
+            <div className="w-8 h-px bg-[#FF6A2A]" />
+            <span className="font-[family-name:var(--font-mono)] text-[12px] tracking-[0.18em] uppercase text-[#6B7C86]">Precision logistics for high-value environments</span>
+          </div>
+
+          <p className="animate-fade-up mt-8 text-[15px] sm:text-lg text-[#9AADB8] max-w-lg leading-relaxed" style={{ animationDelay: '120ms' }}>
             Stop sending five vans to the same yacht. Consolidate deliveries, book return legs, and get last-minute orders to your vessel or shipyard &mdash; fast.
           </p>
 
-          <div className="animate-fade-up mt-10 flex flex-col sm:flex-row gap-4" style={{ animationDelay: '160ms' }}>
-            <Link href="/marketplace" className="btn-primary text-[15px] sm:text-base !px-7">
+          <div className="animate-fade-up mt-10 flex flex-col sm:flex-row gap-4" style={{ animationDelay: '200ms' }}>
+            <Link href="/marketplace" className="btn-primary !text-[13px] sm:!text-sm !px-8">
               Find Available Space
             </Link>
-            <Link href="/listings/create" className="btn-outline text-[15px] sm:text-base">
+            <Link href="/listings/create" className="btn-outline !text-[13px] sm:!text-sm">
               List Your Van Space
             </Link>
           </div>
 
           {/* Stats row */}
-          <div className="animate-fade-up mt-16 sm:mt-20 flex gap-8 sm:gap-12" style={{ animationDelay: '240ms' }}>
+          <div className="animate-fade-up mt-16 sm:mt-20 flex gap-8 sm:gap-14" style={{ animationDelay: '280ms' }}>
             {[
               { value: '200+', label: 'Active carriers' },
               { value: '98%', label: 'On-time rate' },
               { value: '4.9', label: 'Avg rating' },
             ].map(stat => (
               <div key={stat.label}>
-                <div className="text-xl sm:text-3xl font-bold text-white">{stat.value}</div>
-                <div className="text-xs sm:text-sm text-[#6B7C86] mt-0.5">{stat.label}</div>
+                <div className="font-[family-name:var(--font-mono)] text-xl sm:text-3xl font-medium text-[#F7F9FB]">{stat.value}</div>
+                <div className="font-[family-name:var(--font-mono)] text-[11px] tracking-[0.15em] uppercase text-[#6B7C86] mt-1">{stat.label}</div>
               </div>
             ))}
+          </div>
+
+          {/* Tagline */}
+          <div className="animate-fade-up mt-16 inline-block border border-[#1E6F8F]/40 px-6 py-4 relative" style={{ animationDelay: '360ms' }}>
+            <span className="absolute top-[-0.5em] left-4 text-3xl text-[#1E6F8F] leading-none font-[family-name:var(--font-display)]">&ldquo;</span>
+            <span className="font-[family-name:var(--font-display)] text-xl italic font-light text-[#D6C3A3]">Not a courier. A marine-grade logistics layer.</span>
           </div>
         </div>
       </section>
 
       {/* ─── WHAT DO YOU NEED ─── */}
-      <section className="bg-[#162E3D]">
+      <section className="border-t border-white/[0.07]">
         <div className="site-container py-20 sm:py-28">
           <div className="mb-12 sm:mb-16">
-            <h2 className="text-[1.5rem] sm:text-[2.25rem] font-light text-[#F7F9FB] tracking-wide leading-tight" style={{ fontFamily: 'var(--font-display)' }}>
-              What do you need?
+            <span className="font-[family-name:var(--font-mono)] text-[10px] tracking-[0.25em] uppercase text-[#FF6A2A] block mb-2">01 — Services</span>
+            <h2 className="font-[family-name:var(--font-display)] text-[1.5rem] sm:text-[2.5rem] font-light text-[#F7F9FB] tracking-[-0.01em] leading-tight">
+              What do you <em className="text-[#268CB5] italic">need?</em>
             </h2>
-            <p className="mt-2 text-[15px] sm:text-lg text-[#6B7C86]">
+            <p className="mt-2 text-[15px] text-[#6B7C86] max-w-[540px]">
               Whether you&apos;re shipping or filling spare capacity.
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <Link href="/marketplace" className="group block rounded-lg border-2 border-white/[0.08] bg-[#162E3D] p-7 sm:p-9 hover:no-underline hover:border-[#C6904D]/40 hover:shadow-xl hover:shadow-[#C6904D]/5 transition-all duration-300">
+            <Link href="/marketplace" className="group block rounded-md border border-white/[0.06] bg-[#162E3D] p-7 sm:p-9 hover:no-underline hover:border-[#1E6F8F]/40 hover:shadow-xl hover:shadow-[#1E6F8F]/5 transition-all duration-300 hover:-translate-y-1">
               <div className="w-12 h-12 rounded-lg bg-[#FF6A2A] flex items-center justify-center mb-5">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
@@ -83,8 +96,8 @@ export default function Home() {
               </span>
             </Link>
 
-            <Link href="/listings/create" className="group block rounded-lg border-2 border-white/[0.08] bg-[#162E3D] p-7 sm:p-9 hover:no-underline hover:border-stone-300 hover:shadow-xl hover:shadow-stone-500/5 transition-all duration-300">
-              <div className="w-12 h-12 rounded-lg bg-stone-900 flex items-center justify-center mb-5">
+            <Link href="/listings/create" className="group block rounded-md border border-white/[0.06] bg-[#162E3D] p-7 sm:p-9 hover:no-underline hover:border-[#1E6F8F]/40 hover:shadow-xl hover:shadow-[#1E6F8F]/5 transition-all duration-300 hover:-translate-y-1">
+              <div className="w-12 h-12 rounded-lg bg-[#1E6F8F] flex items-center justify-center mb-5">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                 </svg>
@@ -103,28 +116,27 @@ export default function Home() {
       </section>
 
       {/* ─── HOW IT WORKS ─── */}
-      <section className="bg-[#102535] border-y border-white/[0.08]/60">
+      <section className="border-t border-white/[0.07]">
         <div className="site-container py-20 sm:py-28">
           <div className="mb-12 sm:mb-16">
-            <h2 className="text-[1.5rem] sm:text-[2.25rem] font-light text-[#F7F9FB] tracking-wide" style={{ fontFamily: 'var(--font-display)' }}>
-              How it works
+            <span className="font-[family-name:var(--font-mono)] text-[10px] tracking-[0.25em] uppercase text-[#FF6A2A] block mb-2">02 — Process</span>
+            <h2 className="font-[family-name:var(--font-display)] text-[1.5rem] sm:text-[2.5rem] font-light text-[#F7F9FB] tracking-[-0.01em]">
+              How it <em className="text-[#268CB5] italic">works</em>
             </h2>
-            <p className="mt-2 text-[15px] sm:text-lg text-[#6B7C86]">
+            <p className="mt-2 text-[15px] text-[#6B7C86]">
               Book cargo space in three simple steps.
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             {[
-              { num: '1', title: 'Find a route', desc: 'Search by port, date, and cargo type. See real-time availability across the Med.', icon: 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' },
-              { num: '2', title: 'Book & pay', desc: 'Reserve the exact space you need. Secure checkout with instant confirmation.', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' },
-              { num: '3', title: 'Delivered dockside', desc: 'Track in real-time. Your goods arrive direct to the marina berth.', icon: 'M5 13l4 4L19 7' },
+              { num: '01', title: 'Find a route', desc: 'Search by port, date, and cargo type. See real-time availability across the Med.' },
+              { num: '02', title: 'Book & pay', desc: 'Reserve the exact space you need. Secure checkout with instant confirmation.' },
+              { num: '03', title: 'Delivered dockside', desc: 'Track in real-time. Your goods arrive direct to the marina berth.' },
             ].map(step => (
-              <div key={step.num} className="bg-[#162E3D] rounded-lg border border-white/[0.08] p-7">
+              <div key={step.num} className="bg-[#162E3D] rounded-md border border-white/[0.06] p-7">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded bg-[#FF6A2A]/15 flex items-center justify-center">
-                    <span className="text-sm font-bold text-[#FF6A2A]">{step.num}</span>
-                  </div>
+                  <div className="font-[family-name:var(--font-mono)] text-2xl font-light text-[#FF6A2A]/25">{step.num}</div>
                   <h3 className="text-base font-bold text-[#F7F9FB]">{step.title}</h3>
                 </div>
                 <p className="text-sm text-[#6B7C86] leading-relaxed">{step.desc}</p>
@@ -135,19 +147,14 @@ export default function Home() {
       </section>
 
       {/* ─── TWO-WAY ROUTES ─── */}
-      <section className="bg-[#162E3D] border-b border-stone-100">
+      <section className="border-t border-white/[0.07]">
         <div className="site-container py-20 sm:py-28">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 items-center">
             <div>
-              <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-[#FF6A2A]/10 border border-[#C6904D]/20 mb-5">
-                <svg className="w-4 h-4 text-[#FF6A2A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                </svg>
-                <span className="text-xs font-semibold text-[#FF6A2A] tracking-wide uppercase">Two-Way Routes</span>
-              </div>
-              <h2 className="text-[1.5rem] sm:text-[2.25rem] font-light text-[#F7F9FB] tracking-wide leading-tight mb-4" style={{ fontFamily: 'var(--font-display)' }}>
+              <span className="font-[family-name:var(--font-mono)] text-[10px] tracking-[0.25em] uppercase text-[#FF6A2A] block mb-2">03 — Returns</span>
+              <h2 className="font-[family-name:var(--font-display)] text-[1.5rem] sm:text-[2.5rem] font-light text-[#F7F9FB] tracking-[-0.01em] leading-tight mb-4">
                 Full there.{' '}
-                <span className="text-[#FF6A2A]">Empty back?</span>{' '}
+                <em className="text-[#268CB5] italic">Empty back?</em>{' '}
                 Not anymore.
               </h2>
               <p className="text-[15px] text-[#6B7C86] leading-relaxed mb-6">
@@ -161,7 +168,7 @@ export default function Home() {
                   'Halve the number of vans at the marina',
                 ].map(item => (
                   <li key={item} className="flex items-start gap-2.5 text-sm text-[#9AADB8]">
-                    <svg className="w-4 h-4 text-[#FF6A2A] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 text-[#9ED36A] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                     </svg>
                     {item}
@@ -169,7 +176,7 @@ export default function Home() {
                 ))}
               </ul>
             </div>
-            <div className="bg-[#102535] rounded-2xl border border-white/[0.08] p-6 sm:p-8">
+            <div className="bg-[#162E3D] rounded-xl border border-white/[0.06] p-6 sm:p-8">
               <div className="space-y-4">
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-full bg-[#9ED36A]/15 flex items-center justify-center flex-shrink-0">
@@ -179,9 +186,9 @@ export default function Home() {
                   </div>
                   <div className="flex-1">
                     <div className="text-sm font-bold text-[#F7F9FB]">Outbound &mdash; Antibes to Monaco</div>
-                    <div className="text-xs text-[#6B7C86] mt-0.5">Provisions, wine, engine parts &middot; 850kg loaded</div>
-                    <div className="mt-2 h-2 bg-[#9ED36A]/15 rounded-full">
-                      <div className="h-full bg-[#9ED36A]/100 rounded-full" style={{ width: '85%' }} />
+                    <div className="font-[family-name:var(--font-mono)] text-xs text-[#6B7C86] mt-0.5">Provisions, wine, engine parts &middot; 850kg loaded</div>
+                    <div className="mt-2 h-2 bg-[#9ED36A]/10 rounded-full">
+                      <div className="h-full bg-[#9ED36A] rounded-full" style={{ width: '85%' }} />
                     </div>
                   </div>
                 </div>
@@ -198,15 +205,15 @@ export default function Home() {
                   </div>
                   <div className="flex-1">
                     <div className="text-sm font-bold text-[#F7F9FB]">Return &mdash; Monaco to Antibes</div>
-                    <div className="text-xs text-[#6B7C86] mt-0.5">Crew luggage, warranty returns &middot; 200kg booked</div>
-                    <div className="mt-2 h-2 bg-[#FF6A2A]/20 rounded-full">
+                    <div className="font-[family-name:var(--font-mono)] text-xs text-[#6B7C86] mt-0.5">Crew luggage, warranty returns &middot; 200kg booked</div>
+                    <div className="mt-2 h-2 bg-[#FF6A2A]/10 rounded-full">
                       <div className="h-full bg-[#FF6A2A] rounded-full" style={{ width: '20%' }} />
                     </div>
                   </div>
                 </div>
               </div>
               <div className="mt-6 text-center">
-                <span className="text-xs text-[#6B7C86]">Space available on both legs</span>
+                <span className="font-[family-name:var(--font-mono)] text-xs text-[#6B7C86]">Space available on both legs</span>
               </div>
             </div>
           </div>
@@ -214,14 +221,15 @@ export default function Home() {
       </section>
 
       {/* ─── POPULAR ROUTES ─── */}
-      <section className="bg-[#162E3D]">
+      <section className="border-t border-white/[0.07]">
         <div className="site-container py-20 sm:py-28">
           <div className="flex items-end justify-between mb-10">
             <div>
-              <h2 className="text-[1.5rem] sm:text-[2.25rem] font-light text-[#F7F9FB] tracking-wide" style={{ fontFamily: 'var(--font-display)' }}>
-                Popular routes
+              <span className="font-[family-name:var(--font-mono)] text-[10px] tracking-[0.25em] uppercase text-[#FF6A2A] block mb-2">04 — Routes</span>
+              <h2 className="font-[family-name:var(--font-display)] text-[1.5rem] sm:text-[2.5rem] font-light text-[#F7F9FB] tracking-[-0.01em]">
+                Popular <em className="text-[#268CB5] italic">routes</em>
               </h2>
-              <p className="mt-2 text-[15px] sm:text-lg text-[#6B7C86]">Top Mediterranean destinations.</p>
+              <p className="mt-2 text-[15px] text-[#6B7C86]">Top Mediterranean destinations.</p>
             </div>
             <Link href="/marketplace" className="hidden sm:inline-flex items-center gap-1 text-[#FF6A2A] text-sm font-semibold hover:underline">
               View all
@@ -238,15 +246,15 @@ export default function Home() {
               <Link
                 key={route.from + route.to}
                 href={`/marketplace?origin=${route.from}&destination=${route.to}`}
-                className="group block rounded-lg border-2 border-white/[0.08] p-4 sm:p-5 hover:no-underline hover:border-[#C6904D]/40 hover:shadow-lg transition-all"
+                className="group block rounded-md border border-white/[0.06] bg-[#162E3D] p-4 sm:p-5 hover:no-underline hover:border-[#1E6F8F]/40 hover:shadow-lg hover:-translate-y-1 transition-all"
               >
                 <div className="flex items-center gap-2 mb-3">
                   <span className="text-base">{route.emoji}</span>
-                  <span className="text-[11px] text-[#6B7C86] font-semibold uppercase tracking-wider">{route.region}</span>
+                  <span className="font-[family-name:var(--font-mono)] text-[10px] text-[#6B7C86] font-medium tracking-[0.15em] uppercase">{route.region}</span>
                 </div>
                 <div className="space-y-1">
                   <div className="font-bold text-[#F7F9FB] text-sm">{route.from}</div>
-                  <svg className="w-4 h-4 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-[#1E6F8F]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                   </svg>
                   <div className="font-bold text-[#F7F9FB] text-sm">{route.to}</div>
@@ -264,11 +272,16 @@ export default function Home() {
       </section>
 
       {/* ─── FOR WHO ─── */}
-      <section className="bg-[#102535] border-y border-white/[0.08]/60">
+      <section className="border-t border-white/[0.07]">
         <div className="site-container py-20 sm:py-28">
+          <span className="font-[family-name:var(--font-mono)] text-[10px] tracking-[0.25em] uppercase text-[#FF6A2A] block mb-2">05 — Who</span>
+          <h2 className="font-[family-name:var(--font-display)] text-[1.5rem] sm:text-[2.5rem] font-light text-[#F7F9FB] tracking-[-0.01em] mb-12">
+            Built for <em className="text-[#268CB5] italic">maritime</em>
+          </h2>
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-            <div className="rounded-lg bg-[#162E3D] border-2 border-white/[0.08] p-6 sm:p-8">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#FF6A2A]/10 text-[#9a7039] rounded text-xs font-bold mb-5 uppercase tracking-wide">
+            <div className="rounded-md bg-[#162E3D] border border-white/[0.06] p-6 sm:p-8">
+              <div className="font-[family-name:var(--font-mono)] inline-flex items-center gap-2 px-3 py-1.5 bg-[#FF6A2A]/10 text-[#FF6A2A] rounded text-[10px] tracking-[0.15em] uppercase font-bold mb-5">
                 Carriers
               </div>
               <h3 className="text-xl font-semibold text-[#F7F9FB] mb-3">For carriers & drivers</h3>
@@ -277,8 +290,8 @@ export default function Home() {
               </p>
               <ul className="space-y-3 mb-8">
                 {['List both outbound & return legs', 'Set your own prices per direction', 'Get paid directly via Stripe', 'No more empty return journeys'].map(item => (
-                  <li key={item} className="flex items-start gap-3 text-sm text-[#F7F9FB]">
-                    <svg className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <li key={item} className="flex items-start gap-3 text-sm text-[#9AADB8]">
+                    <svg className="w-5 h-5 text-[#9ED36A] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                     </svg>
                     {item}
@@ -290,8 +303,8 @@ export default function Home() {
               </Link>
             </div>
 
-            <div className="rounded-lg bg-[#162E3D] border-2 border-white/[0.08] p-6 sm:p-8">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#FF6A2A]/10 text-[#9a7039] rounded text-xs font-bold mb-5 uppercase tracking-wide">
+            <div className="rounded-md bg-[#162E3D] border border-white/[0.06] p-6 sm:p-8">
+              <div className="font-[family-name:var(--font-mono)] inline-flex items-center gap-2 px-3 py-1.5 bg-[#1E6F8F]/15 text-[#268CB5] rounded text-[10px] tracking-[0.15em] uppercase font-bold mb-5">
                 Crew &amp; Vendors
               </div>
               <h3 className="text-xl font-semibold text-[#F7F9FB] mb-3">For crew, vendors &amp; fleet managers</h3>
@@ -300,8 +313,8 @@ export default function Home() {
               </p>
               <ul className="space-y-3 mb-8">
                 {['Book outbound & return journeys', 'MMSI tracking — deliveries follow your vessel', 'Live driver tracking with ETA & SMS alerts', 'Secure payment with protection'].map(item => (
-                  <li key={item} className="flex items-start gap-3 text-sm text-[#F7F9FB]">
-                    <svg className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <li key={item} className="flex items-start gap-3 text-sm text-[#9AADB8]">
+                    <svg className="w-5 h-5 text-[#9ED36A] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                     </svg>
                     {item}
@@ -317,32 +330,34 @@ export default function Home() {
       </section>
 
       {/* ─── CTA ─── */}
-      <section className="bg-gradient-to-br from-[#1d1916] to-[#2C2520]">
+      <section className="border-t border-[#FF6A2A]/15">
         <div className="site-container py-20 sm:py-28 text-center">
-          <h2 className="text-[1.5rem] sm:text-[2.25rem] lg:text-[2.75rem] font-light text-white tracking-wide leading-tight" style={{ fontFamily: 'var(--font-display)' }}>
-            Stop sending empty vans.
-          </h2>
-          <p className="mt-4 text-[15px] sm:text-lg text-[#6B7C86] max-w-md mx-auto">
-            Join crew, vendors, fleet managers, and carriers making maritime logistics smarter.
-          </p>
-          <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/register" className="btn-primary text-[15px] sm:text-base !px-8">
-              Create Free Account
-            </Link>
-            <Link href="/marketplace" className="btn-outline text-[15px] sm:text-base">
-              Browse Marketplace
-            </Link>
+          <div className="max-w-2xl mx-auto">
+            <div className="bg-gradient-to-br from-[#1E6F8F]/15 to-transparent border border-[#1E6F8F]/25 rounded-md p-10 sm:p-14">
+              <span className="font-[family-name:var(--font-mono)] text-[10px] tracking-[0.25em] uppercase text-[#268CB5] block mb-4">Core positioning</span>
+              <h2 className="font-[family-name:var(--font-display)] text-[1.4rem] sm:text-[2.2rem] font-light italic text-[#D6C3A3] leading-[1.3]">
+                &ldquo;Marine-grade logistics infrastructure<br />for high-value environments.&rdquo;
+              </h2>
+              <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+                <Link href="/register" className="btn-primary !text-sm !px-8">
+                  Create Free Account
+                </Link>
+                <Link href="/marketplace" className="btn-outline !text-sm">
+                  Browse Marketplace
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* ─── FOOTER ─── */}
-      <footer className="bg-[#162E3D] border-t border-white/[0.08] pb-20 md:pb-0">
+      <footer className="border-t border-white/[0.06] bg-[#0B1F2A] pb-20 md:pb-0">
         <div className="site-container py-10 sm:py-12">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
             <div className="flex items-center gap-2.5">
-              <Image src="/logo.png" alt="Onshore Deliver" width={28} height={28} className="rounded-sm" />
-              <span className="text-sm font-semibold text-[#F7F9FB] tracking-wide" style={{ fontFamily: 'var(--font-display)' }}>Onshore Deliver</span>
+              <Image src="/logo.png" alt="ON.SHORE Delivery" width={28} height={28} className="rounded-sm" />
+              <span className="font-[family-name:var(--font-display)] text-sm font-light text-[#6B7C86] tracking-wide">Onshore Group · Brand System</span>
             </div>
             <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-[#6B7C86]">
               <Link href="/about" className="text-[#6B7C86] hover:text-[#F7F9FB] hover:no-underline transition-colors">About</Link>
@@ -351,8 +366,11 @@ export default function Home() {
               <Link href="/help" className="text-[#6B7C86] hover:text-[#F7F9FB] hover:no-underline transition-colors">Support</Link>
             </div>
           </div>
-          <div className="mt-6 pt-6 border-t border-stone-100">
-            <p className="text-xs text-[#6B7C86]">&copy; {new Date().getFullYear()} Onshore Deliver. All rights reserved.</p>
+          <div className="mt-6 pt-6 border-t border-white/[0.04]">
+            <div className="flex justify-between items-center">
+              <p className="text-xs text-[#6B7C86]">&copy; {new Date().getFullYear()} Onshore Group. All rights reserved.</p>
+              <p className="font-[family-name:var(--font-mono)] text-[10px] text-[#6B7C86]/50 tracking-[0.15em] uppercase">ON.SHORE DELIVERY · v1.0</p>
+            </div>
           </div>
         </div>
       </footer>

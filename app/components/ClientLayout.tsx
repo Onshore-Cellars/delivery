@@ -15,8 +15,8 @@ function Footer() {
     <footer className="border-t border-white/[0.06] bg-[#0B1F2A]">
       <div className="site-container py-8">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#6B7C86]">
-          <p className="font-[family-name:var(--font-display)] text-sm font-light text-[#6B7C86]">&copy; {new Date().getFullYear()} Onshore Deliver. All rights reserved.</p>
-          <div className="flex gap-6 font-[family-name:var(--font-mono)] text-[10px] tracking-[0.15em] uppercase">
+          <p className="font-[family-name:var(--font-display)] text-sm font-light text-[#6B7C86]">&copy; {new Date().getFullYear()} Onshore Group · ON.SHORE Delivery</p>
+          <div className="flex gap-6">
             <Link href="/about" className="text-[#6B7C86] hover:text-[#F7F9FB] hover:no-underline transition-colors">About</Link>
             <Link href="/terms" className="text-[#6B7C86] hover:text-[#F7F9FB] hover:no-underline transition-colors">Terms</Link>
             <Link href="/privacy" className="text-[#6B7C86] hover:text-[#F7F9FB] hover:no-underline transition-colors">Privacy</Link>

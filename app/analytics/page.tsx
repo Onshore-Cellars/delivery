@@ -42,9 +42,9 @@ export default function AnalyticsPage() {
     if (user && !user.canCarry) setTab('shipper')
   }, [user])
 
-  if (authLoading) return <div className="min-h-screen bg-[#102535]" />
+  if (authLoading) return <div className="min-h-screen bg-[#faf9f7]" />
   if (!user) return (
-    <div className="min-h-screen bg-[#102535] flex items-center justify-center">
+    <div className="min-h-screen bg-[#faf9f7] flex items-center justify-center">
       <p className="text-[#6B7C86]">Please <Link href="/login" className="text-[#FF6A2A]">sign in</Link></p>
     </div>
   )
@@ -57,15 +57,15 @@ export default function AnalyticsPage() {
   const maxBar = (values: number[]) => Math.max(...values, 1)
 
   return (
-    <div id="main-content" className="min-h-screen bg-[#102535] py-8 px-4">
+    <div id="main-content" className="min-h-screen bg-[#faf9f7] py-8 px-4">
       <div className="max-w-5xl mx-auto">
-        <h1 className="text-2xl font-bold text-[#F7F9FB] mb-6" style={{ fontFamily: 'var(--font-display)' }}>Analytics</h1>
+        <h1 className="text-2xl font-bold text-[#1a1a1a] mb-6" style={{ fontFamily: 'var(--font-display)' }}>Analytics</h1>
 
         {user.canCarry && (
           <div className="flex gap-2 mb-6">
             {(['carrier', 'shipper'] as const).map(t => (
               <button key={t} onClick={() => setTab(t)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${tab === t ? 'bg-[#1a1a1a] text-white' : 'bg-[#162E3D] border border-white/[0.08] text-[#F7F9FB]'}`}>
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${tab === t ? 'bg-[#1a1a1a] text-white' : 'bg-[#162E3D] border border-[#e8e4de] text-[#1a1a1a]'}`}>
                 {t === 'carrier' ? 'Carrier' : 'Shipper'}
               </button>
             ))}
@@ -74,10 +74,10 @@ export default function AnalyticsPage() {
 
         {loading ? (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            {[1,2,3,4].map(i => <div key={i} className="h-24 bg-[#162E3D] rounded-lg border border-white/[0.08] animate-pulse" />)}
+            {[1,2,3,4].map(i => <div key={i} className="h-24 bg-[#162E3D] rounded-lg border border-[#e8e4de] animate-pulse" />)}
           </div>
         ) : !data ? (
-          <div className="text-center py-16 bg-[#162E3D] rounded-lg border border-white/[0.08]">
+          <div className="text-center py-16 bg-[#162E3D] rounded-lg border border-[#e8e4de]">
             <p className="text-[#6B7C86]">No analytics data available yet</p>
           </div>
         ) : tab === 'carrier' ? (
@@ -92,13 +92,13 @@ export default function AnalyticsPage() {
 
             <div className="grid md:grid-cols-2 gap-6 mb-8">
               {/* Monthly Revenue Chart */}
-              <div className="bg-[#162E3D] rounded-lg border border-white/[0.08] p-5">
-                <h3 className="font-semibold text-[#F7F9FB] mb-4">Monthly Revenue</h3>
+              <div className="bg-[#162E3D] rounded-lg border border-[#e8e4de] p-5">
+                <h3 className="font-semibold text-[#1a1a1a] mb-4">Monthly Revenue</h3>
                 <div className="space-y-3">
                   {data.carrier.monthlyRevenue.map(m => (
                     <div key={m.month} className="flex items-center gap-3">
                       <span className="text-xs text-[#6B7C86] w-16 flex-shrink-0">{m.month}</span>
-                      <div className="flex-1 bg-[#102535] rounded-full h-6 relative overflow-hidden">
+                      <div className="flex-1 bg-slate-100 rounded-full h-6 relative overflow-hidden">
                         <div
                           className="bg-[#9ED36A]/100 h-full rounded-full transition-all"
                           style={{ width: `${(m.revenue / maxBar(data.carrier.monthlyRevenue.map(x => x.revenue))) * 100}%` }}
@@ -113,21 +113,21 @@ export default function AnalyticsPage() {
               </div>
 
               {/* Top Routes */}
-              <div className="bg-[#162E3D] rounded-lg border border-white/[0.08] p-5">
-                <h3 className="font-semibold text-[#F7F9FB] mb-4">Top Routes</h3>
+              <div className="bg-[#162E3D] rounded-lg border border-[#e8e4de] p-5">
+                <h3 className="font-semibold text-[#1a1a1a] mb-4">Top Routes</h3>
                 {data.carrier.topRoutes.length === 0 ? (
-                  <p className="text-sm text-[#6B7C86]">No routes yet</p>
+                  <p className="text-sm text-slate-400">No routes yet</p>
                 ) : (
                   <div className="space-y-3">
                     {data.carrier.topRoutes.map((r, i) => (
                       <div key={r.route} className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <span className="w-5 h-5 rounded-full bg-[#FF6A2A]/10 text-[#FF6A2A] text-[10px] font-bold flex items-center justify-center">{i + 1}</span>
-                          <span className="text-sm text-[#F7F9FB]">{r.route}</span>
+                          <span className="text-sm text-[#1a1a1a]">{r.route}</span>
                         </div>
                         <div className="text-right">
-                          <div className="text-sm font-medium text-[#F7F9FB]">{r.count} bookings</div>
-                          <div className="text-xs text-[#6B7C86]">{fmt(r.revenue)}</div>
+                          <div className="text-sm font-medium text-[#1a1a1a]">{r.count} bookings</div>
+                          <div className="text-xs text-slate-400">{fmt(r.revenue)}</div>
                         </div>
                       </div>
                     ))}
@@ -145,20 +145,20 @@ export default function AnalyticsPage() {
             </div>
 
             {/* Listing Performance */}
-            <div className="bg-[#162E3D] rounded-lg border border-white/[0.08] p-5 mb-8">
-              <h3 className="font-semibold text-[#F7F9FB] mb-2">Listing Performance</h3>
+            <div className="bg-[#162E3D] rounded-lg border border-[#e8e4de] p-5 mb-8">
+              <h3 className="font-semibold text-[#1a1a1a] mb-2">Listing Performance</h3>
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div>
-                  <div className="text-2xl font-bold text-[#F7F9FB]">{data.carrier.totalViews.toLocaleString()}</div>
-                  <div className="text-xs text-[#6B7C86]">Total Views</div>
+                  <div className="text-2xl font-bold text-[#1a1a1a]">{data.carrier.totalViews.toLocaleString()}</div>
+                  <div className="text-xs text-slate-400">Total Views</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-[#F7F9FB]">{data.carrier.bookings30d}</div>
-                  <div className="text-xs text-[#6B7C86]">Bookings (30d)</div>
+                  <div className="text-2xl font-bold text-[#1a1a1a]">{data.carrier.bookings30d}</div>
+                  <div className="text-xs text-slate-400">Bookings (30d)</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-[#F7F9FB]">{data.carrier.bookings90d}</div>
-                  <div className="text-xs text-[#6B7C86]">Bookings (90d)</div>
+                  <div className="text-2xl font-bold text-[#1a1a1a]">{data.carrier.bookings90d}</div>
+                  <div className="text-xs text-slate-400">Bookings (90d)</div>
                 </div>
               </div>
             </div>
@@ -174,13 +174,13 @@ export default function AnalyticsPage() {
             </div>
 
             {/* Monthly Spending Chart */}
-            <div className="bg-[#162E3D] rounded-lg border border-white/[0.08] p-5 mb-8">
-              <h3 className="font-semibold text-[#F7F9FB] mb-4">Monthly Spending</h3>
+            <div className="bg-[#162E3D] rounded-lg border border-[#e8e4de] p-5 mb-8">
+              <h3 className="font-semibold text-[#1a1a1a] mb-4">Monthly Spending</h3>
               <div className="space-y-3">
                 {data.shipper.monthlySpending.map(m => (
                   <div key={m.month} className="flex items-center gap-3">
                     <span className="text-xs text-[#6B7C86] w-16 flex-shrink-0">{m.month}</span>
-                    <div className="flex-1 bg-[#102535] rounded-full h-6 relative overflow-hidden">
+                    <div className="flex-1 bg-slate-100 rounded-full h-6 relative overflow-hidden">
                       <div
                         className="bg-[#1E6F8F]/150 h-full rounded-full transition-all"
                         style={{ width: `${(m.spent / maxBar(data.shipper.monthlySpending.map(x => x.spent))) * 100}%` }}
@@ -198,25 +198,25 @@ export default function AnalyticsPage() {
 
         {/* Rating & Review Stats (shown for both) */}
         {data && (
-          <div className="bg-[#162E3D] rounded-lg border border-white/[0.08] p-5 mb-8">
-            <h3 className="font-semibold text-[#F7F9FB] mb-4">Rating</h3>
+          <div className="bg-[#162E3D] rounded-lg border border-[#e8e4de] p-5 mb-8">
+            <h3 className="font-semibold text-[#1a1a1a] mb-4">Rating</h3>
             <div className="flex items-center gap-8">
               <div>
-                <div className="text-4xl font-bold text-[#F7F9FB]">{data.rating.average}</div>
+                <div className="text-4xl font-bold text-[#1a1a1a]">{data.rating.average}</div>
                 <div className="flex items-center gap-1 mt-1">
                   {[1,2,3,4,5].map(s => (
                     <span key={s} className={`text-lg ${s <= Math.round(data.rating.average) ? 'text-[#FF6A2A]' : 'text-slate-200'}`}>★</span>
                   ))}
                 </div>
-                <div className="text-xs text-[#6B7C86] mt-1">{data.rating.totalReviews} reviews</div>
+                <div className="text-xs text-slate-400 mt-1">{data.rating.totalReviews} reviews</div>
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-[#6B7C86]">30-day avg:</span>
-                  <span className="text-sm font-semibold text-[#F7F9FB]">{data.rating.average30d}</span>
+                  <span className="text-sm font-semibold text-[#1a1a1a]">{data.rating.average30d}</span>
                   {data.rating.trend === 'up' && <span className="text-green-500 text-xs">↑ Improving</span>}
                   {data.rating.trend === 'down' && <span className="text-red-500 text-xs">↓ Declining</span>}
-                  {data.rating.trend === 'stable' && <span className="text-[#6B7C86] text-xs">→ Stable</span>}
+                  {data.rating.trend === 'stable' && <span className="text-slate-400 text-xs">→ Stable</span>}
                 </div>
               </div>
             </div>
@@ -225,13 +225,13 @@ export default function AnalyticsPage() {
 
         {/* Status Distribution */}
         {data && Object.keys(data.statusDistribution).length > 0 && (
-          <div className="bg-[#162E3D] rounded-lg border border-white/[0.08] p-5">
-            <h3 className="font-semibold text-[#F7F9FB] mb-4">Booking Status Distribution</h3>
+          <div className="bg-[#162E3D] rounded-lg border border-[#e8e4de] p-5">
+            <h3 className="font-semibold text-[#1a1a1a] mb-4">Booking Status Distribution</h3>
             <div className="flex flex-wrap gap-3">
               {Object.entries(data.statusDistribution).map(([status, count]) => (
-                <div key={status} className="px-3 py-2 rounded-lg bg-[#102535] border border-white/[0.08]">
-                  <div className="text-lg font-bold text-[#F7F9FB]">{count}</div>
-                  <div className="text-[10px] text-[#6B7C86] uppercase tracking-wider">{status.replace('_', ' ')}</div>
+                <div key={status} className="px-3 py-2 rounded-lg bg-[#faf9f7] border border-[#e8e4de]">
+                  <div className="text-lg font-bold text-[#1a1a1a]">{count}</div>
+                  <div className="text-[10px] text-slate-400 uppercase tracking-wider">{status.replace('_', ' ')}</div>
                 </div>
               ))}
             </div>
@@ -242,10 +242,10 @@ export default function AnalyticsPage() {
   )
 }
 
-function StatCard({ label, value, color = 'text-[#F7F9FB]' }: { label: string; value: string; color?: string }) {
+function StatCard({ label, value, color = 'text-[#1a1a1a]' }: { label: string; value: string; color?: string }) {
   return (
-    <div className="bg-[#162E3D] rounded-lg border border-white/[0.08] p-4">
-      <p className="text-xs text-[#6B7C86] font-medium uppercase tracking-wider mb-1">{label}</p>
+    <div className="bg-[#162E3D] rounded-lg border border-[#e8e4de] p-4">
+      <p className="text-xs text-slate-400 font-medium uppercase tracking-wider mb-1">{label}</p>
       <p className={`text-2xl font-bold ${color}`}>{value}</p>
     </div>
   )

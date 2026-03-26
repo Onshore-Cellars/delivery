@@ -76,9 +76,9 @@ export default function NotificationsPage() {
     SYSTEM: 'System',
   }
 
-  if (authLoading) return <div className="min-h-screen bg-[#102535]" />
+  if (authLoading) return <div className="min-h-screen bg-[#faf9f7]" />
   if (!user) return (
-    <div className="min-h-screen bg-[#102535] flex items-center justify-center">
+    <div className="min-h-screen bg-[#faf9f7] flex items-center justify-center">
       <p className="text-[#6B7C86]">Please <Link href="/login" className="text-[#FF6A2A]">sign in</Link></p>
     </div>
   )
@@ -86,15 +86,15 @@ export default function NotificationsPage() {
   const unreadCount = notifications.filter(n => !n.read).length
 
   return (
-    <div id="main-content" className="min-h-screen bg-[#102535] py-8 px-4">
+    <div id="main-content" className="min-h-screen bg-[#faf9f7] py-8 px-4">
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-[#F7F9FB]" style={{ fontFamily: 'var(--font-display)' }}>Notifications</h1>
-            {unreadCount > 0 && <p className="text-xs text-[#6B7C86] mt-1">{unreadCount} unread</p>}
+            <h1 className="text-2xl font-bold text-[#1a1a1a]" style={{ fontFamily: 'var(--font-display)' }}>Notifications</h1>
+            {unreadCount > 0 && <p className="text-xs text-slate-400 mt-1">{unreadCount} unread</p>}
           </div>
           {unreadCount > 0 && (
-            <button onClick={markAllRead} className="px-4 py-2 border border-white/[0.08] rounded-lg text-sm font-medium text-[#F7F9FB] hover:bg-[#162E3D] transition-colors">
+            <button onClick={markAllRead} className="px-4 py-2 border border-[#e8e4de] rounded-lg text-sm font-medium text-[#1a1a1a] hover:bg-[#162E3D] transition-colors">
               Mark all read
             </button>
           )}
@@ -103,16 +103,16 @@ export default function NotificationsPage() {
         <div className="flex gap-2 mb-6">
           {(['all', 'unread'] as const).map(f => (
             <button key={f} onClick={() => setFilter(f)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${filter === f ? 'bg-[#1a1a1a] text-white' : 'bg-[#162E3D] border border-white/[0.08] text-[#F7F9FB] hover:bg-[#162E3D]'}`}>
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${filter === f ? 'bg-[#1a1a1a] text-white' : 'bg-[#162E3D] border border-[#e8e4de] text-[#1a1a1a] hover:bg-[#faf9f7]'}`}>
               {f === 'all' ? 'All' : 'Unread'}
             </button>
           ))}
         </div>
 
         {loading ? (
-          <div className="space-y-3">{[1,2,3,4].map(i => <div key={i} className="h-20 bg-[#162E3D] rounded-lg border border-white/[0.08] animate-pulse" />)}</div>
+          <div className="space-y-3">{[1,2,3,4].map(i => <div key={i} className="h-20 bg-[#162E3D] rounded-lg border border-[#e8e4de] animate-pulse" />)}</div>
         ) : notifications.length === 0 ? (
-          <div className="text-center py-16 bg-[#162E3D] rounded-lg border border-white/[0.08]">
+          <div className="text-center py-16 bg-[#162E3D] rounded-lg border border-[#e8e4de]">
             <p className="text-[#6B7C86]">{filter === 'unread' ? 'No unread notifications' : 'No notifications yet'}</p>
           </div>
         ) : (
@@ -120,18 +120,18 @@ export default function NotificationsPage() {
             {notifications.map(n => (
               <div key={n.id}
                 onClick={() => { if (!n.read) markRead(n.id) }}
-                className={`p-4 rounded-lg border transition-colors cursor-pointer ${n.read ? 'bg-[#162E3D] border-white/[0.08]' : 'bg-[#FF6A2A]/10/50 border-[#C6904D]/20'}`}>
+                className={`p-4 rounded-lg border transition-colors cursor-pointer ${n.read ? 'bg-[#162E3D] border-[#e8e4de]' : 'bg-[#FF6A2A]/10/50 border-[#FF6A2A]/20'}`}>
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
                       {!n.read && <span className="w-2 h-2 rounded-full bg-[#FF6A2A] flex-shrink-0" />}
-                      <span className="text-xs text-[#6B7C86] font-medium">{typeIcon[n.type] || n.type}</span>
+                      <span className="text-xs text-slate-400 font-medium">{typeIcon[n.type] || n.type}</span>
                     </div>
-                    <div className="text-sm font-medium text-[#F7F9FB]">{n.title}</div>
+                    <div className="text-sm font-medium text-[#1a1a1a]">{n.title}</div>
                     <div className="text-xs text-[#6B7C86] mt-0.5">{n.message}</div>
                   </div>
                   <div className="flex items-center gap-3 ml-4">
-                    <span className="text-[10px] text-[#6B7C86] whitespace-nowrap">{new Date(n.createdAt).toLocaleDateString()}</span>
+                    <span className="text-[10px] text-slate-400 whitespace-nowrap">{new Date(n.createdAt).toLocaleDateString()}</span>
                     {n.linkUrl && (
                       <Link href={n.linkUrl} className="text-xs text-[#FF6A2A] font-medium hover:underline whitespace-nowrap"
                         onClick={e => e.stopPropagation()}>View</Link>

@@ -95,23 +95,23 @@ export default function HelpPage() {
     <div className="page-container narrow">
       <div className="mb-8">
         <p className="text-[11px] font-semibold text-[#FF6A2A] uppercase tracking-[0.15em] mb-1">Support</p>
-        <h1 className="text-xl sm:text-2xl font-semibold text-[#F7F9FB] tracking-[-0.02em]">Help & Support</h1>
+        <h1 className="text-xl sm:text-2xl font-semibold text-[#1a1a1a] tracking-[-0.02em]">Help & Support</h1>
         <p className="mt-1.5 text-sm text-[#6B7C86]">Find answers to common questions or chat with our AI assistant</p>
       </div>
 
       {/* FAQ Section */}
       <div className="mb-8">
-        <h2 className="text-sm font-semibold text-[#F7F9FB] uppercase tracking-wider mb-3">Frequently Asked Questions</h2>
-        <div className="bg-[#162E3D] rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-white/[0.08] divide-y divide-slate-100">
+        <h2 className="text-sm font-semibold text-[#1a1a1a] uppercase tracking-wider mb-3">Frequently Asked Questions</h2>
+        <div className="bg-[#162E3D] rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] divide-y divide-slate-100">
           {faqs.map((faq, i) => (
             <div key={i}>
               <button
                 onClick={() => toggleFaq(i)}
-                className="w-full flex items-center justify-between px-4 sm:px-6 py-3.5 sm:py-4 text-left hover:bg-[#162E3D] active:bg-[#102535] transition-colors"
+                className="w-full flex items-center justify-between px-4 sm:px-6 py-3.5 sm:py-4 text-left hover:bg-slate-50 active:bg-slate-100 transition-colors"
               >
-                <span className="text-sm font-medium text-[#F7F9FB] pr-4">{faq.q}</span>
+                <span className="text-sm font-medium text-[#1d1d1f] pr-4">{faq.q}</span>
                 <svg
-                  className={`w-5 h-5 text-[#6B7C86] flex-shrink-0 transition-transform ${openFaq === i ? 'rotate-180' : ''}`}
+                  className={`w-5 h-5 text-slate-400 flex-shrink-0 transition-transform ${openFaq === i ? 'rotate-180' : ''}`}
                   fill="none" stroke="currentColor" viewBox="0 0 24 24"
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -129,8 +129,8 @@ export default function HelpPage() {
 
       {/* AI Chat Section */}
       <div className="mb-8">
-        <h2 className="text-sm font-semibold text-[#F7F9FB] uppercase tracking-wider mb-3">AI Support Assistant</h2>
-        <div className="bg-[#162E3D] rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-white/[0.08] overflow-hidden flex flex-col" style={{ height: '480px' }}>
+        <h2 className="text-sm font-semibold text-[#1a1a1a] uppercase tracking-wider mb-3">AI Support Assistant</h2>
+        <div className="bg-[#162E3D] rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] overflow-hidden flex flex-col" style={{ height: '480px' }}>
           {/* Chat messages */}
           <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
             {messages.map((msg, i) => (
@@ -138,7 +138,7 @@ export default function HelpPage() {
                 <div className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm ${
                   msg.role === 'user'
                     ? 'bg-[#FF6A2A] text-white rounded-br-md'
-                    : 'bg-[#102535] text-[#F7F9FB] rounded-bl-md'
+                    : 'bg-[#f5f5f7] text-[#1a1a1a] rounded-bl-md'
                 }`}>
                   <p className="whitespace-pre-wrap">{msg.content}</p>
                 </div>
@@ -146,7 +146,7 @@ export default function HelpPage() {
             ))}
             {sending && (
               <div className="flex justify-start">
-                <div className="bg-[#102535] text-[#F7F9FB] px-4 py-2.5 rounded-2xl rounded-bl-md">
+                <div className="bg-[#f5f5f7] text-[#1a1a1a] px-4 py-2.5 rounded-2xl rounded-bl-md">
                   <div className="flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                     <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
@@ -159,11 +159,11 @@ export default function HelpPage() {
           </div>
 
           {/* Chat input */}
-          <form onSubmit={sendMessage} className="p-4 border-t border-white/[0.06]">
+          <form onSubmit={sendMessage} className="p-4 border-t border-slate-100">
             <div className="flex gap-2">
               <input
                 type="text"
-                className="flex-1 px-4 py-2.5 rounded-xl border border-white/[0.08] text-sm text-[#F7F9FB] focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10 outline-none"
+                className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-[#1a1a1a] focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10 outline-none"
                 placeholder="Ask a question..."
                 value={input}
                 onChange={e => setInput(e.target.value)}

@@ -35,12 +35,12 @@ export default function CookieConsent() {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-[100] p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] animate-slideUp">
-      <div className="max-w-lg mx-auto bg-[#162E3D] rounded-xl shadow-2xl border border-white/[0.08] overflow-hidden">
+      <div className="max-w-lg mx-auto bg-[#162E3D] rounded-xl shadow-2xl border border-[#e8e4de] overflow-hidden">
         <div className="p-5">
           <div className="flex items-start gap-3 mb-3">
             <span className="text-xl mt-0.5">🍪</span>
             <div>
-              <h3 className="text-sm font-semibold text-[#F7F9FB]" style={{ fontFamily: 'var(--font-display)' }}>
+              <h3 className="text-sm font-semibold text-[#1a1a1a]" style={{ fontFamily: 'var(--font-display)' }}>
                 Cookie Preferences
               </h3>
               <p className="text-xs text-[#6B7C86] mt-1 leading-relaxed">
@@ -51,11 +51,11 @@ export default function CookieConsent() {
           </div>
 
           {showDetails && (
-            <div className="mt-4 space-y-3 border-t border-white/[0.08] pt-4">
+            <div className="mt-4 space-y-3 border-t border-[#e8e4de] pt-4">
               <label className="flex items-center justify-between cursor-not-allowed">
                 <div>
-                  <span className="text-sm font-medium text-[#F7F9FB]">Essential</span>
-                  <p className="text-xs text-[#6B7C86]">Authentication, security, preferences</p>
+                  <span className="text-sm font-medium text-[#1a1a1a]">Essential</span>
+                  <p className="text-xs text-slate-400">Authentication, security, preferences</p>
                 </div>
                 <div className="w-10 h-6 rounded-full bg-[#FF6A2A] relative">
                   <div className="absolute right-0.5 top-0.5 w-5 h-5 rounded-full bg-[#162E3D] shadow" />
@@ -64,8 +64,8 @@ export default function CookieConsent() {
 
               <label className="flex items-center justify-between cursor-pointer" onClick={() => setConsent(c => ({ ...c, analytics: !c.analytics }))}>
                 <div>
-                  <span className="text-sm font-medium text-[#F7F9FB]">Analytics</span>
-                  <p className="text-xs text-[#6B7C86]">Usage data to improve the platform</p>
+                  <span className="text-sm font-medium text-[#1a1a1a]">Analytics</span>
+                  <p className="text-xs text-slate-400">Usage data to improve the platform</p>
                 </div>
                 <div className={`w-10 h-6 rounded-full relative transition-colors ${consent.analytics ? 'bg-[#FF6A2A]' : 'bg-[#e8e4de]'}`}>
                   <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-[#162E3D] shadow transition-all ${consent.analytics ? 'right-0.5' : 'left-0.5'}`} />
@@ -74,8 +74,8 @@ export default function CookieConsent() {
 
               <label className="flex items-center justify-between cursor-pointer" onClick={() => setConsent(c => ({ ...c, marketing: !c.marketing }))}>
                 <div>
-                  <span className="text-sm font-medium text-[#F7F9FB]">Marketing</span>
-                  <p className="text-xs text-[#6B7C86]">Personalised offers and communications</p>
+                  <span className="text-sm font-medium text-[#1a1a1a]">Marketing</span>
+                  <p className="text-xs text-slate-400">Personalised offers and communications</p>
                 </div>
                 <div className={`w-10 h-6 rounded-full relative transition-colors ${consent.marketing ? 'bg-[#FF6A2A]' : 'bg-[#e8e4de]'}`}>
                   <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-[#162E3D] shadow transition-all ${consent.marketing ? 'right-0.5' : 'left-0.5'}`} />
@@ -96,7 +96,7 @@ export default function CookieConsent() {
             </div>
           </div>
 
-          <p className="text-[10px] text-[#6B7C86] mt-3 text-center">
+          <p className="text-[10px] text-slate-400 mt-3 text-center">
             See our <a href="/privacy" className="underline hover:text-[#FF6A2A]">Privacy Policy</a> for details.
           </p>
         </div>
