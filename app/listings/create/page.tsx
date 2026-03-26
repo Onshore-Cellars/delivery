@@ -35,8 +35,8 @@ export default function CreateListingPage() {
     destinationPort: '',
     destinationRegion: '',
     destinationCountry: '',
-    destLat: 0,
-    destLng: 0,
+    destinationLat: 0,
+    destinationLng: 0,
     departureDate: '',
     estimatedArrival: '',
     totalCapacityKg: '',
@@ -123,7 +123,7 @@ export default function CreateListingPage() {
       const res = await fetch('/api/distance', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ originLat: oLat, originLng: oLng, destLat: dLat, destLng: dLng }),
+        body: JSON.stringify({ originLat: oLat, originLng: oLng, destinationLat: dLat, destinationLng: dLng }),
       })
       if (res.ok) {
         const data = await res.json()
@@ -138,10 +138,10 @@ export default function CreateListingPage() {
 
   // Trigger distance calc whenever both coordinates are set
   useEffect(() => {
-    if (form.originLat && form.originLng && form.destLat && form.destLng) {
-      fetchDistance(form.originLat, form.originLng, form.destLat, form.destLng)
+    if (form.originLat && form.originLng && form.destinationLat && form.destinationLng) {
+      fetchDistance(form.originLat, form.originLng, form.destinationLat, form.destinationLng)
     }
-  }, [form.originLat, form.originLng, form.destLat, form.destLng, fetchDistance])
+  }, [form.originLat, form.originLng, form.destinationLat, form.destinationLng, fetchDistance])
 
   // Auto-trigger cost estimate when distance + country + vehicle type are all set
   useEffect(() => {
@@ -545,8 +545,8 @@ export default function CreateListingPage() {
                           destinationPort: data.address || `${data.name}, ${data.city}`,
                           destinationRegion: data.region || prev.destinationRegion,
                           destinationCountry: data.country || prev.destinationCountry,
-                          destLat: data.lat || 0,
-                          destLng: data.lng || 0,
+                          destinationLat: data.lat || 0,
+                          destinationLng: data.lng || 0,
                         }))
                       }
                     }}

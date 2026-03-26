@@ -72,7 +72,7 @@ export async function GET(req: NextRequest) {
         if (listing.originLat && listing.originLng && c.originLat && c.originLng) {
           originDist = haversineKm(listing.originLat, listing.originLng, c.originLat, c.originLng)
           if (originDist <= radiusKm) score += 50
-        } else if (c.originPort.toLowerCase().includes(listing.originPort.toLowerCase().slice(0, 4))) {
+        } else if (c.originPort && listing.originPort && c.originPort.toLowerCase().includes(listing.originPort.toLowerCase().slice(0, 4))) {
           score += 30
           originDist = 20 // approximate
         }
@@ -81,7 +81,7 @@ export async function GET(req: NextRequest) {
         if (listing.destinationLat && listing.destinationLng && c.destinationLat && c.destinationLng) {
           destDist = haversineKm(listing.destinationLat, listing.destinationLng, c.destinationLat, c.destinationLng)
           if (destDist <= radiusKm) score += 50
-        } else if (c.destinationPort.toLowerCase().includes(listing.destinationPort.toLowerCase().slice(0, 4))) {
+        } else if (c.destinationPort && listing.destinationPort && c.destinationPort.toLowerCase().includes(listing.destinationPort.toLowerCase().slice(0, 4))) {
           score += 30
           destDist = 20
         }

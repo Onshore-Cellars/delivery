@@ -16,10 +16,19 @@ function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): nu
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { originLat, originLng, destLat, destLng } = body
+    // Accept both naming conventions for flexibility
+    const originLat = parseFloat(body.originLat)
+    const originLng = parseFloat(body.originLng)
+    const destLat = parseFloat(body.destinationLat ?? body.destLat)
+    const destLng = parseFloat(body.destinationLng ?? body.destLng)
 
-    if (!originLat || !originLng || !destLat || !destLng) {
-      return NextResponse.json({ error: 'Missing coordinates' }, { status: 400 })
+    if (isNaN(originLat) || isNaN(originLng) || isNaN(destLat) || isNaN(destLng)) {
+      return NextResponse.json({ error: 'Missing or invalid coordinates' }, { status: 400 })
+    }
+
+    if (originLat < -90 || originLat > 90 || destLat < -90 || destLat > 90 ||
+        originLng < -180 || originLng > 180 || destLng < -180 || destLng > 180) {
+      return NextResponse.json({ error: 'Coordinates out of range' }, { status: 400 })
     }
 
     const apiKey = process.env.GOOGLE_PLACES_API_KEY
