@@ -90,7 +90,7 @@ export default function CargoCalculator({ onCalculated }: CargoCalculatorProps) 
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="text-xs font-medium text-[#C6904D] hover:text-[#b07e3a] transition-colors"
+        className="text-xs font-medium text-[#FF6A2A] hover:text-[#E85A1E] transition-colors"
       >
         Calculate from pallets/boxes
       </button>
@@ -98,18 +98,18 @@ export default function CargoCalculator({ onCalculated }: CargoCalculatorProps) 
   }
 
   return (
-    <div className="border border-slate-200 rounded-xl p-4 bg-slate-50 space-y-3">
+    <div className="border border-white/[0.08] rounded-xl p-4 bg-[#102535] space-y-3">
       <div className="flex items-center justify-between">
-        <h4 className="text-sm font-semibold text-[#1a1a1a]">Cargo Calculator</h4>
-        <button type="button" onClick={() => setOpen(false)} className="text-xs text-slate-400 hover:text-slate-600">Close</button>
+        <h4 className="text-sm font-semibold text-[#F7F9FB]">Cargo Calculator</h4>
+        <button type="button" onClick={() => setOpen(false)} className="text-xs text-[#6B7C86] hover:text-[#9AADB8]">Close</button>
       </div>
 
       {items.map((item) => (
-        <div key={item.id} className="bg-white rounded-lg border border-slate-100 p-3 space-y-2">
+        <div key={item.id} className="bg-[#162E3D] rounded-lg border border-white/[0.06] p-3 space-y-2">
           <div className="flex items-center justify-between">
             <div className="flex gap-2">
               <select
-                className="text-xs px-2 py-1 rounded border border-slate-200 bg-white outline-none focus:border-[#C6904D]"
+                className="text-xs px-2 py-1 rounded border border-white/[0.08] bg-[#162E3D] outline-none focus:border-[#1E6F8F]"
                 value={item.type}
                 onChange={e => updateItem(item.id, { type: e.target.value as CargoItem['type'], palletSize: e.target.value === 'pallet' ? 'euro' : undefined })}
               >
@@ -119,7 +119,7 @@ export default function CargoCalculator({ onCalculated }: CargoCalculatorProps) 
               </select>
               {item.type === 'pallet' && (
                 <select
-                  className="text-xs px-2 py-1 rounded border border-slate-200 bg-white outline-none focus:border-[#C6904D]"
+                  className="text-xs px-2 py-1 rounded border border-white/[0.08] bg-[#162E3D] outline-none focus:border-[#1E6F8F]"
                   value={item.palletSize}
                   onChange={e => updateItem(item.id, { palletSize: e.target.value as CargoItem['palletSize'] })}
                 >
@@ -136,29 +136,29 @@ export default function CargoCalculator({ onCalculated }: CargoCalculatorProps) 
 
           <div className="grid grid-cols-5 gap-2">
             <div>
-              <label className="block text-[10px] text-slate-500 mb-0.5">Qty</label>
-              <input type="number" min="1" className="w-full px-2 py-1 text-xs rounded border border-slate-200 outline-none focus:border-[#C6904D]" value={item.quantity || ''} onChange={e => updateItem(item.id, { quantity: parseInt(e.target.value) || 1 })} />
+              <label className="block text-[10px] text-[#6B7C86] mb-0.5">Qty</label>
+              <input type="number" min="1" className="w-full px-2 py-1 text-xs rounded border border-white/[0.08] outline-none focus:border-[#1E6F8F]" value={item.quantity || ''} onChange={e => updateItem(item.id, { quantity: parseInt(e.target.value) || 1 })} />
             </div>
             <div>
-              <label className="block text-[10px] text-slate-500 mb-0.5">L (cm)</label>
-              <input type="number" min="0" className="w-full px-2 py-1 text-xs rounded border border-slate-200 outline-none focus:border-[#C6904D]" value={item.lengthCm || ''} onChange={e => updateItem(item.id, { lengthCm: parseFloat(e.target.value) || 0 })} disabled={item.type === 'pallet' && item.palletSize !== 'custom'} />
+              <label className="block text-[10px] text-[#6B7C86] mb-0.5">L (cm)</label>
+              <input type="number" min="0" className="w-full px-2 py-1 text-xs rounded border border-white/[0.08] outline-none focus:border-[#1E6F8F]" value={item.lengthCm || ''} onChange={e => updateItem(item.id, { lengthCm: parseFloat(e.target.value) || 0 })} disabled={item.type === 'pallet' && item.palletSize !== 'custom'} />
             </div>
             <div>
-              <label className="block text-[10px] text-slate-500 mb-0.5">W (cm)</label>
-              <input type="number" min="0" className="w-full px-2 py-1 text-xs rounded border border-slate-200 outline-none focus:border-[#C6904D]" value={item.widthCm || ''} onChange={e => updateItem(item.id, { widthCm: parseFloat(e.target.value) || 0 })} disabled={item.type === 'pallet' && item.palletSize !== 'custom'} />
+              <label className="block text-[10px] text-[#6B7C86] mb-0.5">W (cm)</label>
+              <input type="number" min="0" className="w-full px-2 py-1 text-xs rounded border border-white/[0.08] outline-none focus:border-[#1E6F8F]" value={item.widthCm || ''} onChange={e => updateItem(item.id, { widthCm: parseFloat(e.target.value) || 0 })} disabled={item.type === 'pallet' && item.palletSize !== 'custom'} />
             </div>
             <div>
-              <label className="block text-[10px] text-slate-500 mb-0.5">H (cm)</label>
-              <input type="number" min="0" className="w-full px-2 py-1 text-xs rounded border border-slate-200 outline-none focus:border-[#C6904D]" value={item.heightCm || ''} onChange={e => updateItem(item.id, { heightCm: parseFloat(e.target.value) || 0 })} />
+              <label className="block text-[10px] text-[#6B7C86] mb-0.5">H (cm)</label>
+              <input type="number" min="0" className="w-full px-2 py-1 text-xs rounded border border-white/[0.08] outline-none focus:border-[#1E6F8F]" value={item.heightCm || ''} onChange={e => updateItem(item.id, { heightCm: parseFloat(e.target.value) || 0 })} />
             </div>
             <div>
-              <label className="block text-[10px] text-slate-500 mb-0.5">Wt (kg)</label>
-              <input type="number" min="0" step="0.1" className="w-full px-2 py-1 text-xs rounded border border-slate-200 outline-none focus:border-[#C6904D]" value={item.weightKg || ''} onChange={e => updateItem(item.id, { weightKg: parseFloat(e.target.value) || 0 })} />
+              <label className="block text-[10px] text-[#6B7C86] mb-0.5">Wt (kg)</label>
+              <input type="number" min="0" step="0.1" className="w-full px-2 py-1 text-xs rounded border border-white/[0.08] outline-none focus:border-[#1E6F8F]" value={item.weightKg || ''} onChange={e => updateItem(item.id, { weightKg: parseFloat(e.target.value) || 0 })} />
             </div>
           </div>
 
           {item.heightCm > 0 && (
-            <div className="text-[10px] text-slate-400">
+            <div className="text-[10px] text-[#6B7C86]">
               {item.quantity}× = {((item.lengthCm / 100) * (item.widthCm / 100) * (item.heightCm / 100) * (item.quantity || 1)).toFixed(3)} m&sup3;, {(item.weightKg * (item.quantity || 1)).toFixed(1)} kg
             </div>
           )}
@@ -166,24 +166,24 @@ export default function CargoCalculator({ onCalculated }: CargoCalculatorProps) 
       ))}
 
       <div className="flex gap-2">
-        <button type="button" onClick={() => addItem('pallet')} className="text-xs px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-white transition-colors">+ Pallet</button>
-        <button type="button" onClick={() => addItem('box')} className="text-xs px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-white transition-colors">+ Box</button>
+        <button type="button" onClick={() => addItem('pallet')} className="text-xs px-3 py-1.5 rounded-lg border border-white/[0.08] hover:bg-[#162E3D] transition-colors">+ Pallet</button>
+        <button type="button" onClick={() => addItem('box')} className="text-xs px-3 py-1.5 rounded-lg border border-white/[0.08] hover:bg-[#162E3D] transition-colors">+ Box</button>
       </div>
 
       {/* Summary */}
       {items.some(i => i.heightCm > 0) && (
         <div className="bg-[#0f1628] text-white rounded-lg p-3 flex justify-between items-center">
           <div className="text-xs">
-            <span className="text-slate-400">Total: </span>
+            <span className="text-[#6B7C86]">Total: </span>
             <span className="font-semibold">
               {(items.reduce((sum, i) => sum + (i.weightKg * (i.quantity || 1)), 0)).toFixed(1)} kg
             </span>
-            <span className="text-slate-400 mx-2">|</span>
+            <span className="text-[#6B7C86] mx-2">|</span>
             <span className="font-semibold">
               {(items.reduce((sum, i) => sum + ((i.lengthCm / 100) * (i.widthCm / 100) * (i.heightCm / 100) * (i.quantity || 1)), 0)).toFixed(2)} m&sup3;
             </span>
           </div>
-          <button type="button" onClick={calculate} className="text-xs font-semibold bg-[#C6904D] px-4 py-1.5 rounded-lg hover:bg-[#b07e3a] transition-colors">
+          <button type="button" onClick={calculate} className="text-xs font-semibold bg-[#FF6A2A] px-4 py-1.5 rounded-lg hover:bg-[#b07e3a] transition-colors">
             Apply
           </button>
         </div>

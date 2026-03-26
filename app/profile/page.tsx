@@ -97,8 +97,8 @@ export default function ProfilePage() {
   return (
     <div className="page-container narrow">
         <div className="mb-8">
-          <p className="text-[11px] font-semibold text-[#C6904D] uppercase tracking-[0.15em] mb-1">Account</p>
-          <h1 className="text-xl sm:text-2xl font-semibold text-[#1a1a1a] tracking-[-0.02em]">Profile & Settings</h1>
+          <p className="text-[11px] font-semibold text-[#FF6A2A] uppercase tracking-[0.15em] mb-1">Account</p>
+          <h1 className="text-xl sm:text-2xl font-semibold text-[#F7F9FB] tracking-[-0.02em]">Profile & Settings</h1>
         </div>
 
         {success && (
@@ -108,14 +108,14 @@ export default function ProfilePage() {
         )}
 
         {error && (
-          <div className="mb-6 px-4 py-3 rounded-lg bg-red-50 border border-red-200" role="alert">
-            <p className="text-sm text-red-700 font-medium">{error}</p>
+          <div className="mb-6 px-4 py-3 rounded-lg bg-red-500/10 border border-red-200" role="alert">
+            <p className="text-sm text-red-400 font-medium">{error}</p>
           </div>
         )}
 
         {!profile.termsAcceptedAt && (
-          <div className="mb-6 px-4 py-4 rounded-lg bg-amber-50 border border-amber-200">
-            <p className="text-sm text-amber-800 font-medium mb-3">Please review and accept our updated Terms of Service and Privacy Policy to continue using Onshore Deliver.</p>
+          <div className="mb-6 px-4 py-4 rounded-lg bg-[#FF6A2A]/10 border border-[#FF6A2A]/20">
+            <p className="text-sm text-[#FF6A2A] font-medium mb-3">Please review and accept our updated Terms of Service and Privacy Policy to continue using Onshore Deliver.</p>
             <button
               disabled={acceptingTerms}
               onClick={async () => {
@@ -146,7 +146,7 @@ export default function ProfilePage() {
         )}
 
         {/* Profile Card */}
-        <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-6 sm:p-8 mb-6">
+        <div className="bg-[#162E3D] rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-white/[0.08] p-6 sm:p-8 mb-6">
           <div className="flex items-center gap-4 mb-6">
             <AvatarUpload
               currentUrl={profile.avatarUrl || undefined}
@@ -155,16 +155,16 @@ export default function ProfilePage() {
               onUpload={() => { fetchProfile(); refreshUser() }}
             />
             <div>
-              <h2 className="text-xl font-bold text-[#1a1a1a]">{profile.name}</h2>
-              <p className="text-sm text-slate-500">{profile.role.replace('_', ' ')}{profile.company && ` at ${profile.company}`}</p>
+              <h2 className="text-xl font-bold text-[#F7F9FB]">{profile.name}</h2>
+              <p className="text-sm text-[#6B7C86]">{profile.role.replace('_', ' ')}{profile.company && ` at ${profile.company}`}</p>
               <div className="flex items-center gap-3 mt-1">
                 {rating.count > 0 && (
                   <div className="flex items-center gap-1">
-                    {[1,2,3,4,5].map(s => <svg key={s} className={`w-3.5 h-3.5 ${s <= Math.round(rating.average) ? 'text-[#C6904D]' : 'text-slate-200'}`} fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>)}
-                    <span className="text-xs text-slate-500">{rating.average.toFixed(1)} ({rating.count})</span>
+                    {[1,2,3,4,5].map(s => <svg key={s} className={`w-3.5 h-3.5 ${s <= Math.round(rating.average) ? 'text-[#FF6A2A]' : 'text-slate-200'}`} fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>)}
+                    <span className="text-xs text-[#6B7C86]">{rating.average.toFixed(1)} ({rating.count})</span>
                   </div>
                 )}
-                <span className="text-xs text-slate-400">{profile._count.listings} listings &middot; {profile._count.bookings} bookings</span>
+                <span className="text-xs text-[#6B7C86]">{profile._count.listings} listings &middot; {profile._count.bookings} bookings</span>
               </div>
             </div>
           </div>
@@ -182,12 +182,12 @@ export default function ProfilePage() {
                   ['Member since', new Date(profile.createdAt).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })],
                 ].map(([label, value]) => (
                   <div key={label as string}>
-                    <dt className="text-xs text-slate-400 uppercase tracking-wider">{label}</dt>
-                    <dd className="text-sm font-medium text-[#1a1a1a] mt-0.5">{value || '-'}</dd>
+                    <dt className="text-xs text-[#6B7C86] uppercase tracking-wider">{label}</dt>
+                    <dd className="text-sm font-medium text-[#F7F9FB] mt-0.5">{value || '-'}</dd>
                   </div>
                 ))}
               </dl>
-              {profile.bio && <p className="mt-4 text-sm text-slate-600 leading-relaxed border-t border-slate-100 pt-4">{profile.bio}</p>}
+              {profile.bio && <p className="mt-4 text-sm text-[#9AADB8] leading-relaxed border-t border-white/[0.06] pt-4">{profile.bio}</p>}
               <button onClick={() => setEditing(true)} className="mt-6 btn-primary text-sm !py-2 !px-5">Edit Profile</button>
             </>
           ) : (
@@ -199,8 +199,8 @@ export default function ProfilePage() {
                   ['company', 'Company', 'text'],
                 ].map(([key, label, type]) => (
                   <div key={key}>
-                    <label className="block text-sm font-medium text-[#1a1a1a] mb-1">{label}</label>
-                    <input type={type} className="w-full px-4 py-3 sm:py-2.5 rounded-lg border border-slate-200 text-base sm:text-sm text-[#1a1a1a] focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 outline-none" value={(form[key] as string) || ''} onChange={e => setForm({...form, [key]: e.target.value})} />
+                    <label className="block text-sm font-medium text-[#F7F9FB] mb-1">{label}</label>
+                    <input type={type} className="w-full px-4 py-3 sm:py-2.5 rounded-lg border border-white/[0.08] text-base sm:text-sm text-[#F7F9FB] focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10 outline-none" value={(form[key] as string) || ''} onChange={e => setForm({...form, [key]: e.target.value})} />
                   </div>
                 ))}
                 <div>
@@ -218,32 +218,32 @@ export default function ProfilePage() {
                   ['website', 'Website', 'url'],
                 ].map(([key, label, type]) => (
                   <div key={key}>
-                    <label className="block text-sm font-medium text-[#1a1a1a] mb-1">{label}</label>
-                    <input type={type} className="w-full px-4 py-3 sm:py-2.5 rounded-lg border border-slate-200 text-base sm:text-sm text-[#1a1a1a] focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 outline-none" value={(form[key] as string) || ''} onChange={e => setForm({...form, [key]: e.target.value})} />
+                    <label className="block text-sm font-medium text-[#F7F9FB] mb-1">{label}</label>
+                    <input type={type} className="w-full px-4 py-3 sm:py-2.5 rounded-lg border border-white/[0.08] text-base sm:text-sm text-[#F7F9FB] focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10 outline-none" value={(form[key] as string) || ''} onChange={e => setForm({...form, [key]: e.target.value})} />
                   </div>
                 ))}
               </div>
               <div>
-                <label className="block text-sm font-medium text-[#1a1a1a] mb-1">Bio</label>
-                <textarea rows={3} className="w-full px-4 py-3 sm:py-2.5 rounded-lg border border-slate-200 text-base sm:text-sm text-[#1a1a1a] focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 outline-none resize-none" value={(form.bio as string) || ''} onChange={e => setForm({...form, bio: e.target.value})} />
+                <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Bio</label>
+                <textarea rows={3} className="w-full px-4 py-3 sm:py-2.5 rounded-lg border border-white/[0.08] text-base sm:text-sm text-[#F7F9FB] focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10 outline-none resize-none" value={(form.bio as string) || ''} onChange={e => setForm({...form, bio: e.target.value})} />
               </div>
               <div className="flex gap-3">
                 <button type="submit" disabled={saving} className="btn-primary text-sm !py-2.5 disabled:opacity-50">{saving ? 'Saving...' : 'Save Changes'}</button>
-                <button type="button" onClick={() => setEditing(false)} className="px-5 py-2.5 text-sm text-slate-500 hover:bg-slate-100 rounded-lg transition-colors">Cancel</button>
+                <button type="button" onClick={() => setEditing(false)} className="px-5 py-2.5 text-sm text-[#6B7C86] hover:bg-[#162E3D] rounded-lg transition-colors">Cancel</button>
               </div>
             </form>
           )}
         </div>
 
         {/* Role & Capabilities */}
-        <div className="bg-white rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-6 sm:p-8 mb-6">
-          <h2 className="font-semibold text-[#1a1a1a] mb-2" style={{ fontFamily: 'var(--font-display)' }}>Role & Capabilities</h2>
-          <p className="text-xs text-slate-500 mb-5">Toggle what you can do on the platform. You can both ship and carry.</p>
+        <div className="bg-[#162E3D] rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-white/[0.08] p-6 sm:p-8 mb-6">
+          <h2 className="font-semibold text-[#F7F9FB] mb-2" style={{ fontFamily: 'var(--font-display)' }}>Role & Capabilities</h2>
+          <p className="text-xs text-[#6B7C86] mb-5">Toggle what you can do on the platform. You can both ship and carry.</p>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-sm font-semibold text-[#1a1a1a]">I can carry / deliver</div>
-                <div className="text-xs text-slate-500">List van space, accept bookings, deliver goods to ports</div>
+                <div className="text-sm font-semibold text-[#F7F9FB]">I can carry / deliver</div>
+                <div className="text-xs text-[#6B7C86]">List van space, accept bookings, deliver goods to ports</div>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" checked={form.canCarry as boolean} onChange={async () => {
@@ -266,13 +266,13 @@ export default function ProfilePage() {
                     }
                   }
                 }} className="sr-only peer" />
-                <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#C6904D]"></div>
+                <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[#162E3D] after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF6A2A]"></div>
               </label>
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-sm font-semibold text-[#1a1a1a]">I need deliveries / shipping</div>
-                <div className="text-xs text-slate-500">Book space, request quotes, receive goods at marina</div>
+                <div className="text-sm font-semibold text-[#F7F9FB]">I need deliveries / shipping</div>
+                <div className="text-xs text-[#6B7C86]">Book space, request quotes, receive goods at marina</div>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" checked={form.canShip as boolean} onChange={async () => {
@@ -295,15 +295,15 @@ export default function ProfilePage() {
                     }
                   }
                 }} className="sr-only peer" />
-                <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#C6904D]"></div>
+                <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[#162E3D] after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF6A2A]"></div>
               </label>
             </div>
           </div>
-          <div className="mt-4 pt-4 border-t border-[#e8e4de]">
-            <div className="flex items-center gap-2 text-xs text-slate-400">
-              <span className="font-medium text-[#1a1a1a]">Current role:</span>
-              <span className="badge bg-amber-50 text-[#9a7039]">{profile.role.replace('_', ' ')}</span>
-              {form.canCarry && <span className="badge bg-green-50 text-green-700">Can Carry</span>}
+          <div className="mt-4 pt-4 border-t border-white/[0.08]">
+            <div className="flex items-center gap-2 text-xs text-[#6B7C86]">
+              <span className="font-medium text-[#F7F9FB]">Current role:</span>
+              <span className="badge bg-[#FF6A2A]/10 text-[#9a7039]">{profile.role.replace('_', ' ')}</span>
+              {form.canCarry && <span className="badge bg-[#9ED36A]/10 text-[#9ED36A]">Can Carry</span>}
               {form.canShip && <span className="badge bg-indigo-50 text-indigo-700">Can Ship</span>}
             </div>
           </div>
@@ -311,9 +311,9 @@ export default function ProfilePage() {
 
         {/* Yacht / Vessel Details */}
         {(profile.role === 'YACHT_OWNER' || profile.role === 'CREW' || form.canShip) && (
-          <div className="bg-white rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-6 sm:p-8 mb-6">
-            <h2 className="font-semibold text-[#1a1a1a] mb-2" style={{ fontFamily: 'var(--font-display)' }}>Yacht / Vessel Details</h2>
-            <p className="text-xs text-slate-500 mb-5">Optional — helps carriers find your vessel and deliver to the right berth.</p>
+          <div className="bg-[#162E3D] rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-white/[0.08] p-6 sm:p-8 mb-6">
+            <h2 className="font-semibold text-[#F7F9FB] mb-2" style={{ fontFamily: 'var(--font-display)' }}>Yacht / Vessel Details</h2>
+            <p className="text-xs text-[#6B7C86] mb-5">Optional — helps carriers find your vessel and deliver to the right berth.</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {[
                 ['yachtName', 'Vessel Name', 'text', 'e.g. MY Ocean Dream'],
@@ -323,20 +323,20 @@ export default function ProfilePage() {
                 ['homePort', 'Home Port', 'text', 'e.g. Antibes'],
               ].map(([key, label, type, placeholder]) => (
                 <div key={key}>
-                  <label className="block text-xs font-semibold text-[#1a1a1a] mb-1.5 uppercase tracking-wider">{label}</label>
-                  <input type={type} className="w-full px-4 py-2.5 rounded border border-[#e8e4de] text-sm text-[#1a1a1a] focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 outline-none" placeholder={placeholder as string} value={(form[key] as string) || ''} onChange={e => setForm({...form, [key]: e.target.value})} />
+                  <label className="block text-xs font-semibold text-[#F7F9FB] mb-1.5 uppercase tracking-wider">{label}</label>
+                  <input type={type} className="w-full px-4 py-2.5 rounded border border-white/[0.08] text-sm text-[#F7F9FB] focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10 outline-none" placeholder={placeholder as string} value={(form[key] as string) || ''} onChange={e => setForm({...form, [key]: e.target.value})} />
                 </div>
               ))}
               {/* MMSI & IMO — only shown for yacht accounts */}
               {(profile.role === 'YACHT_OWNER' || profile.role === 'CREW') && (
                 <>
                   <div>
-                    <label className="block text-xs font-semibold text-[#1a1a1a] mb-1.5 uppercase tracking-wider">MMSI Number</label>
-                    <input type="text" className="w-full px-4 py-2.5 rounded border border-[#e8e4de] text-sm text-[#1a1a1a] focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 outline-none" placeholder="9-digit MMSI" maxLength={9} value={(form.yachtMMSI as string) || ''} onChange={e => setForm({...form, yachtMMSI: e.target.value.replace(/\D/g, '').slice(0, 9)})} />
+                    <label className="block text-xs font-semibold text-[#F7F9FB] mb-1.5 uppercase tracking-wider">MMSI Number</label>
+                    <input type="text" className="w-full px-4 py-2.5 rounded border border-white/[0.08] text-sm text-[#F7F9FB] focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10 outline-none" placeholder="9-digit MMSI" maxLength={9} value={(form.yachtMMSI as string) || ''} onChange={e => setForm({...form, yachtMMSI: e.target.value.replace(/\D/g, '').slice(0, 9)})} />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-[#1a1a1a] mb-1.5 uppercase tracking-wider">IMO Number</label>
-                    <input type="text" className="w-full px-4 py-2.5 rounded border border-[#e8e4de] text-sm text-[#1a1a1a] focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 outline-none" placeholder="IMO number" value={(form.yachtIMO as string) || ''} onChange={e => setForm({...form, yachtIMO: e.target.value})} />
+                    <label className="block text-xs font-semibold text-[#F7F9FB] mb-1.5 uppercase tracking-wider">IMO Number</label>
+                    <input type="text" className="w-full px-4 py-2.5 rounded border border-white/[0.08] text-sm text-[#F7F9FB] focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10 outline-none" placeholder="IMO number" value={(form.yachtIMO as string) || ''} onChange={e => setForm({...form, yachtIMO: e.target.value})} />
                   </div>
                 </>
               )}
@@ -363,39 +363,39 @@ export default function ProfilePage() {
         )}
 
         {/* Quick Links */}
-        <div className="bg-white rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-6 sm:p-8 mb-6">
-          <h2 className="font-semibold text-[#1a1a1a] mb-4" style={{ fontFamily: 'var(--font-display)' }}>Account</h2>
+        <div className="bg-[#162E3D] rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-white/[0.08] p-6 sm:p-8 mb-6">
+          <h2 className="font-semibold text-[#F7F9FB] mb-4" style={{ fontFamily: 'var(--font-display)' }}>Account</h2>
           <div className="grid grid-cols-2 gap-3 text-sm">
-            <a href="/dashboard" className="px-4 py-3 rounded border border-[#e8e4de] text-center font-medium text-[#1a1a1a] hover:bg-[#faf9f7] transition-colors hover:no-underline">
+            <a href="/dashboard" className="px-4 py-3 rounded border border-white/[0.08] text-center font-medium text-[#F7F9FB] hover:bg-[#162E3D] transition-colors hover:no-underline">
               Dashboard
             </a>
-            <a href="/messages" className="px-4 py-3 rounded border border-[#e8e4de] text-center font-medium text-[#1a1a1a] hover:bg-[#faf9f7] transition-colors hover:no-underline">
+            <a href="/messages" className="px-4 py-3 rounded border border-white/[0.08] text-center font-medium text-[#F7F9FB] hover:bg-[#162E3D] transition-colors hover:no-underline">
               Messages
             </a>
-            <a href="/reviews" className="px-4 py-3 rounded border border-[#e8e4de] text-center font-medium text-[#1a1a1a] hover:bg-[#faf9f7] transition-colors hover:no-underline">
+            <a href="/reviews" className="px-4 py-3 rounded border border-white/[0.08] text-center font-medium text-[#F7F9FB] hover:bg-[#162E3D] transition-colors hover:no-underline">
               Reviews ({profile._count.receivedReviews})
             </a>
-            <a href="/notifications" className="px-4 py-3 rounded border border-[#e8e4de] text-center font-medium text-[#1a1a1a] hover:bg-[#faf9f7] transition-colors hover:no-underline">
+            <a href="/notifications" className="px-4 py-3 rounded border border-white/[0.08] text-center font-medium text-[#F7F9FB] hover:bg-[#162E3D] transition-colors hover:no-underline">
               Notifications
             </a>
-            <a href="/disputes" className="px-4 py-3 rounded border border-[#e8e4de] text-center font-medium text-[#1a1a1a] hover:bg-[#faf9f7] transition-colors hover:no-underline">
+            <a href="/disputes" className="px-4 py-3 rounded border border-white/[0.08] text-center font-medium text-[#F7F9FB] hover:bg-[#162E3D] transition-colors hover:no-underline">
               Disputes
             </a>
-            <a href="/analytics" className="px-4 py-3 rounded border border-[#e8e4de] text-center font-medium text-[#1a1a1a] hover:bg-[#faf9f7] transition-colors hover:no-underline">
+            <a href="/analytics" className="px-4 py-3 rounded border border-white/[0.08] text-center font-medium text-[#F7F9FB] hover:bg-[#162E3D] transition-colors hover:no-underline">
               Analytics
             </a>
-            <a href="/insurance" className="px-4 py-3 rounded border border-[#e8e4de] text-center font-medium text-[#1a1a1a] hover:bg-[#faf9f7] transition-colors hover:no-underline">
+            <a href="/insurance" className="px-4 py-3 rounded border border-white/[0.08] text-center font-medium text-[#F7F9FB] hover:bg-[#162E3D] transition-colors hover:no-underline">
               Insurance
             </a>
             {form.canCarry && (
               <>
-              <a href="/listings/create" className="px-4 py-3 rounded border border-[#e8e4de] text-center font-medium text-[#1a1a1a] hover:bg-[#faf9f7] transition-colors hover:no-underline">
+              <a href="/listings/create" className="px-4 py-3 rounded border border-white/[0.08] text-center font-medium text-[#F7F9FB] hover:bg-[#162E3D] transition-colors hover:no-underline">
                 List Van Space
               </a>
-              <a href="/vehicles" className="px-4 py-3 rounded border border-[#e8e4de] text-center font-medium text-[#1a1a1a] hover:bg-[#faf9f7] transition-colors hover:no-underline">
+              <a href="/vehicles" className="px-4 py-3 rounded border border-white/[0.08] text-center font-medium text-[#F7F9FB] hover:bg-[#162E3D] transition-colors hover:no-underline">
                 My Vehicles
               </a>
-              <a href="/earnings" className="px-4 py-3 rounded border border-[#e8e4de] text-center font-medium text-[#1a1a1a] hover:bg-[#faf9f7] transition-colors hover:no-underline">
+              <a href="/earnings" className="px-4 py-3 rounded border border-white/[0.08] text-center font-medium text-[#F7F9FB] hover:bg-[#162E3D] transition-colors hover:no-underline">
                 Earnings
               </a>
               </>
@@ -404,13 +404,13 @@ export default function ProfilePage() {
         </div>
 
         {/* Language & Region */}
-        <div className="bg-white rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-6 sm:p-8 mb-6">
-          <h2 className="font-semibold text-[#1a1a1a] mb-2" style={{ fontFamily: 'var(--font-display)' }}>Language & Region</h2>
-          <p className="text-xs text-slate-500 mb-5">Choose your preferred language for the platform.</p>
+        <div className="bg-[#162E3D] rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-white/[0.08] p-6 sm:p-8 mb-6">
+          <h2 className="font-semibold text-[#F7F9FB] mb-2" style={{ fontFamily: 'var(--font-display)' }}>Language & Region</h2>
+          <p className="text-xs text-[#6B7C86] mb-5">Choose your preferred language for the platform.</p>
           <div>
-            <label className="block text-sm font-medium text-[#1a1a1a] mb-1">Preferred Language</label>
+            <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Preferred Language</label>
             <select
-              className="w-full px-4 py-3 sm:py-2.5 rounded-lg border border-slate-200 text-base sm:text-sm text-[#1a1a1a] focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 outline-none"
+              className="w-full px-4 py-3 sm:py-2.5 rounded-lg border border-white/[0.08] text-base sm:text-sm text-[#F7F9FB] focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10 outline-none"
               value={(form.preferredLanguage as string) || 'en'}
               onChange={async (e) => {
                 const val = e.target.value
@@ -440,8 +440,8 @@ export default function ProfilePage() {
         </div>
 
         {/* Change Password */}
-        <div className="bg-white rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-6 sm:p-8 mb-6">
-          <h2 className="font-bold text-[#1a1a1a] mb-4">Change Password</h2>
+        <div className="bg-[#162E3D] rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-white/[0.08] p-6 sm:p-8 mb-6">
+          <h2 className="font-bold text-[#F7F9FB] mb-4">Change Password</h2>
           <form onSubmit={async (e) => {
             e.preventDefault()
             setError('')
@@ -464,16 +464,16 @@ export default function ProfilePage() {
             } catch { setError('Failed to change password') }
           }} className="space-y-3">
             <div>
-              <label className="block text-sm font-medium text-[#1a1a1a] mb-1">Current Password</label>
-              <input type="password" name="currentPassword" required minLength={8} className="w-full px-4 py-3 sm:py-2.5 rounded-lg border border-slate-200 text-base sm:text-sm focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 outline-none" />
+              <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Current Password</label>
+              <input type="password" name="currentPassword" required minLength={8} className="w-full px-4 py-3 sm:py-2.5 rounded-lg border border-white/[0.08] text-base sm:text-sm focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10 outline-none" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#1a1a1a] mb-1">New Password</label>
-              <input type="password" name="newPassword" required minLength={8} className="w-full px-4 py-3 sm:py-2.5 rounded-lg border border-slate-200 text-base sm:text-sm focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 outline-none" />
+              <label className="block text-sm font-medium text-[#F7F9FB] mb-1">New Password</label>
+              <input type="password" name="newPassword" required minLength={8} className="w-full px-4 py-3 sm:py-2.5 rounded-lg border border-white/[0.08] text-base sm:text-sm focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10 outline-none" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#1a1a1a] mb-1">Confirm New Password</label>
-              <input type="password" name="confirmPassword" required minLength={8} className="w-full px-4 py-3 sm:py-2.5 rounded-lg border border-slate-200 text-base sm:text-sm focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 outline-none" />
+              <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Confirm New Password</label>
+              <input type="password" name="confirmPassword" required minLength={8} className="w-full px-4 py-3 sm:py-2.5 rounded-lg border border-white/[0.08] text-base sm:text-sm focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10 outline-none" />
             </div>
             <button type="submit" className="px-5 py-2.5 bg-[#1a1a1a] text-white rounded-lg text-sm font-semibold hover:bg-[#333] transition-colors">
               Change Password
@@ -482,13 +482,13 @@ export default function ProfilePage() {
         </div>
 
         {/* Notification Settings */}
-        <div className="bg-white rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-6 sm:p-8">
-          <h2 className="font-bold text-[#1a1a1a] mb-4">Notification Settings</h2>
+        <div className="bg-[#162E3D] rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-white/[0.08] p-6 sm:p-8">
+          <h2 className="font-bold text-[#F7F9FB] mb-4">Notification Settings</h2>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-sm font-medium text-[#1a1a1a]">Email Notifications</div>
-                <div className="text-xs text-slate-400">Booking updates, messages, and alerts via email</div>
+                <div className="text-sm font-medium text-[#F7F9FB]">Email Notifications</div>
+                <div className="text-xs text-[#6B7C86]">Booking updates, messages, and alerts via email</div>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" checked={form.emailNotifications as boolean} onChange={async () => {
@@ -508,13 +508,13 @@ export default function ProfilePage() {
                     }
                   }
                 }} className="sr-only peer" />
-                <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#1a1a1a]"></div>
+                <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[#162E3D] after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#1a1a1a]"></div>
               </label>
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-sm font-medium text-[#1a1a1a]">SMS Notifications</div>
-                <div className="text-xs text-slate-400">Critical delivery updates via text message</div>
+                <div className="text-sm font-medium text-[#F7F9FB]">SMS Notifications</div>
+                <div className="text-xs text-[#6B7C86]">Critical delivery updates via text message</div>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" checked={form.smsNotifications as boolean} onChange={async () => {
@@ -534,15 +534,15 @@ export default function ProfilePage() {
                     }
                   }
                 }} className="sr-only peer" />
-                <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#1a1a1a]"></div>
+                <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[#162E3D] after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#1a1a1a]"></div>
               </label>
             </div>
           </div>
         </div>
         {/* Data Management */}
-        <div className="bg-white rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-6 sm:p-8">
-          <h2 className="font-bold text-[#1a1a1a] mb-2">Data Management</h2>
-          <p className="text-xs text-slate-400 mb-5">Export or delete your account data. See our <a href="/privacy" className="text-[#C6904D] hover:underline">privacy policy</a> for details.</p>
+        <div className="bg-[#162E3D] rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-white/[0.08] p-6 sm:p-8">
+          <h2 className="font-bold text-[#F7F9FB] mb-2">Data Management</h2>
+          <p className="text-xs text-[#6B7C86] mb-5">Export or delete your account data. See our <a href="/privacy" className="text-[#FF6A2A] hover:underline">privacy policy</a> for details.</p>
           <div className="flex flex-col sm:flex-row gap-3">
             <button
               onClick={async () => {
@@ -560,7 +560,7 @@ export default function ProfilePage() {
                   } else setError('Failed to export data')
                 } catch { setError('Failed to export data') }
               }}
-              className="px-5 py-2.5 border border-[#e8e4de] rounded-lg text-sm font-semibold text-[#1a1a1a] hover:bg-[#faf9f7] transition-colors"
+              className="px-5 py-2.5 border border-white/[0.08] rounded-lg text-sm font-semibold text-[#F7F9FB] hover:bg-[#162E3D] transition-colors"
             >
               Export My Data
             </button>
@@ -575,7 +575,7 @@ export default function ProfilePage() {
                   else { const d = await res.json(); setError(d.error || 'Failed to delete account') }
                 } catch { setError('Failed to delete account') }
               }}
-              className="px-5 py-2.5 border border-red-200 rounded-lg text-sm font-semibold text-red-600 hover:bg-red-50 transition-colors"
+              className="px-5 py-2.5 border border-red-200 rounded-lg text-sm font-semibold text-red-600 hover:bg-red-500/10 transition-colors"
             >
               Delete Account
             </button>

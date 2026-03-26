@@ -167,8 +167,8 @@ export default function DriverPage() {
   if (!user.canCarry) {
     return (
       <div className="page-container narrow text-center py-20">
-        <h2 className="text-xl font-bold text-[#1a1a1a] mb-2">Driver Mode</h2>
-        <p className="text-slate-500 mb-4">Enable &ldquo;I can carry / deliver&rdquo; in your profile to access driver mode.</p>
+        <h2 className="text-xl font-bold text-[#F7F9FB] mb-2">Driver Mode</h2>
+        <p className="text-[#6B7C86] mb-4">Enable &ldquo;I can carry / deliver&rdquo; in your profile to access driver mode.</p>
         <Link href="/profile" className="btn-primary text-sm">Update Profile</Link>
       </div>
     )
@@ -180,14 +180,14 @@ export default function DriverPage() {
   return (
     <div className="page-container narrow">
       <div className="mb-6">
-        <p className="text-[11px] font-semibold text-[#C6904D] uppercase tracking-[0.15em] mb-1">Driver Mode</p>
-        <h1 className="text-xl sm:text-2xl font-semibold text-[#1a1a1a] tracking-[-0.02em]">Active Route</h1>
-        <p className="text-sm text-slate-500 mt-1">Manage your deliveries and share live tracking with customers.</p>
+        <p className="text-[11px] font-semibold text-[#FF6A2A] uppercase tracking-[0.15em] mb-1">Driver Mode</p>
+        <h1 className="text-xl sm:text-2xl font-semibold text-[#F7F9FB] tracking-[-0.02em]">Active Route</h1>
+        <p className="text-sm text-[#6B7C86] mt-1">Manage your deliveries and share live tracking with customers.</p>
       </div>
 
       {error && (
-        <div className="px-4 py-3 rounded-lg bg-red-50 border border-red-100 mb-4 flex items-center justify-between">
-          <p className="text-sm text-red-700">{error}</p>
+        <div className="px-4 py-3 rounded-lg bg-red-500/10 border border-red-500/15 mb-4 flex items-center justify-between">
+          <p className="text-sm text-red-400">{error}</p>
           <button onClick={() => setError('')} className="text-red-400 hover:text-red-600 ml-3 flex-shrink-0">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
@@ -196,20 +196,20 @@ export default function DriverPage() {
 
       {/* Tracking Status */}
       {tracking && position && (
-        <div className="bg-green-50 border border-green-200 rounded-2xl p-4 mb-6">
+        <div className="bg-[#9ED36A]/10 border border-[#9ED36A]/20 rounded-2xl p-4 mb-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse" />
+              <div className="w-3 h-3 rounded-full bg-[#9ED36A]/100 animate-pulse" />
               <div>
-                <span className="text-sm font-semibold text-green-800">Live Tracking Active</span>
-                <p className="text-xs text-green-600 mt-0.5">
+                <span className="text-sm font-semibold text-[#9ED36A]">Live Tracking Active</span>
+                <p className="text-xs text-[#9ED36A] mt-0.5">
                   Position: {position.lat.toFixed(4)}, {position.lng.toFixed(4)}
                 </p>
               </div>
             </div>
             <button
               onClick={stopTracking}
-              className="text-xs font-semibold text-red-600 hover:text-red-800 px-3 py-1.5 rounded-lg hover:bg-red-50 transition-colors"
+              className="text-xs font-semibold text-red-600 hover:text-red-800 px-3 py-1.5 rounded-lg hover:bg-red-500/10 transition-colors"
             >
               Stop Tracking
             </button>
@@ -222,12 +222,12 @@ export default function DriverPage() {
           {[1, 2, 3].map(i => <div key={i} className="loading-shimmer h-28 rounded-2xl" />)}
         </div>
       ) : stops.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-slate-200 p-10 text-center">
-          <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto mb-4">
-            <svg className="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" /></svg>
+        <div className="bg-[#162E3D] rounded-2xl border border-white/[0.08] p-10 text-center">
+          <div className="w-14 h-14 rounded-2xl bg-[#102535] flex items-center justify-center mx-auto mb-4">
+            <svg className="w-6 h-6 text-[#6B7C86]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" /></svg>
           </div>
-          <p className="text-[#1a1a1a] font-semibold mb-1.5">No active deliveries</p>
-          <p className="text-sm text-slate-500 mb-5">Create a listing and get bookings to start delivering.</p>
+          <p className="text-[#F7F9FB] font-semibold mb-1.5">No active deliveries</p>
+          <p className="text-sm text-[#6B7C86] mb-5">Create a listing and get bookings to start delivering.</p>
           <Link href="/listings/create" className="btn-primary !text-sm !py-2.5 !px-6">Create Listing</Link>
         </div>
       ) : (
@@ -236,9 +236,9 @@ export default function DriverPage() {
           {!hasActiveTracking && uniqueListings.map(listingId => {
             const listingStops = stops.filter(s => s.listingId === listingId)
             return (
-              <div key={listingId} className="bg-white rounded-2xl border border-slate-200 p-5">
-                <h3 className="font-bold text-[#1a1a1a] mb-1">{listingStops[0]?.listingTitle}</h3>
-                <p className="text-sm text-slate-500 mb-4">
+              <div key={listingId} className="bg-[#162E3D] rounded-2xl border border-white/[0.08] p-5">
+                <h3 className="font-bold text-[#F7F9FB] mb-1">{listingStops[0]?.listingTitle}</h3>
+                <p className="text-sm text-[#6B7C86] mb-4">
                   {listingStops[0]?.originPort} &rarr; {listingStops[0]?.destinationPort} &middot; {listingStops.length} deliveries
                 </p>
                 <button
@@ -254,33 +254,33 @@ export default function DriverPage() {
 
           {/* Active Stops */}
           <div className="space-y-3">
-            <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Delivery Stops</h2>
+            <h2 className="text-sm font-semibold text-[#6B7C86] uppercase tracking-wider">Delivery Stops</h2>
             {stops.map((stop, index) => (
-              <div key={stop.id} className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5">
+              <div key={stop.id} className="bg-[#162E3D] rounded-2xl border border-white/[0.08] p-4 sm:p-5">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-start gap-3">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold ${
-                      stop.status === 'DELIVERED' ? 'bg-green-100 text-green-700' :
+                      stop.status === 'DELIVERED' ? 'bg-[#9ED36A]/15 text-[#9ED36A]' :
                       stop.status === 'IN_TRANSIT' ? 'bg-indigo-100 text-indigo-700' :
-                      'bg-slate-100 text-slate-500'
+                      'bg-[#102535] text-[#6B7C86]'
                     }`}>
                       {index + 1}
                     </div>
                     <div>
-                      <h3 className="text-sm font-bold text-[#1a1a1a]">{stop.cargoDescription}</h3>
-                      <p className="text-xs text-slate-400 mt-0.5">
+                      <h3 className="text-sm font-bold text-[#F7F9FB]">{stop.cargoDescription}</h3>
+                      <p className="text-xs text-[#6B7C86] mt-0.5">
                         {stop.weightKg}kg &middot; {stop.volumeM3}m&sup3;
-                        {stop.routeDirection === 'return' && <span className="ml-1 text-[#C6904D] font-medium">(Return)</span>}
+                        {stop.routeDirection === 'return' && <span className="ml-1 text-[#FF6A2A] font-medium">(Return)</span>}
                       </p>
                       {stop.yachtName && (
-                        <p className="text-xs text-slate-500 mt-1">
+                        <p className="text-xs text-[#6B7C86] mt-1">
                           Yacht: <strong>{stop.yachtName}</strong>
                           {stop.yachtMMSI && (
                             <a
                               href={`https://www.marinetraffic.com/en/ais/details/ships/mmsi:${stop.yachtMMSI}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="ml-1.5 text-[#C6904D] hover:underline"
+                              className="ml-1.5 text-[#FF6A2A] hover:underline"
                             >
                               Track vessel
                             </a>
@@ -288,33 +288,33 @@ export default function DriverPage() {
                         </p>
                       )}
                       {stop.marinaName && (
-                        <p className="text-xs text-slate-400">
+                        <p className="text-xs text-[#6B7C86]">
                           {stop.marinaName}{stop.berthNumber && `, Berth ${stop.berthNumber}`}
                         </p>
                       )}
                       {stop.pickupAddress && (
-                        <p className="text-xs text-slate-400 mt-0.5">
+                        <p className="text-xs text-[#6B7C86] mt-0.5">
                           Pickup: {stop.pickupAddress}
                           {' '}
                           <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(stop.pickupAddress)}`}
                              target="_blank" rel="noopener noreferrer"
-                             className="text-xs text-[#C6904D] hover:underline">
+                             className="text-xs text-[#FF6A2A] hover:underline">
                             Navigate
                           </a>
                         </p>
                       )}
                       {stop.deliveryAddress && (
-                        <p className="text-xs text-slate-400 mt-0.5">
+                        <p className="text-xs text-[#6B7C86] mt-0.5">
                           {stop.deliveryAddress}
                           {' '}
                           <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(stop.deliveryAddress)}`}
                              target="_blank" rel="noopener noreferrer"
-                             className="text-xs text-[#C6904D] hover:underline">
+                             className="text-xs text-[#FF6A2A] hover:underline">
                             Navigate
                           </a>
                         </p>
                       )}
-                      <p className="text-xs text-slate-400 mt-1">
+                      <p className="text-xs text-[#6B7C86] mt-1">
                         Contact: {stop.shipper.name}
                         {stop.shipper.phone && <span> &middot; {stop.shipper.phone}</span>}
                       </p>

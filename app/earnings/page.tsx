@@ -25,12 +25,12 @@ interface EarningsData {
 }
 
 const statusColors: Record<string, string> = {
-  PENDING: 'bg-amber-100 text-amber-700',
-  CONFIRMED: 'bg-blue-100 text-blue-700',
+  PENDING: 'bg-[#FF6A2A]/15 text-[#FF6A2A]',
+  CONFIRMED: 'bg-blue-100 text-[#268CB5]',
   PICKED_UP: 'bg-indigo-100 text-indigo-700',
   IN_TRANSIT: 'bg-purple-100 text-purple-700',
-  DELIVERED: 'bg-green-100 text-green-700',
-  CANCELLED: 'bg-slate-100 text-slate-500',
+  DELIVERED: 'bg-[#9ED36A]/15 text-[#9ED36A]',
+  CANCELLED: 'bg-[#102535] text-[#6B7C86]',
   DISPUTED: 'bg-red-100 text-red-600',
 }
 
@@ -66,10 +66,10 @@ export default function EarningsPage() {
 
   useEffect(() => { fetchEarnings() }, [fetchEarnings])
 
-  if (authLoading) return <div className="min-h-screen bg-[#faf9f7]" />
+  if (authLoading) return <div className="min-h-screen bg-[#102535]" />
   if (!user) return (
-    <div className="min-h-screen bg-[#faf9f7] flex items-center justify-center">
-      <p className="text-slate-500">Please <Link href="/login" className="text-[#C6904D]">sign in</Link></p>
+    <div className="min-h-screen bg-[#102535] flex items-center justify-center">
+      <p className="text-[#6B7C86]">Please <Link href="/login" className="text-[#FF6A2A]">sign in</Link></p>
     </div>
   )
 
@@ -79,73 +79,73 @@ export default function EarningsPage() {
   }
 
   return (
-    <div id="main-content" className="min-h-screen bg-[#faf9f7] py-8 px-4">
+    <div id="main-content" className="min-h-screen bg-[#102535] py-8 px-4">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold text-[#1a1a1a] mb-6" style={{ fontFamily: 'var(--font-display)' }}>Earnings</h1>
+        <h1 className="text-2xl font-bold text-[#F7F9FB] mb-6" style={{ fontFamily: 'var(--font-display)' }}>Earnings</h1>
 
         {loading ? (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            {[1,2,3,4].map(i => <div key={i} className="h-24 bg-white rounded-lg border border-[#e8e4de] animate-pulse" />)}
+            {[1,2,3,4].map(i => <div key={i} className="h-24 bg-[#162E3D] rounded-lg border border-white/[0.08] animate-pulse" />)}
           </div>
         ) : !data || data.totalBookings === 0 ? (
-          <div className="text-center py-16 bg-white rounded-lg border border-[#e8e4de]">
-            <p className="text-slate-500 mb-2">No earnings yet</p>
-            <p className="text-xs text-slate-400 mb-4">Complete deliveries to start earning</p>
-            <Link href="/marketplace" className="text-[#C6904D] font-medium hover:underline">Browse available bookings</Link>
+          <div className="text-center py-16 bg-[#162E3D] rounded-lg border border-white/[0.08]">
+            <p className="text-[#6B7C86] mb-2">No earnings yet</p>
+            <p className="text-xs text-[#6B7C86] mb-4">Complete deliveries to start earning</p>
+            <Link href="/marketplace" className="text-[#FF6A2A] font-medium hover:underline">Browse available bookings</Link>
           </div>
         ) : (
           <>
             {/* Stats Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-              <div className="bg-white rounded-lg border border-[#e8e4de] p-4">
-                <p className="text-xs text-slate-400 font-medium uppercase tracking-wider mb-1">Total Earned</p>
-                <p className="text-2xl font-bold text-green-600">{fmt(data.totalRevenue, data.currency)}</p>
+              <div className="bg-[#162E3D] rounded-lg border border-white/[0.08] p-4">
+                <p className="text-xs text-[#6B7C86] font-medium uppercase tracking-wider mb-1">Total Earned</p>
+                <p className="text-2xl font-bold text-[#9ED36A]">{fmt(data.totalRevenue, data.currency)}</p>
               </div>
-              <div className="bg-white rounded-lg border border-[#e8e4de] p-4">
-                <p className="text-xs text-slate-400 font-medium uppercase tracking-wider mb-1">Pending Payout</p>
-                <p className="text-2xl font-bold text-amber-600">{fmt(data.pendingPayouts, data.currency)}</p>
+              <div className="bg-[#162E3D] rounded-lg border border-white/[0.08] p-4">
+                <p className="text-xs text-[#6B7C86] font-medium uppercase tracking-wider mb-1">Pending Payout</p>
+                <p className="text-2xl font-bold text-[#FF6A2A]">{fmt(data.pendingPayouts, data.currency)}</p>
               </div>
-              <div className="bg-white rounded-lg border border-[#e8e4de] p-4">
-                <p className="text-xs text-slate-400 font-medium uppercase tracking-wider mb-1">Deliveries</p>
-                <p className="text-2xl font-bold text-[#1a1a1a]">{data.completedDeliveries}</p>
+              <div className="bg-[#162E3D] rounded-lg border border-white/[0.08] p-4">
+                <p className="text-xs text-[#6B7C86] font-medium uppercase tracking-wider mb-1">Deliveries</p>
+                <p className="text-2xl font-bold text-[#F7F9FB]">{data.completedDeliveries}</p>
               </div>
-              <div className="bg-white rounded-lg border border-[#e8e4de] p-4">
-                <p className="text-xs text-slate-400 font-medium uppercase tracking-wider mb-1">Total Bookings</p>
-                <p className="text-2xl font-bold text-[#1a1a1a]">{data.totalBookings}</p>
+              <div className="bg-[#162E3D] rounded-lg border border-white/[0.08] p-4">
+                <p className="text-xs text-[#6B7C86] font-medium uppercase tracking-wider mb-1">Total Bookings</p>
+                <p className="text-2xl font-bold text-[#F7F9FB]">{data.totalBookings}</p>
               </div>
             </div>
 
             {/* Recent Bookings */}
-            <h2 className="text-lg font-semibold text-[#1a1a1a] mb-4">Recent Bookings</h2>
-            <div className="bg-white rounded-lg border border-[#e8e4de] overflow-hidden">
+            <h2 className="text-lg font-semibold text-[#F7F9FB] mb-4">Recent Bookings</h2>
+            <div className="bg-[#162E3D] rounded-lg border border-white/[0.08] overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-[#e8e4de] bg-[#faf9f7]">
-                      <th scope="col" className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">Booking</th>
-                      <th scope="col" className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">Shipper</th>
-                      <th scope="col" className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">Status</th>
-                      <th scope="col" className="text-right px-4 py-3 text-xs font-medium text-slate-500 uppercase">Total</th>
-                      <th scope="col" className="text-right px-4 py-3 text-xs font-medium text-slate-500 uppercase">Your Payout</th>
-                      <th scope="col" className="text-right px-4 py-3 text-xs font-medium text-slate-500 uppercase">Date</th>
+                    <tr className="border-b border-white/[0.08] bg-[#102535]">
+                      <th scope="col" className="text-left px-4 py-3 text-xs font-medium text-[#6B7C86] uppercase">Booking</th>
+                      <th scope="col" className="text-left px-4 py-3 text-xs font-medium text-[#6B7C86] uppercase">Shipper</th>
+                      <th scope="col" className="text-left px-4 py-3 text-xs font-medium text-[#6B7C86] uppercase">Status</th>
+                      <th scope="col" className="text-right px-4 py-3 text-xs font-medium text-[#6B7C86] uppercase">Total</th>
+                      <th scope="col" className="text-right px-4 py-3 text-xs font-medium text-[#6B7C86] uppercase">Your Payout</th>
+                      <th scope="col" className="text-right px-4 py-3 text-xs font-medium text-[#6B7C86] uppercase">Date</th>
                     </tr>
                   </thead>
                   <tbody>
                     {data.recentBookings.map(b => (
-                      <tr key={b.id} className="border-b border-[#e8e4de] last:border-0 hover:bg-[#faf9f7]">
+                      <tr key={b.id} className="border-b border-white/[0.08] last:border-0 hover:bg-[#162E3D]">
                         <td className="px-4 py-3">
-                          <div className="font-medium text-[#1a1a1a]">{b.trackingCode || b.id.slice(0, 8)}</div>
-                          <div className="text-xs text-slate-400 truncate max-w-[200px]">{b.cargoDescription}</div>
+                          <div className="font-medium text-[#F7F9FB]">{b.trackingCode || b.id.slice(0, 8)}</div>
+                          <div className="text-xs text-[#6B7C86] truncate max-w-[200px]">{b.cargoDescription}</div>
                         </td>
-                        <td className="px-4 py-3 text-slate-600">{b.shipper?.name}</td>
+                        <td className="px-4 py-3 text-[#9AADB8]">{b.shipper?.name}</td>
                         <td className="px-4 py-3">
-                          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[b.status] || 'bg-slate-100 text-slate-500'}`}>
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[b.status] || 'bg-[#102535] text-[#6B7C86]'}`}>
                             {b.status}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-right text-slate-600">{fmt(b.totalPrice, b.currency)}</td>
-                        <td className="px-4 py-3 text-right font-medium text-green-600">{fmt(b.carrierPayout, b.currency)}</td>
-                        <td className="px-4 py-3 text-right text-xs text-slate-400">{new Date(b.createdAt).toLocaleDateString()}</td>
+                        <td className="px-4 py-3 text-right text-[#9AADB8]">{fmt(b.totalPrice, b.currency)}</td>
+                        <td className="px-4 py-3 text-right font-medium text-[#9ED36A]">{fmt(b.carrierPayout, b.currency)}</td>
+                        <td className="px-4 py-3 text-right text-xs text-[#6B7C86]">{new Date(b.createdAt).toLocaleDateString()}</td>
                       </tr>
                     ))}
                   </tbody>
