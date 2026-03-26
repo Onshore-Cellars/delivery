@@ -99,9 +99,8 @@ export default function LoginPage() {
       <div className="flex-1 flex items-center justify-center px-5 sm:px-8 py-12">
         <div className="w-full max-w-sm">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 mb-10 hover:no-underline">
-            <Image src="/logo.png" alt="Onshore Deliver" width={32} height={32} className="rounded-sm" />
-            <span className="text-lg font-semibold text-[#F7F9FB] tracking-wide" style={{ fontFamily: 'var(--font-display)' }}>Onshore</span>
+          <Link href="/" className="flex items-center mb-10 hover:no-underline">
+            <Image src="/logo.png" alt="ON.SHORE Delivery" width={36} height={36} className="rounded-sm" />
           </Link>
 
           <h1 className="text-2xl sm:text-3xl font-light text-[#F7F9FB] tracking-wide" style={{ fontFamily: 'var(--font-display)' }}>Welcome back</h1>

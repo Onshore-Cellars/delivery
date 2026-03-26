@@ -97,11 +97,8 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
         <div className="site-container">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2.5 hover:no-underline">
-              <Image src="/logo.png" alt="Onshore Deliver" width={36} height={36} className="rounded-sm" />
-              <span className={`text-lg font-semibold tracking-wide transition-colors duration-300 ${isTransparentMode ? 'text-white' : 'text-[#F7F9FB]'}`} style={{ fontFamily: 'var(--font-display)' }}>
-                ON.SHORE
-              </span>
+            <Link href="/" className="flex items-center hover:no-underline">
+              <Image src="/logo.png" alt="ON.SHORE Delivery" width={36} height={36} className="rounded-sm" />
             </Link>
 
             {/* Desktop nav */}
