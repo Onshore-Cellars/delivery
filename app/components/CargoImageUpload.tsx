@@ -62,12 +62,12 @@ export default function CargoImageUpload({ images, onChange, maxImages = 5 }: Ca
     <div>
       <div className="flex flex-wrap gap-3">
         {images.map((img, i) => (
-          <div key={i} className="relative w-20 h-20 rounded-xl overflow-hidden border border-slate-200 group">
+          <div key={i} className="relative w-20 h-20 rounded-xl overflow-hidden border border-white/10 group">
             <img src={img} alt={`Cargo ${i + 1}`} className="w-full h-full object-cover" />
             <button
               type="button"
               onClick={() => removeImage(i)}
-              className="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-red-500/100 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+              className="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
             >
               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -81,7 +81,7 @@ export default function CargoImageUpload({ images, onChange, maxImages = 5 }: Ca
             type="button"
             onClick={() => fileRef.current?.click()}
             disabled={uploading}
-            className="w-20 h-20 rounded-xl border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-slate-400 hover:border-[#FF6A2A] hover:text-[#FF6A2A] transition-colors disabled:opacity-50"
+            className="w-20 h-20 rounded-xl border-2 border-dashed border-white/15 flex flex-col items-center justify-center text-slate-400 hover:border-[#FF6A2A] hover:text-[#FF6A2A] transition-colors disabled:opacity-50"
           >
             {uploading ? (
               <svg className="w-5 h-5 animate-spin" viewBox="0 0 24 24">

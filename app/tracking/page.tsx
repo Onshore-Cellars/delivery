@@ -104,16 +104,16 @@ export default function TrackingPage() {
     <div className="page-container narrow">
         <div className="mb-8">
           <p className="text-[11px] font-semibold text-[#FF6A2A] uppercase tracking-[0.15em] mb-1">Logistics</p>
-          <h1 className="text-xl sm:text-2xl font-semibold text-[#1d1d1f] tracking-[-0.02em]">Track Shipment</h1>
+          <h1 className="text-xl sm:text-2xl font-semibold text-[#F7F9FB] tracking-[-0.02em]">Track Shipment</h1>
           <p className="text-[#6B7C86] mt-1.5">Enter your tracking code to see real-time delivery status.</p>
         </div>
 
         {/* Search */}
-        <form onSubmit={handleTrack} className="bg-[#162E3D] rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-6 mb-8">
+        <form onSubmit={handleTrack} className="bg-[#162E3D] rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.3)] border border-white/10 p-6 mb-8">
           <div className="flex gap-3">
             <input
               type="text"
-              className="flex-1 px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-sm text-[#1d1d1f] font-mono tracking-wider focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10 focus:bg-[#162E3D] transition-all outline-none uppercase"
+              className="flex-1 px-4 py-3.5 rounded-xl border border-white/10 bg-[#162E3D]/50 text-sm text-[#F7F9FB] font-mono tracking-wider focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10 focus:bg-[#162E3D] transition-all outline-none uppercase"
               placeholder="OD-XXXXXXXX"
               value={code}
               onChange={(e) => setCode(e.target.value.toUpperCase())}
@@ -127,14 +127,14 @@ export default function TrackingPage() {
 
         {/* User's Active Bookings */}
         {user && !data && userBookings.length > 0 && (
-          <div className="bg-[#162E3D] rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-6 mb-8">
-            <h2 className="text-sm font-bold text-[#1a1a1a] mb-4">Your Shipments</h2>
+          <div className="bg-[#162E3D] rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.3)] border border-white/10 p-6 mb-8">
+            <h2 className="text-sm font-bold text-[#F7F9FB] mb-4">Your Shipments</h2>
             <div className="space-y-2">
               {userBookings.slice((shipmentsPage - 1) * SHIPMENTS_PER_PAGE, shipmentsPage * SHIPMENTS_PER_PAGE).map(b => (
                 <button
                   key={b.id}
                   onClick={() => { setCode(b.trackingCode); setTimeout(() => { const form = document.querySelector('form'); if (form) form.requestSubmit() }, 50) }}
-                  className="w-full text-left flex items-center justify-between px-4 py-3 rounded-xl hover:bg-slate-50 transition-colors group"
+                  className="w-full text-left flex items-center justify-between px-4 py-3 rounded-xl hover:bg-[#162E3D] transition-colors group"
                 >
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
@@ -142,7 +142,7 @@ export default function TrackingPage() {
                       <span className={`px-1.5 py-0.5 rounded text-[9px] font-semibold uppercase ${
                         b.status === 'DELIVERED' ? 'bg-[#9ED36A]/10 text-[#9ED36A]' :
                         b.status === 'IN_TRANSIT' ? 'bg-indigo-50 text-indigo-700' :
-                        b.status === 'CANCELLED' ? 'bg-red-500/10 text-red-700' :
+                        b.status === 'CANCELLED' ? 'bg-red-900/20 text-red-300' :
                         'bg-[#FF6A2A]/10 text-[#FF6A2A]'
                       }`}>{b.status.replace('_', ' ')}</span>
                     </div>
@@ -161,7 +161,7 @@ export default function TrackingPage() {
                 <button
                   onClick={() => setShipmentsPage(p => Math.max(1, p - 1))}
                   disabled={shipmentsPage === 1}
-                  className="px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-200 text-[#9AADB8] hover:bg-slate-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="px-3 py-1.5 text-xs font-medium rounded-lg border border-white/10 text-[#9AADB8] hover:bg-[#162E3D] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Previous
                 </button>
@@ -171,7 +171,7 @@ export default function TrackingPage() {
                 <button
                   onClick={() => setShipmentsPage(p => Math.min(Math.ceil(userBookings.length / SHIPMENTS_PER_PAGE), p + 1))}
                   disabled={shipmentsPage >= Math.ceil(userBookings.length / SHIPMENTS_PER_PAGE)}
-                  className="px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-200 text-[#9AADB8] hover:bg-slate-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="px-3 py-1.5 text-xs font-medium rounded-lg border border-white/10 text-[#9AADB8] hover:bg-[#162E3D] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Next
                 </button>
@@ -187,15 +187,15 @@ export default function TrackingPage() {
         {data && (
           <div className="space-y-6 animate-fade-in">
             {/* Status Progress */}
-            <div className="bg-[#162E3D] rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-6">
+            <div className="bg-[#162E3D] rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.3)] border border-white/10 p-6">
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <span className="text-xs font-mono text-slate-400">{data.booking.trackingCode}</span>
-                  <h2 className="text-lg font-bold text-[#1d1d1f]">{data.booking.cargoDescription}</h2>
+                  <h2 className="text-lg font-bold text-[#F7F9FB]">{data.booking.cargoDescription}</h2>
                 </div>
                 <span className={`badge border ${
                   data.booking.status === 'DELIVERED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
-                  data.booking.status === 'CANCELLED' ? 'bg-red-500/10 text-red-700 border-red-200' :
+                  data.booking.status === 'CANCELLED' ? 'bg-red-900/20 text-red-300 border-red-500/30' :
                   'bg-indigo-50 text-indigo-700 border-indigo-200'
                 }`}>
                   {data.booking.status.replace('_', ' ')}
@@ -211,7 +211,7 @@ export default function TrackingPage() {
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold z-10 ${
                           i <= currentStep
                             ? 'bg-[#1d1d1f] text-white'
-                            : 'bg-slate-100 text-slate-400'
+                            : 'bg-[#102535] text-slate-400'
                         }`}>
                           {i <= currentStep ? (
                             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -221,13 +221,13 @@ export default function TrackingPage() {
                             i + 1
                           )}
                         </div>
-                        <span className={`text-[10px] mt-1.5 font-medium ${i <= currentStep ? 'text-[#1d1d1f]' : 'text-slate-400'}`}>
+                        <span className={`text-[10px] mt-1.5 font-medium ${i <= currentStep ? 'text-[#F7F9FB]' : 'text-slate-400'}`}>
                           {step.replace('_', ' ')}
                         </span>
                       </div>
                     ))}
                   </div>
-                  <div className="absolute top-4 left-0 right-0 h-0.5 bg-slate-100 -z-0 mx-8">
+                  <div className="absolute top-4 left-0 right-0 h-0.5 bg-[#102535] -z-0 mx-8">
                     <div
                       className="h-full bg-[#1d1d1f] transition-all duration-500"
                       style={{ width: `${(currentStep / (statusSteps.length - 1)) * 100}%` }}
@@ -239,18 +239,18 @@ export default function TrackingPage() {
 
             {/* Route & Details */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div className="bg-[#162E3D] rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-6">
+              <div className="bg-[#162E3D] rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.3)] border border-white/10 p-6">
                 <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Route</h3>
                 <div className="flex items-center gap-3 mb-4">
                   <div>
-                    <div className="font-bold text-[#1d1d1f]">{data.route.origin}</div>
+                    <div className="font-bold text-[#F7F9FB]">{data.route.origin}</div>
                     <div className="text-xs text-slate-400">{formatDate(data.route.departure)}</div>
                   </div>
                   <svg className="w-5 h-5 text-slate-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                   </svg>
                   <div>
-                    <div className="font-bold text-[#1d1d1f]">{data.route.destination}</div>
+                    <div className="font-bold text-[#F7F9FB]">{data.route.destination}</div>
                     {data.route.estimatedArrival && (
                       <div className="text-xs text-slate-400">{formatDate(data.route.estimatedArrival)}</div>
                     )}
@@ -262,27 +262,27 @@ export default function TrackingPage() {
                 </div>
               </div>
 
-              <div className="bg-[#162E3D] rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-6">
+              <div className="bg-[#162E3D] rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.3)] border border-white/10 p-6">
                 <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Cargo</h3>
                 <dl className="space-y-2 text-sm">
                   {data.booking.cargoType && (
                     <div className="flex justify-between">
                       <dt className="text-[#6B7C86]">Type</dt>
-                      <dd className="font-medium text-[#1d1d1f]">{data.booking.cargoType}</dd>
+                      <dd className="font-medium text-[#F7F9FB]">{data.booking.cargoType}</dd>
                     </div>
                   )}
                   <div className="flex justify-between">
                     <dt className="text-[#6B7C86]">Weight</dt>
-                    <dd className="font-medium text-[#1d1d1f]">{data.booking.weightKg}kg</dd>
+                    <dd className="font-medium text-[#F7F9FB]">{data.booking.weightKg}kg</dd>
                   </div>
                   <div className="flex justify-between">
                     <dt className="text-[#6B7C86]">Volume</dt>
-                    <dd className="font-medium text-[#1d1d1f]">{data.booking.volumeM3}m&sup3;</dd>
+                    <dd className="font-medium text-[#F7F9FB]">{data.booking.volumeM3}m&sup3;</dd>
                   </div>
                   {data.booking.deliveryAddress && (
                     <div className="flex justify-between">
                       <dt className="text-[#6B7C86]">Delivery</dt>
-                      <dd className="font-medium text-[#1d1d1f] text-right">{data.booking.deliveryAddress}</dd>
+                      <dd className="font-medium text-[#F7F9FB] text-right">{data.booking.deliveryAddress}</dd>
                     </div>
                   )}
                 </dl>
@@ -291,17 +291,17 @@ export default function TrackingPage() {
 
             {/* Timeline */}
             {data.events.length > 0 && (
-              <div className="bg-[#162E3D] rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#e8e4de] p-6">
+              <div className="bg-[#162E3D] rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.3)] border border-white/10 p-6">
                 <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Timeline</h3>
                 <div className="space-y-0">
                   {data.events.map((event, i) => (
                     <div key={event.id} className="flex gap-4">
                       <div className="flex flex-col items-center">
-                        <div className={`w-3 h-3 rounded-full ${i === 0 ? 'bg-[#1d1d1f]' : 'bg-slate-300'}`} />
-                        {i < data.events.length - 1 && <div className="w-px h-full bg-slate-200 my-1" />}
+                        <div className={`w-3 h-3 rounded-full ${i === 0 ? 'bg-[#1d1d1f]' : 'bg-[#1E3A4D]'}`} />
+                        {i < data.events.length - 1 && <div className="w-px h-full bg-[#1E3A4D] my-1" />}
                       </div>
                       <div className="pb-6">
-                        <div className="text-sm font-medium text-[#1d1d1f]">{event.description}</div>
+                        <div className="text-sm font-medium text-[#F7F9FB]">{event.description}</div>
                         <div className="text-xs text-slate-400 mt-0.5">
                           {formatDate(event.timestamp)}
                           {event.location && <span> &middot; {event.location}</span>}

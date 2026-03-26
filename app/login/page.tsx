@@ -101,31 +101,31 @@ export default function LoginPage() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 mb-10 hover:no-underline">
             <Image src="/logo.png" alt="Onshore Deliver" width={32} height={32} className="rounded-sm" />
-            <span className="text-lg font-semibold text-[#1a1a1a] tracking-wide" style={{ fontFamily: 'var(--font-display)' }}>Onshore</span>
+            <span className="text-lg font-semibold text-[#F7F9FB] tracking-wide" style={{ fontFamily: 'var(--font-display)' }}>Onshore</span>
           </Link>
 
-          <h1 className="text-2xl sm:text-3xl font-light text-[#1a1a1a] tracking-wide" style={{ fontFamily: 'var(--font-display)' }}>Welcome back</h1>
+          <h1 className="text-2xl sm:text-3xl font-light text-[#F7F9FB] tracking-wide" style={{ fontFamily: 'var(--font-display)' }}>Welcome back</h1>
           <p className="mt-2 text-sm sm:text-base text-[#6B7C86]">Sign in to manage your deliveries.</p>
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-4">
             {error && (
-              <div className="px-4 py-3 rounded-xl bg-red-500/10 border border-red-100" role="alert">
-                <p className="text-sm text-red-700">{error}</p>
+              <div className="px-4 py-3 rounded-xl bg-red-900/20 border border-red-500/30" role="alert">
+                <p className="text-sm text-red-300">{error}</p>
               </div>
             )}
 
             <div>
-              <label htmlFor="email" className="block text-sm font-semibold text-[#1a1a1a] mb-2">Email</label>
+              <label htmlFor="email" className="block text-sm font-semibold text-[#F7F9FB] mb-2">Email</label>
               <input id="email" type="email" required autoComplete="email"
-                className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-[#162E3D] text-[#1a1a1a] text-[15px] placeholder:text-slate-400 focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10 transition-all outline-none"
+                className="w-full px-4 py-3.5 rounded-xl border border-white/10 bg-[#162E3D] text-[#F7F9FB] text-[15px] placeholder:text-slate-400 focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10 transition-all outline-none"
                 placeholder="you@company.com" value={email} onChange={(e) => setEmail(e.target.value)} />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-semibold text-[#1a1a1a] mb-2">Password</label>
+              <label htmlFor="password" className="block text-sm font-semibold text-[#F7F9FB] mb-2">Password</label>
               <div className="relative">
                 <input id="password" type={showPassword ? 'text' : 'password'} required autoComplete="current-password"
-                  className="w-full px-4 py-3.5 pr-12 rounded-xl border border-slate-200 bg-[#162E3D] text-[#1a1a1a] text-[15px] placeholder:text-slate-400 focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10 transition-all outline-none"
+                  className="w-full px-4 py-3.5 pr-12 rounded-xl border border-white/10 bg-[#162E3D] text-[#F7F9FB] text-[15px] placeholder:text-slate-400 focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10 transition-all outline-none"
                   placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} />
                 <button
                   type="button"
@@ -157,7 +157,7 @@ export default function LoginPage() {
           </form>
 
           <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-[#e8e4de]" /></div>
+            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/10" /></div>
             <div className="relative flex justify-center text-xs"><span className="bg-[#162E3D] px-3 text-slate-400 uppercase tracking-wider font-medium">or</span></div>
           </div>
 
@@ -179,8 +179,8 @@ export default function LoginPage() {
 
           {/* Role Selection for Google Sign-in (new users) */}
           {showRoleSelect && (
-            <div className="mt-4 p-4 rounded-xl border border-[#FF6A2A]/20 bg-[#faf9f7]">
-              <p className="text-sm font-semibold text-[#1a1a1a] mb-3">Select your account type to continue:</p>
+            <div className="mt-4 p-4 rounded-xl border border-[#FF6A2A]/20 bg-[#0B1F2A]">
+              <p className="text-sm font-semibold text-[#F7F9FB] mb-3">Select your account type to continue:</p>
               <div className="grid grid-cols-2 gap-2">
                 {[
                   { role: 'SUPPLIER', label: 'Shipper', desc: 'Send goods' },
@@ -193,9 +193,9 @@ export default function LoginPage() {
                     type="button"
                     disabled={loading}
                     onClick={() => handleRoleSelect(role)}
-                    className="flex flex-col items-center gap-1 p-3 rounded-lg border border-slate-200 bg-[#162E3D] hover:border-[#FF6A2A] hover:bg-[#FF6A2A]/5 transition-all text-center disabled:opacity-50"
+                    className="flex flex-col items-center gap-1 p-3 rounded-lg border border-white/10 bg-[#162E3D] hover:border-[#FF6A2A] hover:bg-[#FF6A2A]/5 transition-all text-center disabled:opacity-50"
                   >
-                    <span className="text-sm font-semibold text-[#1a1a1a]">{label}</span>
+                    <span className="text-sm font-semibold text-[#F7F9FB]">{label}</span>
                     <span className="text-xs text-[#6B7C86]">{desc}</span>
                   </button>
                 ))}
@@ -206,7 +206,7 @@ export default function LoginPage() {
 
           <p className="mt-8 text-center text-sm text-[#6B7C86]">
             Don&apos;t have an account?{' '}
-            <Link href="/register" className="font-semibold text-[#FF6A2A] hover:text-[#b07d3f]">Create one</Link>
+            <Link href="/register" className="font-semibold text-[#FF6A2A] hover:text-[#FF8F5A]">Create one</Link>
           </p>
         </div>
       </div>

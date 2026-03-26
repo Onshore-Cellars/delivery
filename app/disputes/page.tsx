@@ -20,7 +20,7 @@ interface Dispute {
 }
 
 const statusColors: Record<string, string> = {
-  OPEN: 'bg-red-100 text-red-700',
+  OPEN: 'bg-red-100 text-red-300',
   UNDER_REVIEW: 'bg-[#FF6A2A]/15 text-[#FF6A2A]',
   RESOLVED: 'bg-[#9ED36A]/15 text-[#9ED36A]',
   APPEALED: 'bg-purple-100 text-purple-700',
@@ -105,47 +105,47 @@ export default function DisputesPage() {
     finally { setCreating(false) }
   }
 
-  if (authLoading) return <div className="min-h-screen bg-[#faf9f7]" />
+  if (authLoading) return <div className="min-h-screen bg-[#0B1F2A]" />
   if (!user) return (
-    <div className="min-h-screen bg-[#faf9f7] flex items-center justify-center">
+    <div className="min-h-screen bg-[#0B1F2A] flex items-center justify-center">
       <p className="text-[#6B7C86]">Please <Link href="/login" className="text-[#FF6A2A]">sign in</Link></p>
     </div>
   )
 
-  const inputClass = 'w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10 outline-none'
+  const inputClass = 'w-full px-3 py-2 rounded-lg border border-white/10 text-sm focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10 outline-none'
 
   return (
-    <div id="main-content" className="min-h-screen bg-[#faf9f7] py-8 px-4">
+    <div id="main-content" className="min-h-screen bg-[#0B1F2A] py-8 px-4">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-[#1a1a1a]" style={{ fontFamily: 'var(--font-display)' }}>Disputes</h1>
-          <button onClick={() => setShowCreate(!showCreate)} className="px-4 py-2 bg-[#1a1a1a] text-white rounded-lg text-sm font-semibold hover:bg-[#333] transition-colors">
+          <h1 className="text-2xl font-bold text-[#F7F9FB]" style={{ fontFamily: 'var(--font-display)' }}>Disputes</h1>
+          <button onClick={() => setShowCreate(!showCreate)} className="px-4 py-2 bg-[#FF6A2A] text-white rounded-lg text-sm font-semibold hover:bg-[#E85A1C] transition-colors">
             {showCreate ? 'Cancel' : 'Raise Dispute'}
           </button>
         </div>
 
-        {error && <div className="mb-4 p-3 bg-red-500/10 border border-red-200 rounded-lg text-sm text-red-400 flex justify-between"><span>{error}</span><button onClick={() => setError('')} className="text-red-400">&times;</button></div>}
+        {error && <div className="mb-4 p-3 bg-red-900/20 border border-red-500/30 rounded-lg text-sm text-red-400 flex justify-between"><span>{error}</span><button onClick={() => setError('')} className="text-red-400">&times;</button></div>}
 
         {showCreate && (
-          <div className="bg-[#162E3D] rounded-lg border border-[#e8e4de] p-5 mb-6">
-            <h2 className="font-semibold text-[#1a1a1a] mb-4">Raise a Dispute</h2>
+          <div className="bg-[#162E3D] rounded-lg border border-white/10 p-5 mb-6">
+            <h2 className="font-semibold text-[#F7F9FB] mb-4">Raise a Dispute</h2>
             <div className="space-y-3 mb-4">
               <div>
-                <label className="block text-sm font-medium text-[#1a1a1a] mb-1">Booking ID or Tracking Code</label>
+                <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Booking ID or Tracking Code</label>
                 <input className={inputClass} placeholder="e.g. OD-ABC123" value={createForm.bookingId} onChange={e => setCreateForm({...createForm, bookingId: e.target.value})} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-[#1a1a1a] mb-1">Dispute Type</label>
+                <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Dispute Type</label>
                 <select className={inputClass} value={createForm.type} onChange={e => setCreateForm({...createForm, type: e.target.value})}>
                   {Object.entries(typeLabels).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-[#1a1a1a] mb-1">Description</label>
+                <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Description</label>
                 <textarea className={inputClass} rows={4} placeholder="Describe what happened..." value={createForm.description} onChange={e => setCreateForm({...createForm, description: e.target.value})} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-[#1a1a1a] mb-1">Claim Amount (optional)</label>
+                <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Claim Amount (optional)</label>
                 <input className={inputClass} type="number" step="0.01" placeholder="0.00" value={createForm.claimAmount} onChange={e => setCreateForm({...createForm, claimAmount: e.target.value})} />
               </div>
             </div>
@@ -156,21 +156,21 @@ export default function DisputesPage() {
         )}
 
         {loading ? (
-          <div className="space-y-4">{[1,2,3].map(i => <div key={i} className="h-32 bg-[#162E3D] rounded-lg border border-[#e8e4de] animate-pulse" />)}</div>
+          <div className="space-y-4">{[1,2,3].map(i => <div key={i} className="h-32 bg-[#162E3D] rounded-lg border border-white/10 animate-pulse" />)}</div>
         ) : disputes.length === 0 ? (
-          <div className="text-center py-16 bg-[#162E3D] rounded-lg border border-[#e8e4de]">
+          <div className="text-center py-16 bg-[#162E3D] rounded-lg border border-white/10">
             <p className="text-[#6B7C86] mb-2">No disputes</p>
             <p className="text-xs text-slate-400">Disputes you raise or receive will appear here</p>
           </div>
         ) : (
           <div className="space-y-4">
             {disputes.map(d => (
-              <div key={d.id} className="bg-[#162E3D] rounded-lg border border-[#e8e4de] p-5">
+              <div key={d.id} className="bg-[#162E3D] rounded-lg border border-white/10 p-5">
                 <div className="flex items-start justify-between mb-3">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-semibold text-[#1a1a1a]">{typeLabels[d.type] || d.type}</span>
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[d.status] || 'bg-slate-100 text-[#6B7C86]'}`}>
+                      <span className="font-semibold text-[#F7F9FB]">{typeLabels[d.type] || d.type}</span>
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[d.status] || 'bg-[#102535] text-[#6B7C86]'}`}>
                         {d.status.replace('_', ' ')}
                       </span>
                       {d.priority && <span className="text-xs text-slate-400">Priority: {d.priority}</span>}
@@ -192,11 +192,11 @@ export default function DisputesPage() {
 
                 {/* AI Assessment (admin only) */}
                 {user?.role === 'ADMIN' && (
-                  <div className="mt-3 pt-3 border-t border-[#e8e4de]">
+                  <div className="mt-3 pt-3 border-t border-white/10">
                     {assessments[d.id] ? (
-                      <div className="bg-[#faf9f7] rounded p-3 text-xs space-y-1">
+                      <div className="bg-[#0B1F2A] rounded p-3 text-xs space-y-1">
                         <div className="flex items-center gap-2 mb-2">
-                          <span className="font-semibold text-[#1a1a1a]">AI Assessment</span>
+                          <span className="font-semibold text-[#F7F9FB]">AI Assessment</span>
                           <span className="px-2 py-0.5 rounded-full bg-[#FF6A2A]/10 text-[#FF6A2A] font-medium">Fairness: {assessments[d.id].fairnessScore}/10</span>
                         </div>
                         <p className="text-[#9AADB8]"><strong>Recommendation:</strong> {assessments[d.id].recommendation}</p>
@@ -207,7 +207,7 @@ export default function DisputesPage() {
                       <button
                         onClick={() => assessDispute(d)}
                         disabled={assessingId === d.id}
-                        className="px-3 py-1.5 bg-[#FF6A2A] text-white rounded text-xs font-medium hover:bg-[#b07d3f] disabled:opacity-50 transition-colors"
+                        className="px-3 py-1.5 bg-[#FF6A2A] text-white rounded text-xs font-medium hover:bg-[#E85A1C] disabled:opacity-50 transition-colors"
                       >
                         {assessingId === d.id ? 'Assessing...' : 'AI Assess'}
                       </button>

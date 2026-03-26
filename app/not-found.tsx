@@ -5,16 +5,16 @@ export const metadata: Metadata = { title: 'Page Not Found' }
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#faf9f7] px-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#0B1F2A] px-4">
       <div className="text-center max-w-md">
-        <h1 className="text-6xl font-bold text-[#1a1a1a] mb-4" style={{ fontFamily: 'var(--font-display)' }}>404</h1>
-        <h2 className="text-xl font-semibold text-[#1a1a1a] mb-2">Page not found</h2>
+        <h1 className="text-6xl font-bold text-[#F7F9FB] mb-4" style={{ fontFamily: 'var(--font-display)' }}>404</h1>
+        <h2 className="text-xl font-semibold text-[#F7F9FB] mb-2">Page not found</h2>
         <p className="text-sm text-[#6B7C86] mb-8">The page you&apos;re looking for doesn&apos;t exist or has been moved.</p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Link href="/" className="px-6 py-3 bg-[#1a1a1a] text-white rounded-lg text-sm font-semibold hover:bg-[#333] transition-colors">
+          <Link href="/" className="px-6 py-3 bg-[#FF6A2A] text-white rounded-lg text-sm font-semibold hover:bg-[#E85A1C] transition-colors">
             Go Home
           </Link>
-          <Link href="/marketplace" className="px-6 py-3 border border-[#e8e4de] text-[#1a1a1a] rounded-lg text-sm font-semibold hover:bg-[#162E3D] transition-colors">
+          <Link href="/marketplace" className="px-6 py-3 border border-white/10 text-[#F7F9FB] rounded-lg text-sm font-semibold hover:bg-[#162E3D] transition-colors">
             Browse Marketplace
           </Link>
         </div>

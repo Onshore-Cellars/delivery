@@ -56,14 +56,14 @@ function VerifyEmailContent() {
   return (
     <div className="page-container flex items-center justify-center py-20">
       <div className="text-center">
-        <div className={`w-16 h-16 rounded-full ${success ? 'bg-[#9ED36A]/10' : 'bg-red-500/10'} flex items-center justify-center mx-auto mb-4`}>
+        <div className={`w-16 h-16 rounded-full ${success ? 'bg-[#9ED36A]/10' : 'bg-red-900/20'} flex items-center justify-center mx-auto mb-4`}>
           {success ? (
             <svg className="w-8 h-8 text-[#9ED36A]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
           ) : (
             <svg className="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
           )}
         </div>
-        <h2 className="text-xl font-bold text-[#1a1a1a] mb-2">{success ? 'Email Verified!' : 'Verification Failed'}</h2>
+        <h2 className="text-xl font-bold text-[#F7F9FB] mb-2">{success ? 'Email Verified!' : 'Verification Failed'}</h2>
         <p className="text-[#6B7C86] mb-6">{success ? 'Your email has been verified. You can now use all features.' : error}</p>
         <Link href={success ? '/dashboard' : '/login'} className="btn-primary">
           {success ? 'Go to Dashboard' : 'Back to Login'}

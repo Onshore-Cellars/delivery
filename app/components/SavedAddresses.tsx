@@ -84,26 +84,26 @@ export default function SavedAddresses({ token, onSelect, type = 'all', selectab
   return (
     <div>
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold text-[#1a1a1a]">Saved Addresses</h3>
+        <h3 className="text-sm font-semibold text-[#F7F9FB]">Saved Addresses</h3>
         <button onClick={() => setShowForm(!showForm)} className="text-xs font-semibold text-[#FF6A2A] hover:underline">
           {showForm ? 'Cancel' : '+ Add'}
         </button>
       </div>
 
       {showForm && (
-        <div className="bg-[#faf9f7] rounded-lg p-4 mb-4 space-y-3">
+        <div className="bg-[#0B1F2A] rounded-lg p-4 mb-4 space-y-3">
           <div className="grid grid-cols-2 gap-3">
-            <input placeholder="Label (e.g. Home, Marina)" value={form.label} onChange={e => setForm({ ...form, label: e.target.value })} className="col-span-2 px-3 py-2 rounded border border-[#e8e4de] text-sm focus:border-[#FF6A2A] outline-none" />
-            <input placeholder="Address" value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} className="col-span-2 px-3 py-2 rounded border border-[#e8e4de] text-sm focus:border-[#FF6A2A] outline-none" />
-            <input placeholder="City" value={form.city} onChange={e => setForm({ ...form, city: e.target.value })} className="px-3 py-2 rounded border border-[#e8e4de] text-sm focus:border-[#FF6A2A] outline-none" />
-            <input placeholder="Country" value={form.country} onChange={e => setForm({ ...form, country: e.target.value })} className="px-3 py-2 rounded border border-[#e8e4de] text-sm focus:border-[#FF6A2A] outline-none" />
-            <input placeholder="Contact name" value={form.contactName} onChange={e => setForm({ ...form, contactName: e.target.value })} className="px-3 py-2 rounded border border-[#e8e4de] text-sm focus:border-[#FF6A2A] outline-none" />
-            <input placeholder="Contact phone" value={form.contactPhone} onChange={e => setForm({ ...form, contactPhone: e.target.value })} className="px-3 py-2 rounded border border-[#e8e4de] text-sm focus:border-[#FF6A2A] outline-none" />
-            <input placeholder="Marina name" value={form.marinaName} onChange={e => setForm({ ...form, marinaName: e.target.value })} className="px-3 py-2 rounded border border-[#e8e4de] text-sm focus:border-[#FF6A2A] outline-none" />
-            <input placeholder="Berth number" value={form.berthNumber} onChange={e => setForm({ ...form, berthNumber: e.target.value })} className="px-3 py-2 rounded border border-[#e8e4de] text-sm focus:border-[#FF6A2A] outline-none" />
+            <input placeholder="Label (e.g. Home, Marina)" value={form.label} onChange={e => setForm({ ...form, label: e.target.value })} className="col-span-2 px-3 py-2 rounded border border-white/10 text-sm focus:border-[#FF6A2A] outline-none" />
+            <input placeholder="Address" value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} className="col-span-2 px-3 py-2 rounded border border-white/10 text-sm focus:border-[#FF6A2A] outline-none" />
+            <input placeholder="City" value={form.city} onChange={e => setForm({ ...form, city: e.target.value })} className="px-3 py-2 rounded border border-white/10 text-sm focus:border-[#FF6A2A] outline-none" />
+            <input placeholder="Country" value={form.country} onChange={e => setForm({ ...form, country: e.target.value })} className="px-3 py-2 rounded border border-white/10 text-sm focus:border-[#FF6A2A] outline-none" />
+            <input placeholder="Contact name" value={form.contactName} onChange={e => setForm({ ...form, contactName: e.target.value })} className="px-3 py-2 rounded border border-white/10 text-sm focus:border-[#FF6A2A] outline-none" />
+            <input placeholder="Contact phone" value={form.contactPhone} onChange={e => setForm({ ...form, contactPhone: e.target.value })} className="px-3 py-2 rounded border border-white/10 text-sm focus:border-[#FF6A2A] outline-none" />
+            <input placeholder="Marina name" value={form.marinaName} onChange={e => setForm({ ...form, marinaName: e.target.value })} className="px-3 py-2 rounded border border-white/10 text-sm focus:border-[#FF6A2A] outline-none" />
+            <input placeholder="Berth number" value={form.berthNumber} onChange={e => setForm({ ...form, berthNumber: e.target.value })} className="px-3 py-2 rounded border border-white/10 text-sm focus:border-[#FF6A2A] outline-none" />
           </div>
-          <textarea placeholder="Notes (e.g. gate code, access instructions)" value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} className="w-full px-3 py-2 rounded border border-[#e8e4de] text-sm focus:border-[#FF6A2A] outline-none min-h-[50px] resize-none" />
-          <label className="flex items-center gap-2 text-xs text-[#4a4a4a]">
+          <textarea placeholder="Notes (e.g. gate code, access instructions)" value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} className="w-full px-3 py-2 rounded border border-white/10 text-sm focus:border-[#FF6A2A] outline-none min-h-[50px] resize-none" />
+          <label className="flex items-center gap-2 text-xs text-[#9AADB8]">
             <input type="checkbox" checked={form.isDefault} onChange={e => setForm({ ...form, isDefault: e.target.checked })} className="rounded" />
             Set as default
           </label>
@@ -118,12 +118,12 @@ export default function SavedAddresses({ token, onSelect, type = 'all', selectab
           {addresses.map(addr => (
             <div
               key={addr.id}
-              className={`p-3 rounded-lg border ${selectable ? 'cursor-pointer hover:border-[#FF6A2A]' : ''} ${addr.isDefault ? 'border-[#FF6A2A] bg-[#FF6A2A]/5' : 'border-[#e8e4de]'} transition-colors`}
+              className={`p-3 rounded-lg border ${selectable ? 'cursor-pointer hover:border-[#FF6A2A]' : ''} ${addr.isDefault ? 'border-[#FF6A2A] bg-[#FF6A2A]/5' : 'border-white/10'} transition-colors`}
               onClick={() => selectable && onSelect?.(addr)}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-semibold text-[#1a1a1a]">{addr.label}</span>
+                  <span className="text-sm font-semibold text-[#F7F9FB]">{addr.label}</span>
                   {addr.isDefault && <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#FF6A2A]/10 text-[#FF6A2A] font-semibold">Default</span>}
                 </div>
                 {!selectable && (
@@ -132,7 +132,7 @@ export default function SavedAddresses({ token, onSelect, type = 'all', selectab
                   </button>
                 )}
               </div>
-              <p className="text-xs text-[#4a4a4a] mt-1">{addr.address}</p>
+              <p className="text-xs text-[#9AADB8] mt-1">{addr.address}</p>
               {(addr.city || addr.country) && <p className="text-xs text-slate-400">{[addr.city, addr.country].filter(Boolean).join(', ')}</p>}
               {addr.marinaName && <p className="text-xs text-slate-400">Marina: {addr.marinaName}{addr.berthNumber ? ` — Berth ${addr.berthNumber}` : ''}</p>}
             </div>

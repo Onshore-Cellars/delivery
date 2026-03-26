@@ -360,10 +360,10 @@ export default function Home() {
               <span className="font-[family-name:var(--font-display)] text-sm font-light text-[#6B7C86] tracking-wide">Onshore Group · Brand System</span>
             </div>
             <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-[#6B7C86]">
-              <Link href="/about" className="text-[#6B7C86] hover:text-[#F7F9FB] hover:no-underline transition-colors">About</Link>
-              <Link href="/terms" className="text-[#6B7C86] hover:text-[#F7F9FB] hover:no-underline transition-colors">Terms</Link>
-              <Link href="/privacy" className="text-[#6B7C86] hover:text-[#F7F9FB] hover:no-underline transition-colors">Privacy</Link>
-              <Link href="/help" className="text-[#6B7C86] hover:text-[#F7F9FB] hover:no-underline transition-colors">Support</Link>
+              <Link href="/about" className="text-[#6B7C86] hover:text-white hover:no-underline transition-colors">About</Link>
+              <Link href="/terms" className="text-[#6B7C86] hover:text-white hover:no-underline transition-colors">Terms</Link>
+              <Link href="/privacy" className="text-[#6B7C86] hover:text-white hover:no-underline transition-colors">Privacy</Link>
+              <Link href="/help" className="text-[#6B7C86] hover:text-white hover:no-underline transition-colors">Support</Link>
             </div>
           </div>
           <div className="mt-6 pt-6 border-t border-white/[0.04]">

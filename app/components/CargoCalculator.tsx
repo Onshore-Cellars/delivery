@@ -90,7 +90,7 @@ export default function CargoCalculator({ onCalculated }: CargoCalculatorProps) 
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="text-xs font-medium text-[#FF6A2A] hover:text-[#b07e3a] transition-colors"
+        className="text-xs font-medium text-[#FF6A2A] hover:text-[#FF8F5A] transition-colors"
       >
         Calculate from pallets/boxes
       </button>
@@ -98,9 +98,9 @@ export default function CargoCalculator({ onCalculated }: CargoCalculatorProps) 
   }
 
   return (
-    <div className="border border-slate-200 rounded-xl p-4 bg-slate-50 space-y-3">
+    <div className="border border-white/10 rounded-xl p-4 bg-[#162E3D] space-y-3">
       <div className="flex items-center justify-between">
-        <h4 className="text-sm font-semibold text-[#1a1a1a]">Cargo Calculator</h4>
+        <h4 className="text-sm font-semibold text-[#F7F9FB]">Cargo Calculator</h4>
         <button type="button" onClick={() => setOpen(false)} className="text-xs text-slate-400 hover:text-[#9AADB8]">Close</button>
       </div>
 
@@ -109,7 +109,7 @@ export default function CargoCalculator({ onCalculated }: CargoCalculatorProps) 
           <div className="flex items-center justify-between">
             <div className="flex gap-2">
               <select
-                className="text-xs px-2 py-1 rounded border border-slate-200 bg-[#162E3D] outline-none focus:border-[#FF6A2A]"
+                className="text-xs px-2 py-1 rounded border border-white/10 bg-[#162E3D] outline-none focus:border-[#FF6A2A]"
                 value={item.type}
                 onChange={e => updateItem(item.id, { type: e.target.value as CargoItem['type'], palletSize: e.target.value === 'pallet' ? 'euro' : undefined })}
               >
@@ -119,7 +119,7 @@ export default function CargoCalculator({ onCalculated }: CargoCalculatorProps) 
               </select>
               {item.type === 'pallet' && (
                 <select
-                  className="text-xs px-2 py-1 rounded border border-slate-200 bg-[#162E3D] outline-none focus:border-[#FF6A2A]"
+                  className="text-xs px-2 py-1 rounded border border-white/10 bg-[#162E3D] outline-none focus:border-[#FF6A2A]"
                   value={item.palletSize}
                   onChange={e => updateItem(item.id, { palletSize: e.target.value as CargoItem['palletSize'] })}
                 >
@@ -137,23 +137,23 @@ export default function CargoCalculator({ onCalculated }: CargoCalculatorProps) 
           <div className="grid grid-cols-5 gap-2">
             <div>
               <label className="block text-[10px] text-[#6B7C86] mb-0.5">Qty</label>
-              <input type="number" min="1" className="w-full px-2 py-1 text-xs rounded border border-slate-200 outline-none focus:border-[#FF6A2A]" value={item.quantity || ''} onChange={e => updateItem(item.id, { quantity: parseInt(e.target.value) || 1 })} />
+              <input type="number" min="1" className="w-full px-2 py-1 text-xs rounded border border-white/10 outline-none focus:border-[#FF6A2A]" value={item.quantity || ''} onChange={e => updateItem(item.id, { quantity: parseInt(e.target.value) || 1 })} />
             </div>
             <div>
               <label className="block text-[10px] text-[#6B7C86] mb-0.5">L (cm)</label>
-              <input type="number" min="0" className="w-full px-2 py-1 text-xs rounded border border-slate-200 outline-none focus:border-[#FF6A2A]" value={item.lengthCm || ''} onChange={e => updateItem(item.id, { lengthCm: parseFloat(e.target.value) || 0 })} disabled={item.type === 'pallet' && item.palletSize !== 'custom'} />
+              <input type="number" min="0" className="w-full px-2 py-1 text-xs rounded border border-white/10 outline-none focus:border-[#FF6A2A]" value={item.lengthCm || ''} onChange={e => updateItem(item.id, { lengthCm: parseFloat(e.target.value) || 0 })} disabled={item.type === 'pallet' && item.palletSize !== 'custom'} />
             </div>
             <div>
               <label className="block text-[10px] text-[#6B7C86] mb-0.5">W (cm)</label>
-              <input type="number" min="0" className="w-full px-2 py-1 text-xs rounded border border-slate-200 outline-none focus:border-[#FF6A2A]" value={item.widthCm || ''} onChange={e => updateItem(item.id, { widthCm: parseFloat(e.target.value) || 0 })} disabled={item.type === 'pallet' && item.palletSize !== 'custom'} />
+              <input type="number" min="0" className="w-full px-2 py-1 text-xs rounded border border-white/10 outline-none focus:border-[#FF6A2A]" value={item.widthCm || ''} onChange={e => updateItem(item.id, { widthCm: parseFloat(e.target.value) || 0 })} disabled={item.type === 'pallet' && item.palletSize !== 'custom'} />
             </div>
             <div>
               <label className="block text-[10px] text-[#6B7C86] mb-0.5">H (cm)</label>
-              <input type="number" min="0" className="w-full px-2 py-1 text-xs rounded border border-slate-200 outline-none focus:border-[#FF6A2A]" value={item.heightCm || ''} onChange={e => updateItem(item.id, { heightCm: parseFloat(e.target.value) || 0 })} />
+              <input type="number" min="0" className="w-full px-2 py-1 text-xs rounded border border-white/10 outline-none focus:border-[#FF6A2A]" value={item.heightCm || ''} onChange={e => updateItem(item.id, { heightCm: parseFloat(e.target.value) || 0 })} />
             </div>
             <div>
               <label className="block text-[10px] text-[#6B7C86] mb-0.5">Wt (kg)</label>
-              <input type="number" min="0" step="0.1" className="w-full px-2 py-1 text-xs rounded border border-slate-200 outline-none focus:border-[#FF6A2A]" value={item.weightKg || ''} onChange={e => updateItem(item.id, { weightKg: parseFloat(e.target.value) || 0 })} />
+              <input type="number" min="0" step="0.1" className="w-full px-2 py-1 text-xs rounded border border-white/10 outline-none focus:border-[#FF6A2A]" value={item.weightKg || ''} onChange={e => updateItem(item.id, { weightKg: parseFloat(e.target.value) || 0 })} />
             </div>
           </div>
 
@@ -166,8 +166,8 @@ export default function CargoCalculator({ onCalculated }: CargoCalculatorProps) 
       ))}
 
       <div className="flex gap-2">
-        <button type="button" onClick={() => addItem('pallet')} className="text-xs px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-[#162E3D] transition-colors">+ Pallet</button>
-        <button type="button" onClick={() => addItem('box')} className="text-xs px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-[#162E3D] transition-colors">+ Box</button>
+        <button type="button" onClick={() => addItem('pallet')} className="text-xs px-3 py-1.5 rounded-lg border border-white/10 hover:bg-[#162E3D] transition-colors">+ Pallet</button>
+        <button type="button" onClick={() => addItem('box')} className="text-xs px-3 py-1.5 rounded-lg border border-white/10 hover:bg-[#162E3D] transition-colors">+ Box</button>
       </div>
 
       {/* Summary */}
@@ -183,7 +183,7 @@ export default function CargoCalculator({ onCalculated }: CargoCalculatorProps) 
               {(items.reduce((sum, i) => sum + ((i.lengthCm / 100) * (i.widthCm / 100) * (i.heightCm / 100) * (i.quantity || 1)), 0)).toFixed(2)} m&sup3;
             </span>
           </div>
-          <button type="button" onClick={calculate} className="text-xs font-semibold bg-[#FF6A2A] px-4 py-1.5 rounded-lg hover:bg-[#b07e3a] transition-colors">
+          <button type="button" onClick={calculate} className="text-xs font-semibold bg-[#FF6A2A] px-4 py-1.5 rounded-lg hover:bg-[#E85A1C] transition-colors">
             Apply
           </button>
         </div>

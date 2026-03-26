@@ -141,13 +141,13 @@ export default function VehiclesPage() {
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-[#F7F9FB]" style={{ fontFamily: 'var(--font-display)' }}>My Vehicles</h1>
-          <button onClick={() => setShowAdd(!showAdd)} className="px-4 py-2 bg-[#F7F9FB] text-white rounded-lg text-sm font-semibold hover:bg-[#102535] transition-colors">
+          <button onClick={() => setShowAdd(!showAdd)} className="px-4 py-2 bg-[#FF6A2A] text-white rounded-lg text-sm font-semibold hover:bg-[#102535] transition-colors">
             {showAdd ? 'Cancel' : '+ Add Vehicle'}
           </button>
         </div>
 
-        {error && <div className="mb-4 p-3 bg-red-500/10 border border-red-200 rounded-lg text-sm text-red-400 flex justify-between"><span>{error}</span><button onClick={() => setError('')} className="text-red-400">&times;</button></div>}
-        {success && <div className="mb-4 p-3 bg-[#9ED36A]/10 border border-green-200 rounded-lg text-sm text-[#9ED36A] flex justify-between"><span>{success}</span><button onClick={() => setSuccess('')} className="text-green-400">&times;</button></div>}
+        {error && <div className="mb-4 p-3 bg-red-900/20 border border-red-500/30 rounded-lg text-sm text-red-400 flex justify-between"><span>{error}</span><button onClick={() => setError('')} className="text-red-400">&times;</button></div>}
+        {success && <div className="mb-4 p-3 bg-[#9ED36A]/10 border border-green-500/30 rounded-lg text-sm text-[#9ED36A] flex justify-between"><span>{success}</span><button onClick={() => setSuccess('')} className="text-green-400">&times;</button></div>}
 
         {showAdd && (
           <div className="bg-[#162E3D] rounded-lg border border-[rgba(255,255,255,0.08)] p-5 mb-6">
@@ -168,7 +168,7 @@ export default function VehiclesPage() {
               <input className={inputClass} placeholder="Payload (kg)" type="number" value={addForm.maxPayloadKg} onChange={e => setAddForm({...addForm, maxPayloadKg: e.target.value})} />
               <input className={inputClass} placeholder="Volume (m³)" type="number" step="0.1" value={addForm.cargoVolumeM3} onChange={e => setAddForm({...addForm, cargoVolumeM3: e.target.value})} />
             </div>
-            <button onClick={handleAdd} disabled={saving} className="px-4 py-2 bg-[#F7F9FB] text-white rounded-lg text-sm font-semibold disabled:opacity-50">
+            <button onClick={handleAdd} disabled={saving} className="px-4 py-2 bg-[#FF6A2A] text-white rounded-lg text-sm font-semibold disabled:opacity-50">
               {saving ? 'Saving...' : 'Add Vehicle'}
             </button>
           </div>
@@ -195,7 +195,7 @@ export default function VehiclesPage() {
                       <input className={inputClass} type="number" step="0.1" value={editForm.cargoVolumeM3 || ''} onChange={e => setEditForm({...editForm, cargoVolumeM3: parseFloat(e.target.value) || undefined})} placeholder="Volume m³" />
                     </div>
                     <div className="flex gap-2">
-                      <button onClick={() => handleSave(v.id)} disabled={saving} className="px-3 py-1.5 bg-[#F7F9FB] text-white rounded text-xs font-medium disabled:opacity-50">{saving ? 'Saving...' : 'Save'}</button>
+                      <button onClick={() => handleSave(v.id)} disabled={saving} className="px-3 py-1.5 bg-[#FF6A2A] text-white rounded text-xs font-medium disabled:opacity-50">{saving ? 'Saving...' : 'Save'}</button>
                       <button onClick={() => setEditingId(null)} className="px-3 py-1.5 border border-[rgba(255,255,255,0.08)] rounded text-xs font-medium">Cancel</button>
                     </div>
                   </div>
@@ -224,7 +224,7 @@ export default function VehiclesPage() {
                     </div>
                     <div className="flex gap-2">
                       <button onClick={() => { setEditingId(v.id); setEditForm(v) }} className="px-3 py-1.5 border border-[rgba(255,255,255,0.08)] rounded text-xs font-medium text-[#F7F9FB] hover:bg-[#102535]">Edit</button>
-                      <button onClick={() => handleDelete(v.id)} className="px-3 py-1.5 border border-red-200 rounded text-xs font-medium text-red-500 hover:bg-red-500/100/10">Delete</button>
+                      <button onClick={() => handleDelete(v.id)} className="px-3 py-1.5 border border-red-500/30 rounded text-xs font-medium text-red-500 hover:bg-red-900/20">Delete</button>
                     </div>
                   </div>
                 )}

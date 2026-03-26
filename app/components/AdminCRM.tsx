@@ -738,19 +738,19 @@ export default function AdminCRM({ token }: { token: string }) {
 
   const priorityBadge = (p: string) => {
     const colors: Record<string, string> = {
-      high: 'bg-red-500/10 text-red-700 border-red-200',
+      high: 'bg-red-900/20 text-red-300 border-red-500/30',
       medium: 'bg-[#FF6A2A]/10 text-[#FF6A2A] border-[#FF6A2A]/20',
-      low: 'bg-slate-50 text-[#6B7C86] border-slate-200',
+      low: 'bg-[#162E3D] text-[#6B7C86] border-white/10',
     }
     return colors[p] || colors.medium
   }
 
   const statusBadge = (s: string) => {
     const colors: Record<string, string> = {
-      draft: 'bg-slate-50 text-[#9AADB8] border-slate-200',
-      sending: 'bg-[#1E6F8F]/15 text-[#268CB5] border-blue-200',
-      sent: 'bg-[#9ED36A]/10 text-[#9ED36A] border-green-200',
-      failed: 'bg-red-500/10 text-red-700 border-red-200',
+      draft: 'bg-[#162E3D] text-[#9AADB8] border-white/10',
+      sending: 'bg-[#1E6F8F]/15 text-[#268CB5] border-[#1E6F8F]/30',
+      sent: 'bg-[#9ED36A]/10 text-[#9ED36A] border-green-500/30',
+      failed: 'bg-red-900/20 text-red-300 border-red-500/30',
     }
     return colors[s] || colors.draft
   }
@@ -767,19 +767,19 @@ export default function AdminCRM({ token }: { token: string }) {
       {/* Stats Bar */}
       <div className="flex flex-wrap gap-4">
         <div className="bg-[#162E3D] rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex-1 min-w-[140px]">
-          <div className="text-2xl font-bold text-[#1a1a1a]">{totalContacts.toLocaleString()}</div>
+          <div className="text-2xl font-bold text-[#F7F9FB]">{totalContacts.toLocaleString()}</div>
           <div className="text-xs text-slate-400 mt-0.5">Total Contacts</div>
         </div>
         <div className="bg-[#162E3D] rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex-1 min-w-[140px]">
-          <div className="text-2xl font-bold text-[#1a1a1a]">{withEmail.toLocaleString()}</div>
+          <div className="text-2xl font-bold text-[#F7F9FB]">{withEmail.toLocaleString()}</div>
           <div className="text-xs text-slate-400 mt-0.5">With Email</div>
         </div>
         <div className="bg-[#162E3D] rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex-1 min-w-[140px]">
-          <div className="text-2xl font-bold text-[#1a1a1a]">{categories.length}</div>
+          <div className="text-2xl font-bold text-[#F7F9FB]">{categories.length}</div>
           <div className="text-xs text-slate-400 mt-0.5">Categories</div>
         </div>
         <div className="bg-[#162E3D] rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex-1 min-w-[140px]">
-          <div className="text-2xl font-bold text-[#1a1a1a]">{campaigns.length}</div>
+          <div className="text-2xl font-bold text-[#F7F9FB]">{campaigns.length}</div>
           <div className="text-xs text-slate-400 mt-0.5">Campaigns</div>
         </div>
       </div>
@@ -801,7 +801,7 @@ export default function AdminCRM({ token }: { token: string }) {
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
               view === v.key
                 ? 'bg-[#1d1d1f] text-white'
-                : 'text-[#6B7C86] hover:text-[#1d1d1f] hover:bg-slate-50 border border-slate-200'
+                : 'text-[#6B7C86] hover:text-[#F7F9FB] hover:bg-[#162E3D] border border-white/10'
             }`}
           >
             {v.label}
@@ -811,7 +811,7 @@ export default function AdminCRM({ token }: { token: string }) {
 
       {/* ═══════════════════ CONTACTS VIEW ═══════════════════ */}
       {view === 'contacts' && (
-        <div className="bg-[#162E3D] rounded-2xl border border-[#e8e4de] shadow-sm overflow-hidden">
+        <div className="bg-[#162E3D] rounded-2xl border border-white/10 shadow-sm overflow-hidden">
           {/* Toolbar */}
           <div className="p-4 border-b border-slate-100 space-y-3">
             <div className="flex flex-wrap gap-3 items-center">
@@ -821,13 +821,13 @@ export default function AdminCRM({ token }: { token: string }) {
                   placeholder="Search contacts..."
                   value={searchInput}
                   onChange={e => setSearchInput(e.target.value)}
-                  className="w-full px-3.5 py-2 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10"
+                  className="w-full px-3.5 py-2 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10"
                 />
               </div>
               <select
                 value={categoryFilter}
                 onChange={e => { setCategoryFilter(e.target.value); setPage(1) }}
-                className="px-3 py-2 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A]"
+                className="px-3 py-2 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A]"
               >
                 <option value="">All Categories</option>
                 {categories.map(c => (
@@ -837,7 +837,7 @@ export default function AdminCRM({ token }: { token: string }) {
               <select
                 value={priorityFilter}
                 onChange={e => { setPriorityFilter(e.target.value); setPage(1) }}
-                className="px-3 py-2 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A]"
+                className="px-3 py-2 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A]"
               >
                 <option value="">All Priorities</option>
                 <option value="high">High</option>
@@ -846,13 +846,13 @@ export default function AdminCRM({ token }: { token: string }) {
               </select>
               <button
                 onClick={() => setShowAddForm(true)}
-                className="px-4 py-2 rounded-lg bg-[#FF6A2A] text-white text-sm font-medium hover:bg-[#b07e3f]"
+                className="px-4 py-2 rounded-lg bg-[#FF6A2A] text-white text-sm font-medium hover:bg-[#E85A1C]"
               >
                 + Add Contact
               </button>
               <button
                 onClick={exportContactsCSV}
-                className="px-4 py-2 rounded-lg border border-slate-200 text-sm font-medium text-[#9AADB8] hover:bg-slate-50"
+                className="px-4 py-2 rounded-lg border border-white/10 text-sm font-medium text-[#9AADB8] hover:bg-[#162E3D]"
                 title="Export CSV"
               >
                 ↓ CSV
@@ -863,9 +863,9 @@ export default function AdminCRM({ token }: { token: string }) {
             {selected.size > 0 && (
               <div className="flex items-center gap-3 bg-[#1E6F8F]/15 rounded-lg px-4 py-2">
                 <span className="text-sm font-medium text-[#268CB5]">{selected.size} selected</span>
-                <button onClick={() => bulkUpdatePriority('high')} className="px-3 py-1 rounded text-xs font-medium bg-red-100 text-red-700 hover:bg-red-200">Set High</button>
+                <button onClick={() => bulkUpdatePriority('high')} className="px-3 py-1 rounded text-xs font-medium bg-red-100 text-red-300 hover:bg-red-200">Set High</button>
                 <button onClick={() => bulkUpdatePriority('medium')} className="px-3 py-1 rounded text-xs font-medium bg-[#FF6A2A]/15 text-[#FF6A2A] hover:bg-[#FF6A2A]/20">Set Medium</button>
-                <button onClick={() => bulkUpdatePriority('low')} className="px-3 py-1 rounded text-xs font-medium bg-slate-100 text-[#9AADB8] hover:bg-slate-200">Set Low</button>
+                <button onClick={() => bulkUpdatePriority('low')} className="px-3 py-1 rounded text-xs font-medium bg-[#102535] text-[#9AADB8] hover:bg-[#162E3D]">Set Low</button>
                 <button onClick={() => deleteContacts(Array.from(selected))} className="px-3 py-1 rounded text-xs font-medium bg-red-600 text-white hover:bg-red-700 ml-auto">Delete</button>
               </div>
             )}
@@ -880,9 +880,9 @@ export default function AdminCRM({ token }: { token: string }) {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-slate-100 bg-slate-50/50">
+                  <tr className="border-b border-slate-100 bg-[#162E3D]/50">
                     <th className="px-4 py-3 text-left">
-                      <input type="checkbox" checked={selected.size === contacts.length && contacts.length > 0} onChange={toggleAll} className="rounded border-slate-300" />
+                      <input type="checkbox" checked={selected.size === contacts.length && contacts.length > 0} onChange={toggleAll} className="rounded border-white/15" />
                     </th>
                     <th className="px-4 py-3 text-left font-medium text-[#6B7C86]">Name</th>
                     <th className="px-4 py-3 text-left font-medium text-[#6B7C86]">Category</th>
@@ -895,16 +895,16 @@ export default function AdminCRM({ token }: { token: string }) {
                 </thead>
                 <tbody>
                   {contacts.map(c => (
-                    <tr key={c.id} className="border-b border-slate-50 hover:bg-slate-50/50">
+                    <tr key={c.id} className="border-b border-white/10 hover:bg-[#162E3D]/50">
                       <td className="px-4 py-3">
-                        <input type="checkbox" checked={selected.has(c.id)} onChange={() => toggleSelect(c.id)} className="rounded border-slate-300" />
+                        <input type="checkbox" checked={selected.has(c.id)} onChange={() => toggleSelect(c.id)} className="rounded border-white/15" />
                       </td>
                       <td className="px-4 py-3">
-                        <div className="font-medium text-[#1a1a1a]">{c.name}</div>
+                        <div className="font-medium text-[#F7F9FB]">{c.name}</div>
                         {c.website && <div className="text-xs text-slate-400 truncate max-w-[200px]">{c.website}</div>}
                       </td>
                       <td className="px-4 py-3">
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#1E6F8F]/15 text-[#268CB5] border border-blue-200">{c.category}</span>
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#1E6F8F]/15 text-[#268CB5] border border-[#1E6F8F]/30">{c.category}</span>
                       </td>
                       <td className="px-4 py-3 text-[#9AADB8] text-xs">{c.email || '—'}</td>
                       <td className="px-4 py-3 text-[#9AADB8] text-xs">{c.phone || '—'}</td>
@@ -935,7 +935,7 @@ export default function AdminCRM({ token }: { token: string }) {
                             </button>
                           )}
                           <button onClick={() => setEditContact(c)} className="px-2 py-1 rounded text-xs font-medium text-[#268CB5] hover:bg-[#1E6F8F]/15">Edit</button>
-                          <button onClick={() => deleteContacts([c.id])} className="px-2 py-1 rounded text-xs font-medium text-red-400 hover:bg-red-500/100/10">Del</button>
+                          <button onClick={() => deleteContacts([c.id])} className="px-2 py-1 rounded text-xs font-medium text-red-400 hover:bg-red-900/20">Del</button>
                         </div>
                       </td>
                     </tr>
@@ -950,9 +950,9 @@ export default function AdminCRM({ token }: { token: string }) {
             <div className="p-4 border-t border-slate-100 flex items-center justify-between">
               <span className="text-xs text-slate-400">{total.toLocaleString()} contacts</span>
               <div className="flex gap-1">
-                <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-200 hover:bg-slate-50 disabled:opacity-40">Prev</button>
+                <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="px-3 py-1.5 rounded-lg text-xs font-medium border border-white/10 hover:bg-[#162E3D] disabled:opacity-40">Prev</button>
                 <span className="px-3 py-1.5 text-xs text-[#6B7C86]">Page {page} of {totalPages}</span>
-                <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-200 hover:bg-slate-50 disabled:opacity-40">Next</button>
+                <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="px-3 py-1.5 rounded-lg text-xs font-medium border border-white/10 hover:bg-[#162E3D] disabled:opacity-40">Next</button>
               </div>
             </div>
           )}
@@ -961,10 +961,10 @@ export default function AdminCRM({ token }: { token: string }) {
 
       {/* ═══════════════════ CAMPAIGNS VIEW ═══════════════════ */}
       {view === 'campaigns' && (
-        <div className="bg-[#162E3D] rounded-2xl border border-[#e8e4de] shadow-sm overflow-hidden">
+        <div className="bg-[#162E3D] rounded-2xl border border-white/10 shadow-sm overflow-hidden">
           <div className="p-4 border-b border-slate-100 flex justify-between items-center">
-            <h3 className="text-sm font-semibold text-[#1a1a1a]">Email Campaigns</h3>
-            <button onClick={() => setView('compose')} className="px-4 py-2 rounded-lg bg-[#FF6A2A] text-white text-sm font-medium hover:bg-[#b07e3f]">
+            <h3 className="text-sm font-semibold text-[#F7F9FB]">Email Campaigns</h3>
+            <button onClick={() => setView('compose')} className="px-4 py-2 rounded-lg bg-[#FF6A2A] text-white text-sm font-medium hover:bg-[#E85A1C]">
               New Campaign
             </button>
           </div>
@@ -972,11 +972,11 @@ export default function AdminCRM({ token }: { token: string }) {
           {campaigns.length === 0 ? (
             <div className="p-8 text-center text-slate-400 text-sm">No campaigns yet. Create one to start emailing your contacts.</div>
           ) : (
-            <div className="divide-y divide-slate-50">
+            <div className="divide-y divide-white/10">
               {campaigns.map(c => (
-                <div key={c.id} className="px-4 py-3 hover:bg-slate-50/50 flex items-center justify-between">
+                <div key={c.id} className="px-4 py-3 hover:bg-[#162E3D]/50 flex items-center justify-between">
                   <div>
-                    <div className="font-medium text-[#1a1a1a] text-sm">{c.name}</div>
+                    <div className="font-medium text-[#F7F9FB] text-sm">{c.name}</div>
                     <div className="text-xs text-slate-400 mt-0.5">
                       {c.subject} &middot; {c._count.recipients} recipients
                     </div>
@@ -1003,7 +1003,7 @@ export default function AdminCRM({ token }: { token: string }) {
                           showToast('Failed to delete campaign', 'error')
                         }
                       }}
-                      className="px-2 py-1 rounded text-xs font-medium text-red-400 hover:bg-red-500/100/10"
+                      className="px-2 py-1 rounded text-xs font-medium text-red-400 hover:bg-red-900/20"
                     >
                       Del
                     </button>
@@ -1017,22 +1017,22 @@ export default function AdminCRM({ token }: { token: string }) {
 
       {/* ═══════════════════ COMPOSE VIEW ═══════════════════ */}
       {view === 'compose' && (
-        <div className="bg-[#162E3D] rounded-2xl border border-[#e8e4de] shadow-sm p-6 space-y-5">
-          <h3 className="text-lg font-bold text-[#1a1a1a]">Compose Campaign</h3>
+        <div className="bg-[#162E3D] rounded-2xl border border-white/10 shadow-sm p-6 space-y-5">
+          <h3 className="text-lg font-bold text-[#F7F9FB]">Compose Campaign</h3>
           <p className="text-xs text-slate-400 -mt-3">
-            Use <code className="bg-slate-100 px-1 rounded">{'{{name}}'}</code> to personalise with the contact&apos;s name.
+            Use <code className="bg-[#102535] px-1 rounded">{'{{name}}'}</code> to personalise with the contact&apos;s name.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-medium text-[#6B7C86] mb-1">Campaign Name</label>
               <input type="text" value={campaignName} onChange={e => setCampaignName(e.target.value)}
-                placeholder="e.g. New Route Announcement" className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10" />
+                placeholder="e.g. New Route Announcement" className="w-full px-3 py-2.5 rounded-xl border border-white/10 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10" />
             </div>
             <div>
               <label className="block text-xs font-medium text-[#6B7C86] mb-1">Subject Line</label>
               <input type="text" value={campaignSubject} onChange={e => setCampaignSubject(e.target.value)}
-                placeholder="e.g. New Mediterranean Delivery Routes" className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10" />
+                placeholder="e.g. New Mediterranean Delivery Routes" className="w-full px-3 py-2.5 rounded-xl border border-white/10 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10" />
             </div>
           </div>
 
@@ -1040,7 +1040,7 @@ export default function AdminCRM({ token }: { token: string }) {
             <div>
               <label className="block text-xs font-medium text-[#6B7C86] mb-1">Target Category (optional)</label>
               <select value={campaignCategory} onChange={e => setCampaignCategory(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#FF6A2A]">
+                className="w-full px-3 py-2.5 rounded-xl border border-white/10 text-sm outline-none focus:border-[#FF6A2A]">
                 <option value="">All Categories</option>
                 {categories.map(c => (
                   <option key={c.value} value={c.value}>{c.value} ({c.count})</option>
@@ -1050,7 +1050,7 @@ export default function AdminCRM({ token }: { token: string }) {
             <div>
               <label className="block text-xs font-medium text-[#6B7C86] mb-1">Target Priority (optional)</label>
               <select value={campaignPriority} onChange={e => setCampaignPriority(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#FF6A2A]">
+                className="w-full px-3 py-2.5 rounded-xl border border-white/10 text-sm outline-none focus:border-[#FF6A2A]">
                 <option value="">All Priorities</option>
                 <option value="high">High</option>
                 <option value="medium">Medium</option>
@@ -1066,12 +1066,12 @@ export default function AdminCRM({ token }: { token: string }) {
               onChange={e => setCampaignHtml(e.target.value)}
               rows={12}
               placeholder={`<h2>Hello {{name}},</h2>\n<p>We're excited to announce new delivery routes across the Mediterranean...</p>`}
-              className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10 font-mono resize-y"
+              className="w-full px-3 py-2.5 rounded-xl border border-white/10 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10 font-mono resize-y"
             />
           </div>
 
           <div className="flex gap-3">
-            <button onClick={() => setView('campaigns')} className="px-5 py-2.5 rounded-xl border border-slate-200 text-sm font-medium text-[#9AADB8] hover:bg-slate-50">
+            <button onClick={() => setView('campaigns')} className="px-5 py-2.5 rounded-xl border border-white/10 text-sm font-medium text-[#9AADB8] hover:bg-[#162E3D]">
               Cancel
             </button>
             <button
@@ -1112,7 +1112,7 @@ export default function AdminCRM({ token }: { token: string }) {
             <button onClick={() => sendCampaign(true)} disabled={actionLoading} className="px-5 py-2.5 rounded-xl border border-[#FF6A2A] text-[#FF6A2A] text-sm font-medium hover:bg-[#FF6A2A]/5 disabled:opacity-50">
               Save Draft
             </button>
-            <button onClick={() => sendCampaign(false)} disabled={actionLoading} className="px-5 py-2.5 rounded-xl bg-[#FF6A2A] text-white text-sm font-medium hover:bg-[#b07e3f] disabled:opacity-50">
+            <button onClick={() => sendCampaign(false)} disabled={actionLoading} className="px-5 py-2.5 rounded-xl bg-[#FF6A2A] text-white text-sm font-medium hover:bg-[#E85A1C] disabled:opacity-50">
               {actionLoading ? 'Sending...' : 'Send Campaign'}
             </button>
           </div>
@@ -1128,32 +1128,32 @@ export default function AdminCRM({ token }: { token: string }) {
           {socialStats && (
             <div className="flex flex-wrap gap-4">
               <div className="bg-[#162E3D] rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex-1 min-w-[120px]">
-                <div className="text-2xl font-bold text-[#1a1a1a]">{socialStats.total}</div>
+                <div className="text-2xl font-bold text-[#F7F9FB]">{socialStats.total}</div>
                 <div className="text-xs text-slate-400 mt-0.5">Total Posts</div>
               </div>
               <div className="bg-[#162E3D] rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex-1 min-w-[120px]">
-                <div className="text-2xl font-bold text-[#1a1a1a]">{socialStats.engagement.impressions.toLocaleString()}</div>
+                <div className="text-2xl font-bold text-[#F7F9FB]">{socialStats.engagement.impressions.toLocaleString()}</div>
                 <div className="text-xs text-slate-400 mt-0.5">Impressions</div>
               </div>
               <div className="bg-[#162E3D] rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex-1 min-w-[120px]">
-                <div className="text-2xl font-bold text-[#1a1a1a]">{socialStats.engagement.likes.toLocaleString()}</div>
+                <div className="text-2xl font-bold text-[#F7F9FB]">{socialStats.engagement.likes.toLocaleString()}</div>
                 <div className="text-xs text-slate-400 mt-0.5">Likes</div>
               </div>
               <div className="bg-[#162E3D] rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex-1 min-w-[120px]">
-                <div className="text-2xl font-bold text-[#1a1a1a]">{socialStats.engagement.shares.toLocaleString()}</div>
+                <div className="text-2xl font-bold text-[#F7F9FB]">{socialStats.engagement.shares.toLocaleString()}</div>
                 <div className="text-xs text-slate-400 mt-0.5">Shares</div>
               </div>
             </div>
           )}
 
-          <div className="bg-[#162E3D] rounded-2xl border border-[#e8e4de] shadow-sm overflow-hidden">
+          <div className="bg-[#162E3D] rounded-2xl border border-white/10 shadow-sm overflow-hidden">
             {/* Toolbar */}
             <div className="p-4 border-b border-slate-100 flex flex-wrap gap-3 items-center justify-between">
               <div className="flex gap-2">
                 <select
                   value={socialPlatformFilter}
                   onChange={e => setSocialPlatformFilter(e.target.value)}
-                  className="px-3 py-2 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A]"
+                  className="px-3 py-2 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A]"
                 >
                   <option value="">All Platforms</option>
                   <option value="linkedin">LinkedIn</option>
@@ -1162,7 +1162,7 @@ export default function AdminCRM({ token }: { token: string }) {
                 <select
                   value={socialStatusFilter}
                   onChange={e => setSocialStatusFilter(e.target.value)}
-                  className="px-3 py-2 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A]"
+                  className="px-3 py-2 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A]"
                 >
                   <option value="">All Statuses</option>
                   <option value="draft">Draft</option>
@@ -1196,22 +1196,22 @@ export default function AdminCRM({ token }: { token: string }) {
                 No social posts yet. Use AI to generate your first batch.
               </div>
             ) : (
-              <div className="divide-y divide-slate-50">
+              <div className="divide-y divide-white/10">
                 {socialPosts.map(post => (
-                  <div key={post.id} className="p-4 hover:bg-slate-50/50">
+                  <div key={post.id} className="p-4 hover:bg-[#162E3D]/50">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1.5">
                           <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${
-                            post.platform === 'linkedin' ? 'bg-[#1E6F8F]/15 text-[#268CB5] border-blue-200' : 'bg-pink-50 text-pink-700 border-pink-200'
+                            post.platform === 'linkedin' ? 'bg-[#1E6F8F]/15 text-[#268CB5] border-[#1E6F8F]/30' : 'bg-pink-900/20 text-pink-300 border-pink-500/30'
                           }`}>
                             {post.platform}
                           </span>
                           <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${
-                            post.status === 'published' ? 'bg-[#9ED36A]/10 text-[#9ED36A] border-green-200' :
+                            post.status === 'published' ? 'bg-[#9ED36A]/10 text-[#9ED36A] border-green-500/30' :
                             post.status === 'scheduled' ? 'bg-[#FF6A2A]/10 text-[#FF6A2A] border-[#FF6A2A]/20' :
-                            post.status === 'failed' ? 'bg-red-500/10 text-red-700 border-red-200' :
-                            'bg-slate-50 text-[#9AADB8] border-slate-200'
+                            post.status === 'failed' ? 'bg-red-900/20 text-red-300 border-red-500/30' :
+                            'bg-[#162E3D] text-[#9AADB8] border-white/10'
                           }`}>
                             {post.status}
                           </span>
@@ -1221,7 +1221,7 @@ export default function AdminCRM({ token }: { token: string }) {
                             </span>
                           )}
                         </div>
-                        <p className="text-sm text-[#1a1a1a] whitespace-pre-wrap line-clamp-3">{post.content}</p>
+                        <p className="text-sm text-[#F7F9FB] whitespace-pre-wrap line-clamp-3">{post.content}</p>
                         {post.hashtags && (
                           <p className="text-xs text-blue-500 mt-1">{post.hashtags}</p>
                         )}
@@ -1250,7 +1250,7 @@ export default function AdminCRM({ token }: { token: string }) {
                               showToast('Failed to delete post', 'error')
                             }
                           }}
-                          className="text-red-500 hover:text-red-700 font-medium"
+                          className="text-red-500 hover:text-red-300 font-medium"
                         >
                           Delete
                         </button>
@@ -1271,20 +1271,20 @@ export default function AdminCRM({ token }: { token: string }) {
           <div className="flex flex-wrap gap-4">
             {['pending', 'executed', 'rejected'].map(s => (
               <div key={s} className="bg-[#162E3D] rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex-1 min-w-[120px]">
-                <div className="text-2xl font-bold text-[#1a1a1a]">{aiQueueStats[s] || 0}</div>
+                <div className="text-2xl font-bold text-[#F7F9FB]">{aiQueueStats[s] || 0}</div>
                 <div className="text-xs text-slate-400 mt-0.5 capitalize">{s}</div>
               </div>
             ))}
           </div>
 
-          <div className="bg-[#162E3D] rounded-2xl border border-[#e8e4de] shadow-sm overflow-hidden">
+          <div className="bg-[#162E3D] rounded-2xl border border-white/10 shadow-sm overflow-hidden">
             {/* Toolbar */}
             <div className="p-4 border-b border-slate-100 flex flex-wrap gap-3 items-center justify-between">
               <div className="flex gap-2">
                 <select
                   value={aiQueueStatusFilter}
                   onChange={e => setAiQueueStatusFilter(e.target.value)}
-                  className="px-3 py-2 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A]"
+                  className="px-3 py-2 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A]"
                 >
                   <option value="pending">Pending</option>
                   <option value="executed">Executed</option>
@@ -1296,35 +1296,35 @@ export default function AdminCRM({ token }: { token: string }) {
                 <button
                   onClick={() => generateAiContent('social_post', { platform: 'linkedin' })}
                   disabled={aiGenerating}
-                  className="px-3 py-2 rounded-lg border border-slate-200 text-sm font-medium text-[#9AADB8] hover:bg-slate-50 disabled:opacity-50"
+                  className="px-3 py-2 rounded-lg border border-white/10 text-sm font-medium text-[#9AADB8] hover:bg-[#162E3D] disabled:opacity-50"
                 >
                   ✦ Social Post
                 </button>
                 <button
                   onClick={() => generateAiContent('campaign', { goal: 'engage existing contacts' })}
                   disabled={aiGenerating}
-                  className="px-3 py-2 rounded-lg border border-slate-200 text-sm font-medium text-[#9AADB8] hover:bg-slate-50 disabled:opacity-50"
+                  className="px-3 py-2 rounded-lg border border-white/10 text-sm font-medium text-[#9AADB8] hover:bg-[#162E3D] disabled:opacity-50"
                 >
                   ✦ Campaign
                 </button>
                 <button
                   onClick={() => generateAiContent('followups')}
                   disabled={aiGenerating}
-                  className="px-3 py-2 rounded-lg border border-slate-200 text-sm font-medium text-[#9AADB8] hover:bg-slate-50 disabled:opacity-50"
+                  className="px-3 py-2 rounded-lg border border-white/10 text-sm font-medium text-[#9AADB8] hover:bg-[#162E3D] disabled:opacity-50"
                 >
                   ✦ Follow-ups
                 </button>
                 <button
                   onClick={() => generateAiContent('analyze')}
                   disabled={aiGenerating}
-                  className="px-3 py-2 rounded-lg border border-slate-200 text-sm font-medium text-[#9AADB8] hover:bg-slate-50 disabled:opacity-50"
+                  className="px-3 py-2 rounded-lg border border-white/10 text-sm font-medium text-[#9AADB8] hover:bg-[#162E3D] disabled:opacity-50"
                 >
                   ✦ Analyze CRM
                 </button>
                 <button
                   onClick={() => generateAiContent('social_batch', { count: 7 })}
                   disabled={aiGenerating}
-                  className="px-3 py-2 rounded-lg bg-[#FF6A2A] text-white text-sm font-medium hover:bg-[#b07e3f] disabled:opacity-50"
+                  className="px-3 py-2 rounded-lg bg-[#FF6A2A] text-white text-sm font-medium hover:bg-[#E85A1C] disabled:opacity-50"
                 >
                   {aiGenerating ? 'Generating...' : '✦ Generate Week'}
                 </button>
@@ -1339,7 +1339,7 @@ export default function AdminCRM({ token }: { token: string }) {
                 No {aiQueueStatusFilter === 'all' ? '' : aiQueueStatusFilter} actions. Use the buttons above to generate AI content.
               </div>
             ) : (
-              <div className="divide-y divide-slate-50">
+              <div className="divide-y divide-white/10">
                 {aiActions.map(action => {
                   const isExpanded = expandedAction === action.id
                   const isEditing = editingPayload === action.id
@@ -1365,18 +1365,18 @@ export default function AdminCRM({ token }: { token: string }) {
                           <div className="flex items-center gap-2 mb-1">
                             <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${
                               action.type.includes('social') ? 'bg-purple-50 text-purple-700 border-purple-200' :
-                              action.type.includes('campaign') ? 'bg-[#1E6F8F]/15 text-[#268CB5] border-blue-200' :
+                              action.type.includes('campaign') ? 'bg-[#1E6F8F]/15 text-[#268CB5] border-[#1E6F8F]/30' :
                               action.type.includes('followup') ? 'bg-[#FF6A2A]/10 text-[#FF6A2A] border-[#FF6A2A]/20' :
                               action.type.includes('analyze') ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
-                              'bg-slate-50 text-[#9AADB8] border-slate-200'
+                              'bg-[#162E3D] text-[#9AADB8] border-white/10'
                             }`}>
                               {action.type.replace(/_/g, ' ')}
                             </span>
                             <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${
                               action.status === 'pending' ? 'bg-[#FF6A2A]/10 text-[#FF6A2A] border-[#FF6A2A]/20' :
-                              action.status === 'executed' ? 'bg-[#9ED36A]/10 text-[#9ED36A] border-green-200' :
-                              action.status === 'rejected' ? 'bg-red-500/10 text-red-700 border-red-200' :
-                              'bg-slate-50 text-[#9AADB8] border-slate-200'
+                              action.status === 'executed' ? 'bg-[#9ED36A]/10 text-[#9ED36A] border-green-500/30' :
+                              action.status === 'rejected' ? 'bg-red-900/20 text-red-300 border-red-500/30' :
+                              'bg-[#162E3D] text-[#9AADB8] border-white/10'
                             }`}>
                               {action.status}
                             </span>
@@ -1384,7 +1384,7 @@ export default function AdminCRM({ token }: { token: string }) {
                               <span className="text-[10px] text-slate-400">{Math.round(action.confidence * 100)}% confidence</span>
                             )}
                           </div>
-                          <h4 className="font-medium text-sm text-[#1a1a1a]">{action.title}</h4>
+                          <h4 className="font-medium text-sm text-[#F7F9FB]">{action.title}</h4>
                           {action.description && (
                             <p className="text-xs text-[#6B7C86] mt-0.5">{action.description}</p>
                           )}
@@ -1404,14 +1404,14 @@ export default function AdminCRM({ token }: { token: string }) {
                                   setEditingPayload(action.id)
                                   setEditPayloadText(JSON.stringify(payload, null, 2))
                                 }}
-                                className="px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-200 text-[#9AADB8] hover:bg-slate-50"
+                                className="px-3 py-1.5 rounded-lg text-xs font-medium border border-white/10 text-[#9AADB8] hover:bg-[#162E3D]"
                               >
                                 Edit
                               </button>
                               <button
                                 onClick={() => handleAiAction(action.id, 'reject')}
                                 disabled={actionLoading}
-                                className="px-3 py-1.5 rounded-lg text-xs font-medium bg-red-500/10 text-red-400 hover:bg-red-100 disabled:opacity-50"
+                                className="px-3 py-1.5 rounded-lg text-xs font-medium bg-red-900/20 text-red-400 hover:bg-red-900/30 disabled:opacity-50"
                               >
                                 ✕ Reject
                               </button>
@@ -1422,7 +1422,7 @@ export default function AdminCRM({ token }: { token: string }) {
 
                       {/* Expanded Payload Preview */}
                       {isExpanded && !isEditing && (
-                        <div className="mt-3 bg-slate-50 rounded-xl p-4 text-xs">
+                        <div className="mt-3 bg-[#162E3D] rounded-xl p-4 text-xs">
                           {action.type === 'draft_social' && (
                             <div className="space-y-2">
                               <div className="flex gap-2">
@@ -1431,7 +1431,7 @@ export default function AdminCRM({ token }: { token: string }) {
                               </div>
                               <div>
                                 <span className="text-[#6B7C86] font-medium block mb-1">Content:</span>
-                                <p className="text-sm text-[#1a1a1a] whitespace-pre-wrap">{payloadContent}</p>
+                                <p className="text-sm text-[#F7F9FB] whitespace-pre-wrap">{payloadContent}</p>
                               </div>
                               {payloadHashtags && (
                                 <p className="text-blue-500">{payloadHashtags}</p>
@@ -1444,7 +1444,7 @@ export default function AdminCRM({ token }: { token: string }) {
                               <div><span className="text-[#6B7C86] font-medium">Subject:</span> {payloadSubject}</div>
                               <div>
                                 <span className="text-[#6B7C86] font-medium block mb-1">Email Preview:</span>
-                                <div className="border border-slate-200 rounded-lg p-3 bg-[#162E3D] text-sm max-h-60 overflow-y-auto" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(payloadHtmlBody) }} />
+                                <div className="border border-white/10 rounded-lg p-3 bg-[#162E3D] text-sm max-h-60 overflow-y-auto" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(payloadHtmlBody) }} />
                               </div>
                             </div>
                           )}
@@ -1454,13 +1454,13 @@ export default function AdminCRM({ token }: { token: string }) {
                               <div><span className="text-[#6B7C86] font-medium">Subject:</span> {payloadSubject}</div>
                               <div>
                                 <span className="text-[#6B7C86] font-medium block mb-1">Body:</span>
-                                <div className="border border-slate-200 rounded-lg p-3 bg-[#162E3D] text-sm max-h-40 overflow-y-auto" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(payloadBody) }} />
+                                <div className="border border-white/10 rounded-lg p-3 bg-[#162E3D] text-sm max-h-40 overflow-y-auto" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(payloadBody) }} />
                               </div>
                             </div>
                           )}
                           {action.type === 'analyze_contacts' && (
                             <div className="space-y-2">
-                              {payloadSummary && <p className="text-sm text-[#1a1a1a]">{payloadSummary}</p>}
+                              {payloadSummary && <p className="text-sm text-[#F7F9FB]">{payloadSummary}</p>}
                               {payloadInsights.length > 0 && (
                                 <div>
                                   <span className="text-[#6B7C86] font-medium block mb-1">Insights:</span>
@@ -1483,7 +1483,7 @@ export default function AdminCRM({ token }: { token: string }) {
                             <pre className="whitespace-pre-wrap text-xs text-[#9AADB8]">{JSON.stringify(payload, null, 2)}</pre>
                           )}
                           {action.error && (
-                            <div className="mt-2 text-red-400 bg-red-500/10 rounded-lg px-3 py-2">Error: {action.error}</div>
+                            <div className="mt-2 text-red-400 bg-red-900/20 rounded-lg px-3 py-2">Error: {action.error}</div>
                           )}
                         </div>
                       )}
@@ -1495,18 +1495,18 @@ export default function AdminCRM({ token }: { token: string }) {
                             value={editPayloadText}
                             onChange={e => setEditPayloadText(e.target.value)}
                             rows={10}
-                            className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-mono outline-none focus:border-[#FF6A2A] resize-y"
+                            className="w-full px-3 py-2 rounded-xl border border-white/10 text-xs font-mono outline-none focus:border-[#FF6A2A] resize-y"
                           />
                           <div className="flex gap-2">
                             <button
                               onClick={() => handleAiEditSave(action.id)}
-                              className="px-4 py-2 rounded-lg bg-[#FF6A2A] text-white text-xs font-medium hover:bg-[#b07e3f]"
+                              className="px-4 py-2 rounded-lg bg-[#FF6A2A] text-white text-xs font-medium hover:bg-[#E85A1C]"
                             >
                               Save Changes
                             </button>
                             <button
                               onClick={() => setEditingPayload(null)}
-                              className="px-4 py-2 rounded-lg border border-slate-200 text-xs font-medium text-[#9AADB8] hover:bg-slate-50"
+                              className="px-4 py-2 rounded-lg border border-white/10 text-xs font-medium text-[#9AADB8] hover:bg-[#162E3D]"
                             >
                               Cancel
                             </button>
@@ -1528,20 +1528,20 @@ export default function AdminCRM({ token }: { token: string }) {
           {/* Inbox Stats */}
           <div className="flex flex-wrap gap-4">
             <div className="bg-[#162E3D] rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex-1 min-w-[120px]">
-              <div className="text-2xl font-bold text-[#1a1a1a]">{inboxStats.unread}</div>
+              <div className="text-2xl font-bold text-[#F7F9FB]">{inboxStats.unread}</div>
               <div className="text-xs text-slate-400 mt-0.5">Unread</div>
             </div>
             <div className="bg-[#162E3D] rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex-1 min-w-[120px]">
-              <div className="text-2xl font-bold text-[#1a1a1a]">{inboxStats.starred}</div>
+              <div className="text-2xl font-bold text-[#F7F9FB]">{inboxStats.starred}</div>
               <div className="text-xs text-slate-400 mt-0.5">Starred</div>
             </div>
             <div className="bg-[#162E3D] rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex-1 min-w-[120px]">
-              <div className="text-2xl font-bold text-[#1a1a1a]">{inboxStats.total}</div>
+              <div className="text-2xl font-bold text-[#F7F9FB]">{inboxStats.total}</div>
               <div className="text-xs text-slate-400 mt-0.5">Total</div>
             </div>
           </div>
 
-          <div className="bg-[#162E3D] rounded-2xl border border-[#e8e4de] shadow-sm overflow-hidden">
+          <div className="bg-[#162E3D] rounded-2xl border border-white/10 shadow-sm overflow-hidden">
             {/* Toolbar */}
             <div className="p-4 border-b border-slate-100 space-y-3">
               <div className="flex flex-wrap gap-3 items-center">
@@ -1551,13 +1551,13 @@ export default function AdminCRM({ token }: { token: string }) {
                     placeholder="Search emails..."
                     value={inboxSearchInput}
                     onChange={e => setInboxSearchInput(e.target.value)}
-                    className="w-full px-3.5 py-2 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10"
+                    className="w-full px-3.5 py-2 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10"
                   />
                 </div>
                 <select
                   value={inboxFolder}
                   onChange={e => { setInboxFolder(e.target.value); setInboxPage(1) }}
-                  className="px-3 py-2 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A]"
+                  className="px-3 py-2 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A]"
                 >
                   <option value="INBOX">Inbox</option>
                   <option value="Sent">Sent</option>
@@ -1571,7 +1571,7 @@ export default function AdminCRM({ token }: { token: string }) {
                       className={`px-3 py-2 rounded-lg text-xs font-medium capitalize transition-all ${
                         inboxFilter === f
                           ? 'bg-[#1d1d1f] text-white'
-                          : 'border border-slate-200 text-[#6B7C86] hover:bg-slate-50'
+                          : 'border border-white/10 text-[#6B7C86] hover:bg-[#162E3D]'
                       }`}
                     >
                       {f}
@@ -1581,7 +1581,7 @@ export default function AdminCRM({ token }: { token: string }) {
                 <button
                   onClick={syncInbox}
                   disabled={inboxSyncing}
-                  className="px-4 py-2 rounded-lg bg-[#FF6A2A] text-white text-sm font-medium hover:bg-[#b07e3f] disabled:opacity-50"
+                  className="px-4 py-2 rounded-lg bg-[#FF6A2A] text-white text-sm font-medium hover:bg-[#E85A1C] disabled:opacity-50"
                 >
                   {inboxSyncing ? 'Syncing...' : '↻ Sync'}
                 </button>
@@ -1593,7 +1593,7 @@ export default function AdminCRM({ token }: { token: string }) {
                     setComposeEmailSubject('')
                     setComposeEmailBody('')
                   }}
-                  className="px-4 py-2 rounded-lg bg-[#1d1d1f] text-white text-sm font-medium hover:bg-[#333]"
+                  className="px-4 py-2 rounded-lg bg-[#1d1d1f] text-white text-sm font-medium hover:bg-[#E85A1C]"
                 >
                   + Compose
                 </button>
@@ -1608,11 +1608,11 @@ export default function AdminCRM({ token }: { token: string }) {
                 {inboxStats.total === 0 ? 'No emails yet. Click "Sync" to fetch from your mailbox.' : 'No emails match your filters.'}
               </div>
             ) : (
-              <div className="divide-y divide-slate-50">
+              <div className="divide-y divide-white/10">
                 {inboxEmails.map(email => (
                   <div
                     key={email.id}
-                    className={`px-4 py-3 hover:bg-slate-50/50 cursor-pointer flex items-start gap-3 ${!email.isRead ? 'bg-[#1E6F8F]/15/30' : ''}`}
+                    className={`px-4 py-3 hover:bg-[#162E3D]/50 cursor-pointer flex items-start gap-3 ${!email.isRead ? 'bg-[#1E6F8F]/15/30' : ''}`}
                     onClick={async () => {
                       setSelectedEmail(email)
                       if (!email.isRead) {
@@ -1633,11 +1633,11 @@ export default function AdminCRM({ token }: { token: string }) {
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-0.5">
-                        <span className={`text-sm truncate ${!email.isRead ? 'font-semibold text-[#1a1a1a]' : 'text-[#9AADB8]'}`}>
+                        <span className={`text-sm truncate ${!email.isRead ? 'font-semibold text-[#F7F9FB]' : 'text-[#9AADB8]'}`}>
                           {email.folder === 'Sent' ? `To: ${email.to}` : (email.fromName || email.from)}
                         </span>
                         {email.contact && (
-                          <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-[#1E6F8F]/15 text-[#268CB5] border border-blue-200">
+                          <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-[#1E6F8F]/15 text-[#268CB5] border border-[#1E6F8F]/30">
                             {email.contact.category}
                           </span>
                         )}
@@ -1645,7 +1645,7 @@ export default function AdminCRM({ token }: { token: string }) {
                           <span className="text-slate-400 text-xs">📎</span>
                         )}
                       </div>
-                      <div className={`text-sm truncate ${!email.isRead ? 'font-medium text-[#1a1a1a]' : 'text-slate-700'}`}>
+                      <div className={`text-sm truncate ${!email.isRead ? 'font-medium text-[#F7F9FB]' : 'text-[#9AADB8]'}`}>
                         {email.subject}
                       </div>
                       <div className="text-xs text-slate-400 truncate mt-0.5">
@@ -1667,9 +1667,9 @@ export default function AdminCRM({ token }: { token: string }) {
               <div className="p-4 border-t border-slate-100 flex items-center justify-between">
                 <span className="text-xs text-slate-400">{inboxStats.total} emails</span>
                 <div className="flex gap-1">
-                  <button onClick={() => setInboxPage(p => Math.max(1, p - 1))} disabled={inboxPage === 1} className="px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-200 hover:bg-slate-50 disabled:opacity-40">Prev</button>
+                  <button onClick={() => setInboxPage(p => Math.max(1, p - 1))} disabled={inboxPage === 1} className="px-3 py-1.5 rounded-lg text-xs font-medium border border-white/10 hover:bg-[#162E3D] disabled:opacity-40">Prev</button>
                   <span className="px-3 py-1.5 text-xs text-[#6B7C86]">Page {inboxPage} of {inboxTotalPages}</span>
-                  <button onClick={() => setInboxPage(p => Math.min(inboxTotalPages, p + 1))} disabled={inboxPage === inboxTotalPages} className="px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-200 hover:bg-slate-50 disabled:opacity-40">Next</button>
+                  <button onClick={() => setInboxPage(p => Math.min(inboxTotalPages, p + 1))} disabled={inboxPage === inboxTotalPages} className="px-3 py-1.5 rounded-lg text-xs font-medium border border-white/10 hover:bg-[#162E3D] disabled:opacity-40">Next</button>
                 </div>
               </div>
             )}
@@ -1679,12 +1679,12 @@ export default function AdminCRM({ token }: { token: string }) {
 
       {/* ═══════════════════ EMAIL DETAIL VIEW ═══════════════════ */}
       {view === 'inbox' && selectedEmail && (
-        <div className="bg-[#162E3D] rounded-2xl border border-[#e8e4de] shadow-sm overflow-hidden">
+        <div className="bg-[#162E3D] rounded-2xl border border-white/10 shadow-sm overflow-hidden">
           {/* Header */}
           <div className="p-4 border-b border-slate-100 flex items-center gap-3">
             <button
               onClick={() => setSelectedEmail(null)}
-              className="px-3 py-1.5 rounded-lg border border-slate-200 text-sm text-[#9AADB8] hover:bg-slate-50"
+              className="px-3 py-1.5 rounded-lg border border-white/10 text-sm text-[#9AADB8] hover:bg-[#162E3D]"
             >
               ← Back
             </button>
@@ -1703,7 +1703,7 @@ export default function AdminCRM({ token }: { token: string }) {
                 setComposeEmailBody(`\n\n---\nOn ${new Date(selectedEmail.date).toLocaleString('en-GB')}, ${selectedEmail.fromName || selectedEmail.from} wrote:\n> ${(selectedEmail.textBody || selectedEmail.snippet || '').split('\n').join('\n> ')}`)
                 setShowComposeEmail(true)
               }}
-              className="px-4 py-1.5 rounded-lg bg-[#FF6A2A] text-white text-sm font-medium hover:bg-[#b07e3f]"
+              className="px-4 py-1.5 rounded-lg bg-[#FF6A2A] text-white text-sm font-medium hover:bg-[#E85A1C]"
             >
               Reply
             </button>
@@ -1713,7 +1713,7 @@ export default function AdminCRM({ token }: { token: string }) {
                 setSelectedEmail(null)
                 showToast('Email archived')
               }}
-              className="px-3 py-1.5 rounded-lg border border-slate-200 text-sm text-[#9AADB8] hover:bg-slate-50"
+              className="px-3 py-1.5 rounded-lg border border-white/10 text-sm text-[#9AADB8] hover:bg-[#162E3D]"
             >
               Archive
             </button>
@@ -1721,11 +1721,11 @@ export default function AdminCRM({ token }: { token: string }) {
 
           {/* Email Content */}
           <div className="p-6 space-y-4">
-            <h2 className="text-xl font-bold text-[#1a1a1a]">{selectedEmail.subject}</h2>
+            <h2 className="text-xl font-bold text-[#F7F9FB]">{selectedEmail.subject}</h2>
 
             <div className="flex items-start justify-between">
               <div>
-                <div className="text-sm font-medium text-[#1a1a1a]">
+                <div className="text-sm font-medium text-[#F7F9FB]">
                   {selectedEmail.fromName || selectedEmail.from}
                   {selectedEmail.fromName && (
                     <span className="text-slate-400 font-normal ml-2">&lt;{selectedEmail.from}&gt;</span>
@@ -1737,7 +1737,7 @@ export default function AdminCRM({ token }: { token: string }) {
                 </div>
                 {selectedEmail.contact && (
                   <div className="mt-1">
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#1E6F8F]/15 text-[#268CB5] border border-blue-200">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#1E6F8F]/15 text-[#268CB5] border border-[#1E6F8F]/30">
                       CRM: {selectedEmail.contact.name} — {selectedEmail.contact.category}
                     </span>
                   </div>
@@ -1754,7 +1754,7 @@ export default function AdminCRM({ token }: { token: string }) {
             {selectedEmail.hasAttachments && selectedEmail.attachments && (
               <div className="flex flex-wrap gap-2">
                 {(JSON.parse(selectedEmail.attachments) as { filename: string; contentType: string; size: number }[]).map((att, i) => (
-                  <div key={i} className="flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 bg-slate-50 text-xs text-[#9AADB8]">
+                  <div key={i} className="flex items-center gap-2 px-3 py-2 rounded-lg border border-white/10 bg-[#162E3D] text-xs text-[#9AADB8]">
                     <span>📎</span>
                     <span>{att.filename}</span>
                     <span className="text-slate-400">({(att.size / 1024).toFixed(0)}KB)</span>
@@ -1766,11 +1766,11 @@ export default function AdminCRM({ token }: { token: string }) {
             <div className="border-t border-slate-100 pt-4">
               {selectedEmail.htmlBody ? (
                 <div
-                  className="prose prose-sm max-w-none text-[#1a1a1a]"
+                  className="prose prose-sm max-w-none text-[#F7F9FB]"
                   dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(selectedEmail.htmlBody) }}
                 />
               ) : (
-                <pre className="text-sm text-[#1a1a1a] whitespace-pre-wrap font-sans">
+                <pre className="text-sm text-[#F7F9FB] whitespace-pre-wrap font-sans">
                   {selectedEmail.textBody || '(no content)'}
                 </pre>
               )}
@@ -1784,7 +1784,7 @@ export default function AdminCRM({ token }: { token: string }) {
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setShowComposeEmail(false)}>
           <div className="bg-[#162E3D] rounded-2xl shadow-2xl w-full max-w-lg" onClick={e => e.stopPropagation()}>
             <div className="p-6 border-b border-slate-100">
-              <h3 className="text-lg font-bold text-[#1a1a1a]">{replyTo ? 'Reply' : 'New Email'}</h3>
+              <h3 className="text-lg font-bold text-[#F7F9FB]">{replyTo ? 'Reply' : 'New Email'}</h3>
               <p className="text-xs text-slate-400 mt-1">From: info@onshoredelivery.com</p>
             </div>
             <div className="p-6 space-y-4">
@@ -1795,7 +1795,7 @@ export default function AdminCRM({ token }: { token: string }) {
                   value={composeEmailTo}
                   onChange={e => setComposeEmailTo(e.target.value)}
                   placeholder="recipient@example.com"
-                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10"
+                  className="w-full px-3 py-2.5 rounded-xl border border-white/10 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10"
                 />
               </div>
               <div>
@@ -1805,7 +1805,7 @@ export default function AdminCRM({ token }: { token: string }) {
                   value={composeEmailSubject}
                   onChange={e => setComposeEmailSubject(e.target.value)}
                   placeholder="Email subject..."
-                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10"
+                  className="w-full px-3 py-2.5 rounded-xl border border-white/10 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10"
                 />
               </div>
               <div>
@@ -1815,21 +1815,21 @@ export default function AdminCRM({ token }: { token: string }) {
                   onChange={e => setComposeEmailBody(e.target.value)}
                   rows={10}
                   placeholder="Write your message..."
-                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10 resize-y"
+                  className="w-full px-3 py-2.5 rounded-xl border border-white/10 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10 resize-y"
                 />
               </div>
             </div>
             <div className="p-6 border-t border-slate-100 flex gap-3">
               <button
                 onClick={() => setShowComposeEmail(false)}
-                className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-medium text-[#9AADB8] hover:bg-slate-50"
+                className="flex-1 px-4 py-2.5 rounded-xl border border-white/10 text-sm font-medium text-[#9AADB8] hover:bg-[#162E3D]"
               >
                 Cancel
               </button>
               <button
                 onClick={sendComposeEmail}
                 disabled={composeEmailSending || !composeEmailTo || !composeEmailSubject || !composeEmailBody}
-                className="flex-1 px-4 py-2.5 rounded-xl bg-[#FF6A2A] text-white text-sm font-medium hover:bg-[#b07e3f] disabled:opacity-50"
+                className="flex-1 px-4 py-2.5 rounded-xl bg-[#FF6A2A] text-white text-sm font-medium hover:bg-[#E85A1C] disabled:opacity-50"
               >
                 {composeEmailSending ? 'Sending...' : 'Send'}
               </button>
@@ -1840,9 +1840,9 @@ export default function AdminCRM({ token }: { token: string }) {
 
       {/* ═══════════════════ AI CHAT VIEW ═══════════════════ */}
       {view === 'ai' && (
-        <div className="bg-[#162E3D] rounded-2xl border border-[#e8e4de] shadow-sm overflow-hidden flex flex-col" style={{ height: '600px' }}>
+        <div className="bg-[#162E3D] rounded-2xl border border-white/10 shadow-sm overflow-hidden flex flex-col" style={{ height: '600px' }}>
           <div className="p-4 border-b border-slate-100">
-            <h3 className="text-sm font-semibold text-[#1a1a1a]">AI CRM Assistant</h3>
+            <h3 className="text-sm font-semibold text-[#F7F9FB]">AI CRM Assistant</h3>
             <p className="text-xs text-slate-400 mt-0.5">
               Ask me to draft emails, plan campaigns, analyze contacts, or generate social content. All actions require your approval.
             </p>
@@ -1882,7 +1882,7 @@ export default function AdminCRM({ token }: { token: string }) {
                           })
                           .finally(() => { setAiChatLoading(false); setAiInput('') })
                       }}
-                      className="px-3 py-1.5 rounded-lg border border-slate-200 text-xs text-[#9AADB8] hover:bg-slate-50"
+                      className="px-3 py-1.5 rounded-lg border border-white/10 text-xs text-[#9AADB8] hover:bg-[#162E3D]"
                     >
                       {suggestion}
                     </button>
@@ -1896,7 +1896,7 @@ export default function AdminCRM({ token }: { token: string }) {
                 <div className={`max-w-[80%] rounded-2xl px-4 py-3 ${
                   msg.role === 'user'
                     ? 'bg-[#1d1d1f] text-white'
-                    : 'bg-slate-50 text-[#1a1a1a]'
+                    : 'bg-[#162E3D] text-[#F7F9FB]'
                 }`}>
                   <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
                   {msg.actions && msg.actions.length > 0 && (
@@ -1906,7 +1906,7 @@ export default function AdminCRM({ token }: { token: string }) {
                           key={j}
                           onClick={() => executeAiChatAction(action)}
                           disabled={actionLoading}
-                          className="px-3 py-1.5 rounded-lg bg-[#FF6A2A] text-white text-xs font-medium hover:bg-[#b07e3f] disabled:opacity-50"
+                          className="px-3 py-1.5 rounded-lg bg-[#FF6A2A] text-white text-xs font-medium hover:bg-[#E85A1C] disabled:opacity-50"
                         >
                           {action.label} →
                         </button>
@@ -1919,11 +1919,11 @@ export default function AdminCRM({ token }: { token: string }) {
 
             {aiChatLoading && (
               <div className="flex justify-start">
-                <div className="bg-slate-50 rounded-2xl px-4 py-3">
+                <div className="bg-[#162E3D] rounded-2xl px-4 py-3">
                   <div className="flex gap-1">
-                    <div className="w-2 h-2 rounded-full bg-slate-300 animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <div className="w-2 h-2 rounded-full bg-slate-300 animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <div className="w-2 h-2 rounded-full bg-slate-300 animate-bounce" style={{ animationDelay: '300ms' }} />
+                    <div className="w-2 h-2 rounded-full bg-[#1E3A4D] animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <div className="w-2 h-2 rounded-full bg-[#1E3A4D] animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <div className="w-2 h-2 rounded-full bg-[#1E3A4D] animate-bounce" style={{ animationDelay: '300ms' }} />
                   </div>
                 </div>
               </div>
@@ -1940,12 +1940,12 @@ export default function AdminCRM({ token }: { token: string }) {
                 onChange={e => setAiInput(e.target.value)}
                 onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendAiMessage() } }}
                 placeholder="Ask the AI assistant..."
-                className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10"
+                className="flex-1 px-4 py-2.5 rounded-xl border border-white/10 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10"
               />
               <button
                 onClick={sendAiMessage}
                 disabled={aiChatLoading || !aiInput.trim()}
-                className="px-5 py-2.5 rounded-xl bg-[#1d1d1f] text-white text-sm font-medium hover:bg-[#333] disabled:opacity-50"
+                className="px-5 py-2.5 rounded-xl bg-[#1d1d1f] text-white text-sm font-medium hover:bg-[#E85A1C] disabled:opacity-50"
               >
                 Send
               </button>
@@ -1959,7 +1959,7 @@ export default function AdminCRM({ token }: { token: string }) {
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setEmailModal(null)}>
           <div className="bg-[#162E3D] rounded-2xl shadow-2xl w-full max-w-lg" onClick={e => e.stopPropagation()}>
             <div className="p-6 border-b border-slate-100">
-              <h3 className="text-lg font-bold text-[#1a1a1a]">Send Email</h3>
+              <h3 className="text-lg font-bold text-[#F7F9FB]">Send Email</h3>
               <p className="text-xs text-slate-400 mt-1">To: {emailModal.name} &lt;{emailModal.email}&gt;</p>
             </div>
             <div className="p-6 space-y-4">
@@ -1970,7 +1970,7 @@ export default function AdminCRM({ token }: { token: string }) {
                   value={emailSubject}
                   onChange={e => setEmailSubject(e.target.value)}
                   placeholder="e.g. Following up on our conversation"
-                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10"
+                  className="w-full px-3 py-2.5 rounded-xl border border-white/10 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10"
                 />
               </div>
               <div>
@@ -1980,7 +1980,7 @@ export default function AdminCRM({ token }: { token: string }) {
                   onChange={e => setEmailBody(e.target.value)}
                   rows={8}
                   placeholder={`Hi ${emailModal.name},\n\n`}
-                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10 resize-y"
+                  className="w-full px-3 py-2.5 rounded-xl border border-white/10 text-sm outline-none focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10 resize-y"
                 />
               </div>
               {emailModal.phone && (
@@ -1992,13 +1992,13 @@ export default function AdminCRM({ token }: { token: string }) {
               )}
             </div>
             <div className="p-6 border-t border-slate-100 flex gap-3">
-              <button onClick={() => setEmailModal(null)} className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-medium text-[#9AADB8] hover:bg-slate-50">
+              <button onClick={() => setEmailModal(null)} className="flex-1 px-4 py-2.5 rounded-xl border border-white/10 text-sm font-medium text-[#9AADB8] hover:bg-[#162E3D]">
                 Cancel
               </button>
               <button
                 onClick={sendQuickEmail}
                 disabled={emailSending || !emailSubject || !emailBody}
-                className="flex-1 px-4 py-2.5 rounded-xl bg-[#FF6A2A] text-white text-sm font-medium hover:bg-[#b07e3f] disabled:opacity-50"
+                className="flex-1 px-4 py-2.5 rounded-xl bg-[#FF6A2A] text-white text-sm font-medium hover:bg-[#E85A1C] disabled:opacity-50"
               >
                 {emailSending ? 'Sending...' : 'Send Email'}
               </button>
@@ -2063,19 +2063,19 @@ function ContactForm({
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="bg-[#162E3D] rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
         <div className="p-6 border-b border-slate-100">
-          <h3 className="text-lg font-bold text-[#1a1a1a]">{contact ? 'Edit Contact' : 'Add Contact'}</h3>
+          <h3 className="text-lg font-bold text-[#F7F9FB]">{contact ? 'Edit Contact' : 'Add Contact'}</h3>
         </div>
         <div className="p-6 space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2">
               <label className="block text-xs font-medium text-[#6B7C86] mb-1">Name *</label>
               <input type="text" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A]" />
+                className="w-full px-3 py-2 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A]" />
             </div>
             <div>
               <label className="block text-xs font-medium text-[#6B7C86] mb-1">Category *</label>
               <input type="text" list="cat-list" value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
-                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A]" />
+                className="w-full px-3 py-2 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A]" />
               <datalist id="cat-list">
                 {categories.map(c => <option key={c.value} value={c.value} />)}
               </datalist>
@@ -2083,7 +2083,7 @@ function ContactForm({
             <div>
               <label className="block text-xs font-medium text-[#6B7C86] mb-1">Priority</label>
               <select value={form.priority} onChange={e => setForm(f => ({ ...f, priority: e.target.value }))}
-                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A]">
+                className="w-full px-3 py-2 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A]">
                 <option value="high">High</option>
                 <option value="medium">Medium</option>
                 <option value="low">Low</option>
@@ -2092,59 +2092,59 @@ function ContactForm({
             <div>
               <label className="block text-xs font-medium text-[#6B7C86] mb-1">Email</label>
               <input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A]" />
+                className="w-full px-3 py-2 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A]" />
             </div>
             <div>
               <label className="block text-xs font-medium text-[#6B7C86] mb-1">Email 2</label>
               <input type="email" value={form.email2} onChange={e => setForm(f => ({ ...f, email2: e.target.value }))}
-                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A]" />
+                className="w-full px-3 py-2 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A]" />
             </div>
             <div>
               <label className="block text-xs font-medium text-[#6B7C86] mb-1">Phone</label>
               <input type="text" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
-                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A]" />
+                className="w-full px-3 py-2 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A]" />
             </div>
             <div>
               <label className="block text-xs font-medium text-[#6B7C86] mb-1">Phone 2</label>
               <input type="text" value={form.phone2} onChange={e => setForm(f => ({ ...f, phone2: e.target.value }))}
-                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A]" />
+                className="w-full px-3 py-2 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A]" />
             </div>
             <div>
               <label className="block text-xs font-medium text-[#6B7C86] mb-1">Country</label>
               <input type="text" value={form.country} onChange={e => setForm(f => ({ ...f, country: e.target.value }))}
-                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A]" />
+                className="w-full px-3 py-2 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A]" />
             </div>
             <div>
               <label className="block text-xs font-medium text-[#6B7C86] mb-1">Location</label>
               <input type="text" value={form.location} onChange={e => setForm(f => ({ ...f, location: e.target.value }))}
-                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A]" />
+                className="w-full px-3 py-2 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A]" />
             </div>
             <div>
               <label className="block text-xs font-medium text-[#6B7C86] mb-1">Website</label>
               <input type="text" value={form.website} onChange={e => setForm(f => ({ ...f, website: e.target.value }))}
-                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A]" />
+                className="w-full px-3 py-2 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A]" />
             </div>
             <div>
               <label className="block text-xs font-medium text-[#6B7C86] mb-1">Instagram</label>
               <input type="text" value={form.instagram} onChange={e => setForm(f => ({ ...f, instagram: e.target.value }))}
-                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A]" />
+                className="w-full px-3 py-2 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A]" />
             </div>
           </div>
           <div>
             <label className="block text-xs font-medium text-[#6B7C86] mb-1">Tags</label>
             <input type="text" value={form.tags} onChange={e => setForm(f => ({ ...f, tags: e.target.value }))}
-              placeholder="comma-separated tags" className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A]" />
+              placeholder="comma-separated tags" className="w-full px-3 py-2 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A]" />
           </div>
           <div>
             <label className="block text-xs font-medium text-[#6B7C86] mb-1">Notes</label>
             <textarea rows={3} value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
-              className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] resize-none" />
+              className="w-full px-3 py-2 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A] resize-none" />
           </div>
         </div>
         <div className="p-6 border-t border-slate-100 flex gap-3">
-          <button onClick={onClose} className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-medium text-[#9AADB8] hover:bg-slate-50">Cancel</button>
+          <button onClick={onClose} className="flex-1 px-4 py-2.5 rounded-xl border border-white/10 text-sm font-medium text-[#9AADB8] hover:bg-[#162E3D]">Cancel</button>
           <button onClick={handleSubmit} disabled={loading || !form.name || !form.category}
-            className="flex-1 px-4 py-2.5 rounded-xl bg-[#1d1d1f] text-white text-sm font-medium hover:bg-[#333] disabled:opacity-50">
+            className="flex-1 px-4 py-2.5 rounded-xl bg-[#1d1d1f] text-white text-sm font-medium hover:bg-[#E85A1C] disabled:opacity-50">
             {loading ? 'Saving...' : contact ? 'Update' : 'Create'}
           </button>
         </div>

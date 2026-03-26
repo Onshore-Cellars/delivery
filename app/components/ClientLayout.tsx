@@ -17,10 +17,10 @@ function Footer() {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#6B7C86]">
           <p className="font-[family-name:var(--font-display)] text-sm font-light text-[#6B7C86]">&copy; {new Date().getFullYear()} Onshore Group · ON.SHORE Delivery</p>
           <div className="flex gap-6">
-            <Link href="/about" className="text-[#6B7C86] hover:text-[#F7F9FB] hover:no-underline transition-colors">About</Link>
-            <Link href="/terms" className="text-[#6B7C86] hover:text-[#F7F9FB] hover:no-underline transition-colors">Terms</Link>
-            <Link href="/privacy" className="text-[#6B7C86] hover:text-[#F7F9FB] hover:no-underline transition-colors">Privacy</Link>
-            <Link href="/help" className="text-[#6B7C86] hover:text-[#F7F9FB] hover:no-underline transition-colors">Support</Link>
+            <Link href="/about" className="text-[#6B7C86] hover:text-white hover:no-underline transition-colors">About</Link>
+            <Link href="/terms" className="text-[#6B7C86] hover:text-white hover:no-underline transition-colors">Terms</Link>
+            <Link href="/privacy" className="text-[#6B7C86] hover:text-white hover:no-underline transition-colors">Privacy</Link>
+            <Link href="/help" className="text-[#6B7C86] hover:text-white hover:no-underline transition-colors">Support</Link>
           </div>
         </div>
       </div>

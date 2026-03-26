@@ -226,7 +226,7 @@ export default function ListingDetailPage() {
 
   return (
     <div className="page-container">
-        <Link href="/marketplace" className="text-sm text-[#6B7C86] hover:text-[#1a1a1a] transition-colors">&larr; Back to Marketplace</Link>
+        <Link href="/marketplace" className="text-sm text-[#6B7C86] hover:text-white transition-colors">&larr; Back to Marketplace</Link>
 
         {formSuccess && (
           <div className="mt-4 px-4 py-3 rounded-lg bg-emerald-50 border border-emerald-200">
@@ -234,8 +234,8 @@ export default function ListingDetailPage() {
           </div>
         )}
         {formError && (
-          <div className="mt-4 px-4 py-3 rounded-lg bg-red-500/10 border border-red-100">
-            <p className="text-sm text-red-700">{formError}</p>
+          <div className="mt-4 px-4 py-3 rounded-lg bg-red-900/20 border border-red-500/30">
+            <p className="text-sm text-red-300">{formError}</p>
           </div>
         )}
 
@@ -245,10 +245,10 @@ export default function ListingDetailPage() {
             {/* Header */}
             <div className="bg-[#162E3D] rounded-xl shadow-sm border border-slate-100 p-6">
               {listing.featured && <span className="badge bg-[#FF6A2A]/10 text-[#FF6A2A] border border-[#FF6A2A]/20 mb-3">Featured</span>}
-              <h1 className="text-xl sm:text-2xl font-semibold text-[#1a1a1a]">{listing.title}</h1>              {listing.description && <p className="mt-2 text-[#9AADB8] leading-relaxed">{listing.description}</p>}
+              <h1 className="text-xl sm:text-2xl font-semibold text-[#F7F9FB]">{listing.title}</h1>              {listing.description && <p className="mt-2 text-[#9AADB8] leading-relaxed">{listing.description}</p>}
 
               <div className="mt-6 flex flex-wrap gap-2">
-                <span className="badge bg-[#f5f5f7] text-[#1a1a1a] border border-[#d2d2d7]">{listing.vehicleType}</span>
+                <span className="badge bg-[#162E3D] text-[#F7F9FB] border border-white/10">{listing.vehicleType}</span>
                 {listing.hasRefrigeration && <span className="badge bg-indigo-50 text-indigo-700 border border-indigo-200">Refrigerated</span>}
                 {listing.hasTailLift && <span className="badge bg-purple-50 text-purple-700 border border-purple-200">Tail Lift</span>}
                 {listing.hasGPS && <span className="badge bg-emerald-50 text-emerald-700 border border-emerald-200">GPS Tracked</span>}
@@ -258,32 +258,32 @@ export default function ListingDetailPage() {
 
             {/* Route */}
             <div className="bg-[#162E3D] rounded-xl shadow-sm border border-slate-100 p-6">
-              <h2 className="font-bold text-[#1a1a1a] mb-4">Route</h2>
+              <h2 className="font-bold text-[#F7F9FB] mb-4">Route</h2>
               <div className="flex items-center gap-6">
                 <div className="flex-1">
                   <div className="text-xs text-slate-400 uppercase tracking-wider">Origin</div>
-                  <div className="text-lg font-bold text-[#1a1a1a]">{listing.originPort}</div>
+                  <div className="text-lg font-bold text-[#F7F9FB]">{listing.originPort}</div>
                   {listing.originRegion && <div className="text-sm text-[#6B7C86]">{listing.originRegion}{listing.originCountry && `, ${listing.originCountry}`}</div>}
                 </div>
                 <div className="flex flex-col items-center px-4">
-                  <div className="w-16 h-px bg-slate-300" />
+                  <div className="w-16 h-px bg-[#1E3A4D]" />
                   <svg className="w-5 h-5 text-[#FF6A2A] mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
                 </div>
                 <div className="flex-1">
                   <div className="text-xs text-slate-400 uppercase tracking-wider">Destination</div>
-                  <div className="text-lg font-bold text-[#1a1a1a]">{listing.destinationPort}</div>
+                  <div className="text-lg font-bold text-[#F7F9FB]">{listing.destinationPort}</div>
                   {listing.destinationRegion && <div className="text-sm text-[#6B7C86]">{listing.destinationRegion}{listing.destinationCountry && `, ${listing.destinationCountry}`}</div>}
                 </div>
               </div>
               <div className="mt-4 grid grid-cols-2 sm:grid-cols-2 gap-3 sm:gap-4 pt-4 border-t border-slate-100">
                 <div>
                   <div className="text-xs text-slate-400">Departure</div>
-                  <div className="font-semibold text-[#1a1a1a]">{formatDate(listing.departureDate)}</div>
+                  <div className="font-semibold text-[#F7F9FB]">{formatDate(listing.departureDate)}</div>
                 </div>
                 {listing.estimatedArrival && (
                   <div>
                     <div className="text-xs text-slate-400">Est. Arrival</div>
-                    <div className="font-semibold text-[#1a1a1a]">{formatDate(listing.estimatedArrival)}</div>
+                    <div className="font-semibold text-[#F7F9FB]">{formatDate(listing.estimatedArrival)}</div>
                   </div>
                 )}
               </div>
@@ -291,26 +291,26 @@ export default function ListingDetailPage() {
 
             {/* Capacity */}
             <div className="bg-[#162E3D] rounded-xl shadow-sm border border-slate-100 p-6">
-              <h2 className="font-bold text-[#1a1a1a] mb-4">Capacity</h2>
+              <h2 className="font-bold text-[#F7F9FB] mb-4">Capacity</h2>
               <div className="mb-4">
                 <div className="flex justify-between text-sm mb-1">
                   <span className="text-[#6B7C86]">Fill rate</span>
-                  <span className="font-semibold text-[#1a1a1a]">{fillPercent}%</span>
+                  <span className="font-semibold text-[#F7F9FB]">{fillPercent}%</span>
                 </div>
-                <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
+                <div className="w-full h-3 bg-[#102535] rounded-full overflow-hidden">
                   <div className="h-full bg-gradient-to-r from-[#FF6A2A] to-[#d4a76a] rounded-full transition-all" style={{ width: `${fillPercent}%` }} />
                 </div>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <div><div className="text-xs text-slate-400">Available Weight</div><div className="text-lg font-bold text-[#1a1a1a]">{listing.availableKg.toFixed(0)}kg</div></div>
-                <div><div className="text-xs text-slate-400">Available Volume</div><div className="text-lg font-bold text-[#1a1a1a]">{listing.availableM3.toFixed(1)}m&sup3;</div></div>
+                <div><div className="text-xs text-slate-400">Available Weight</div><div className="text-lg font-bold text-[#F7F9FB]">{listing.availableKg.toFixed(0)}kg</div></div>
+                <div><div className="text-xs text-slate-400">Available Volume</div><div className="text-lg font-bold text-[#F7F9FB]">{listing.availableM3.toFixed(1)}m&sup3;</div></div>
                 <div><div className="text-xs text-slate-400">Total Weight</div><div className="text-sm text-[#9AADB8]">{listing.totalCapacityKg.toFixed(0)}kg</div></div>
                 <div><div className="text-xs text-slate-400">Total Volume</div><div className="text-sm text-[#9AADB8]">{listing.totalCapacityM3.toFixed(1)}m&sup3;</div></div>
               </div>
               {(listing.maxItemLength || listing.maxItemWidth || listing.maxItemHeight) && (
                 <div className="mt-4 pt-4 border-t border-slate-100">
                   <div className="text-xs text-slate-400 mb-1">Max Item Dimensions</div>
-                  <div className="text-sm text-[#1a1a1a]">
+                  <div className="text-sm text-[#F7F9FB]">
                     {listing.maxItemLength && `${listing.maxItemLength}cm L`}
                     {listing.maxItemWidth && ` x ${listing.maxItemWidth}cm W`}
                     {listing.maxItemHeight && ` x ${listing.maxItemHeight}cm H`}
@@ -320,7 +320,7 @@ export default function ListingDetailPage() {
               {acceptedCargo.length > 0 && (
                 <div className="mt-4 pt-4 border-t border-slate-100">
                   <div className="text-xs text-slate-400 mb-2">Accepted Cargo Types</div>
-                  <div className="flex flex-wrap gap-1">{acceptedCargo.map((c: string) => <span key={c} className="badge bg-slate-50 text-[#9AADB8] border border-slate-200">{c}</span>)}</div>
+                  <div className="flex flex-wrap gap-1">{acceptedCargo.map((c: string) => <span key={c} className="badge bg-[#162E3D] text-[#9AADB8] border border-white/10">{c}</span>)}</div>
                 </div>
               )}
             </div>
@@ -332,7 +332,7 @@ export default function ListingDetailPage() {
                   <svg className="w-5 h-5 text-[#FF6A2A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                   </svg>
-                  <h2 className="font-bold text-[#1a1a1a]">Return Journey</h2>
+                  <h2 className="font-bold text-[#F7F9FB]">Return Journey</h2>
                   <span className="badge bg-[#FF6A2A]/10 text-[#FF6A2A] text-[10px]">Two-Way</span>
                 </div>
                 <p className="text-xs text-slate-400 mb-3">{listing.destinationPort} &rarr; {listing.originPort}</p>
@@ -343,14 +343,14 @@ export default function ListingDetailPage() {
                 )}
                 {(listing.returnAvailableKg || listing.returnAvailableM3) && (
                   <div className="grid grid-cols-2 gap-3 mb-3">
-                    {listing.returnAvailableKg && <div><div className="text-xs text-slate-400">Available</div><div className="text-lg font-bold text-[#1a1a1a]">{listing.returnAvailableKg.toFixed(0)}kg</div></div>}
-                    {listing.returnAvailableM3 && <div><div className="text-xs text-slate-400">Volume</div><div className="text-lg font-bold text-[#1a1a1a]">{listing.returnAvailableM3.toFixed(1)}m&sup3;</div></div>}
+                    {listing.returnAvailableKg && <div><div className="text-xs text-slate-400">Available</div><div className="text-lg font-bold text-[#F7F9FB]">{listing.returnAvailableKg.toFixed(0)}kg</div></div>}
+                    {listing.returnAvailableM3 && <div><div className="text-xs text-slate-400">Volume</div><div className="text-lg font-bold text-[#F7F9FB]">{listing.returnAvailableM3.toFixed(1)}m&sup3;</div></div>}
                   </div>
                 )}
                 {(listing.returnFlatRate || listing.returnPricePerKg || listing.returnPricePerM3) && (
                   <div className="pt-3 border-t border-slate-100">
                     <div className="text-xs text-slate-400 mb-1">Return Pricing</div>
-                    {listing.returnFlatRate && <div className="text-sm font-semibold text-[#1a1a1a]">{formatCurrency(listing.returnFlatRate, listing.currency)} flat</div>}
+                    {listing.returnFlatRate && <div className="text-sm font-semibold text-[#F7F9FB]">{formatCurrency(listing.returnFlatRate, listing.currency)} flat</div>}
                     {listing.returnPricePerKg && <div className="text-sm text-[#9AADB8]">{formatCurrency(listing.returnPricePerKg, listing.currency)}/kg</div>}
                     {listing.returnPricePerM3 && <div className="text-sm text-[#9AADB8]">{formatCurrency(listing.returnPricePerM3, listing.currency)}/m&sup3;</div>}
                   </div>
@@ -368,11 +368,11 @@ export default function ListingDetailPage() {
             <div className="bg-[#162E3D] rounded-xl shadow-sm border border-slate-100 p-6 sticky top-24">
               <div className="text-xs text-slate-400 uppercase tracking-wider mb-2">Pricing</div>
               {listing.flatRate ? (
-                <div className="text-3xl font-semibold text-[#1a1a1a]">{formatCurrency(listing.flatRate, listing.currency)}<span className="text-sm font-normal text-slate-400 ml-1">flat</span></div>
+                <div className="text-3xl font-semibold text-[#F7F9FB]">{formatCurrency(listing.flatRate, listing.currency)}<span className="text-sm font-normal text-slate-400 ml-1">flat</span></div>
               ) : (
                 <div className="space-y-1">
-                  {listing.pricePerKg && <div className="text-xl font-bold text-[#1a1a1a]">{formatCurrency(listing.pricePerKg, listing.currency)}<span className="text-sm font-normal text-slate-400">/kg</span></div>}
-                  {listing.pricePerM3 && <div className="text-xl font-bold text-[#1a1a1a]">{formatCurrency(listing.pricePerM3, listing.currency)}<span className="text-sm font-normal text-slate-400">/m&sup3;</span></div>}
+                  {listing.pricePerKg && <div className="text-xl font-bold text-[#F7F9FB]">{formatCurrency(listing.pricePerKg, listing.currency)}<span className="text-sm font-normal text-slate-400">/kg</span></div>}
+                  {listing.pricePerM3 && <div className="text-xl font-bold text-[#F7F9FB]">{formatCurrency(listing.pricePerM3, listing.currency)}<span className="text-sm font-normal text-slate-400">/m&sup3;</span></div>}
                 </div>
               )}
               {listing.minimumCharge && <div className="text-xs text-slate-400 mt-1">Min. charge: {formatCurrency(listing.minimumCharge, listing.currency)}</div>}
@@ -389,7 +389,7 @@ export default function ListingDetailPage() {
                         Place Bid
                       </button>
                     )}
-                    <button onClick={() => { setShowContact(!showContact); setShowBooking(false); setShowBid(false) }} className="w-full px-4 py-3 text-sm font-medium text-[#9AADB8] border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
+                    <button onClick={() => { setShowContact(!showContact); setShowBooking(false); setShowBid(false) }} className="w-full px-4 py-3 text-sm font-medium text-[#9AADB8] border border-white/10 rounded-lg hover:bg-[#162E3D] transition-colors">
                       Message Carrier
                     </button>
                   </>
@@ -404,11 +404,11 @@ export default function ListingDetailPage() {
               {/* Carrier Info (anonymous until booking confirmed) */}
               <div className="mt-6 pt-6 border-t border-slate-100">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-full bg-[#f5f5f7] flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-full bg-[#162E3D] flex items-center justify-center">
                     <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                   </div>
                   <div>
-                    <div className="font-semibold text-[#1a1a1a] text-sm">Verified Carrier</div>
+                    <div className="font-semibold text-[#F7F9FB] text-sm">Verified Carrier</div>
                     <div className="text-xs text-slate-400">Identity revealed after booking</div>
                   </div>
                 </div>
@@ -437,8 +437,8 @@ export default function ListingDetailPage() {
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
             <div className="bg-[#162E3D] rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
               <div className="p-6 border-b border-slate-100 flex justify-between items-center">
-                <h2 className="text-xl font-bold text-[#1a1a1a]">Book Space</h2>
-                <button onClick={() => setShowBooking(false)} className="p-2 hover:bg-slate-100 rounded-lg"><svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
+                <h2 className="text-xl font-bold text-[#F7F9FB]">Book Space</h2>
+                <button onClick={() => setShowBooking(false)} className="p-2 hover:bg-[#102535] rounded-lg"><svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
               </div>
               <form onSubmit={submitBooking} className="p-6 space-y-5">
                 {/* Cargo Details */}
@@ -446,9 +446,9 @@ export default function ListingDetailPage() {
                   <h3 className="text-sm font-semibold text-[#6B7C86] uppercase tracking-wide mb-3">Cargo Details</h3>
                   <div className="space-y-3">
                     <div>
-                      <label className="block text-sm font-medium text-[#1a1a1a] mb-1">Description *</label>
-                      <input required className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A]" placeholder="e.g. 12 cases premium wine, temperature sensitive" value={bookingForm.cargoDescription} onChange={e => setBookingForm({...bookingForm, cargoDescription: e.target.value})} />
-                      <button type="button" onClick={classifyCargo} disabled={classifying || !bookingForm.cargoDescription.trim()} className="mt-1.5 text-xs font-medium text-[#FF6A2A] hover:text-[#b07e3a] disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                      <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Description *</label>
+                      <input required className="w-full px-4 py-2.5 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A]" placeholder="e.g. 12 cases premium wine, temperature sensitive" value={bookingForm.cargoDescription} onChange={e => setBookingForm({...bookingForm, cargoDescription: e.target.value})} />
+                      <button type="button" onClick={classifyCargo} disabled={classifying || !bookingForm.cargoDescription.trim()} className="mt-1.5 text-xs font-medium text-[#FF6A2A] hover:text-[#FF8F5A] disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
                         {classifying ? 'Analyzing...' : 'Analyze with AI \u2726'}
                       </button>
                       {cargoWarnings.length > 0 && (
@@ -458,13 +458,13 @@ export default function ListingDetailPage() {
                       )}
                     </div>
                     <div className="grid grid-cols-2 gap-3">
-                      <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Weight (kg) *</label><input type="number" required step="0.1" max={listing.availableKg} className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A]" value={bookingForm.weightKg} onChange={e => setBookingForm({...bookingForm, weightKg: e.target.value})} /></div>
-                      <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Volume (m&sup3;) *</label><input type="number" required step="0.1" max={listing.availableM3} className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A]" value={bookingForm.volumeM3} onChange={e => setBookingForm({...bookingForm, volumeM3: e.target.value})} /></div>
+                      <div><label className="block text-sm font-medium text-[#F7F9FB] mb-1">Weight (kg) *</label><input type="number" required step="0.1" max={listing.availableKg} className="w-full px-4 py-2.5 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A]" value={bookingForm.weightKg} onChange={e => setBookingForm({...bookingForm, weightKg: e.target.value})} /></div>
+                      <div><label className="block text-sm font-medium text-[#F7F9FB] mb-1">Volume (m&sup3;) *</label><input type="number" required step="0.1" max={listing.availableM3} className="w-full px-4 py-2.5 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A]" value={bookingForm.volumeM3} onChange={e => setBookingForm({...bookingForm, volumeM3: e.target.value})} /></div>
                     </div>
                     <CargoCalculator onCalculated={(wt, vol) => setBookingForm(prev => ({ ...prev, weightKg: String(wt), volumeM3: String(vol) }))} />
                     <div className="grid grid-cols-2 gap-3">
-                      <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Declared Value</label><input type="number" step="0.01" className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A]" placeholder="e.g. 5000" value={bookingForm.declaredValue} onChange={e => setBookingForm({...bookingForm, declaredValue: e.target.value})} /></div>
-                      <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Special Handling</label><input className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A]" placeholder="e.g. Refrigerated" value={bookingForm.specialHandling} onChange={e => setBookingForm({...bookingForm, specialHandling: e.target.value})} /></div>
+                      <div><label className="block text-sm font-medium text-[#F7F9FB] mb-1">Declared Value</label><input type="number" step="0.01" className="w-full px-4 py-2.5 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A]" placeholder="e.g. 5000" value={bookingForm.declaredValue} onChange={e => setBookingForm({...bookingForm, declaredValue: e.target.value})} /></div>
+                      <div><label className="block text-sm font-medium text-[#F7F9FB] mb-1">Special Handling</label><input className="w-full px-4 py-2.5 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A]" placeholder="e.g. Refrigerated" value={bookingForm.specialHandling} onChange={e => setBookingForm({...bookingForm, specialHandling: e.target.value})} /></div>
                     </div>
                   </div>
                 </div>
@@ -473,22 +473,22 @@ export default function ListingDetailPage() {
                 <div>
                   <h3 className="text-sm font-semibold text-[#6B7C86] uppercase tracking-wide mb-3">Collection Details</h3>
                   <div className="space-y-3">
-                    <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Pickup Address *</label><input required className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A]" placeholder="Full address for cargo collection" value={bookingForm.pickupAddress} onChange={e => setBookingForm({...bookingForm, pickupAddress: e.target.value})} /></div>
+                    <div><label className="block text-sm font-medium text-[#F7F9FB] mb-1">Pickup Address *</label><input required className="w-full px-4 py-2.5 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A]" placeholder="Full address for cargo collection" value={bookingForm.pickupAddress} onChange={e => setBookingForm({...bookingForm, pickupAddress: e.target.value})} /></div>
                     <div className="grid grid-cols-2 gap-3">
-                      <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Contact Name *</label><input required className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A]" placeholder="Who to ask for" value={bookingForm.pickupContact} onChange={e => setBookingForm({...bookingForm, pickupContact: e.target.value})} /></div>
-                      <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Contact Phone *</label><input required type="tel" className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A]" placeholder="+44 7700 900000" value={bookingForm.pickupPhone} onChange={e => setBookingForm({...bookingForm, pickupPhone: e.target.value})} /></div>
+                      <div><label className="block text-sm font-medium text-[#F7F9FB] mb-1">Contact Name *</label><input required className="w-full px-4 py-2.5 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A]" placeholder="Who to ask for" value={bookingForm.pickupContact} onChange={e => setBookingForm({...bookingForm, pickupContact: e.target.value})} /></div>
+                      <div><label className="block text-sm font-medium text-[#F7F9FB] mb-1">Contact Phone *</label><input required type="tel" className="w-full px-4 py-2.5 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A]" placeholder="+44 7700 900000" value={bookingForm.pickupPhone} onChange={e => setBookingForm({...bookingForm, pickupPhone: e.target.value})} /></div>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-sm font-medium text-[#1a1a1a] mb-1">Preferred Time</label>
-                        <select className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] bg-[#162E3D]" value={bookingForm.pickupTimeWindow} onChange={e => setBookingForm({...bookingForm, pickupTimeWindow: e.target.value})}>
+                        <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Preferred Time</label>
+                        <select className="w-full px-4 py-2.5 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A] bg-[#162E3D]" value={bookingForm.pickupTimeWindow} onChange={e => setBookingForm({...bookingForm, pickupTimeWindow: e.target.value})}>
                           <option value="">Any time</option>
                           <option value="morning">Morning (8am–12pm)</option>
                           <option value="afternoon">Afternoon (12–5pm)</option>
                           <option value="evening">Evening (5–9pm)</option>
                         </select>
                       </div>
-                      <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Access Notes</label><input className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A]" placeholder="Gate code, dock #, etc." value={bookingForm.pickupNotes} onChange={e => setBookingForm({...bookingForm, pickupNotes: e.target.value})} /></div>
+                      <div><label className="block text-sm font-medium text-[#F7F9FB] mb-1">Access Notes</label><input className="w-full px-4 py-2.5 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A]" placeholder="Gate code, dock #, etc." value={bookingForm.pickupNotes} onChange={e => setBookingForm({...bookingForm, pickupNotes: e.target.value})} /></div>
                     </div>
                   </div>
                 </div>
@@ -497,26 +497,26 @@ export default function ListingDetailPage() {
                 <div>
                   <h3 className="text-sm font-semibold text-[#6B7C86] uppercase tracking-wide mb-3">Delivery Details</h3>
                   <div className="space-y-3">
-                    <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Delivery Address *</label><input required className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A]" placeholder="Full address for delivery" value={bookingForm.deliveryAddress} onChange={e => setBookingForm({...bookingForm, deliveryAddress: e.target.value})} /></div>
+                    <div><label className="block text-sm font-medium text-[#F7F9FB] mb-1">Delivery Address *</label><input required className="w-full px-4 py-2.5 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A]" placeholder="Full address for delivery" value={bookingForm.deliveryAddress} onChange={e => setBookingForm({...bookingForm, deliveryAddress: e.target.value})} /></div>
                     <div className="grid grid-cols-2 gap-3">
-                      <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Recipient Name *</label><input required className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A]" placeholder="Who will receive" value={bookingForm.deliveryContact} onChange={e => setBookingForm({...bookingForm, deliveryContact: e.target.value})} /></div>
-                      <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Recipient Phone *</label><input required type="tel" className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A]" placeholder="+33 6 12 34 56 78" value={bookingForm.deliveryPhone} onChange={e => setBookingForm({...bookingForm, deliveryPhone: e.target.value})} /></div>
+                      <div><label className="block text-sm font-medium text-[#F7F9FB] mb-1">Recipient Name *</label><input required className="w-full px-4 py-2.5 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A]" placeholder="Who will receive" value={bookingForm.deliveryContact} onChange={e => setBookingForm({...bookingForm, deliveryContact: e.target.value})} /></div>
+                      <div><label className="block text-sm font-medium text-[#F7F9FB] mb-1">Recipient Phone *</label><input required type="tel" className="w-full px-4 py-2.5 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A]" placeholder="+33 6 12 34 56 78" value={bookingForm.deliveryPhone} onChange={e => setBookingForm({...bookingForm, deliveryPhone: e.target.value})} /></div>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-sm font-medium text-[#1a1a1a] mb-1">Preferred Time</label>
-                        <select className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] bg-[#162E3D]" value={bookingForm.deliveryTimeWindow} onChange={e => setBookingForm({...bookingForm, deliveryTimeWindow: e.target.value})}>
+                        <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Preferred Time</label>
+                        <select className="w-full px-4 py-2.5 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A] bg-[#162E3D]" value={bookingForm.deliveryTimeWindow} onChange={e => setBookingForm({...bookingForm, deliveryTimeWindow: e.target.value})}>
                           <option value="">Any time</option>
                           <option value="morning">Morning (8am–12pm)</option>
                           <option value="afternoon">Afternoon (12–5pm)</option>
                           <option value="evening">Evening (5–9pm)</option>
                         </select>
                       </div>
-                      <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Vessel / Site Name</label><input className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A]" placeholder="e.g. MY Serenity" value={bookingForm.vesselName} onChange={e => setBookingForm({...bookingForm, vesselName: e.target.value})} /></div>
+                      <div><label className="block text-sm font-medium text-[#F7F9FB] mb-1">Vessel / Site Name</label><input className="w-full px-4 py-2.5 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A]" placeholder="e.g. MY Serenity" value={bookingForm.vesselName} onChange={e => setBookingForm({...bookingForm, vesselName: e.target.value})} /></div>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
-                      <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Marina / Berth</label><input className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A]" placeholder="e.g. Port Hercules, Berth 42" value={bookingForm.marinaName} onChange={e => setBookingForm({...bookingForm, marinaName: e.target.value})} /></div>
-                      <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Delivery Notes</label><input className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A]" placeholder="Special instructions" value={bookingForm.deliveryNotes} onChange={e => setBookingForm({...bookingForm, deliveryNotes: e.target.value})} /></div>
+                      <div><label className="block text-sm font-medium text-[#F7F9FB] mb-1">Marina / Berth</label><input className="w-full px-4 py-2.5 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A]" placeholder="e.g. Port Hercules, Berth 42" value={bookingForm.marinaName} onChange={e => setBookingForm({...bookingForm, marinaName: e.target.value})} /></div>
+                      <div><label className="block text-sm font-medium text-[#F7F9FB] mb-1">Delivery Notes</label><input className="w-full px-4 py-2.5 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A]" placeholder="Special instructions" value={bookingForm.deliveryNotes} onChange={e => setBookingForm({...bookingForm, deliveryNotes: e.target.value})} /></div>
                     </div>
                   </div>
                 </div>
@@ -532,17 +532,17 @@ export default function ListingDetailPage() {
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
             <div className="bg-[#162E3D] rounded-2xl shadow-2xl max-w-lg w-full">
               <div className="p-6 border-b border-slate-100 flex justify-between items-center">
-                <h2 className="text-xl font-bold text-[#1a1a1a]">Place a Bid</h2>
-                <button onClick={() => setShowBid(false)} className="p-2 hover:bg-slate-100 rounded-lg"><svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
+                <h2 className="text-xl font-bold text-[#F7F9FB]">Place a Bid</h2>
+                <button onClick={() => setShowBid(false)} className="p-2 hover:bg-[#102535] rounded-lg"><svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
               </div>
               <form onSubmit={submitBid} className="p-6 space-y-4">
                 {listing.minBidPrice && <p className="text-sm text-[#6B7C86]">Minimum bid: {formatCurrency(listing.minBidPrice, listing.currency)}</p>}
-                <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Your Bid ({listing.currency}) *</label><input type="number" required step="0.01" min={listing.minBidPrice || 0} className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A]" value={bidForm.amount} onChange={e => setBidForm({...bidForm, amount: e.target.value})} /></div>
+                <div><label className="block text-sm font-medium text-[#F7F9FB] mb-1">Your Bid ({listing.currency}) *</label><input type="number" required step="0.01" min={listing.minBidPrice || 0} className="w-full px-4 py-2.5 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A]" value={bidForm.amount} onChange={e => setBidForm({...bidForm, amount: e.target.value})} /></div>
                 <div className="grid grid-cols-2 gap-3">
-                  <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Weight (kg) *</label><input type="number" required step="0.1" className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A]" value={bidForm.weightKg} onChange={e => setBidForm({...bidForm, weightKg: e.target.value})} /></div>
-                  <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Volume (m&sup3;) *</label><input type="number" required step="0.1" className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A]" value={bidForm.volumeM3} onChange={e => setBidForm({...bidForm, volumeM3: e.target.value})} /></div>
+                  <div><label className="block text-sm font-medium text-[#F7F9FB] mb-1">Weight (kg) *</label><input type="number" required step="0.1" className="w-full px-4 py-2.5 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A]" value={bidForm.weightKg} onChange={e => setBidForm({...bidForm, weightKg: e.target.value})} /></div>
+                  <div><label className="block text-sm font-medium text-[#F7F9FB] mb-1">Volume (m&sup3;) *</label><input type="number" required step="0.1" className="w-full px-4 py-2.5 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A]" value={bidForm.volumeM3} onChange={e => setBidForm({...bidForm, volumeM3: e.target.value})} /></div>
                 </div>
-                <div><label className="block text-sm font-medium text-[#1a1a1a] mb-1">Message</label><textarea rows={3} className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] resize-none" placeholder="Tell the carrier about your cargo..." value={bidForm.message} onChange={e => setBidForm({...bidForm, message: e.target.value})} /></div>
+                <div><label className="block text-sm font-medium text-[#F7F9FB] mb-1">Message</label><textarea rows={3} className="w-full px-4 py-2.5 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A] resize-none" placeholder="Tell the carrier about your cargo..." value={bidForm.message} onChange={e => setBidForm({...bidForm, message: e.target.value})} /></div>
                 <button type="submit" disabled={formLoading} className="w-full btn-primary !py-3 text-sm disabled:opacity-50">{formLoading ? 'Submitting...' : 'Submit Bid'}</button>
               </form>
             </div>
@@ -554,14 +554,14 @@ export default function ListingDetailPage() {
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
             <div className="bg-[#162E3D] rounded-2xl shadow-2xl max-w-lg w-full">
               <div className="p-6 border-b border-slate-100 flex justify-between items-center">
-                <h2 className="text-xl font-bold text-[#1a1a1a]">Message Carrier</h2>
-                <button onClick={() => setShowContact(false)} className="p-2 hover:bg-slate-100 rounded-lg"><svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
+                <h2 className="text-xl font-bold text-[#F7F9FB]">Message Carrier</h2>
+                <button onClick={() => setShowContact(false)} className="p-2 hover:bg-[#102535] rounded-lg"><svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
               </div>
               <form onSubmit={sendMessage} className="p-6 space-y-4">
                 <p className="text-sm text-[#6B7C86]">Send an in-app message to the carrier. Contact details will be shared after a confirmed booking.</p>
                 <div>
-                  <label className="block text-sm font-medium text-[#1a1a1a] mb-1">Your Message</label>
-                  <textarea rows={4} required className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#FF6A2A] resize-none" placeholder="Hi, I'm interested in your listing..." value={messageContent} onChange={e => setMessageContent(e.target.value)} />
+                  <label className="block text-sm font-medium text-[#F7F9FB] mb-1">Your Message</label>
+                  <textarea rows={4} required className="w-full px-4 py-2.5 rounded-lg border border-white/10 text-sm outline-none focus:border-[#FF6A2A] resize-none" placeholder="Hi, I'm interested in your listing..." value={messageContent} onChange={e => setMessageContent(e.target.value)} />
                 </div>
                 <button type="submit" disabled={formLoading} className="w-full btn-primary !py-3 text-sm disabled:opacity-50">{formLoading ? 'Sending...' : 'Send Message'}</button>
               </form>
