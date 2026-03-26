@@ -166,7 +166,7 @@ export async function POST(request: NextRequest) {
         subject: String(subject).trim(),
         htmlBody,
         textBody: textBody || null,
-        filters: filters || {},
+        filters: filters ? (typeof filters === 'string' ? filters : JSON.stringify(filters)) : null,
         status: send ? 'sending' : 'draft',
       },
     })
