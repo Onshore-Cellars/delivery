@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '../../components/AuthProvider'
@@ -30,9 +30,13 @@ export default function CreateListingPage() {
     originPort: '',
     originRegion: '',
     originCountry: '',
+    originLat: 0,
+    originLng: 0,
     destinationPort: '',
     destinationRegion: '',
     destinationCountry: '',
+    destLat: 0,
+    destLng: 0,
     departureDate: '',
     estimatedArrival: '',
     totalCapacityKg: '',
@@ -67,8 +71,11 @@ export default function CreateListingPage() {
 
   const [costEstimate, setCostEstimate] = useState<null | { fuelCost: number; tollEstimate: number; ferryWarning?: string; totalEstimate: number; breakdown: { label: string; amount: number }[] }>(null)
   const [estimateDistance, setEstimateDistance] = useState('')
+  const [estimateDuration, setEstimateDuration] = useState('')
+  const [distanceSource, setDistanceSource] = useState<'google' | 'estimate' | ''>('')
   const [estimateLoading, setEstimateLoading] = useState(false)
   const [estimateOpen, setEstimateOpen] = useState(false)
+  const distanceFetchRef = useRef(false)
   const [generatingDescription, setGeneratingDescription] = useState(false)
 
   const makes = useMemo(() => getVehicleMakes(), [])
@@ -107,6 +114,61 @@ export default function CreateListingPage() {
     setForm({ ...form, [target.name]: value })
   }
 
+  // Auto-calculate distance when both origin and destination have coordinates
+  const fetchDistance = useCallback(async (oLat: number, oLng: number, dLat: number, dLng: number) => {
+    if (!oLat || !oLng || !dLat || !dLng) return
+    if (distanceFetchRef.current) return
+    distanceFetchRef.current = true
+    try {
+      const res = await fetch('/api/distance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ originLat: oLat, originLng: oLng, destLat: dLat, destLng: dLng }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setEstimateDistance(String(data.distanceKm))
+        setEstimateDuration(data.durationText || '')
+        setDistanceSource(data.source || 'estimate')
+        setEstimateOpen(true) // Auto-open the cost estimator panel
+      }
+    } catch { /* fallback — user can still enter manually */ }
+    distanceFetchRef.current = false
+  }, [])
+
+  // Trigger distance calc whenever both coordinates are set
+  useEffect(() => {
+    if (form.originLat && form.originLng && form.destLat && form.destLng) {
+      fetchDistance(form.originLat, form.originLng, form.destLat, form.destLng)
+    }
+  }, [form.originLat, form.originLng, form.destLat, form.destLng, fetchDistance])
+
+  // Auto-trigger cost estimate when distance + country + vehicle type are all set
+  useEffect(() => {
+    if (!estimateDistance || !form.originCountry || !form.destinationCountry || !form.vehicleType) return
+    const timer = setTimeout(async () => {
+      setEstimateLoading(true)
+      setCostEstimate(null)
+      try {
+        const res = await fetch('/api/route-cost', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            originCountry: form.originCountry,
+            destinationCountry: form.destinationCountry,
+            distanceKm: Number(estimateDistance),
+            vehicleType: form.vehicleType,
+            fuelType: selectedSpec?.fuelType,
+          }),
+        })
+        const data = await res.json()
+        if (res.ok) setCostEstimate(data.estimate)
+      } catch { /* ignore */ }
+      setEstimateLoading(false)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [estimateDistance, form.originCountry, form.destinationCountry, form.vehicleType, selectedSpec?.fuelType])
+
   const handleEstimateCost = async () => {
     if (!estimateDistance || !form.originCountry || !form.destinationCountry || !form.vehicleType) return
     setEstimateLoading(true)
@@ -120,6 +182,7 @@ export default function CreateListingPage() {
           destinationCountry: form.destinationCountry,
           distanceKm: Number(estimateDistance),
           vehicleType: form.vehicleType,
+          fuelType: selectedSpec?.fuelType,
         }),
       })
       const data = await res.json()
@@ -445,6 +508,8 @@ export default function CreateListingPage() {
                           originPort: data.address || `${data.name}, ${data.city}`,
                           originRegion: data.region || prev.originRegion,
                           originCountry: data.country || prev.originCountry,
+                          originLat: data.lat || 0,
+                          originLng: data.lng || 0,
                         }))
                       }
                     }}
@@ -480,6 +545,8 @@ export default function CreateListingPage() {
                           destinationPort: data.address || `${data.name}, ${data.city}`,
                           destinationRegion: data.region || prev.destinationRegion,
                           destinationCountry: data.country || prev.destinationCountry,
+                          destLat: data.lat || 0,
+                          destLng: data.lng || 0,
                         }))
                       }
                     }}
@@ -983,7 +1050,11 @@ export default function CreateListingPage() {
             >
               <div>
                 <h2 className="text-lg font-bold text-[#1a1a1a]">Route Cost Estimator</h2>
-                <p className="text-xs text-slate-400 mt-0.5">Estimate fuel, tolls &amp; ferry costs to help set your prices.</p>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  {estimateDistance
+                    ? `${estimateDistance} km${estimateDuration ? ` · ${estimateDuration}` : ''}${distanceSource === 'google' ? ' (Google Maps)' : distanceSource === 'estimate' ? ' (estimated)' : ''}`
+                    : 'Estimate fuel, tolls & ferry costs to help set your prices.'}
+                </p>
               </div>
               <span className={`text-slate-400 transition-transform ${estimateOpen ? 'rotate-180' : ''}`}>
                 &#9660;
@@ -991,16 +1062,24 @@ export default function CreateListingPage() {
             </button>
             {estimateOpen && (
               <div className="px-5 sm:px-6 pb-5 sm:pb-6 space-y-4 border-t border-slate-100 pt-4">
+                {estimateDuration && (
+                  <div className="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 rounded-lg px-3 py-2">
+                    <svg className="w-4 h-4 text-[#C6904D]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <span>Estimated drive time: <strong>{estimateDuration}</strong></span>
+                    {distanceSource === 'google' && <span className="text-xs text-slate-400">(Google Maps)</span>}
+                  </div>
+                )}
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className={labelCls}>Distance (km)</label>
+                    <label className={labelCls}>Distance (km) {distanceSource && <span className="text-xs font-normal text-slate-400">— auto-calculated, adjust if needed</span>}</label>
                     <input
                       type="number"
                       step="1"
                       className={inputCls}
                       placeholder="e.g. 950"
                       value={estimateDistance}
-                      onChange={e => setEstimateDistance(e.target.value)}
+                      onChange={e => { setEstimateDistance(e.target.value); setDistanceSource(''); }}
                     />
                   </div>
                   <div className="flex items-end">
@@ -1010,7 +1089,7 @@ export default function CreateListingPage() {
                       disabled={estimateLoading || !estimateDistance || !form.originCountry || !form.destinationCountry || !form.vehicleType}
                       className="btn-outline text-sm !py-2.5 w-full disabled:opacity-40"
                     >
-                      {estimateLoading ? 'Calculating...' : 'Calculate Estimate'}
+                      {estimateLoading ? 'Calculating...' : 'Recalculate'}
                     </button>
                   </div>
                 </div>
@@ -1043,6 +1122,34 @@ export default function CreateListingPage() {
                         <p className="text-xs text-amber-800 font-medium">&#9875; Ferry: {costEstimate.ferryWarning}</p>
                       </div>
                     )}
+
+                    {/* Guide pricing suggestions */}
+                    <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-4 space-y-2">
+                      <p className="text-xs font-semibold text-emerald-800 uppercase tracking-wide">Guide Pricing</p>
+                      <div className="grid grid-cols-3 gap-2 text-center">
+                        {[
+                          { label: 'Budget', margin: 1.15, color: 'text-slate-600' },
+                          { label: 'Standard', margin: 1.35, color: 'text-emerald-700 font-bold' },
+                          { label: 'Premium', margin: 1.6, color: 'text-amber-700' },
+                        ].map(tier => (
+                          <button
+                            key={tier.label}
+                            type="button"
+                            onClick={() => {
+                              const suggested = Math.round(costEstimate.totalEstimate * tier.margin * 100) / 100
+                              setForm(prev => ({ ...prev, flatRate: String(suggested) }))
+                            }}
+                            className="rounded-lg bg-white border border-emerald-100 p-2 hover:border-emerald-300 transition-colors cursor-pointer"
+                          >
+                            <span className="text-[10px] text-slate-500 block">{tier.label}</span>
+                            <span className={`text-sm ${tier.color}`}>
+                              &euro;{(costEstimate.totalEstimate * tier.margin).toFixed(0)}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                      <p className="text-[10px] text-emerald-600 text-center">Click to set as your flat rate — includes {estimateDistance}km fuel + tolls</p>
+                    </div>
 
                     {form.totalCapacityKg && Number(form.totalCapacityKg) > 0 && (
                       <div className="rounded-lg bg-amber-50 border border-amber-100 p-3">

@@ -16,20 +16,58 @@ interface CostParams {
   destinationCountry: string
   distanceKm: number
   vehicleType: string
+  fuelType?: string          // 'Diesel' | 'Electric' | 'Petrol'
   fuelPricePerLitre?: number // default EUR rates
 }
 
 // Average fuel consumption by vehicle type (litres per 100km)
+// Matches vehicle types from lib/vehicles.ts
 const FUEL_CONSUMPTION: Record<string, number> = {
-  'Car': 8,
-  'Van': 10,
-  'Truck': 25,
+  // Vans
+  'Small Van': 7.5,
+  'Medium Van': 9.5,
+  'Large Van': 11,
+  'Luton Van': 13,
+  'Sprinter': 11,
+  'Tail Lift Van': 12,
+  'Chassis Cab': 11,
+  // Refrigerated
   'Refrigerated Van': 13,
   'Refrigerated Truck': 30,
-  'Flatbed': 28,
-  'Container': 32,
-  'Cargo Ship': 0, // N/A for ships
+  'Temperature Controlled': 14,
+  // Trucks
+  'Box Truck': 22,
+  'Flatbed': 25,
+  'Curtain-side': 25,
+  'Tipper Truck': 28,
+  'Low Loader': 35,
+  'Crane Truck (HIAB)': 32,
+  'Hazmat Vehicle': 28,
+  'Tanker': 30,
+  'Car Transporter': 32,
+  // Cars / small
+  'Estate Car': 7,
+  'SUV': 9,
+  'Car with Trailer': 10,
+  'Pickup Truck': 12,
+  'Motorcycle Courier': 4,
+  'Cargo Bike': 0,
+  'Minibus (Cargo)': 12,
+  'Boat Trailer': 12,
+  // Electric — use kWh/100km converted to equivalent diesel cost
+  // These are handled separately: ~20kWh/100km at ~€0.30/kWh ≈ €6/100km
+  'Other': 10,
 }
+
+// Electric vehicles: kWh per 100km (used when fuelType is 'Electric')
+const ELECTRIC_CONSUMPTION: Record<string, number> = {
+  'Small Van': 20,
+  'Medium Van': 25,
+  'Large Van': 30,
+  'default': 25,
+}
+
+const ELECTRICITY_PRICE_PER_KWH = 0.30 // EUR average
 
 // Average fuel prices in EUR per litre by country (approximate)
 const FUEL_PRICES: Record<string, number> = {
@@ -73,13 +111,23 @@ const FERRY_ROUTES: { from: string[]; to: string[]; note: string }[] = [
 ]
 
 export function estimateRouteCost(params: CostParams): CostEstimate {
-  const { originCountry, destinationCountry, distanceKm, vehicleType, fuelPricePerLitre } = params
+  const { originCountry, destinationCountry, distanceKm, vehicleType, fuelType, fuelPricePerLitre } = params
 
-  const consumption = FUEL_CONSUMPTION[vehicleType] || FUEL_CONSUMPTION['Van']
-  const fuelPrice = fuelPricePerLitre || FUEL_PRICES[originCountry] || FUEL_PRICES['default']
+  const isElectric = fuelType === 'Electric'
 
-  // Fuel cost
-  const fuelCost = (distanceKm / 100) * consumption * fuelPrice
+  let fuelCost: number
+  let fuelLabel: string
+
+  if (isElectric) {
+    const kwh = ELECTRIC_CONSUMPTION[vehicleType] || ELECTRIC_CONSUMPTION['default']
+    fuelCost = (distanceKm / 100) * kwh * ELECTRICITY_PRICE_PER_KWH
+    fuelLabel = `Electricity (${kwh}kWh/100km × ${distanceKm}km)`
+  } else {
+    const consumption = FUEL_CONSUMPTION[vehicleType] || FUEL_CONSUMPTION['Other']
+    const fuelPrice = fuelPricePerLitre || FUEL_PRICES[originCountry] || FUEL_PRICES['default']
+    fuelCost = (distanceKm / 100) * consumption * fuelPrice
+    fuelLabel = `Fuel (${consumption}L/100km × ${distanceKm}km)`
+  }
 
   // Toll estimate (use average of origin and destination country rates)
   const originToll = TOLL_RATES[originCountry] || TOLL_RATES['default']
@@ -101,7 +149,7 @@ export function estimateRouteCost(params: CostParams): CostEstimate {
   }
 
   const breakdown: { label: string; amount: number }[] = [
-    { label: `Fuel (${consumption}L/100km \u00D7 ${distanceKm}km)`, amount: Math.round(fuelCost * 100) / 100 },
+    { label: fuelLabel, amount: Math.round(fuelCost * 100) / 100 },
     { label: `Tolls (est. 60% toll roads)`, amount: Math.round(tollEstimate * 100) / 100 },
   ]
 
