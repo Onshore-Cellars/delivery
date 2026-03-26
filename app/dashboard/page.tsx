@@ -42,15 +42,15 @@ interface Booking {
 }
 
 const statusColors: Record<string, string> = {
-  ACTIVE: 'bg-green-50 text-green-700 border-green-200',
-  FULL: 'bg-amber-50 text-amber-700 border-amber-200',
-  COMPLETED: 'bg-slate-100 text-slate-600 border-slate-200',
-  CANCELLED: 'bg-red-50 text-red-700 border-red-200',
+  ACTIVE: 'bg-[#9ED36A]/10 text-[#9ED36A] border-[#9ED36A]/20',
+  FULL: 'bg-[#FF6A2A]/10 text-[#FF6A2A] border-[#FF6A2A]/20',
+  COMPLETED: 'bg-[#102535] text-[#9AADB8] border-white/[0.08]',
+  CANCELLED: 'bg-red-500/10 text-red-400 border-red-200',
   IN_TRANSIT: 'bg-indigo-50 text-indigo-700 border-indigo-200',
-  PENDING: 'bg-amber-50 text-amber-700 border-amber-200',
-  CONFIRMED: 'bg-green-50 text-green-700 border-green-200',
+  PENDING: 'bg-[#FF6A2A]/10 text-[#FF6A2A] border-[#FF6A2A]/20',
+  CONFIRMED: 'bg-[#9ED36A]/10 text-[#9ED36A] border-[#9ED36A]/20',
   PICKED_UP: 'bg-indigo-50 text-indigo-700 border-indigo-200',
-  DELIVERED: 'bg-slate-100 text-slate-600 border-slate-200',
+  DELIVERED: 'bg-[#102535] text-[#9AADB8] border-white/[0.08]',
 }
 
 function PaymentBanner() {
@@ -59,15 +59,15 @@ function PaymentBanner() {
   if (!payment) return null
   if (payment === 'success') {
     return (
-      <div className="mb-6 px-4 py-3 rounded-xl bg-green-50 border border-green-200">
-        <p className="text-sm font-medium text-green-800">Payment successful! Your booking is confirmed. Check your email for the receipt.</p>
+      <div className="mb-6 px-4 py-3 rounded-xl bg-[#9ED36A]/10 border border-[#9ED36A]/20">
+        <p className="text-sm font-medium text-[#9ED36A]">Payment successful! Your booking is confirmed. Check your email for the receipt.</p>
       </div>
     )
   }
   if (payment === 'cancelled') {
     return (
-      <div className="mb-6 px-4 py-3 rounded-xl bg-amber-50 border border-amber-200">
-        <p className="text-sm font-medium text-amber-800">Payment was cancelled. Your booking has been created — you can pay from your dashboard.</p>
+      <div className="mb-6 px-4 py-3 rounded-xl bg-[#FF6A2A]/10 border border-[#FF6A2A]/20">
+        <p className="text-sm font-medium text-[#FF6A2A]">Payment was cancelled. Your booking has been created — you can pay from your dashboard.</p>
       </div>
     )
   }
@@ -157,7 +157,7 @@ export default function DashboardPage() {
       <Suspense><PaymentBanner /></Suspense>
 
       {error && (
-        <div className="mb-6 px-4 py-3 rounded-xl bg-red-50 border border-red-200">
+        <div className="mb-6 px-4 py-3 rounded-xl bg-red-500/10 border border-red-200">
           <p className="text-sm font-medium text-red-800">{error}</p>
         </div>
       )}
@@ -165,8 +165,8 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8 gap-3">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-[#1a1a1a] tracking-tight">Welcome back, {user.name}</h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-[#F7F9FB] tracking-tight">Welcome back, {user.name}</h1>
+          <p className="text-sm text-[#6B7C86] mt-1">
             {user.company && <span>{user.company} &middot; </span>}
             {user.canCarry ? 'Manage your routes and bookings' : 'Track your deliveries'}
           </p>
@@ -195,8 +195,8 @@ export default function DashboardPage() {
             onClick={() => setTab(t as typeof tab)}
             className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all whitespace-nowrap ${
               tab === t
-                ? 'bg-[#C6904D] text-white'
-                : 'text-slate-500 hover:text-[#1a1a1a] hover:bg-slate-100'
+                ? 'bg-[#FF6A2A] text-white'
+                : 'text-[#6B7C86] hover:text-[#F7F9FB] hover:bg-[#162E3D]'
             }`}
           >
             {t.charAt(0).toUpperCase() + t.slice(1)}
@@ -238,24 +238,24 @@ export default function DashboardPage() {
 
                 {/* Quick Links */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-                  <Link href="/analytics" className="px-4 py-3 rounded-xl border border-slate-200 text-center text-sm font-medium text-[#1a1a1a] hover:bg-slate-50 transition-colors hover:no-underline">
+                  <Link href="/analytics" className="px-4 py-3 rounded-xl border border-white/[0.08] text-center text-sm font-medium text-[#F7F9FB] hover:bg-[#162E3D] transition-colors hover:no-underline">
                     Analytics
                   </Link>
-                  <Link href="/notifications" className="px-4 py-3 rounded-xl border border-slate-200 text-center text-sm font-medium text-[#1a1a1a] hover:bg-slate-50 transition-colors hover:no-underline">
+                  <Link href="/notifications" className="px-4 py-3 rounded-xl border border-white/[0.08] text-center text-sm font-medium text-[#F7F9FB] hover:bg-[#162E3D] transition-colors hover:no-underline">
                     Notifications
                   </Link>
-                  <Link href="/insurance" className="px-4 py-3 rounded-xl border border-slate-200 text-center text-sm font-medium text-[#1a1a1a] hover:bg-slate-50 transition-colors hover:no-underline">
+                  <Link href="/insurance" className="px-4 py-3 rounded-xl border border-white/[0.08] text-center text-sm font-medium text-[#F7F9FB] hover:bg-[#162E3D] transition-colors hover:no-underline">
                     Insurance
                   </Link>
-                  <Link href="/disputes" className="px-4 py-3 rounded-xl border border-slate-200 text-center text-sm font-medium text-[#1a1a1a] hover:bg-slate-50 transition-colors hover:no-underline">
+                  <Link href="/disputes" className="px-4 py-3 rounded-xl border border-white/[0.08] text-center text-sm font-medium text-[#F7F9FB] hover:bg-[#162E3D] transition-colors hover:no-underline">
                     Disputes
                   </Link>
                   {user.canCarry && (
                     <>
-                      <Link href="/earnings" className="px-4 py-3 rounded-xl border border-slate-200 text-center text-sm font-medium text-[#1a1a1a] hover:bg-slate-50 transition-colors hover:no-underline">
+                      <Link href="/earnings" className="px-4 py-3 rounded-xl border border-white/[0.08] text-center text-sm font-medium text-[#F7F9FB] hover:bg-[#162E3D] transition-colors hover:no-underline">
                         Earnings
                       </Link>
-                      <Link href="/vehicles" className="px-4 py-3 rounded-xl border border-slate-200 text-center text-sm font-medium text-[#1a1a1a] hover:bg-slate-50 transition-colors hover:no-underline">
+                      <Link href="/vehicles" className="px-4 py-3 rounded-xl border border-white/[0.08] text-center text-sm font-medium text-[#F7F9FB] hover:bg-[#162E3D] transition-colors hover:no-underline">
                         Vehicles
                       </Link>
                     </>
@@ -267,8 +267,8 @@ export default function DashboardPage() {
                   <div className="bg-gradient-to-br from-[#C6904D]/5 to-transparent rounded-2xl border border-[#C6904D]/20 p-5 sm:p-6">
                     <div className="flex items-center justify-between mb-3">
                       <div>
-                        <h2 className="font-bold text-[#1a1a1a] text-base">AI Insights</h2>
-                        <p className="text-xs text-slate-500 mt-0.5">Smart suggestions to optimise your deliveries</p>
+                        <h2 className="font-bold text-[#F7F9FB] text-base">AI Insights</h2>
+                        <p className="text-xs text-[#6B7C86] mt-0.5">Smart suggestions to optimise your deliveries</p>
                       </div>
                       <button
                         onClick={async () => {
@@ -294,7 +294,7 @@ export default function DashboardPage() {
                           finally { setLoadingConsolidation(false) }
                         }}
                         disabled={loadingConsolidation}
-                        className="px-4 py-2 bg-[#C6904D] text-white rounded-lg text-xs font-semibold hover:bg-[#b07d3f] disabled:opacity-50 transition-colors"
+                        className="px-4 py-2 bg-[#FF6A2A] text-white rounded-lg text-xs font-semibold hover:bg-[#E85A1E] disabled:opacity-50 transition-colors"
                       >
                         {loadingConsolidation ? 'Analysing...' : aiConsolidation ? 'Refresh' : 'Analyse'}
                       </button>
@@ -302,72 +302,72 @@ export default function DashboardPage() {
                     {aiConsolidation ? (
                       <div className="space-y-2">
                         {aiConsolidation.suggestions?.map((s, i) => (
-                          <div key={i} className="flex items-start gap-2 text-sm text-slate-600">
-                            <span className="text-[#C6904D] mt-0.5">*</span>{s}
+                          <div key={i} className="flex items-start gap-2 text-sm text-[#9AADB8]">
+                            <span className="text-[#FF6A2A] mt-0.5">*</span>{s}
                           </div>
                         ))}
                         {aiConsolidation.potentialSavings && (
-                          <p className="text-xs font-medium text-green-600 mt-2">Potential savings: {aiConsolidation.potentialSavings}</p>
+                          <p className="text-xs font-medium text-[#9ED36A] mt-2">Potential savings: {aiConsolidation.potentialSavings}</p>
                         )}
-                        <p className="text-xs text-slate-400 mt-1">{aiConsolidation.reasoning}</p>
+                        <p className="text-xs text-[#6B7C86] mt-1">{aiConsolidation.reasoning}</p>
                       </div>
                     ) : !loadingConsolidation ? (
-                      <p className="text-xs text-slate-500">Analyse your bookings and listings for consolidation opportunities and cost savings.</p>
+                      <p className="text-xs text-[#6B7C86]">Analyse your bookings and listings for consolidation opportunities and cost savings.</p>
                     ) : null}
                   </div>
                 )}
 
                 {/* Recent bookings */}
-                <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-                  <div className="px-5 sm:px-6 py-4 border-b border-slate-100">
-                    <h2 className="font-bold text-[#1a1a1a] text-base">Recent Bookings</h2>
+                <div className="bg-[#162E3D] rounded-2xl border border-white/[0.08] overflow-hidden">
+                  <div className="px-5 sm:px-6 py-4 border-b border-white/[0.06]">
+                    <h2 className="font-bold text-[#F7F9FB] text-base">Recent Bookings</h2>
                   </div>
                   {bookings.length === 0 ? (
                     <div className="p-10 sm:p-14 text-center">
-                      <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto mb-4">
-                        <svg className="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+                      <div className="w-14 h-14 rounded-2xl bg-[#102535] flex items-center justify-center mx-auto mb-4">
+                        <svg className="w-6 h-6 text-[#6B7C86]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
                       </div>
-                      <p className="text-[#1a1a1a] font-semibold mb-1.5">No bookings yet</p>
-                      <p className="text-sm text-slate-500 mb-5">Browse available listings to get started</p>
+                      <p className="text-[#F7F9FB] font-semibold mb-1.5">No bookings yet</p>
+                      <p className="text-sm text-[#6B7C86] mb-5">Browse available listings to get started</p>
                       <Link href="/marketplace" className="btn-primary !text-sm !py-2.5 !px-6">Browse Marketplace</Link>
                     </div>
                   ) : (
                     <div>
                       {bookings.slice((bookingPage - 1) * BOOKINGS_PER_PAGE, bookingPage * BOOKINGS_PER_PAGE).map(b => (
-                        <div key={b.id} className="px-5 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between hover:bg-slate-50 transition-colors gap-2 border-b border-slate-50 last:border-0">
+                        <div key={b.id} className="px-5 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between hover:bg-[#162E3D] transition-colors gap-2 border-b border-slate-50 last:border-0">
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2.5 flex-wrap">
-                              <span className={`badge border ${statusColors[b.status] || 'bg-slate-100 text-slate-600'}`}>
+                              <span className={`badge border ${statusColors[b.status] || 'bg-[#102535] text-[#9AADB8]'}`}>
                                 {b.status.replace('_', ' ')}
                               </span>
-                              <span className="text-sm font-semibold text-[#1a1a1a] truncate">{b.cargoDescription}</span>
+                              <span className="text-sm font-semibold text-[#F7F9FB] truncate">{b.cargoDescription}</span>
                             </div>
-                            <div className="mt-1.5 text-xs text-slate-500">
+                            <div className="mt-1.5 text-xs text-[#6B7C86]">
                               {b.listing.originPort} &rarr; {b.listing.destinationPort} &middot; {formatDate(b.listing.departureDate)}
                             </div>
                           </div>
                           <div className="text-left sm:text-right">
-                            <div className="text-sm font-bold text-[#1a1a1a]">{formatCurrency(b.totalPrice, b.currency)}</div>
-                            {b.trackingCode && <div className="text-xs text-slate-400 font-mono mt-0.5">{b.trackingCode}</div>}
+                            <div className="text-sm font-bold text-[#F7F9FB]">{formatCurrency(b.totalPrice, b.currency)}</div>
+                            {b.trackingCode && <div className="text-xs text-[#6B7C86] font-mono mt-0.5">{b.trackingCode}</div>}
                           </div>
                         </div>
                       ))}
                       {bookings.length > BOOKINGS_PER_PAGE && (
-                        <div className="flex items-center justify-between px-5 sm:px-6 py-3 border-t border-slate-100">
+                        <div className="flex items-center justify-between px-5 sm:px-6 py-3 border-t border-white/[0.06]">
                           <button
                             onClick={() => setBookingPage(p => Math.max(1, p - 1))}
                             disabled={bookingPage === 1}
-                            className="px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                            className="px-3 py-1.5 text-xs font-medium rounded-lg border border-white/[0.08] text-[#9AADB8] hover:bg-[#162E3D] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                           >
                             Previous
                           </button>
-                          <span className="text-xs text-slate-500">
+                          <span className="text-xs text-[#6B7C86]">
                             Page {bookingPage} of {Math.ceil(bookings.length / BOOKINGS_PER_PAGE)}
                           </span>
                           <button
                             onClick={() => setBookingPage(p => Math.min(Math.ceil(bookings.length / BOOKINGS_PER_PAGE), p + 1))}
                             disabled={bookingPage >= Math.ceil(bookings.length / BOOKINGS_PER_PAGE)}
-                            className="px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                            className="px-3 py-1.5 text-xs font-medium rounded-lg border border-white/[0.08] text-[#9AADB8] hover:bg-[#162E3D] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                           >
                             Next
                           </button>
@@ -383,25 +383,25 @@ export default function DashboardPage() {
             {tab === 'listings' && user.canCarry && (
               <div className="space-y-4">
                 {listings.length === 0 ? (
-                  <div className="bg-white rounded-2xl border border-slate-200 p-10 sm:p-12 text-center">
-                    <p className="text-slate-500 font-medium mb-4">You haven&apos;t created any listings yet</p>
+                  <div className="bg-[#162E3D] rounded-2xl border border-white/[0.08] p-10 sm:p-12 text-center">
+                    <p className="text-[#6B7C86] font-medium mb-4">You haven&apos;t created any listings yet</p>
                     <Link href="/listings/create" className="btn-primary !text-sm !py-2.5 !px-6">Create Your First Listing</Link>
                   </div>
                 ) : (
                   listings.map(l => (
-                    <div key={l.id} className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 card-hover">
+                    <div key={l.id} className="bg-[#162E3D] rounded-2xl border border-white/[0.08] p-5 sm:p-6 card-hover">
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                         <div>
                           <div className="flex items-center gap-2.5 mb-2 flex-wrap">
-                            <h3 className="font-bold text-[#1a1a1a]">{l.title}</h3>
+                            <h3 className="font-bold text-[#F7F9FB]">{l.title}</h3>
                             <span className={`badge border ${statusColors[l.status]}`}>{l.status}</span>
                           </div>
-                          <p className="text-sm text-slate-500">{l.originPort} &rarr; {l.destinationPort} &middot; {formatDate(l.departureDate)}</p>
+                          <p className="text-sm text-[#6B7C86]">{l.originPort} &rarr; {l.destinationPort} &middot; {formatDate(l.departureDate)}</p>
                         </div>
                         <div className="sm:text-right">
-                          <div className="text-sm text-slate-500 mb-1.5">{l.availableKg.toFixed(0)} kg / {l.availableM3.toFixed(1)} m&sup3; available</div>
-                          <div className="w-full sm:w-32 h-2 bg-slate-100 rounded-full overflow-hidden">
-                            <div className="h-full bg-[#C6904D] rounded-full transition-all" style={{ width: `${((l.totalCapacityKg - l.availableKg) / l.totalCapacityKg * 100)}%` }} />
+                          <div className="text-sm text-[#6B7C86] mb-1.5">{l.availableKg.toFixed(0)} kg / {l.availableM3.toFixed(1)} m&sup3; available</div>
+                          <div className="w-full sm:w-32 h-2 bg-[#102535] rounded-full overflow-hidden">
+                            <div className="h-full bg-[#FF6A2A] rounded-full transition-all" style={{ width: `${((l.totalCapacityKg - l.availableKg) / l.totalCapacityKg * 100)}%` }} />
                           </div>
                         </div>
                       </div>
@@ -415,51 +415,51 @@ export default function DashboardPage() {
             {tab === 'bookings' && (
               <div className="space-y-4">
                 {bookings.length === 0 ? (
-                  <div className="bg-white rounded-2xl border border-slate-200 p-10 sm:p-12 text-center">
-                    <p className="text-slate-500 font-medium mb-4">No bookings yet</p>
+                  <div className="bg-[#162E3D] rounded-2xl border border-white/[0.08] p-10 sm:p-12 text-center">
+                    <p className="text-[#6B7C86] font-medium mb-4">No bookings yet</p>
                     <Link href="/marketplace" className="btn-primary !text-sm !py-2.5 !px-6">Browse Marketplace</Link>
                   </div>
                 ) : (
                   bookings.map(b => (
-                    <div key={b.id} className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 card-hover">
+                    <div key={b.id} className="bg-[#162E3D] rounded-2xl border border-white/[0.08] p-5 sm:p-6 card-hover">
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                         <div>
                           <div className="flex items-center gap-2.5 mb-2 flex-wrap">
                             <span className={`badge border ${statusColors[b.status]}`}>{b.status.replace('_', ' ')}</span>
-                            <h3 className="font-bold text-[#1a1a1a]">{b.cargoDescription}</h3>
+                            <h3 className="font-bold text-[#F7F9FB]">{b.cargoDescription}</h3>
                           </div>
-                          <p className="text-sm text-slate-500">{b.listing.originPort} &rarr; {b.listing.destinationPort} &middot; {formatDate(b.listing.departureDate)}</p>
-                          <p className="text-xs text-slate-400 mt-1">
+                          <p className="text-sm text-[#6B7C86]">{b.listing.originPort} &rarr; {b.listing.destinationPort} &middot; {formatDate(b.listing.departureDate)}</p>
+                          <p className="text-xs text-[#6B7C86] mt-1">
                             Carrier: {b.listing.carrier.name}{b.listing.carrier.company && ` (${b.listing.carrier.company})`}
                           </p>
                         </div>
                         <div className="sm:text-right">
-                          <div className="text-lg font-bold text-[#1a1a1a]">{formatCurrency(b.totalPrice, b.currency)}</div>
-                          <div className="text-xs text-slate-400 mt-0.5">{b.weightKg} kg &middot; {b.volumeM3} m&sup3;</div>
+                          <div className="text-lg font-bold text-[#F7F9FB]">{formatCurrency(b.totalPrice, b.currency)}</div>
+                          <div className="text-xs text-[#6B7C86] mt-0.5">{b.weightKg} kg &middot; {b.volumeM3} m&sup3;</div>
                           {b.paymentStatus && (
                             <span className={`inline-block text-[10px] font-bold uppercase tracking-wider mt-1 px-2 py-0.5 rounded ${
-                              b.paymentStatus === 'PAID' ? 'bg-green-50 text-green-700' :
-                              b.paymentStatus === 'FAILED' ? 'bg-red-50 text-red-700' :
+                              b.paymentStatus === 'PAID' ? 'bg-[#9ED36A]/10 text-[#9ED36A]' :
+                              b.paymentStatus === 'FAILED' ? 'bg-red-500/10 text-red-400' :
                               b.paymentStatus === 'REFUNDED' ? 'bg-purple-50 text-purple-700' :
-                              'bg-amber-50 text-amber-700'
+                              'bg-[#FF6A2A]/10 text-[#FF6A2A]'
                             }`}>{b.paymentStatus}</span>
                           )}
                           {b.trackingCode && (
-                            <div className="mt-1.5 inline-flex text-xs font-mono text-[#1a1a1a] bg-slate-100 px-2.5 py-1 rounded-lg">{b.trackingCode}</div>
+                            <div className="mt-1.5 inline-flex text-xs font-mono text-[#F7F9FB] bg-[#102535] px-2.5 py-1 rounded-lg">{b.trackingCode}</div>
                           )}
                           <div className="mt-2 flex gap-2 justify-end flex-wrap">
                             <a
                               href={`/api/bookings/${b.id}/invoice/pdf`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-[11px] font-medium text-[#C6904D] hover:text-[#a87a3d] transition-colors"
+                              className="text-[11px] font-medium text-[#FF6A2A] hover:text-[#E85A1E] transition-colors"
                             >
                               Download Invoice
                             </a>
                             {(b.status === 'DELIVERED' || b.status === 'COMPLETED') && (
                               <Link
                                 href={`/marketplace?origin=${encodeURIComponent(b.listing.originPort)}&destination=${encodeURIComponent(b.listing.destinationPort)}`}
-                                className="text-[11px] font-medium text-slate-500 hover:text-[#1a1a1a] transition-colors"
+                                className="text-[11px] font-medium text-[#6B7C86] hover:text-[#F7F9FB] transition-colors"
                               >
                                 Book Again
                               </Link>
@@ -480,9 +480,9 @@ export default function DashboardPage() {
 
 function StatCard({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
-    <div className={`rounded-2xl border p-5 sm:p-6 transition-shadow hover:shadow-md ${accent ? 'bg-[#C6904D] border-[#C6904D]' : 'bg-white border-slate-200'}`}>
-      <div className={`text-xs font-semibold uppercase tracking-wider ${accent ? 'text-[#e8c994]' : 'text-slate-400'}`}>{label}</div>
-      <div className={`mt-2 text-2xl sm:text-3xl font-bold tracking-tight ${accent ? 'text-white' : 'text-[#1a1a1a]'}`}>{value}</div>
+    <div className={`rounded-2xl border p-5 sm:p-6 transition-shadow hover:shadow-md ${accent ? 'bg-[#FF6A2A] border-[#C6904D]' : 'bg-[#162E3D] border-white/[0.08]'}`}>
+      <div className={`text-xs font-semibold uppercase tracking-wider ${accent ? 'text-[#e8c994]' : 'text-[#6B7C86]'}`}>{label}</div>
+      <div className={`mt-2 text-2xl sm:text-3xl font-bold tracking-tight ${accent ? 'text-white' : 'text-[#F7F9FB]'}`}>{value}</div>
     </div>
   )
 }

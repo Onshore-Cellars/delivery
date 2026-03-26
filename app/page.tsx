@@ -5,17 +5,17 @@ import Image from 'next/image'
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#162E3D]">
       {/* ─── HERO ─── */}
       <section className="relative bg-gradient-to-br from-[#1d1916] via-[#2C2520] to-[#1d1916] overflow-hidden">
         {/* Background grid */}
         <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '32px 32px' }} />
         {/* Background glow */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-[#C6904D]/10 rounded-full blur-[120px]" />
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-[#FF6A2A]/10 rounded-full blur-[120px]" />
 
         <div className="relative site-container pt-36 sm:pt-48 pb-24 sm:pb-32">
           {/* Eyebrow */}
-          <div className="animate-fade-up inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/[0.07] border border-white/10 mb-10">
+          <div className="animate-fade-up inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#162E3D]/[0.07] border border-white/10 mb-10">
             <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
             <span className="text-xs font-semibold text-stone-300 tracking-wide uppercase">Now serving 50+ ports</span>
           </div>
@@ -25,7 +25,7 @@ export default function Home() {
             <span className="gradient-text">Smarter deliveries.</span>
           </h1>
 
-          <p className="animate-fade-up mt-6 text-[15px] sm:text-lg text-stone-400 max-w-lg leading-relaxed" style={{ animationDelay: '80ms' }}>
+          <p className="animate-fade-up mt-6 text-[15px] sm:text-lg text-[#6B7C86] max-w-lg leading-relaxed" style={{ animationDelay: '80ms' }}>
             Stop sending five vans to the same yacht. Consolidate deliveries, book return legs, and get last-minute orders to your vessel or shipyard &mdash; fast.
           </p>
 
@@ -47,7 +47,7 @@ export default function Home() {
             ].map(stat => (
               <div key={stat.label}>
                 <div className="text-xl sm:text-3xl font-bold text-white">{stat.value}</div>
-                <div className="text-xs sm:text-sm text-stone-500 mt-0.5">{stat.label}</div>
+                <div className="text-xs sm:text-sm text-[#6B7C86] mt-0.5">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -55,45 +55,45 @@ export default function Home() {
       </section>
 
       {/* ─── WHAT DO YOU NEED ─── */}
-      <section className="bg-white">
+      <section className="bg-[#162E3D]">
         <div className="site-container py-20 sm:py-28">
           <div className="mb-12 sm:mb-16">
-            <h2 className="text-[1.5rem] sm:text-[2.25rem] font-light text-[#1d1916] tracking-wide leading-tight" style={{ fontFamily: 'var(--font-display)' }}>
+            <h2 className="text-[1.5rem] sm:text-[2.25rem] font-light text-[#F7F9FB] tracking-wide leading-tight" style={{ fontFamily: 'var(--font-display)' }}>
               What do you need?
             </h2>
-            <p className="mt-2 text-[15px] sm:text-lg text-stone-500">
+            <p className="mt-2 text-[15px] sm:text-lg text-[#6B7C86]">
               Whether you&apos;re shipping or filling spare capacity.
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <Link href="/marketplace" className="group block rounded-lg border-2 border-stone-200 bg-white p-7 sm:p-9 hover:no-underline hover:border-[#C6904D]/40 hover:shadow-xl hover:shadow-[#C6904D]/5 transition-all duration-300">
-              <div className="w-12 h-12 rounded-lg bg-[#C6904D] flex items-center justify-center mb-5">
+            <Link href="/marketplace" className="group block rounded-lg border-2 border-white/[0.08] bg-[#162E3D] p-7 sm:p-9 hover:no-underline hover:border-[#C6904D]/40 hover:shadow-xl hover:shadow-[#C6904D]/5 transition-all duration-300">
+              <div className="w-12 h-12 rounded-lg bg-[#FF6A2A] flex items-center justify-center mb-5">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                 </svg>
               </div>
-              <h3 className="text-lg font-bold text-stone-900 mb-2">I need a delivery</h3>
-              <p className="text-sm text-stone-500 leading-relaxed mb-5">
+              <h3 className="text-lg font-bold text-[#F7F9FB] mb-2">I need a delivery</h3>
+              <p className="text-sm text-[#6B7C86] leading-relaxed mb-5">
                 Find carriers heading to your port. Ship provisions, equipment, wine, or supplies to any marina.
               </p>
-              <span className="inline-flex items-center gap-1.5 text-[#C6904D] text-sm font-semibold group-hover:gap-2.5 transition-all">
+              <span className="inline-flex items-center gap-1.5 text-[#FF6A2A] text-sm font-semibold group-hover:gap-2.5 transition-all">
                 Browse routes
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
               </span>
             </Link>
 
-            <Link href="/listings/create" className="group block rounded-lg border-2 border-stone-200 bg-white p-7 sm:p-9 hover:no-underline hover:border-stone-300 hover:shadow-xl hover:shadow-stone-500/5 transition-all duration-300">
+            <Link href="/listings/create" className="group block rounded-lg border-2 border-white/[0.08] bg-[#162E3D] p-7 sm:p-9 hover:no-underline hover:border-stone-300 hover:shadow-xl hover:shadow-stone-500/5 transition-all duration-300">
               <div className="w-12 h-12 rounded-lg bg-stone-900 flex items-center justify-center mb-5">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                 </svg>
               </div>
-              <h3 className="text-lg font-bold text-stone-900 mb-2">I have van space</h3>
-              <p className="text-sm text-stone-500 leading-relaxed mb-5">
+              <h3 className="text-lg font-bold text-[#F7F9FB] mb-2">I have van space</h3>
+              <p className="text-sm text-[#6B7C86] leading-relaxed mb-5">
                 Already heading to a port? List your spare capacity and earn on routes you&apos;re running.
               </p>
-              <span className="inline-flex items-center gap-1.5 text-[#C6904D] text-sm font-semibold group-hover:gap-2.5 transition-all">
+              <span className="inline-flex items-center gap-1.5 text-[#FF6A2A] text-sm font-semibold group-hover:gap-2.5 transition-all">
                 List space
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
               </span>
@@ -103,13 +103,13 @@ export default function Home() {
       </section>
 
       {/* ─── HOW IT WORKS ─── */}
-      <section className="bg-[#FAF8F4] border-y border-[#DED7CC]/60">
+      <section className="bg-[#102535] border-y border-white/[0.08]/60">
         <div className="site-container py-20 sm:py-28">
           <div className="mb-12 sm:mb-16">
-            <h2 className="text-[1.5rem] sm:text-[2.25rem] font-light text-[#1d1916] tracking-wide" style={{ fontFamily: 'var(--font-display)' }}>
+            <h2 className="text-[1.5rem] sm:text-[2.25rem] font-light text-[#F7F9FB] tracking-wide" style={{ fontFamily: 'var(--font-display)' }}>
               How it works
             </h2>
-            <p className="mt-2 text-[15px] sm:text-lg text-stone-500">
+            <p className="mt-2 text-[15px] sm:text-lg text-[#6B7C86]">
               Book cargo space in three simple steps.
             </p>
           </div>
@@ -120,14 +120,14 @@ export default function Home() {
               { num: '2', title: 'Book & pay', desc: 'Reserve the exact space you need. Secure checkout with instant confirmation.', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' },
               { num: '3', title: 'Delivered dockside', desc: 'Track in real-time. Your goods arrive direct to the marina berth.', icon: 'M5 13l4 4L19 7' },
             ].map(step => (
-              <div key={step.num} className="bg-white rounded-lg border border-stone-200 p-7">
+              <div key={step.num} className="bg-[#162E3D] rounded-lg border border-white/[0.08] p-7">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded bg-amber-100 flex items-center justify-center">
-                    <span className="text-sm font-bold text-[#C6904D]">{step.num}</span>
+                  <div className="w-10 h-10 rounded bg-[#FF6A2A]/15 flex items-center justify-center">
+                    <span className="text-sm font-bold text-[#FF6A2A]">{step.num}</span>
                   </div>
-                  <h3 className="text-base font-bold text-stone-900">{step.title}</h3>
+                  <h3 className="text-base font-bold text-[#F7F9FB]">{step.title}</h3>
                 </div>
-                <p className="text-sm text-stone-500 leading-relaxed">{step.desc}</p>
+                <p className="text-sm text-[#6B7C86] leading-relaxed">{step.desc}</p>
               </div>
             ))}
           </div>
@@ -135,22 +135,22 @@ export default function Home() {
       </section>
 
       {/* ─── TWO-WAY ROUTES ─── */}
-      <section className="bg-white border-b border-stone-100">
+      <section className="bg-[#162E3D] border-b border-stone-100">
         <div className="site-container py-20 sm:py-28">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 items-center">
             <div>
-              <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-[#C6904D]/10 border border-[#C6904D]/20 mb-5">
-                <svg className="w-4 h-4 text-[#C6904D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-[#FF6A2A]/10 border border-[#C6904D]/20 mb-5">
+                <svg className="w-4 h-4 text-[#FF6A2A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                 </svg>
-                <span className="text-xs font-semibold text-[#C6904D] tracking-wide uppercase">Two-Way Routes</span>
+                <span className="text-xs font-semibold text-[#FF6A2A] tracking-wide uppercase">Two-Way Routes</span>
               </div>
-              <h2 className="text-[1.5rem] sm:text-[2.25rem] font-light text-[#1d1916] tracking-wide leading-tight mb-4" style={{ fontFamily: 'var(--font-display)' }}>
+              <h2 className="text-[1.5rem] sm:text-[2.25rem] font-light text-[#F7F9FB] tracking-wide leading-tight mb-4" style={{ fontFamily: 'var(--font-display)' }}>
                 Full there.{' '}
-                <span className="text-[#C6904D]">Empty back?</span>{' '}
+                <span className="text-[#FF6A2A]">Empty back?</span>{' '}
                 Not anymore.
               </h2>
-              <p className="text-[15px] text-stone-500 leading-relaxed mb-6">
+              <p className="text-[15px] text-[#6B7C86] leading-relaxed mb-6">
                 Every delivery van that drives to a marina drives back empty. That&apos;s wasted fuel, wasted time, and a missed opportunity. With two-way route listings, carriers offer space in both directions &mdash; and earn on the return.
               </p>
               <ul className="space-y-3">
@@ -160,8 +160,8 @@ export default function Home() {
                   'Vendors consolidate pickups from multiple yachts on the return',
                   'Halve the number of vans at the marina',
                 ].map(item => (
-                  <li key={item} className="flex items-start gap-2.5 text-sm text-stone-600">
-                    <svg className="w-4 h-4 text-[#C6904D] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <li key={item} className="flex items-start gap-2.5 text-sm text-[#9AADB8]">
+                    <svg className="w-4 h-4 text-[#FF6A2A] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                     </svg>
                     {item}
@@ -169,44 +169,44 @@ export default function Home() {
                 ))}
               </ul>
             </div>
-            <div className="bg-[#FAF8F4] rounded-2xl border border-[#DED7CC] p-6 sm:p-8">
+            <div className="bg-[#102535] rounded-2xl border border-white/[0.08] p-6 sm:p-8">
               <div className="space-y-4">
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                    <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-10 h-10 rounded-full bg-[#9ED36A]/15 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-5 h-5 text-[#9ED36A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
                     </svg>
                   </div>
                   <div className="flex-1">
-                    <div className="text-sm font-bold text-[#1d1916]">Outbound &mdash; Antibes to Monaco</div>
-                    <div className="text-xs text-stone-400 mt-0.5">Provisions, wine, engine parts &middot; 850kg loaded</div>
-                    <div className="mt-2 h-2 bg-green-100 rounded-full">
-                      <div className="h-full bg-green-500 rounded-full" style={{ width: '85%' }} />
+                    <div className="text-sm font-bold text-[#F7F9FB]">Outbound &mdash; Antibes to Monaco</div>
+                    <div className="text-xs text-[#6B7C86] mt-0.5">Provisions, wine, engine parts &middot; 850kg loaded</div>
+                    <div className="mt-2 h-2 bg-[#9ED36A]/15 rounded-full">
+                      <div className="h-full bg-[#9ED36A]/100 rounded-full" style={{ width: '85%' }} />
                     </div>
                   </div>
                 </div>
                 <div className="flex items-center justify-center">
-                  <svg className="w-6 h-6 text-[#C6904D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-6 h-6 text-[#FF6A2A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
                   </svg>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-[#C6904D]/10 flex items-center justify-center flex-shrink-0">
-                    <svg className="w-5 h-5 text-[#C6904D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-10 h-10 rounded-full bg-[#FF6A2A]/10 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-5 h-5 text-[#FF6A2A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                     </svg>
                   </div>
                   <div className="flex-1">
-                    <div className="text-sm font-bold text-[#1d1916]">Return &mdash; Monaco to Antibes</div>
-                    <div className="text-xs text-stone-400 mt-0.5">Crew luggage, warranty returns &middot; 200kg booked</div>
-                    <div className="mt-2 h-2 bg-[#C6904D]/20 rounded-full">
-                      <div className="h-full bg-[#C6904D] rounded-full" style={{ width: '20%' }} />
+                    <div className="text-sm font-bold text-[#F7F9FB]">Return &mdash; Monaco to Antibes</div>
+                    <div className="text-xs text-[#6B7C86] mt-0.5">Crew luggage, warranty returns &middot; 200kg booked</div>
+                    <div className="mt-2 h-2 bg-[#FF6A2A]/20 rounded-full">
+                      <div className="h-full bg-[#FF6A2A] rounded-full" style={{ width: '20%' }} />
                     </div>
                   </div>
                 </div>
               </div>
               <div className="mt-6 text-center">
-                <span className="text-xs text-stone-400">Space available on both legs</span>
+                <span className="text-xs text-[#6B7C86]">Space available on both legs</span>
               </div>
             </div>
           </div>
@@ -214,16 +214,16 @@ export default function Home() {
       </section>
 
       {/* ─── POPULAR ROUTES ─── */}
-      <section className="bg-white">
+      <section className="bg-[#162E3D]">
         <div className="site-container py-20 sm:py-28">
           <div className="flex items-end justify-between mb-10">
             <div>
-              <h2 className="text-[1.5rem] sm:text-[2.25rem] font-light text-[#1d1916] tracking-wide" style={{ fontFamily: 'var(--font-display)' }}>
+              <h2 className="text-[1.5rem] sm:text-[2.25rem] font-light text-[#F7F9FB] tracking-wide" style={{ fontFamily: 'var(--font-display)' }}>
                 Popular routes
               </h2>
-              <p className="mt-2 text-[15px] sm:text-lg text-slate-500">Top Mediterranean destinations.</p>
+              <p className="mt-2 text-[15px] sm:text-lg text-[#6B7C86]">Top Mediterranean destinations.</p>
             </div>
-            <Link href="/marketplace" className="hidden sm:inline-flex items-center gap-1 text-[#C6904D] text-sm font-semibold hover:underline">
+            <Link href="/marketplace" className="hidden sm:inline-flex items-center gap-1 text-[#FF6A2A] text-sm font-semibold hover:underline">
               View all
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
             </Link>
@@ -238,25 +238,25 @@ export default function Home() {
               <Link
                 key={route.from + route.to}
                 href={`/marketplace?origin=${route.from}&destination=${route.to}`}
-                className="group block rounded-lg border-2 border-stone-200 p-4 sm:p-5 hover:no-underline hover:border-[#C6904D]/40 hover:shadow-lg transition-all"
+                className="group block rounded-lg border-2 border-white/[0.08] p-4 sm:p-5 hover:no-underline hover:border-[#C6904D]/40 hover:shadow-lg transition-all"
               >
                 <div className="flex items-center gap-2 mb-3">
                   <span className="text-base">{route.emoji}</span>
-                  <span className="text-[11px] text-stone-400 font-semibold uppercase tracking-wider">{route.region}</span>
+                  <span className="text-[11px] text-[#6B7C86] font-semibold uppercase tracking-wider">{route.region}</span>
                 </div>
                 <div className="space-y-1">
-                  <div className="font-bold text-stone-900 text-sm">{route.from}</div>
+                  <div className="font-bold text-[#F7F9FB] text-sm">{route.from}</div>
                   <svg className="w-4 h-4 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                   </svg>
-                  <div className="font-bold text-stone-900 text-sm">{route.to}</div>
+                  <div className="font-bold text-[#F7F9FB] text-sm">{route.to}</div>
                 </div>
-                <div className="mt-3 text-xs text-[#C6904D] font-semibold group-hover:underline">View space</div>
+                <div className="mt-3 text-xs text-[#FF6A2A] font-semibold group-hover:underline">View space</div>
               </Link>
             ))}
           </div>
 
-          <Link href="/marketplace" className="sm:hidden flex items-center justify-center gap-1 mt-6 text-[#C6904D] text-sm font-semibold">
+          <Link href="/marketplace" className="sm:hidden flex items-center justify-center gap-1 mt-6 text-[#FF6A2A] text-sm font-semibold">
             View all routes
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
           </Link>
@@ -264,20 +264,20 @@ export default function Home() {
       </section>
 
       {/* ─── FOR WHO ─── */}
-      <section className="bg-[#FAF8F4] border-y border-[#DED7CC]/60">
+      <section className="bg-[#102535] border-y border-white/[0.08]/60">
         <div className="site-container py-20 sm:py-28">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-            <div className="rounded-lg bg-white border-2 border-stone-200 p-6 sm:p-8">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-50 text-[#9a7039] rounded text-xs font-bold mb-5 uppercase tracking-wide">
+            <div className="rounded-lg bg-[#162E3D] border-2 border-white/[0.08] p-6 sm:p-8">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#FF6A2A]/10 text-[#9a7039] rounded text-xs font-bold mb-5 uppercase tracking-wide">
                 Carriers
               </div>
-              <h3 className="text-xl font-semibold text-[#1d1916] mb-3">For carriers & drivers</h3>
-              <p className="text-sm text-stone-500 mb-6 leading-relaxed">
+              <h3 className="text-xl font-semibold text-[#F7F9FB] mb-3">For carriers & drivers</h3>
+              <p className="text-sm text-[#6B7C86] mb-6 leading-relaxed">
                 Already heading to a port or marina? Monetise your spare van space.
               </p>
               <ul className="space-y-3 mb-8">
                 {['List both outbound & return legs', 'Set your own prices per direction', 'Get paid directly via Stripe', 'No more empty return journeys'].map(item => (
-                  <li key={item} className="flex items-start gap-3 text-sm text-stone-700">
+                  <li key={item} className="flex items-start gap-3 text-sm text-[#F7F9FB]">
                     <svg className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                     </svg>
@@ -290,17 +290,17 @@ export default function Home() {
               </Link>
             </div>
 
-            <div className="rounded-lg bg-white border-2 border-stone-200 p-6 sm:p-8">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-50 text-[#9a7039] rounded text-xs font-bold mb-5 uppercase tracking-wide">
+            <div className="rounded-lg bg-[#162E3D] border-2 border-white/[0.08] p-6 sm:p-8">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#FF6A2A]/10 text-[#9a7039] rounded text-xs font-bold mb-5 uppercase tracking-wide">
                 Crew &amp; Vendors
               </div>
-              <h3 className="text-xl font-semibold text-[#1d1916] mb-3">For crew, vendors &amp; fleet managers</h3>
-              <p className="text-sm text-stone-500 mb-6 leading-relaxed">
+              <h3 className="text-xl font-semibold text-[#F7F9FB] mb-3">For crew, vendors &amp; fleet managers</h3>
+              <p className="text-sm text-[#6B7C86] mb-6 leading-relaxed">
                 Last-minute parts, provisions, or equipment? Get it to your yacht or shipyard without the hassle.
               </p>
               <ul className="space-y-3 mb-8">
                 {['Book outbound & return journeys', 'MMSI tracking — deliveries follow your vessel', 'Live driver tracking with ETA & SMS alerts', 'Secure payment with protection'].map(item => (
-                  <li key={item} className="flex items-start gap-3 text-sm text-stone-700">
+                  <li key={item} className="flex items-start gap-3 text-sm text-[#F7F9FB]">
                     <svg className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                     </svg>
@@ -322,7 +322,7 @@ export default function Home() {
           <h2 className="text-[1.5rem] sm:text-[2.25rem] lg:text-[2.75rem] font-light text-white tracking-wide leading-tight" style={{ fontFamily: 'var(--font-display)' }}>
             Stop sending empty vans.
           </h2>
-          <p className="mt-4 text-[15px] sm:text-lg text-stone-400 max-w-md mx-auto">
+          <p className="mt-4 text-[15px] sm:text-lg text-[#6B7C86] max-w-md mx-auto">
             Join crew, vendors, fleet managers, and carriers making maritime logistics smarter.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
@@ -337,22 +337,22 @@ export default function Home() {
       </section>
 
       {/* ─── FOOTER ─── */}
-      <footer className="bg-white border-t border-stone-200 pb-20 md:pb-0">
+      <footer className="bg-[#162E3D] border-t border-white/[0.08] pb-20 md:pb-0">
         <div className="site-container py-10 sm:py-12">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
             <div className="flex items-center gap-2.5">
               <Image src="/logo.png" alt="Onshore Deliver" width={28} height={28} className="rounded-sm" />
-              <span className="text-sm font-semibold text-[#1d1916] tracking-wide" style={{ fontFamily: 'var(--font-display)' }}>Onshore Deliver</span>
+              <span className="text-sm font-semibold text-[#F7F9FB] tracking-wide" style={{ fontFamily: 'var(--font-display)' }}>Onshore Deliver</span>
             </div>
-            <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-stone-500">
-              <Link href="/about" className="text-stone-500 hover:text-stone-900 hover:no-underline transition-colors">About</Link>
-              <Link href="/terms" className="text-stone-500 hover:text-stone-900 hover:no-underline transition-colors">Terms</Link>
-              <Link href="/privacy" className="text-stone-500 hover:text-stone-900 hover:no-underline transition-colors">Privacy</Link>
-              <Link href="/help" className="text-stone-500 hover:text-stone-900 hover:no-underline transition-colors">Support</Link>
+            <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-[#6B7C86]">
+              <Link href="/about" className="text-[#6B7C86] hover:text-[#F7F9FB] hover:no-underline transition-colors">About</Link>
+              <Link href="/terms" className="text-[#6B7C86] hover:text-[#F7F9FB] hover:no-underline transition-colors">Terms</Link>
+              <Link href="/privacy" className="text-[#6B7C86] hover:text-[#F7F9FB] hover:no-underline transition-colors">Privacy</Link>
+              <Link href="/help" className="text-[#6B7C86] hover:text-[#F7F9FB] hover:no-underline transition-colors">Support</Link>
             </div>
           </div>
           <div className="mt-6 pt-6 border-t border-stone-100">
-            <p className="text-xs text-stone-400">&copy; {new Date().getFullYear()} Onshore Deliver. All rights reserved.</p>
+            <p className="text-xs text-[#6B7C86]">&copy; {new Date().getFullYear()} Onshore Deliver. All rights reserved.</p>
           </div>
         </div>
       </footer>

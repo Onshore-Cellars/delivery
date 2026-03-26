@@ -57,8 +57,8 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
   const isTransparentMode = transparent && !scrolled
   const navLinkCls = (href: string) => `px-4 py-2 rounded text-xs font-medium uppercase tracking-wider transition-colors hover:no-underline ${
     isActive(href)
-      ? isTransparentMode ? 'bg-white/20 text-white font-semibold' : 'bg-stone-100 text-[#1d1916]'
-      : isTransparentMode ? 'text-white hover:text-white/80 hover:bg-white/10' : 'text-stone-600 hover:text-[#1d1916] hover:bg-stone-50'
+      ? isTransparentMode ? 'bg-[#162E3D]/20 text-white font-semibold' : 'bg-[#102535] text-[#F7F9FB]'
+      : isTransparentMode ? 'text-white hover:text-white/80 hover:bg-[#162E3D]/10' : 'text-[#9AADB8] hover:text-[#F7F9FB] hover:bg-[#162E3D]'
   }`
 
   // Bottom tab items for mobile
@@ -92,14 +92,14 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
       <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         transparent && !scrolled
           ? 'bg-transparent'
-          : 'bg-[#FEFCF9]/95 backdrop-blur-xl border-b border-[#DED7CC] shadow-[0_0_25px_rgba(29,25,22,0.06)]'
+          : 'bg-[#0B1F2A]/95 backdrop-blur-xl border-b border-white/[0.08] shadow-[0_0_25px_rgba(29,25,22,0.06)]'
       }`}>
         <div className="site-container">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2.5 hover:no-underline">
               <Image src="/logo.png" alt="Onshore Deliver" width={36} height={36} className="rounded-sm" />
-              <span className={`text-lg font-semibold tracking-wide transition-colors duration-300 ${isTransparentMode ? 'text-white' : 'text-[#1d1916]'}`} style={{ fontFamily: 'var(--font-display)' }}>
+              <span className={`text-lg font-semibold tracking-wide transition-colors duration-300 ${isTransparentMode ? 'text-white' : 'text-[#F7F9FB]'}`} style={{ fontFamily: 'var(--font-display)' }}>
                 Onshore
               </span>
             </Link>
@@ -129,7 +129,7 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
                       <Link href="/listings/create" className={navLinkCls('/listings/create')}>
                         List Space
                       </Link>
-                      <Link href="/driver" className={`px-4 py-2 rounded text-xs font-medium uppercase tracking-wider transition-colors hover:no-underline ${isActive('/driver') ? isTransparentMode ? 'bg-green-500/20 text-green-300' : 'bg-green-100 text-green-800' : isTransparentMode ? 'text-green-300/80 hover:text-green-200 hover:bg-white/10' : 'text-green-700 hover:text-green-900 hover:bg-green-50'}`}>
+                      <Link href="/driver" className={`px-4 py-2 rounded text-xs font-medium uppercase tracking-wider transition-colors hover:no-underline ${isActive('/driver') ? isTransparentMode ? 'bg-[#9ED36A]/100/20 text-green-300' : 'bg-[#9ED36A]/15 text-[#9ED36A]' : isTransparentMode ? 'text-green-300/80 hover:text-green-200 hover:bg-[#162E3D]/10' : 'text-[#9ED36A] hover:text-green-900 hover:bg-[#9ED36A]/10'}`}>
                         Driver Mode
                       </Link>
                     </>
@@ -147,8 +147,8 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
                       onBlur={() => setTimeout(() => setMoreMenuOpen(false), 150)}
                       className={`px-3 py-2 rounded text-xs font-medium uppercase tracking-wider transition-colors ${
                         moreMenuOpen || ['/analytics','/insurance','/disputes','/earnings','/vehicles','/quotes','/reviews'].includes(pathname)
-                          ? isTransparentMode ? 'bg-white/20 text-white font-semibold' : 'bg-stone-100 text-[#1d1916]'
-                          : isTransparentMode ? 'text-white hover:text-white/80 hover:bg-white/10' : 'text-stone-600 hover:text-[#1d1916] hover:bg-stone-50'
+                          ? isTransparentMode ? 'bg-[#162E3D]/20 text-white font-semibold' : 'bg-[#102535] text-[#F7F9FB]'
+                          : isTransparentMode ? 'text-white hover:text-white/80 hover:bg-[#162E3D]/10' : 'text-[#9AADB8] hover:text-[#F7F9FB] hover:bg-[#162E3D]'
                       }`}
                       aria-label="More pages"
                     >
@@ -156,42 +156,42 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
                       <svg className="w-3 h-3 ml-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
                     </button>
                     {moreMenuOpen && (
-                      <div className="absolute top-full right-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-stone-200 py-1 z-50">
-                        <Link href="/quotes" className="block px-4 py-2.5 text-sm text-[#1d1916] hover:bg-stone-50 hover:no-underline">Quotes</Link>
-                        <Link href="/analytics" className="block px-4 py-2.5 text-sm text-[#1d1916] hover:bg-stone-50 hover:no-underline">Analytics</Link>
-                        <Link href="/insurance" className="block px-4 py-2.5 text-sm text-[#1d1916] hover:bg-stone-50 hover:no-underline">Insurance</Link>
-                        <Link href="/disputes" className="block px-4 py-2.5 text-sm text-[#1d1916] hover:bg-stone-50 hover:no-underline">Disputes</Link>
+                      <div className="absolute top-full right-0 mt-1 w-48 bg-[#162E3D] rounded-lg shadow-lg border border-white/[0.08] py-1 z-50">
+                        <Link href="/quotes" className="block px-4 py-2.5 text-sm text-[#F7F9FB] hover:bg-[#162E3D] hover:no-underline">Quotes</Link>
+                        <Link href="/analytics" className="block px-4 py-2.5 text-sm text-[#F7F9FB] hover:bg-[#162E3D] hover:no-underline">Analytics</Link>
+                        <Link href="/insurance" className="block px-4 py-2.5 text-sm text-[#F7F9FB] hover:bg-[#162E3D] hover:no-underline">Insurance</Link>
+                        <Link href="/disputes" className="block px-4 py-2.5 text-sm text-[#F7F9FB] hover:bg-[#162E3D] hover:no-underline">Disputes</Link>
                         {user.canCarry && (
                           <>
-                            <Link href="/earnings" className="block px-4 py-2.5 text-sm text-[#1d1916] hover:bg-stone-50 hover:no-underline">Earnings</Link>
-                            <Link href="/vehicles" className="block px-4 py-2.5 text-sm text-[#1d1916] hover:bg-stone-50 hover:no-underline">My Vehicles</Link>
+                            <Link href="/earnings" className="block px-4 py-2.5 text-sm text-[#F7F9FB] hover:bg-[#162E3D] hover:no-underline">Earnings</Link>
+                            <Link href="/vehicles" className="block px-4 py-2.5 text-sm text-[#F7F9FB] hover:bg-[#162E3D] hover:no-underline">My Vehicles</Link>
                           </>
                         )}
                       </div>
                     )}
                   </div>
 
-                  <div className={`w-px h-6 mx-2 ${isTransparentMode ? 'bg-white/20' : 'bg-stone-200'}`} />
+                  <div className={`w-px h-6 mx-2 ${isTransparentMode ? 'bg-[#162E3D]/20' : 'bg-stone-200'}`} />
 
                   {/* Notifications */}
-                  <Link href="/notifications" className={`relative p-2 rounded transition-colors ${isTransparentMode ? 'hover:bg-white/10' : 'hover:bg-stone-50'}`} title="Notifications" aria-label="Notifications">
-                    <svg className={`w-5 h-5 ${isTransparentMode ? 'text-white' : 'text-stone-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <Link href="/notifications" className={`relative p-2 rounded transition-colors ${isTransparentMode ? 'hover:bg-[#162E3D]/10' : 'hover:bg-[#162E3D]'}`} title="Notifications" aria-label="Notifications">
+                    <svg className={`w-5 h-5 ${isTransparentMode ? 'text-white' : 'text-[#6B7C86]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                     </svg>
                     {unreadNotifs > 0 && (
-                      <span className="absolute top-0.5 right-0.5 min-w-[18px] h-[18px] rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center px-1">
+                      <span className="absolute top-0.5 right-0.5 min-w-[18px] h-[18px] rounded-full bg-red-500/100 text-white text-[10px] font-bold flex items-center justify-center px-1">
                         {unreadNotifs > 9 ? '9+' : unreadNotifs}
                       </span>
                     )}
                   </Link>
 
                   {/* Messages */}
-                  <Link href="/messages" className={`relative p-2 rounded transition-colors ${isTransparentMode ? 'hover:bg-white/10' : 'hover:bg-stone-50'}`} title="Messages" aria-label="Messages">
-                    <svg className={`w-5 h-5 ${isTransparentMode ? 'text-white' : 'text-stone-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <Link href="/messages" className={`relative p-2 rounded transition-colors ${isTransparentMode ? 'hover:bg-[#162E3D]/10' : 'hover:bg-[#162E3D]'}`} title="Messages" aria-label="Messages">
+                    <svg className={`w-5 h-5 ${isTransparentMode ? 'text-white' : 'text-[#6B7C86]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                     </svg>
                     {unreadMessages > 0 && (
-                      <span className="absolute top-0.5 right-0.5 min-w-[18px] h-[18px] rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center px-1">
+                      <span className="absolute top-0.5 right-0.5 min-w-[18px] h-[18px] rounded-full bg-red-500/100 text-white text-[10px] font-bold flex items-center justify-center px-1">
                         {unreadMessages > 9 ? '9+' : unreadMessages}
                       </span>
                     )}
@@ -202,8 +202,8 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
                     {user.avatarUrl ? (
                       <img src={user.avatarUrl} alt={user.name} className="w-8 h-8 rounded-full object-cover ring-2 ring-stone-100" />
                     ) : (
-                      <div className="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center ring-2 ring-stone-100">
-                        <span className="text-xs font-semibold text-[#1d1916]">
+                      <div className="w-8 h-8 rounded-full bg-[#102535] flex items-center justify-center ring-2 ring-stone-100">
+                        <span className="text-xs font-semibold text-[#F7F9FB]">
                           {user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
                         </span>
                       </div>
@@ -212,7 +212,7 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
 
                   <button
                     onClick={logout}
-                    className="px-3 py-2 text-xs font-medium text-stone-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                    className="px-3 py-2 text-xs font-medium text-[#6B7C86] hover:text-red-600 hover:bg-red-500/10 rounded transition-colors"
                     title="Sign out"
                     aria-label="Sign out"
                   >
@@ -223,11 +223,11 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
                 </>
               ) : (
                 <>
-                  <div className={`w-px h-6 mx-2 ${isTransparentMode ? 'bg-white/20' : 'bg-stone-200'}`} />
-                  <Link href="/login" className={`px-4 py-2 rounded text-sm font-medium transition-colors hover:no-underline ${isTransparentMode ? 'text-white hover:text-white/80 hover:bg-white/10' : 'text-stone-600 hover:text-[#1d1916] hover:bg-stone-50'}`}>
+                  <div className={`w-px h-6 mx-2 ${isTransparentMode ? 'bg-[#162E3D]/20' : 'bg-stone-200'}`} />
+                  <Link href="/login" className={`px-4 py-2 rounded text-sm font-medium transition-colors hover:no-underline ${isTransparentMode ? 'text-white hover:text-white/80 hover:bg-[#162E3D]/10' : 'text-[#9AADB8] hover:text-[#F7F9FB] hover:bg-[#162E3D]'}`}>
                     Sign In
                   </Link>
-                  <Link href="/register" className="bg-[#C6904D] text-white text-xs font-semibold uppercase tracking-wider px-5 py-2.5 rounded-sm hover:bg-[#B07D3A] hover:no-underline transition-all">
+                  <Link href="/register" className="bg-[#FF6A2A] text-white text-xs font-semibold uppercase tracking-wider px-5 py-2.5 rounded-sm hover:bg-[#E85A1E] hover:no-underline transition-all">
                     Get Started
                   </Link>
                 </>
@@ -237,18 +237,18 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
             {/* Mobile: right side actions */}
             <div className="flex md:hidden items-center gap-2">
               {user && unreadMessages > 0 && (
-                <Link href="/messages" className={`relative p-2 rounded ${isTransparentMode ? 'hover:bg-white/10' : 'hover:bg-stone-50'}`} aria-label="Messages">
-                  <svg className={`w-5 h-5 ${isTransparentMode ? 'text-white' : 'text-stone-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <Link href="/messages" className={`relative p-2 rounded ${isTransparentMode ? 'hover:bg-[#162E3D]/10' : 'hover:bg-[#162E3D]'}`} aria-label="Messages">
+                  <svg className={`w-5 h-5 ${isTransparentMode ? 'text-white' : 'text-[#9AADB8]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                   </svg>
-                  <span className="absolute top-0.5 right-0.5 min-w-[16px] h-[16px] rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center">
+                  <span className="absolute top-0.5 right-0.5 min-w-[16px] h-[16px] rounded-full bg-red-500/100 text-white text-[9px] font-bold flex items-center justify-center">
                     {unreadMessages > 9 ? '9+' : unreadMessages}
                   </span>
                 </Link>
               )}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className={`p-2 rounded transition-colors ${isTransparentMode ? 'text-white hover:bg-white/10' : 'text-stone-600 hover:bg-stone-50'}`}
+                className={`p-2 rounded transition-colors ${isTransparentMode ? 'text-white hover:bg-[#162E3D]/10' : 'text-[#9AADB8] hover:bg-[#162E3D]'}`}
                 aria-label="Menu"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -268,11 +268,11 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-[60] md:hidden">
           <div className="mobile-menu-overlay absolute inset-0" onClick={close} />
-          <div className="absolute top-0 right-0 w-full max-w-[320px] h-full bg-white shadow-2xl animate-slide-in-right flex flex-col">
+          <div className="absolute top-0 right-0 w-full max-w-[320px] h-full bg-[#162E3D] shadow-2xl animate-slide-in-right flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between h-16 px-5 border-b border-stone-100">
-              <span className="text-base font-bold text-[#1d1916]">Menu</span>
-              <button onClick={close} className="p-2 -mr-2 rounded text-stone-400 hover:text-[#1d1916] hover:bg-stone-50 transition-colors" aria-label="Close menu">
+              <span className="text-base font-bold text-[#F7F9FB]">Menu</span>
+              <button onClick={close} className="p-2 -mr-2 rounded text-[#6B7C86] hover:text-[#F7F9FB] hover:bg-[#162E3D] transition-colors" aria-label="Close menu">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -281,95 +281,95 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
 
             {/* Links */}
             <div className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
-              <Link href="/marketplace" onClick={close} className={`flex items-center gap-3.5 px-4 py-3.5 rounded text-[15px] font-medium transition-colors hover:no-underline ${isActive('/marketplace') ? 'bg-amber-50 text-[#C6904D]' : 'text-[#1d1916] hover:bg-stone-50'}`}>
-                <TabIcon icon="search" className={isActive('/marketplace') ? 'text-[#C6904D]' : 'text-stone-400'} />
+              <Link href="/marketplace" onClick={close} className={`flex items-center gap-3.5 px-4 py-3.5 rounded text-[15px] font-medium transition-colors hover:no-underline ${isActive('/marketplace') ? 'bg-[#FF6A2A]/10 text-[#FF6A2A]' : 'text-[#F7F9FB] hover:bg-[#162E3D]'}`}>
+                <TabIcon icon="search" className={isActive('/marketplace') ? 'text-[#FF6A2A]' : 'text-[#6B7C86]'} />
                 Marketplace
               </Link>
-              <Link href="/get-quotes" onClick={close} className={`flex items-center gap-3.5 px-4 py-3.5 rounded text-[15px] font-medium transition-colors hover:no-underline ${isActive('/get-quotes') ? 'bg-amber-50 text-[#C6904D]' : 'text-[#1d1916] hover:bg-stone-50'}`}>
-                <svg className={`w-5 h-5 ${isActive('/get-quotes') ? 'text-[#C6904D]' : 'text-stone-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+              <Link href="/get-quotes" onClick={close} className={`flex items-center gap-3.5 px-4 py-3.5 rounded text-[15px] font-medium transition-colors hover:no-underline ${isActive('/get-quotes') ? 'bg-[#FF6A2A]/10 text-[#FF6A2A]' : 'text-[#F7F9FB] hover:bg-[#162E3D]'}`}>
+                <svg className={`w-5 h-5 ${isActive('/get-quotes') ? 'text-[#FF6A2A]' : 'text-[#6B7C86]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
                 Get Quotes
               </Link>
-              <Link href="/tracking" onClick={close} className={`flex items-center gap-3.5 px-4 py-3.5 rounded text-[15px] font-medium transition-colors hover:no-underline ${isActive('/tracking') ? 'bg-amber-50 text-[#C6904D]' : 'text-[#1d1916] hover:bg-stone-50'}`}>
-                <TabIcon icon="location" className={isActive('/tracking') ? 'text-[#C6904D]' : 'text-stone-400'} />
+              <Link href="/tracking" onClick={close} className={`flex items-center gap-3.5 px-4 py-3.5 rounded text-[15px] font-medium transition-colors hover:no-underline ${isActive('/tracking') ? 'bg-[#FF6A2A]/10 text-[#FF6A2A]' : 'text-[#F7F9FB] hover:bg-[#162E3D]'}`}>
+                <TabIcon icon="location" className={isActive('/tracking') ? 'text-[#FF6A2A]' : 'text-[#6B7C86]'} />
                 Track Shipment
               </Link>
-              <Link href="/community" onClick={close} className={`flex items-center gap-3.5 px-4 py-3.5 rounded text-[15px] font-medium transition-colors hover:no-underline ${isActive('/community') ? 'bg-amber-50 text-[#C6904D]' : 'text-[#1d1916] hover:bg-stone-50'}`}>
-                <svg className={`w-5 h-5 ${isActive('/community') ? 'text-[#C6904D]' : 'text-stone-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+              <Link href="/community" onClick={close} className={`flex items-center gap-3.5 px-4 py-3.5 rounded text-[15px] font-medium transition-colors hover:no-underline ${isActive('/community') ? 'bg-[#FF6A2A]/10 text-[#FF6A2A]' : 'text-[#F7F9FB] hover:bg-[#162E3D]'}`}>
+                <svg className={`w-5 h-5 ${isActive('/community') ? 'text-[#FF6A2A]' : 'text-[#6B7C86]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
                 Community
               </Link>
 
               {user ? (
                 <>
                   <div className="pt-4 pb-2 px-4">
-                    <p className="text-[11px] font-semibold text-stone-400 uppercase tracking-widest">Account</p>
+                    <p className="text-[11px] font-semibold text-[#6B7C86] uppercase tracking-widest">Account</p>
                   </div>
-                  <Link href="/dashboard" onClick={close} className={`flex items-center gap-3.5 px-4 py-3.5 rounded text-[15px] font-medium transition-colors hover:no-underline ${isActive('/dashboard') ? 'bg-amber-50 text-[#C6904D]' : 'text-[#1d1916] hover:bg-stone-50'}`}>
-                    <TabIcon icon="grid" className={isActive('/dashboard') ? 'text-[#C6904D]' : 'text-stone-400'} />
+                  <Link href="/dashboard" onClick={close} className={`flex items-center gap-3.5 px-4 py-3.5 rounded text-[15px] font-medium transition-colors hover:no-underline ${isActive('/dashboard') ? 'bg-[#FF6A2A]/10 text-[#FF6A2A]' : 'text-[#F7F9FB] hover:bg-[#162E3D]'}`}>
+                    <TabIcon icon="grid" className={isActive('/dashboard') ? 'text-[#FF6A2A]' : 'text-[#6B7C86]'} />
                     Dashboard
                   </Link>
-                  <Link href="/messages" onClick={close} className={`flex items-center justify-between px-4 py-3.5 rounded text-[15px] font-medium transition-colors hover:no-underline ${isActive('/messages') ? 'bg-amber-50 text-[#C6904D]' : 'text-[#1d1916] hover:bg-stone-50'}`}>
+                  <Link href="/messages" onClick={close} className={`flex items-center justify-between px-4 py-3.5 rounded text-[15px] font-medium transition-colors hover:no-underline ${isActive('/messages') ? 'bg-[#FF6A2A]/10 text-[#FF6A2A]' : 'text-[#F7F9FB] hover:bg-[#162E3D]'}`}>
                     <span className="flex items-center gap-3.5">
-                      <TabIcon icon="chat" className={isActive('/messages') ? 'text-[#C6904D]' : 'text-stone-400'} />
+                      <TabIcon icon="chat" className={isActive('/messages') ? 'text-[#FF6A2A]' : 'text-[#6B7C86]'} />
                       Messages
                     </span>
                     {unreadMessages > 0 && (
-                      <span className="min-w-[22px] h-[22px] rounded-full bg-red-500 text-white text-[11px] font-bold flex items-center justify-center px-1.5">
+                      <span className="min-w-[22px] h-[22px] rounded-full bg-red-500/100 text-white text-[11px] font-bold flex items-center justify-center px-1.5">
                         {unreadMessages > 9 ? '9+' : unreadMessages}
                       </span>
                     )}
                   </Link>
-                  <Link href="/profile" onClick={close} className={`flex items-center gap-3.5 px-4 py-3.5 rounded text-[15px] font-medium transition-colors hover:no-underline ${isActive('/profile') ? 'bg-amber-50 text-[#C6904D]' : 'text-[#1d1916] hover:bg-stone-50'}`}>
-                    <TabIcon icon="user" className={isActive('/profile') ? 'text-[#C6904D]' : 'text-stone-400'} />
+                  <Link href="/profile" onClick={close} className={`flex items-center gap-3.5 px-4 py-3.5 rounded text-[15px] font-medium transition-colors hover:no-underline ${isActive('/profile') ? 'bg-[#FF6A2A]/10 text-[#FF6A2A]' : 'text-[#F7F9FB] hover:bg-[#162E3D]'}`}>
+                    <TabIcon icon="user" className={isActive('/profile') ? 'text-[#FF6A2A]' : 'text-[#6B7C86]'} />
                     Profile
                   </Link>
-                  <Link href="/quotes" onClick={close} className={`flex items-center gap-3.5 px-4 py-3.5 rounded text-[15px] font-medium transition-colors hover:no-underline ${isActive('/quotes') ? 'bg-amber-50 text-[#C6904D]' : 'text-[#1d1916] hover:bg-stone-50'}`}>
-                    <svg className={`w-5 h-5 ${isActive('/quotes') ? 'text-[#C6904D]' : 'text-stone-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+                  <Link href="/quotes" onClick={close} className={`flex items-center gap-3.5 px-4 py-3.5 rounded text-[15px] font-medium transition-colors hover:no-underline ${isActive('/quotes') ? 'bg-[#FF6A2A]/10 text-[#FF6A2A]' : 'text-[#F7F9FB] hover:bg-[#162E3D]'}`}>
+                    <svg className={`w-5 h-5 ${isActive('/quotes') ? 'text-[#FF6A2A]' : 'text-[#6B7C86]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
                     Quotes
                   </Link>
-                  <Link href="/notifications" onClick={close} className={`flex items-center justify-between px-4 py-3.5 rounded text-[15px] font-medium transition-colors hover:no-underline ${isActive('/notifications') ? 'bg-amber-50 text-[#C6904D]' : 'text-[#1d1916] hover:bg-stone-50'}`}>
+                  <Link href="/notifications" onClick={close} className={`flex items-center justify-between px-4 py-3.5 rounded text-[15px] font-medium transition-colors hover:no-underline ${isActive('/notifications') ? 'bg-[#FF6A2A]/10 text-[#FF6A2A]' : 'text-[#F7F9FB] hover:bg-[#162E3D]'}`}>
                     <span className="flex items-center gap-3.5">
-                      <svg className={`w-5 h-5 ${isActive('/notifications') ? 'text-[#C6904D]' : 'text-stone-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                      <svg className={`w-5 h-5 ${isActive('/notifications') ? 'text-[#FF6A2A]' : 'text-[#6B7C86]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
                       Notifications
                     </span>
                     {unreadNotifs > 0 && (
-                      <span className="min-w-[22px] h-[22px] rounded-full bg-red-500 text-white text-[11px] font-bold flex items-center justify-center px-1.5">
+                      <span className="min-w-[22px] h-[22px] rounded-full bg-red-500/100 text-white text-[11px] font-bold flex items-center justify-center px-1.5">
                         {unreadNotifs > 9 ? '9+' : unreadNotifs}
                       </span>
                     )}
                   </Link>
                   {user.canCarry && (
                     <>
-                    <Link href="/listings/create" onClick={close} className={`flex items-center gap-3.5 px-4 py-3.5 rounded text-[15px] font-medium transition-colors hover:no-underline ${isActive('/listings/create') ? 'bg-amber-50 text-[#C6904D]' : 'text-[#1d1916] hover:bg-stone-50'}`}>
-                      <svg className={`w-5 h-5 ${isActive('/listings/create') ? 'text-[#C6904D]' : 'text-stone-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <Link href="/listings/create" onClick={close} className={`flex items-center gap-3.5 px-4 py-3.5 rounded text-[15px] font-medium transition-colors hover:no-underline ${isActive('/listings/create') ? 'bg-[#FF6A2A]/10 text-[#FF6A2A]' : 'text-[#F7F9FB] hover:bg-[#162E3D]'}`}>
+                      <svg className={`w-5 h-5 ${isActive('/listings/create') ? 'text-[#FF6A2A]' : 'text-[#6B7C86]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 4v16m8-8H4" />
                       </svg>
                       List Space
                     </Link>
-                    <Link href="/vehicles" onClick={close} className={`flex items-center gap-3.5 px-4 py-3.5 rounded text-[15px] font-medium transition-colors hover:no-underline ${isActive('/vehicles') ? 'bg-amber-50 text-[#C6904D]' : 'text-[#1d1916] hover:bg-stone-50'}`}>
-                      <svg className={`w-5 h-5 ${isActive('/vehicles') ? 'text-[#C6904D]' : 'text-stone-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 7h8m-8 4h4m5 4H5a2 2 0 01-2-2V7a2 2 0 012-2h14a2 2 0 012 2v6a2 2 0 01-2 2zm-3 0v2a2 2 0 01-2 2H9a2 2 0 01-2-2v-2" /></svg>
+                    <Link href="/vehicles" onClick={close} className={`flex items-center gap-3.5 px-4 py-3.5 rounded text-[15px] font-medium transition-colors hover:no-underline ${isActive('/vehicles') ? 'bg-[#FF6A2A]/10 text-[#FF6A2A]' : 'text-[#F7F9FB] hover:bg-[#162E3D]'}`}>
+                      <svg className={`w-5 h-5 ${isActive('/vehicles') ? 'text-[#FF6A2A]' : 'text-[#6B7C86]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 7h8m-8 4h4m5 4H5a2 2 0 01-2-2V7a2 2 0 012-2h14a2 2 0 012 2v6a2 2 0 01-2 2zm-3 0v2a2 2 0 01-2 2H9a2 2 0 01-2-2v-2" /></svg>
                       My Vehicles
                     </Link>
-                    <Link href="/earnings" onClick={close} className={`flex items-center gap-3.5 px-4 py-3.5 rounded text-[15px] font-medium transition-colors hover:no-underline ${isActive('/earnings') ? 'bg-amber-50 text-[#C6904D]' : 'text-[#1d1916] hover:bg-stone-50'}`}>
-                      <svg className={`w-5 h-5 ${isActive('/earnings') ? 'text-[#C6904D]' : 'text-stone-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <Link href="/earnings" onClick={close} className={`flex items-center gap-3.5 px-4 py-3.5 rounded text-[15px] font-medium transition-colors hover:no-underline ${isActive('/earnings') ? 'bg-[#FF6A2A]/10 text-[#FF6A2A]' : 'text-[#F7F9FB] hover:bg-[#162E3D]'}`}>
+                      <svg className={`w-5 h-5 ${isActive('/earnings') ? 'text-[#FF6A2A]' : 'text-[#6B7C86]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                       Earnings
                     </Link>
                     </>
                   )}
-                  <Link href="/disputes" onClick={close} className={`flex items-center gap-3.5 px-4 py-3.5 rounded text-[15px] font-medium transition-colors hover:no-underline ${isActive('/disputes') ? 'bg-amber-50 text-[#C6904D]' : 'text-[#1d1916] hover:bg-stone-50'}`}>
-                    <svg className={`w-5 h-5 ${isActive('/disputes') ? 'text-[#C6904D]' : 'text-stone-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" /></svg>
+                  <Link href="/disputes" onClick={close} className={`flex items-center gap-3.5 px-4 py-3.5 rounded text-[15px] font-medium transition-colors hover:no-underline ${isActive('/disputes') ? 'bg-[#FF6A2A]/10 text-[#FF6A2A]' : 'text-[#F7F9FB] hover:bg-[#162E3D]'}`}>
+                    <svg className={`w-5 h-5 ${isActive('/disputes') ? 'text-[#FF6A2A]' : 'text-[#6B7C86]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" /></svg>
                     Disputes
                   </Link>
-                  <Link href="/analytics" onClick={close} className={`flex items-center gap-3.5 px-4 py-3.5 rounded text-[15px] font-medium transition-colors hover:no-underline ${isActive('/analytics') ? 'bg-amber-50 text-[#C6904D]' : 'text-[#1d1916] hover:bg-stone-50'}`}>
-                    <svg className={`w-5 h-5 ${isActive('/analytics') ? 'text-[#C6904D]' : 'text-stone-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                  <Link href="/analytics" onClick={close} className={`flex items-center gap-3.5 px-4 py-3.5 rounded text-[15px] font-medium transition-colors hover:no-underline ${isActive('/analytics') ? 'bg-[#FF6A2A]/10 text-[#FF6A2A]' : 'text-[#F7F9FB] hover:bg-[#162E3D]'}`}>
+                    <svg className={`w-5 h-5 ${isActive('/analytics') ? 'text-[#FF6A2A]' : 'text-[#6B7C86]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
                     Analytics
                   </Link>
-                  <Link href="/insurance" onClick={close} className={`flex items-center gap-3.5 px-4 py-3.5 rounded text-[15px] font-medium transition-colors hover:no-underline ${isActive('/insurance') ? 'bg-amber-50 text-[#C6904D]' : 'text-[#1d1916] hover:bg-stone-50'}`}>
-                    <svg className={`w-5 h-5 ${isActive('/insurance') ? 'text-[#C6904D]' : 'text-stone-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                  <Link href="/insurance" onClick={close} className={`flex items-center gap-3.5 px-4 py-3.5 rounded text-[15px] font-medium transition-colors hover:no-underline ${isActive('/insurance') ? 'bg-[#FF6A2A]/10 text-[#FF6A2A]' : 'text-[#F7F9FB] hover:bg-[#162E3D]'}`}>
+                    <svg className={`w-5 h-5 ${isActive('/insurance') ? 'text-[#FF6A2A]' : 'text-[#6B7C86]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                     Insurance
                   </Link>
                   {user.role === 'ADMIN' && (
-                    <Link href="/admin" onClick={close} className={`flex items-center gap-3.5 px-4 py-3.5 rounded text-[15px] font-medium transition-colors hover:no-underline ${isActive('/admin') ? 'bg-amber-50 text-[#C6904D]' : 'text-[#1d1916] hover:bg-stone-50'}`}>
-                      <svg className={`w-5 h-5 ${isActive('/admin') ? 'text-[#C6904D]' : 'text-stone-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <Link href="/admin" onClick={close} className={`flex items-center gap-3.5 px-4 py-3.5 rounded text-[15px] font-medium transition-colors hover:no-underline ${isActive('/admin') ? 'bg-[#FF6A2A]/10 text-[#FF6A2A]' : 'text-[#F7F9FB] hover:bg-[#162E3D]'}`}>
+                      <svg className={`w-5 h-5 ${isActive('/admin') ? 'text-[#FF6A2A]' : 'text-[#6B7C86]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       </svg>
@@ -380,8 +380,8 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
               ) : (
                 <>
                   <div className="pt-3" />
-                  <Link href="/login" onClick={close} className="flex items-center gap-3.5 px-4 py-3.5 rounded text-[15px] font-medium text-[#1d1916] hover:bg-stone-50 transition-colors hover:no-underline">
-                    <TabIcon icon="login" className="text-stone-400" />
+                  <Link href="/login" onClick={close} className="flex items-center gap-3.5 px-4 py-3.5 rounded text-[15px] font-medium text-[#F7F9FB] hover:bg-[#162E3D] transition-colors hover:no-underline">
+                    <TabIcon icon="login" className="text-[#6B7C86]" />
                     Sign In
                   </Link>
                 </>
@@ -392,20 +392,20 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
             <div className="border-t border-stone-100 p-4 safe-bottom">
               {user ? (
                 <div>
-                  <div className="flex items-center gap-3 px-3 py-3 mb-2 bg-stone-50 rounded">
+                  <div className="flex items-center gap-3 px-3 py-3 mb-2 bg-[#102535] rounded">
                     <div className="w-10 h-10 rounded-full bg-stone-200 flex items-center justify-center">
-                      <span className="text-sm font-semibold text-[#1d1916]">
+                      <span className="text-sm font-semibold text-[#F7F9FB]">
                         {user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
                       </span>
                     </div>
                     <div className="min-w-0">
-                      <p className="text-sm font-semibold text-[#1d1916] truncate">{user.name}</p>
-                      <p className="text-xs text-stone-500 truncate">{user.email}</p>
+                      <p className="text-sm font-semibold text-[#F7F9FB] truncate">{user.name}</p>
+                      <p className="text-xs text-[#6B7C86] truncate">{user.email}</p>
                     </div>
                   </div>
                   <button
                     onClick={() => { logout(); close() }}
-                    className="w-full px-4 py-3 text-sm font-semibold text-red-600 rounded hover:bg-red-50 transition-colors text-left"
+                    className="w-full px-4 py-3 text-sm font-semibold text-red-600 rounded hover:bg-red-500/10 transition-colors text-left"
                   >
                     Sign Out
                   </button>
@@ -421,7 +421,7 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
       )}
 
       {/* ---- MOBILE BOTTOM TAB BAR ---- */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white/90 backdrop-blur-xl border-t border-stone-200/80 safe-bottom">
+      <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-[#0B1F2A]/95 backdrop-blur-xl border-t border-white/[0.08] safe-bottom">
         <div className="flex items-center justify-around px-2 h-16">
           {bottomTabs.map(tab => {
             const active = isActive(tab.href)
@@ -430,18 +430,18 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
                 key={tab.href}
                 href={tab.href}
                 className={`relative flex flex-col items-center gap-0.5 px-3 py-1.5 rounded transition-colors hover:no-underline min-w-[64px] ${
-                  active ? 'text-[#C6904D]' : 'text-stone-400'
+                  active ? 'text-[#FF6A2A]' : 'text-[#6B7C86]'
                 }`}
               >
                 <div className="relative w-5 h-5 flex items-center justify-center">
-                  <TabIcon icon={tab.icon} className={active ? 'text-[#C6904D]' : 'text-stone-400'} />
+                  <TabIcon icon={tab.icon} className={active ? 'text-[#FF6A2A]' : 'text-[#6B7C86]'} />
                   {'badge' in tab && tab.badge && tab.badge > 0 && (
-                    <span className="absolute -top-1 -right-2.5 min-w-[14px] h-[14px] rounded-full bg-red-500 text-white text-[8px] font-bold flex items-center justify-center leading-none">
+                    <span className="absolute -top-1 -right-2.5 min-w-[14px] h-[14px] rounded-full bg-red-500/100 text-white text-[8px] font-bold flex items-center justify-center leading-none">
                       {tab.badge > 9 ? '9+' : tab.badge}
                     </span>
                   )}
                 </div>
-                <span className={`text-[10px] font-medium leading-none ${active ? 'text-[#C6904D]' : 'text-stone-400'}`}>
+                <span className={`text-[10px] font-medium leading-none ${active ? 'text-[#FF6A2A]' : 'text-[#6B7C86]'}`}>
                   {tab.label}
                 </span>
               </Link>

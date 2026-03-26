@@ -17,7 +17,7 @@ export default function LanguageSwitcher() {
     <div className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-[#4a4a4a] hover:bg-[#f5f3f0] transition-colors"
+        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-[#4a4a4a] hover:bg-[#162E3D] transition-colors"
       >
         <span>{current.flag}</span>
         <span className="hidden sm:inline">{current.label}</span>
@@ -27,13 +27,13 @@ export default function LanguageSwitcher() {
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-[#e8e4de] z-50 overflow-hidden min-w-[140px]">
+          <div className="absolute right-0 top-full mt-1 bg-[#162E3D] rounded-lg shadow-lg border border-white/[0.08] z-50 overflow-hidden min-w-[140px]">
             {languages.map(lang => (
               <button
                 key={lang.code}
                 onClick={() => { setLocale(lang.code); setOpen(false) }}
-                className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-[#f5f3f0] transition-colors ${
-                  locale === lang.code ? 'bg-[#f5f3f0] font-semibold text-[#1a1a1a]' : 'text-[#4a4a4a]'
+                className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-[#162E3D] transition-colors ${
+                  locale === lang.code ? 'bg-[#102535] font-semibold text-[#F7F9FB]' : 'text-[#4a4a4a]'
                 }`}
               >
                 <span>{lang.flag}</span>

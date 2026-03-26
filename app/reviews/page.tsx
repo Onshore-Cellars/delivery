@@ -74,14 +74,14 @@ function StarRating({ rating, onChange, interactive = false, size = 'md' }: {
 function SubRatingBar({ label, value }: { label: string; value: number }) {
   return (
     <div className="flex items-center gap-3">
-      <span className="text-sm text-slate-500 w-28 shrink-0">{label}</span>
-      <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
+      <span className="text-sm text-[#6B7C86] w-28 shrink-0">{label}</span>
+      <div className="flex-1 h-2 bg-[#102535] rounded-full overflow-hidden">
         <div
-          className="h-full rounded-full bg-[#C6904D] transition-all duration-500"
+          className="h-full rounded-full bg-[#FF6A2A] transition-all duration-500"
           style={{ width: `${(value / 5) * 100}%` }}
         />
       </div>
-      <span className="text-sm font-medium text-slate-700 w-8 text-right">{value.toFixed(1)}</span>
+      <span className="text-sm font-medium text-[#9AADB8] w-8 text-right">{value.toFixed(1)}</span>
     </div>
   )
 }
@@ -258,7 +258,7 @@ export default function ReviewsPage() {
       <div className="page-container">
           <div className="animate-pulse space-y-6">
             <div className="h-8 bg-slate-200 rounded w-48" />
-            <div className="bg-white rounded-xl shadow-sm p-8">
+            <div className="bg-[#162E3D] rounded-xl shadow-sm p-8">
               <div className="flex items-center gap-6">
                 <div className="h-16 w-16 bg-slate-200 rounded-full" />
                 <div className="space-y-2 flex-1">
@@ -269,7 +269,7 @@ export default function ReviewsPage() {
             </div>
             <div className="h-10 bg-slate-200 rounded w-64" />
             {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-white rounded-xl shadow-sm p-6">
+              <div key={i} className="bg-[#162E3D] rounded-xl shadow-sm p-6">
                 <div className="space-y-3">
                   <div className="h-4 bg-slate-200 rounded w-40" />
                   <div className="h-4 bg-slate-200 rounded w-full" />
@@ -291,9 +291,9 @@ export default function ReviewsPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <p className="text-[11px] font-semibold text-[#C6904D] uppercase tracking-[0.15em] mb-1">Feedback</p>
-            <h1 className="text-xl sm:text-2xl font-semibold text-[#1a1a1a] tracking-[-0.02em]">Reviews</h1>
-            <p className="text-sm text-slate-500 mt-1">Manage your ratings and feedback</p>
+            <p className="text-[11px] font-semibold text-[#FF6A2A] uppercase tracking-[0.15em] mb-1">Feedback</p>
+            <h1 className="text-xl sm:text-2xl font-semibold text-[#F7F9FB] tracking-[-0.02em]">Reviews</h1>
+            <p className="text-sm text-[#6B7C86] mt-1">Manage your ratings and feedback</p>
           </div>
           <button
             onClick={() => setShowNewReview(!showNewReview)}
@@ -304,17 +304,17 @@ export default function ReviewsPage() {
         </div>
 
         {/* Rating Summary */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 sm:p-8 mb-6">
+        <div className="bg-[#162E3D] rounded-xl shadow-sm border border-white/[0.06] p-6 sm:p-8 mb-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
             <div className="flex flex-col items-center text-center min-w-[120px]">
-              <div className="text-5xl font-semibold text-[#1a1a1a]">{average > 0 ? average.toFixed(1) : '—'}</div>
+              <div className="text-5xl font-semibold text-[#F7F9FB]">{average > 0 ? average.toFixed(1) : '—'}</div>
               <StarRating rating={Math.round(average)} size="md" />
-              <p className="text-sm text-slate-500 mt-1">
+              <p className="text-sm text-[#6B7C86] mt-1">
                 {count} {count === 1 ? 'review' : 'reviews'}
               </p>
             </div>
             {count > 0 && (
-              <div className="flex-1 w-full space-y-2.5 sm:border-l sm:border-slate-100 sm:pl-8">
+              <div className="flex-1 w-full space-y-2.5 sm:border-l sm:border-white/[0.06] sm:pl-8">
                 <SubRatingBar
                   label="Communication"
                   value={
@@ -348,7 +348,7 @@ export default function ReviewsPage() {
         {aboutMeReviews.length >= 3 && (
           <div className="bg-gradient-to-br from-[#C6904D]/5 to-transparent rounded-xl border border-[#C6904D]/20 p-6 sm:p-8 mb-6">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-base font-semibold text-[#1a1a1a]">AI Review Summary</h2>
+              <h2 className="text-base font-semibold text-[#F7F9FB]">AI Review Summary</h2>
               <button
                 onClick={async () => {
                   if (!token || !user) return
@@ -362,37 +362,37 @@ export default function ReviewsPage() {
                   finally { setLoadingSummary(false) }
                 }}
                 disabled={loadingSummary}
-                className="px-4 py-2 bg-[#C6904D] text-white rounded-lg text-xs font-semibold hover:bg-[#b07d3f] disabled:opacity-50 transition-colors"
+                className="px-4 py-2 bg-[#FF6A2A] text-white rounded-lg text-xs font-semibold hover:bg-[#E85A1E] disabled:opacity-50 transition-colors"
               >
                 {loadingSummary ? 'Analysing...' : aiSummary ? 'Refresh' : 'Generate Summary'}
               </button>
             </div>
             {aiSummary ? (
               <div className="space-y-3 text-sm">
-                <p className="text-slate-600">{aiSummary.summary}</p>
+                <p className="text-[#9AADB8]">{aiSummary.summary}</p>
                 {aiSummary.strengths?.length > 0 && (
                   <div>
-                    <span className="text-xs font-semibold text-green-700">Strengths:</span>
-                    <ul className="mt-1 space-y-0.5">{aiSummary.strengths.map((s, i) => <li key={i} className="text-xs text-slate-500 flex items-start gap-1"><span className="text-green-500">+</span>{s}</li>)}</ul>
+                    <span className="text-xs font-semibold text-[#9ED36A]">Strengths:</span>
+                    <ul className="mt-1 space-y-0.5">{aiSummary.strengths.map((s, i) => <li key={i} className="text-xs text-[#6B7C86] flex items-start gap-1"><span className="text-green-500">+</span>{s}</li>)}</ul>
                   </div>
                 )}
                 {aiSummary.improvements?.length > 0 && (
                   <div>
-                    <span className="text-xs font-semibold text-amber-700">Areas for improvement:</span>
-                    <ul className="mt-1 space-y-0.5">{aiSummary.improvements.map((s, i) => <li key={i} className="text-xs text-slate-500 flex items-start gap-1"><span className="text-amber-500">-</span>{s}</li>)}</ul>
+                    <span className="text-xs font-semibold text-[#FF6A2A]">Areas for improvement:</span>
+                    <ul className="mt-1 space-y-0.5">{aiSummary.improvements.map((s, i) => <li key={i} className="text-xs text-[#6B7C86] flex items-start gap-1"><span className="text-amber-500">-</span>{s}</li>)}</ul>
                   </div>
                 )}
               </div>
             ) : !loadingSummary ? (
-              <p className="text-xs text-slate-500">Get an AI-powered analysis of your review themes, strengths, and areas for improvement.</p>
+              <p className="text-xs text-[#6B7C86]">Get an AI-powered analysis of your review themes, strengths, and areas for improvement.</p>
             ) : null}
           </div>
         )}
 
         {/* Write New Review Form */}
         {showNewReview && (
-          <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 sm:p-8 mb-6">
-            <h2 className="text-lg font-bold text-[#1a1a1a] mb-6">Write a New Review</h2>
+          <div className="bg-[#162E3D] rounded-xl shadow-sm border border-white/[0.06] p-6 sm:p-8 mb-6">
+            <h2 className="text-lg font-bold text-[#F7F9FB] mb-6">Write a New Review</h2>
 
             {submitSuccess && (
               <div className="mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-700 text-sm">
@@ -400,7 +400,7 @@ export default function ReviewsPage() {
               </div>
             )}
             {submitError && (
-              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+              <div className="mb-4 p-3 bg-red-500/10 border border-red-200 rounded-lg text-red-400 text-sm">
                 {submitError}
               </div>
             )}
@@ -408,16 +408,16 @@ export default function ReviewsPage() {
             <form onSubmit={handleSubmitReview} className="space-y-6">
               {/* Booking Selection */}
               <div>
-                <label className="block text-sm font-medium text-[#1a1a1a] mb-2">Select a Completed Booking</label>
+                <label className="block text-sm font-medium text-[#F7F9FB] mb-2">Select a Completed Booking</label>
                 {loadingBookings ? (
                   <div className="loading-shimmer h-10 rounded-lg" />
                 ) : completedBookings.length === 0 ? (
-                  <p className="text-sm text-slate-500 italic">No completed bookings available for review.</p>
+                  <p className="text-sm text-[#6B7C86] italic">No completed bookings available for review.</p>
                 ) : (
                   <select
                     value={selectedBooking}
                     onChange={(e) => setSelectedBooking(e.target.value)}
-                    className="w-full px-4 py-3 sm:py-2.5 border border-slate-200 rounded-lg text-base sm:text-sm text-[#1a1a1a] bg-white focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 outline-none"
+                    className="w-full px-4 py-3 sm:py-2.5 border border-white/[0.08] rounded-lg text-base sm:text-sm text-[#F7F9FB] bg-[#162E3D] focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10 outline-none"
                   >
                     <option value="">Choose a booking...</option>
                     {completedBookings.map((b) => (
@@ -431,35 +431,35 @@ export default function ReviewsPage() {
 
               {/* Overall Rating */}
               <div>
-                <label className="block text-sm font-medium text-[#1a1a1a] mb-2">Overall Rating</label>
+                <label className="block text-sm font-medium text-[#F7F9FB] mb-2">Overall Rating</label>
                 <StarRating rating={newRating} onChange={setNewRating} interactive size="lg" />
               </div>
 
               {/* Sub-ratings */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-[#1a1a1a] mb-2">Communication</label>
+                  <label className="block text-sm font-medium text-[#F7F9FB] mb-2">Communication</label>
                   <StarRating rating={newCommunication} onChange={setNewCommunication} interactive size="md" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#1a1a1a] mb-2">Timeliness</label>
+                  <label className="block text-sm font-medium text-[#F7F9FB] mb-2">Timeliness</label>
                   <StarRating rating={newTimeliness} onChange={setNewTimeliness} interactive size="md" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#1a1a1a] mb-2">Condition</label>
+                  <label className="block text-sm font-medium text-[#F7F9FB] mb-2">Condition</label>
                   <StarRating rating={newCondition} onChange={setNewCondition} interactive size="md" />
                 </div>
               </div>
 
               {/* Comment */}
               <div>
-                <label className="block text-sm font-medium text-[#1a1a1a] mb-2">Your Review</label>
+                <label className="block text-sm font-medium text-[#F7F9FB] mb-2">Your Review</label>
                 <textarea
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
                   rows={4}
                   placeholder="Share your experience..."
-                  className="w-full px-4 py-3 border border-slate-200 rounded-lg text-base sm:text-sm text-[#1a1a1a] resize-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 outline-none"
+                  className="w-full px-4 py-3 border border-white/[0.08] rounded-lg text-base sm:text-sm text-[#F7F9FB] resize-none focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10 outline-none"
                 />
               </div>
 
@@ -477,13 +477,13 @@ export default function ReviewsPage() {
         )}
 
         {/* Tabs */}
-        <div className="flex gap-1 bg-white rounded-xl shadow-sm border border-slate-100 p-1 mb-6">
+        <div className="flex gap-1 bg-[#162E3D] rounded-xl shadow-sm border border-white/[0.06] p-1 mb-6">
           <button
             onClick={() => setActiveTab('about')}
             className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all ${
               activeTab === 'about'
                 ? 'bg-[#1d1d1f] text-white shadow-sm'
-                : 'text-slate-500 hover:text-[#1a1a1a] hover:bg-slate-50'
+                : 'text-[#6B7C86] hover:text-[#F7F9FB] hover:bg-[#162E3D]'
             }`}
           >
             Reviews About Me ({aboutMeReviews.length})
@@ -493,7 +493,7 @@ export default function ReviewsPage() {
             className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all ${
               activeTab === 'written'
                 ? 'bg-[#1d1d1f] text-white shadow-sm'
-                : 'text-slate-500 hover:text-[#1a1a1a] hover:bg-slate-50'
+                : 'text-[#6B7C86] hover:text-[#F7F9FB] hover:bg-[#162E3D]'
             }`}
           >
             Reviews I&apos;ve Written ({writtenReviews.length})
@@ -502,16 +502,16 @@ export default function ReviewsPage() {
 
         {/* Reviews List */}
         {currentReviews.length === 0 ? (
-          <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-12 text-center">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-slate-100 flex items-center justify-center">
-              <svg className="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-[#162E3D] rounded-xl shadow-sm border border-white/[0.06] p-12 text-center">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#102535] flex items-center justify-center">
+              <svg className="w-8 h-8 text-[#6B7C86]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
               </svg>
             </div>
-            <h3 className="text-lg font-bold text-[#1a1a1a] mb-1">
+            <h3 className="text-lg font-bold text-[#F7F9FB] mb-1">
               {activeTab === 'about' ? 'No reviews yet' : 'You haven\'t written any reviews'}
             </h3>
-            <p className="text-sm text-slate-500 max-w-sm mx-auto">
+            <p className="text-sm text-[#6B7C86] max-w-sm mx-auto">
               {activeTab === 'about'
                 ? 'Reviews from other users will appear here after completed bookings.'
                 : 'After completing a booking, you can share your experience by writing a review.'}
@@ -528,7 +528,7 @@ export default function ReviewsPage() {
         ) : (
           <div className="space-y-4">
             {currentReviews.map((review) => (
-              <div key={review.id} className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+              <div key={review.id} className="bg-[#162E3D] rounded-xl shadow-sm border border-white/[0.06] p-6">
                 {/* Review Header */}
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
@@ -536,34 +536,34 @@ export default function ReviewsPage() {
                       {(activeTab === 'about' ? review.author.name : review.target.name).charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <p className="font-medium text-[#1a1a1a]">
+                      <p className="font-medium text-[#F7F9FB]">
                         {activeTab === 'about' ? review.author.name : review.target.name}
                       </p>
-                      <p className="text-xs text-slate-400">{formatDate(review.createdAt)}</p>
+                      <p className="text-xs text-[#6B7C86]">{formatDate(review.createdAt)}</p>
                     </div>
                   </div>
                   <StarRating rating={review.rating} size="sm" />
                 </div>
 
                 {/* Comment */}
-                <p className="text-sm text-slate-700 leading-relaxed mb-4">{review.comment}</p>
+                <p className="text-sm text-[#9AADB8] leading-relaxed mb-4">{review.comment}</p>
 
                 {/* Sub-ratings */}
-                <div className="grid grid-cols-3 gap-4 mb-4 p-3 bg-slate-50 rounded-lg">
+                <div className="grid grid-cols-3 gap-4 mb-4 p-3 bg-[#102535] rounded-lg">
                   <div className="text-center">
-                    <p className="text-xs text-slate-500 mb-0.5">Communication</p>
+                    <p className="text-xs text-[#6B7C86] mb-0.5">Communication</p>
                     <div className="flex items-center justify-center gap-1">
                       <StarRating rating={review.communicationRating} size="sm" />
                     </div>
                   </div>
                   <div className="text-center">
-                    <p className="text-xs text-slate-500 mb-0.5">Timeliness</p>
+                    <p className="text-xs text-[#6B7C86] mb-0.5">Timeliness</p>
                     <div className="flex items-center justify-center gap-1">
                       <StarRating rating={review.timelinessRating} size="sm" />
                     </div>
                   </div>
                   <div className="text-center">
-                    <p className="text-xs text-slate-500 mb-0.5">Condition</p>
+                    <p className="text-xs text-[#6B7C86] mb-0.5">Condition</p>
                     <div className="flex items-center justify-center gap-1">
                       <StarRating rating={review.conditionRating} size="sm" />
                     </div>
@@ -572,9 +572,9 @@ export default function ReviewsPage() {
 
                 {/* Response (for reviews about me) */}
                 {activeTab === 'about' && review.response && (
-                  <div className="mt-4 pl-4 border-l-2 border-slate-200">
-                    <p className="text-xs font-medium text-slate-500 mb-1">Your Response</p>
-                    <p className="text-sm text-slate-600">{review.response}</p>
+                  <div className="mt-4 pl-4 border-l-2 border-white/[0.08]">
+                    <p className="text-xs font-medium text-[#6B7C86] mb-1">Your Response</p>
+                    <p className="text-sm text-[#9AADB8]">{review.response}</p>
                   </div>
                 )}
 
@@ -588,12 +588,12 @@ export default function ReviewsPage() {
                           onChange={(e) => setResponseText(e.target.value)}
                           rows={3}
                           placeholder="Write your response..."
-                          className="w-full px-4 py-3 border border-slate-200 rounded-lg text-base sm:text-sm text-[#1a1a1a] resize-none focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 outline-none"
+                          className="w-full px-4 py-3 border border-white/[0.08] rounded-lg text-base sm:text-sm text-[#F7F9FB] resize-none focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10 outline-none"
                         />
                         <div className="flex gap-2 justify-end">
                           <button
                             onClick={() => { setRespondingTo(null); setResponseText('') }}
-                            className="px-4 py-2 text-sm text-slate-500 hover:text-[#1a1a1a] transition-colors"
+                            className="px-4 py-2 text-sm text-[#6B7C86] hover:text-[#F7F9FB] transition-colors"
                           >
                             Cancel
                           </button>
@@ -609,7 +609,7 @@ export default function ReviewsPage() {
                     ) : (
                       <button
                         onClick={() => { setRespondingTo(review.id); setResponseText('') }}
-                        className="text-sm font-medium text-[#1a1a1a] hover:text-[#1a1a1a] transition-colors hover:underline"
+                        className="text-sm font-medium text-[#F7F9FB] hover:text-[#F7F9FB] transition-colors hover:underline"
                       >
                         Respond to this review
                       </button>

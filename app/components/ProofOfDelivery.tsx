@@ -207,21 +207,21 @@ export default function ProofOfDelivery({ bookingId, trackingCode, token, onComp
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white w-full sm:max-w-lg sm:rounded-lg rounded-t-2xl shadow-2xl max-h-[92vh] overflow-y-auto">
+      <div className="relative bg-[#162E3D] w-full sm:max-w-lg sm:rounded-lg rounded-t-2xl shadow-2xl max-h-[92vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-[#e8e4de] px-5 py-4 z-10 rounded-t-2xl sm:rounded-t-lg flex items-center justify-between">
+        <div className="sticky top-0 bg-[#162E3D] border-b border-white/[0.08] px-5 py-4 z-10 rounded-t-2xl sm:rounded-t-lg flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-[#1a1a1a]" style={{ fontFamily: 'var(--font-display)' }}>Proof of Delivery</h2>
-            <p className="text-xs text-slate-500">{trackingCode}</p>
+            <h2 className="text-lg font-semibold text-[#F7F9FB]" style={{ fontFamily: 'var(--font-display)' }}>Proof of Delivery</h2>
+            <p className="text-xs text-[#6B7C86]">{trackingCode}</p>
           </div>
-          <button onClick={onClose} className="p-2 rounded hover:bg-[#f5f3f0] text-slate-400">
+          <button onClick={onClose} className="p-2 rounded hover:bg-[#162E3D] text-[#6B7C86]">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
         </div>
 
         {error && (
-          <div className="mx-5 mt-4 px-4 py-3 rounded bg-red-50 border border-red-100">
-            <p className="text-sm text-red-700">{error}</p>
+          <div className="mx-5 mt-4 px-4 py-3 rounded bg-red-500/10 border border-red-500/15">
+            <p className="text-sm text-red-400">{error}</p>
           </div>
         )}
 
@@ -230,11 +230,11 @@ export default function ProofOfDelivery({ bookingId, trackingCode, token, onComp
           {step === 'capture' && (
             <>
               <div>
-                <h3 className="text-sm font-semibold text-[#1a1a1a] mb-3">Delivery Photo</h3>
+                <h3 className="text-sm font-semibold text-[#F7F9FB] mb-3">Delivery Photo</h3>
                 {photoData ? (
                   <div className="relative">
-                    <img src={photoData} alt="Delivery" className="w-full rounded-lg border border-[#e8e4de]" />
-                    <button onClick={() => setPhotoData(null)} className="absolute top-2 right-2 p-1.5 bg-white/90 rounded-full shadow text-slate-500 hover:text-red-500">
+                    <img src={photoData} alt="Delivery" className="w-full rounded-lg border border-white/[0.08]" />
+                    <button onClick={() => setPhotoData(null)} className="absolute top-2 right-2 p-1.5 bg-[#162E3D]/90 rounded-full shadow text-[#6B7C86] hover:text-red-500">
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                     </button>
                   </div>
@@ -242,21 +242,21 @@ export default function ProofOfDelivery({ bookingId, trackingCode, token, onComp
                   <div className="relative">
                     <video ref={videoRef} autoPlay playsInline muted className="w-full rounded-lg bg-black" />
                     <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-3">
-                      <button onClick={capturePhoto} className="w-14 h-14 rounded-full bg-white border-4 border-[#C6904D] shadow-lg" />
-                      <button onClick={stopCamera} className="p-3 rounded-full bg-white/80 text-slate-600 shadow">
+                      <button onClick={capturePhoto} className="w-14 h-14 rounded-full bg-[#162E3D] border-4 border-[#C6904D] shadow-lg" />
+                      <button onClick={stopCamera} className="p-3 rounded-full bg-[#162E3D]/80 text-[#9AADB8] shadow">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                       </button>
                     </div>
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 gap-3">
-                    <button onClick={startCamera} className="flex flex-col items-center gap-2 p-6 rounded-lg border-2 border-dashed border-[#e8e4de] hover:border-[#C6904D] transition-colors">
-                      <svg className="w-8 h-8 text-[#C6904D]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                      <span className="text-xs font-semibold text-[#1a1a1a]">Take Photo</span>
+                    <button onClick={startCamera} className="flex flex-col items-center gap-2 p-6 rounded-lg border-2 border-dashed border-white/[0.08] hover:border-[#C6904D] transition-colors">
+                      <svg className="w-8 h-8 text-[#FF6A2A]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                      <span className="text-xs font-semibold text-[#F7F9FB]">Take Photo</span>
                     </button>
-                    <label className="flex flex-col items-center gap-2 p-6 rounded-lg border-2 border-dashed border-[#e8e4de] hover:border-[#C6904D] transition-colors cursor-pointer">
-                      <svg className="w-8 h-8 text-[#C6904D]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                      <span className="text-xs font-semibold text-[#1a1a1a]">Upload Photo</span>
+                    <label className="flex flex-col items-center gap-2 p-6 rounded-lg border-2 border-dashed border-white/[0.08] hover:border-[#C6904D] transition-colors cursor-pointer">
+                      <svg className="w-8 h-8 text-[#FF6A2A]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                      <span className="text-xs font-semibold text-[#F7F9FB]">Upload Photo</span>
                       <input type="file" accept="image/*" capture="environment" className="hidden" onChange={handleFileUpload} />
                     </label>
                   </div>
@@ -264,13 +264,13 @@ export default function ProofOfDelivery({ bookingId, trackingCode, token, onComp
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-[#1a1a1a] mb-2">Recipient Name</label>
-                <input type="text" className="w-full px-4 py-3 rounded border border-[#e8e4de] text-sm text-[#1a1a1a] focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 outline-none" placeholder="Name of person receiving delivery" value={recipientName} onChange={e => setRecipientName(e.target.value)} />
+                <label className="block text-sm font-semibold text-[#F7F9FB] mb-2">Recipient Name</label>
+                <input type="text" className="w-full px-4 py-3 rounded border border-white/[0.08] text-sm text-[#F7F9FB] focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10 outline-none" placeholder="Name of person receiving delivery" value={recipientName} onChange={e => setRecipientName(e.target.value)} />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-[#1a1a1a] mb-2">Notes (optional)</label>
-                <textarea className="w-full px-4 py-3 rounded border border-[#e8e4de] text-sm text-[#1a1a1a] focus:border-[#C6904D] focus:ring-2 focus:ring-[#C6904D]/10 outline-none min-h-[60px] resize-none" placeholder="e.g. Left at gangway, 3 boxes" value={notes} onChange={e => setNotes(e.target.value)} />
+                <label className="block text-sm font-semibold text-[#F7F9FB] mb-2">Notes (optional)</label>
+                <textarea className="w-full px-4 py-3 rounded border border-white/[0.08] text-sm text-[#F7F9FB] focus:border-[#1E6F8F] focus:ring-2 focus:ring-[#1E6F8F]/10 outline-none min-h-[60px] resize-none" placeholder="e.g. Left at gangway, 3 boxes" value={notes} onChange={e => setNotes(e.target.value)} />
               </div>
 
               <div className="flex gap-3">
@@ -279,7 +279,7 @@ export default function ProofOfDelivery({ bookingId, trackingCode, token, onComp
                 </button>
               </div>
               {photoData && (
-                <button onClick={() => { setStep('review') }} className="w-full text-center text-sm text-[#C6904D] font-semibold">
+                <button onClick={() => { setStep('review') }} className="w-full text-center text-sm text-[#FF6A2A] font-semibold">
                   Skip signature — submit with photo only
                 </button>
               )}
@@ -290,9 +290,9 @@ export default function ProofOfDelivery({ bookingId, trackingCode, token, onComp
           {step === 'signature' && (
             <>
               <div>
-                <h3 className="text-sm font-semibold text-[#1a1a1a] mb-1">Signature</h3>
-                <p className="text-xs text-slate-500 mb-3">Ask the recipient to sign below with their finger</p>
-                <div className="relative border-2 border-[#e8e4de] rounded-lg bg-white overflow-hidden" style={{ touchAction: 'none' }}>
+                <h3 className="text-sm font-semibold text-[#F7F9FB] mb-1">Signature</h3>
+                <p className="text-xs text-[#6B7C86] mb-3">Ask the recipient to sign below with their finger</p>
+                <div className="relative border-2 border-white/[0.08] rounded-lg bg-[#162E3D] overflow-hidden" style={{ touchAction: 'none' }}>
                   <canvas
                     ref={canvasRef}
                     className="w-full"
@@ -305,7 +305,7 @@ export default function ProofOfDelivery({ bookingId, trackingCode, token, onComp
                     onTouchMove={draw}
                     onTouchEnd={endDraw}
                   />
-                  <button onClick={clearSignature} className="absolute top-2 right-2 px-3 py-1 bg-white rounded border border-[#e8e4de] text-xs font-semibold text-slate-500 hover:text-[#1a1a1a]">
+                  <button onClick={clearSignature} className="absolute top-2 right-2 px-3 py-1 bg-[#162E3D] rounded border border-white/[0.08] text-xs font-semibold text-[#6B7C86] hover:text-[#F7F9FB]">
                     Clear
                   </button>
                 </div>
@@ -322,33 +322,33 @@ export default function ProofOfDelivery({ bookingId, trackingCode, token, onComp
           {step === 'review' && (
             <>
               <div className="space-y-4">
-                <h3 className="text-sm font-semibold text-[#1a1a1a]">Review Proof of Delivery</h3>
+                <h3 className="text-sm font-semibold text-[#F7F9FB]">Review Proof of Delivery</h3>
 
                 {photoData && (
                   <div>
-                    <p className="text-xs text-slate-500 mb-2">Delivery Photo</p>
-                    <img src={photoData} alt="Delivery" className="w-full max-h-48 object-cover rounded-lg border border-[#e8e4de]" />
+                    <p className="text-xs text-[#6B7C86] mb-2">Delivery Photo</p>
+                    <img src={photoData} alt="Delivery" className="w-full max-h-48 object-cover rounded-lg border border-white/[0.08]" />
                   </div>
                 )}
 
                 {signatureData && (
                   <div>
-                    <p className="text-xs text-slate-500 mb-2">Signature</p>
-                    <img src={signatureData} alt="Signature" className="w-full h-24 object-contain rounded-lg border border-[#e8e4de] bg-white p-2" />
+                    <p className="text-xs text-[#6B7C86] mb-2">Signature</p>
+                    <img src={signatureData} alt="Signature" className="w-full h-24 object-contain rounded-lg border border-white/[0.08] bg-[#162E3D] p-2" />
                   </div>
                 )}
 
                 {recipientName && (
                   <div>
-                    <p className="text-xs text-slate-500">Received by</p>
-                    <p className="text-sm font-medium text-[#1a1a1a]">{recipientName}</p>
+                    <p className="text-xs text-[#6B7C86]">Received by</p>
+                    <p className="text-sm font-medium text-[#F7F9FB]">{recipientName}</p>
                   </div>
                 )}
 
                 {notes && (
                   <div>
-                    <p className="text-xs text-slate-500">Notes</p>
-                    <p className="text-sm text-[#1a1a1a]">{notes}</p>
+                    <p className="text-xs text-[#6B7C86]">Notes</p>
+                    <p className="text-sm text-[#F7F9FB]">{notes}</p>
                   </div>
                 )}
 

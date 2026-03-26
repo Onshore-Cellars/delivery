@@ -237,16 +237,44 @@ export const vehicleSpecs: VehicleSpec[] = [
 
   // ─── LUTON VANS ────────────────────────────────────────────────────────────
   { make: 'Ford', model: 'Transit Luton', type: 'Luton Van', maxPayloadKg: 1500, cargoVolumeM3: 18.0, cargoLengthCm: 400, cargoWidthCm: 200, cargoHeightCm: 220, fuelType: 'Diesel' },
+  { make: 'Ford', model: 'Transit Luton Tail Lift', type: 'Luton Van', maxPayloadKg: 1400, cargoVolumeM3: 18.0, cargoLengthCm: 400, cargoWidthCm: 200, cargoHeightCm: 220, fuelType: 'Diesel' },
   { make: 'Mercedes-Benz', model: 'Sprinter Luton', type: 'Luton Van', maxPayloadKg: 1400, cargoVolumeM3: 20.0, cargoLengthCm: 430, cargoWidthCm: 210, cargoHeightCm: 220, fuelType: 'Diesel' },
+  { make: 'Mercedes-Benz', model: 'Sprinter Luton Tail Lift', type: 'Luton Van', maxPayloadKg: 1300, cargoVolumeM3: 20.0, cargoLengthCm: 430, cargoWidthCm: 210, cargoHeightCm: 220, fuelType: 'Diesel' },
   { make: 'Renault', model: 'Master Luton', type: 'Luton Van', maxPayloadKg: 1300, cargoVolumeM3: 19.0, cargoLengthCm: 410, cargoWidthCm: 205, cargoHeightCm: 220, fuelType: 'Diesel' },
+  { make: 'Renault', model: 'Master Luton Tail Lift', type: 'Luton Van', maxPayloadKg: 1200, cargoVolumeM3: 19.0, cargoLengthCm: 410, cargoWidthCm: 205, cargoHeightCm: 220, fuelType: 'Diesel' },
   { make: 'Fiat', model: 'Ducato Luton', type: 'Luton Van', maxPayloadKg: 1350, cargoVolumeM3: 19.5, cargoLengthCm: 420, cargoWidthCm: 205, cargoHeightCm: 220, fuelType: 'Diesel' },
+  { make: 'Volkswagen', model: 'Crafter Luton', type: 'Luton Van', maxPayloadKg: 1350, cargoVolumeM3: 19.0, cargoLengthCm: 420, cargoWidthCm: 205, cargoHeightCm: 220, fuelType: 'Diesel' },
+  { make: 'Volkswagen', model: 'Crafter Luton Tail Lift', type: 'Luton Van', maxPayloadKg: 1250, cargoVolumeM3: 19.0, cargoLengthCm: 420, cargoWidthCm: 205, cargoHeightCm: 220, fuelType: 'Diesel' },
+  { make: 'Peugeot', model: 'Boxer Luton', type: 'Luton Van', maxPayloadKg: 1300, cargoVolumeM3: 19.5, cargoLengthCm: 420, cargoWidthCm: 205, cargoHeightCm: 220, fuelType: 'Diesel' },
+  { make: 'Citroen', model: 'Relay Luton', type: 'Luton Van', maxPayloadKg: 1300, cargoVolumeM3: 19.5, cargoLengthCm: 420, cargoWidthCm: 205, cargoHeightCm: 220, fuelType: 'Diesel' },
+  { make: 'Vauxhall', model: 'Movano Luton', type: 'Luton Van', maxPayloadKg: 1300, cargoVolumeM3: 19.0, cargoLengthCm: 410, cargoWidthCm: 205, cargoHeightCm: 220, fuelType: 'Diesel' },
+  { make: 'Opel', model: 'Movano Luton', type: 'Luton Van', maxPayloadKg: 1300, cargoVolumeM3: 19.0, cargoLengthCm: 410, cargoWidthCm: 205, cargoHeightCm: 220, fuelType: 'Diesel' },
+  { make: 'Iveco', model: 'Daily Luton 3.5t', type: 'Luton Van', maxPayloadKg: 1500, cargoVolumeM3: 20.0, cargoLengthCm: 430, cargoWidthCm: 210, cargoHeightCm: 220, fuelType: 'Diesel' },
+  { make: 'Iveco', model: 'Daily Luton Tail Lift 3.5t', type: 'Luton Van', maxPayloadKg: 1400, cargoVolumeM3: 20.0, cargoLengthCm: 430, cargoWidthCm: 210, cargoHeightCm: 220, fuelType: 'Diesel' },
+  { make: 'MAN', model: 'TGE Luton', type: 'Luton Van', maxPayloadKg: 1350, cargoVolumeM3: 19.0, cargoLengthCm: 420, cargoWidthCm: 205, cargoHeightCm: 220, fuelType: 'Diesel' },
+  { make: 'Nissan', model: 'Interstar Luton', type: 'Luton Van', maxPayloadKg: 1300, cargoVolumeM3: 19.0, cargoLengthCm: 410, cargoWidthCm: 205, cargoHeightCm: 220, fuelType: 'Diesel' },
 
   // ─── REFRIGERATED VANS ─────────────────────────────────────────────────────
+  // Medium fridge (based on Transit Custom / Vito class)
   { make: 'Ford', model: 'Transit Custom Fridge', type: 'Refrigerated Van', maxPayloadKg: 800, cargoVolumeM3: 5.0, cargoLengthCm: 250, cargoWidthCm: 165, cargoHeightCm: 130, fuelType: 'Diesel' },
+  { make: 'Mercedes-Benz', model: 'Vito Fridge L2', type: 'Refrigerated Van', maxPayloadKg: 850, cargoVolumeM3: 5.5, cargoLengthCm: 270, cargoWidthCm: 160, cargoHeightCm: 128, fuelType: 'Diesel' },
+  { make: 'Renault', model: 'Trafic Fridge', type: 'Refrigerated Van', maxPayloadKg: 850, cargoVolumeM3: 4.5, cargoLengthCm: 235, cargoWidthCm: 158, cargoHeightCm: 130, fuelType: 'Diesel' },
+  { make: 'Volkswagen', model: 'Transporter Fridge', type: 'Refrigerated Van', maxPayloadKg: 850, cargoVolumeM3: 5.0, cargoLengthCm: 260, cargoWidthCm: 162, cargoHeightCm: 130, fuelType: 'Diesel' },
+  { make: 'Peugeot', model: 'Expert Fridge', type: 'Refrigerated Van', maxPayloadKg: 900, cargoVolumeM3: 4.5, cargoLengthCm: 235, cargoWidthCm: 158, cargoHeightCm: 128, fuelType: 'Diesel' },
+  { make: 'Citroen', model: 'Dispatch Fridge', type: 'Refrigerated Van', maxPayloadKg: 900, cargoVolumeM3: 4.5, cargoLengthCm: 235, cargoWidthCm: 158, cargoHeightCm: 128, fuelType: 'Diesel' },
+  { make: 'Vauxhall', model: 'Vivaro Fridge', type: 'Refrigerated Van', maxPayloadKg: 850, cargoVolumeM3: 4.5, cargoLengthCm: 235, cargoWidthCm: 158, cargoHeightCm: 130, fuelType: 'Diesel' },
+  { make: 'Toyota', model: 'Proace Fridge', type: 'Refrigerated Van', maxPayloadKg: 900, cargoVolumeM3: 4.5, cargoLengthCm: 235, cargoWidthCm: 158, cargoHeightCm: 128, fuelType: 'Diesel' },
+  // Large fridge (based on Sprinter / Master / Crafter class)
   { make: 'Mercedes-Benz', model: 'Sprinter Fridge L2H2', type: 'Refrigerated Van', maxPayloadKg: 1000, cargoVolumeM3: 8.5, cargoLengthCm: 340, cargoWidthCm: 175, cargoHeightCm: 180, fuelType: 'Diesel' },
+  { make: 'Mercedes-Benz', model: 'Sprinter Fridge L3H2', type: 'Refrigerated Van', maxPayloadKg: 950, cargoVolumeM3: 11.0, cargoLengthCm: 420, cargoWidthCm: 175, cargoHeightCm: 180, fuelType: 'Diesel' },
   { make: 'Renault', model: 'Master Fridge L2H2', type: 'Refrigerated Van', maxPayloadKg: 1000, cargoVolumeM3: 8.0, cargoLengthCm: 310, cargoWidthCm: 170, cargoHeightCm: 175, fuelType: 'Diesel' },
+  { make: 'Renault', model: 'Master Fridge L3H2', type: 'Refrigerated Van', maxPayloadKg: 950, cargoVolumeM3: 10.5, cargoLengthCm: 365, cargoWidthCm: 170, cargoHeightCm: 175, fuelType: 'Diesel' },
   { make: 'Volkswagen', model: 'Crafter Fridge L3H2', type: 'Refrigerated Van', maxPayloadKg: 1000, cargoVolumeM3: 9.0, cargoLengthCm: 340, cargoWidthCm: 175, cargoHeightCm: 180, fuelType: 'Diesel' },
+  { make: 'Ford', model: 'Transit Fridge L3H2', type: 'Refrigerated Van', maxPayloadKg: 1100, cargoVolumeM3: 9.0, cargoLengthCm: 340, cargoWidthCm: 170, cargoHeightCm: 178, fuelType: 'Diesel' },
   { make: 'Fiat', model: 'Ducato Fridge L2H2', type: 'Refrigerated Van', maxPayloadKg: 1050, cargoVolumeM3: 8.0, cargoLengthCm: 305, cargoWidthCm: 175, cargoHeightCm: 170, fuelType: 'Diesel' },
+  { make: 'Peugeot', model: 'Boxer Fridge L2H2', type: 'Refrigerated Van', maxPayloadKg: 1000, cargoVolumeM3: 8.0, cargoLengthCm: 305, cargoWidthCm: 175, cargoHeightCm: 170, fuelType: 'Diesel' },
+  { make: 'Citroen', model: 'Relay Fridge L2H2', type: 'Refrigerated Van', maxPayloadKg: 1000, cargoVolumeM3: 8.0, cargoLengthCm: 305, cargoWidthCm: 175, cargoHeightCm: 170, fuelType: 'Diesel' },
+  { make: 'Iveco', model: 'Daily Fridge L2H2 3.5t', type: 'Refrigerated Van', maxPayloadKg: 1200, cargoVolumeM3: 9.0, cargoLengthCm: 340, cargoWidthCm: 175, cargoHeightCm: 180, fuelType: 'Diesel' },
 
   // ─── PICKUP TRUCKS ─────────────────────────────────────────────────────────
   { make: 'Ford', model: 'Ranger', type: 'Pickup Truck', maxPayloadKg: 1100, cargoVolumeM3: 1.5, cargoLengthCm: 156, cargoWidthCm: 154, cargoHeightCm: 51, fuelType: 'Diesel' },
@@ -257,10 +285,35 @@ export const vehicleSpecs: VehicleSpec[] = [
   { make: 'Isuzu', model: 'D-Max', type: 'Pickup Truck', maxPayloadKg: 1100, cargoVolumeM3: 1.5, cargoLengthCm: 152, cargoWidthCm: 154, cargoHeightCm: 48, fuelType: 'Diesel' },
 
   // ─── BOX TRUCKS ────────────────────────────────────────────────────────────
+  // 3.5t class
+  { make: 'Iveco', model: 'Daily Box 3.5t', type: 'Box Truck', maxPayloadKg: 1600, cargoVolumeM3: 16.0, cargoLengthCm: 380, cargoWidthCm: 200, cargoHeightCm: 210, fuelType: 'Diesel' },
+  { make: 'Mercedes-Benz', model: 'Sprinter Box 3.5t', type: 'Box Truck', maxPayloadKg: 1350, cargoVolumeM3: 15.0, cargoLengthCm: 370, cargoWidthCm: 195, cargoHeightCm: 210, fuelType: 'Diesel' },
+  { make: 'Ford', model: 'Transit Box Body 3.5t', type: 'Box Truck', maxPayloadKg: 1400, cargoVolumeM3: 14.0, cargoLengthCm: 350, cargoWidthCm: 195, cargoHeightCm: 200, fuelType: 'Diesel' },
+  { make: 'Renault', model: 'Master Box Body 3.5t', type: 'Box Truck', maxPayloadKg: 1350, cargoVolumeM3: 15.0, cargoLengthCm: 370, cargoWidthCm: 195, cargoHeightCm: 210, fuelType: 'Diesel' },
+  { make: 'Fiat', model: 'Ducato Box Body 3.5t', type: 'Box Truck', maxPayloadKg: 1300, cargoVolumeM3: 15.0, cargoLengthCm: 370, cargoWidthCm: 195, cargoHeightCm: 210, fuelType: 'Diesel' },
+  { make: 'Volkswagen', model: 'Crafter Box Body 3.5t', type: 'Box Truck', maxPayloadKg: 1350, cargoVolumeM3: 14.5, cargoLengthCm: 360, cargoWidthCm: 195, cargoHeightCm: 210, fuelType: 'Diesel' },
+  { make: 'Peugeot', model: 'Boxer Box Body 3.5t', type: 'Box Truck', maxPayloadKg: 1300, cargoVolumeM3: 15.0, cargoLengthCm: 370, cargoWidthCm: 195, cargoHeightCm: 210, fuelType: 'Diesel' },
+  { make: 'Citroen', model: 'Relay Box Body 3.5t', type: 'Box Truck', maxPayloadKg: 1300, cargoVolumeM3: 15.0, cargoLengthCm: 370, cargoWidthCm: 195, cargoHeightCm: 210, fuelType: 'Diesel' },
+  // 5.0–5.5t class
+  { make: 'Iveco', model: 'Daily 50C Box 5.2t', type: 'Box Truck', maxPayloadKg: 2700, cargoVolumeM3: 20.0, cargoLengthCm: 430, cargoWidthCm: 215, cargoHeightCm: 220, fuelType: 'Diesel' },
+  { make: 'Mercedes-Benz', model: 'Sprinter 519 Box 5.0t', type: 'Box Truck', maxPayloadKg: 2500, cargoVolumeM3: 19.0, cargoLengthCm: 420, cargoWidthCm: 210, cargoHeightCm: 215, fuelType: 'Diesel' },
+  { make: 'Renault', model: 'Master 4.5t Box', type: 'Box Truck', maxPayloadKg: 2200, cargoVolumeM3: 19.0, cargoLengthCm: 420, cargoWidthCm: 210, cargoHeightCm: 215, fuelType: 'Diesel' },
+  { make: 'Fiat', model: 'Ducato Maxi Box 5.0t', type: 'Box Truck', maxPayloadKg: 2500, cargoVolumeM3: 19.5, cargoLengthCm: 425, cargoWidthCm: 210, cargoHeightCm: 215, fuelType: 'Diesel' },
+  // 7.5t class
   { make: 'Iveco', model: 'Daily Box 7.2t', type: 'Box Truck', maxPayloadKg: 3500, cargoVolumeM3: 25.0, cargoLengthCm: 470, cargoWidthCm: 220, cargoHeightCm: 230, fuelType: 'Diesel' },
+  { make: 'Iveco', model: 'Eurocargo 7.5t Box', type: 'Box Truck', maxPayloadKg: 3800, cargoVolumeM3: 30.0, cargoLengthCm: 520, cargoWidthCm: 240, cargoHeightCm: 240, fuelType: 'Diesel' },
   { make: 'Mercedes-Benz', model: 'Atego 7.5t Box', type: 'Box Truck', maxPayloadKg: 3800, cargoVolumeM3: 30.0, cargoLengthCm: 500, cargoWidthCm: 240, cargoHeightCm: 240, fuelType: 'Diesel' },
+  { make: 'Mercedes-Benz', model: 'Atego 7.5t Tail Lift Box', type: 'Box Truck', maxPayloadKg: 3500, cargoVolumeM3: 30.0, cargoLengthCm: 500, cargoWidthCm: 240, cargoHeightCm: 240, fuelType: 'Diesel' },
   { make: 'MAN', model: 'TGL 7.5t Box', type: 'Box Truck', maxPayloadKg: 3700, cargoVolumeM3: 28.0, cargoLengthCm: 490, cargoWidthCm: 240, cargoHeightCm: 235, fuelType: 'Diesel' },
+  { make: 'MAN', model: 'TGL 7.5t Tail Lift Box', type: 'Box Truck', maxPayloadKg: 3400, cargoVolumeM3: 28.0, cargoLengthCm: 490, cargoWidthCm: 240, cargoHeightCm: 235, fuelType: 'Diesel' },
   { make: 'DAF', model: 'LF 7.5t Box', type: 'Box Truck', maxPayloadKg: 3600, cargoVolumeM3: 28.0, cargoLengthCm: 490, cargoWidthCm: 240, cargoHeightCm: 235, fuelType: 'Diesel' },
+  { make: 'DAF', model: 'LF 7.5t Tail Lift Box', type: 'Box Truck', maxPayloadKg: 3300, cargoVolumeM3: 28.0, cargoLengthCm: 490, cargoWidthCm: 240, cargoHeightCm: 235, fuelType: 'Diesel' },
+  { make: 'Renault', model: 'D 7.5t Box', type: 'Box Truck', maxPayloadKg: 3600, cargoVolumeM3: 28.0, cargoLengthCm: 490, cargoWidthCm: 240, cargoHeightCm: 235, fuelType: 'Diesel' },
+  { make: 'Volvo', model: 'FL 7.5t Box', type: 'Box Truck', maxPayloadKg: 3700, cargoVolumeM3: 29.0, cargoLengthCm: 500, cargoWidthCm: 240, cargoHeightCm: 240, fuelType: 'Diesel' },
+  { make: 'Volvo', model: 'FE Electric 7.5t Box', type: 'Box Truck', maxPayloadKg: 3200, cargoVolumeM3: 29.0, cargoLengthCm: 500, cargoWidthCm: 240, cargoHeightCm: 240, fuelType: 'Electric' },
+  { make: 'Scania', model: 'L-Series 7.5t Box', type: 'Box Truck', maxPayloadKg: 3700, cargoVolumeM3: 29.0, cargoLengthCm: 500, cargoWidthCm: 240, cargoHeightCm: 240, fuelType: 'Diesel' },
+  { make: 'Fuso', model: 'Canter 7C15 Box', type: 'Box Truck', maxPayloadKg: 3500, cargoVolumeM3: 24.0, cargoLengthCm: 460, cargoWidthCm: 215, cargoHeightCm: 225, fuelType: 'Diesel' },
+  { make: 'Fuso', model: 'eCanter Electric Box', type: 'Box Truck', maxPayloadKg: 3000, cargoVolumeM3: 24.0, cargoLengthCm: 460, cargoWidthCm: 215, cargoHeightCm: 225, fuelType: 'Electric' },
 
   // ─── FLATBED TRUCKS ───────────────────────────────────────────────────────
   { make: 'Ford', model: 'Transit Flatbed', type: 'Flatbed', maxPayloadKg: 1600, cargoVolumeM3: 8.0, cargoLengthCm: 400, cargoWidthCm: 210, cargoHeightCm: 0, fuelType: 'Diesel' },
@@ -275,8 +328,17 @@ export const vehicleSpecs: VehicleSpec[] = [
 
   // ─── TAIL LIFT VANS ───────────────────────────────────────────────────────
   { make: 'Ford', model: 'Transit L3H2 Tail Lift', type: 'Tail Lift Van', maxPayloadKg: 1300, cargoVolumeM3: 11.0, cargoLengthCm: 340, cargoWidthCm: 178, cargoHeightCm: 185, fuelType: 'Diesel' },
+  { make: 'Ford', model: 'Transit L4H3 Tail Lift', type: 'Tail Lift Van', maxPayloadKg: 1200, cargoVolumeM3: 14.5, cargoLengthCm: 395, cargoWidthCm: 178, cargoHeightCm: 210, fuelType: 'Diesel' },
   { make: 'Mercedes-Benz', model: 'Sprinter 316 Tail Lift', type: 'Tail Lift Van', maxPayloadKg: 1100, cargoVolumeM3: 13.0, cargoLengthCm: 430, cargoWidthCm: 183, cargoHeightCm: 193, fuelType: 'Diesel' },
+  { make: 'Mercedes-Benz', model: 'Sprinter 519 Tail Lift', type: 'Tail Lift Van', maxPayloadKg: 2200, cargoVolumeM3: 14.0, cargoLengthCm: 435, cargoWidthCm: 183, cargoHeightCm: 193, fuelType: 'Diesel' },
   { make: 'Iveco', model: 'Daily 35S Tail Lift', type: 'Tail Lift Van', maxPayloadKg: 1500, cargoVolumeM3: 12.0, cargoLengthCm: 350, cargoWidthCm: 180, cargoHeightCm: 190, fuelType: 'Diesel' },
+  { make: 'Iveco', model: 'Daily 50C Tail Lift', type: 'Tail Lift Van', maxPayloadKg: 2500, cargoVolumeM3: 16.0, cargoLengthCm: 420, cargoWidthCm: 200, cargoHeightCm: 200, fuelType: 'Diesel' },
+  { make: 'Renault', model: 'Master L3H2 Tail Lift', type: 'Tail Lift Van', maxPayloadKg: 1200, cargoVolumeM3: 12.5, cargoLengthCm: 365, cargoWidthCm: 179, cargoHeightCm: 189, fuelType: 'Diesel' },
+  { make: 'Volkswagen', model: 'Crafter L3H2 Tail Lift', type: 'Tail Lift Van', maxPayloadKg: 1200, cargoVolumeM3: 10.8, cargoLengthCm: 340, cargoWidthCm: 183, cargoHeightCm: 185, fuelType: 'Diesel' },
+  { make: 'Fiat', model: 'Ducato L3H2 Tail Lift', type: 'Tail Lift Van', maxPayloadKg: 1150, cargoVolumeM3: 12.5, cargoLengthCm: 365, cargoWidthCm: 183, cargoHeightCm: 175, fuelType: 'Diesel' },
+  { make: 'Peugeot', model: 'Boxer L3H2 Tail Lift', type: 'Tail Lift Van', maxPayloadKg: 1150, cargoVolumeM3: 12.5, cargoLengthCm: 365, cargoWidthCm: 183, cargoHeightCm: 175, fuelType: 'Diesel' },
+  { make: 'Citroen', model: 'Relay L3H2 Tail Lift', type: 'Tail Lift Van', maxPayloadKg: 1150, cargoVolumeM3: 12.5, cargoLengthCm: 365, cargoWidthCm: 183, cargoHeightCm: 175, fuelType: 'Diesel' },
+  { make: 'MAN', model: 'TGE L3H2 Tail Lift', type: 'Tail Lift Van', maxPayloadKg: 1200, cargoVolumeM3: 10.8, cargoLengthCm: 340, cargoWidthCm: 183, cargoHeightCm: 185, fuelType: 'Diesel' },
 
   // ─── REFRIGERATED TRUCKS ──────────────────────────────────────────────────
   { make: 'Iveco', model: 'Daily Fridge 3.5t', type: 'Refrigerated Truck', maxPayloadKg: 1200, cargoVolumeM3: 14.0, cargoLengthCm: 380, cargoWidthCm: 190, cargoHeightCm: 195, fuelType: 'Diesel' },
