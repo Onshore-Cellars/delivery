@@ -539,23 +539,45 @@ export default function AdminCRM({ token }: { token: string }) {
     }
   }
 
-  const exportContactsCSV = () => {
-    if (contacts.length === 0) return
-    const headers = ['Name', 'Category', 'Email', 'Email 2', 'Phone', 'Phone 2', 'Country', 'Location', 'Website', 'Instagram', 'Priority', 'Tags', 'Notes']
-    const rows = contacts.map(c => [
-      c.name, c.category, c.email || '', c.email2 || '', c.phone || '', c.phone2 || '',
-      c.country || '', c.location || '', c.website || '', c.instagram || '',
-      c.priority, c.tags || '', c.notes?.replace(/\n/g, ' ') || '',
-    ])
-    const csv = [headers.join(','), ...rows.map(r => r.map(v => `"${v.replace(/"/g, '""')}"`).join(','))].join('\n')
-    const blob = new Blob([csv], { type: 'text/csv' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `crm-contacts-${new Date().toISOString().slice(0, 10)}.csv`
-    a.click()
-    URL.revokeObjectURL(url)
-    showToast(`Exported ${contacts.length} contacts`)
+  const exportContactsCSV = async () => {
+    try {
+      showToast('Exporting all contacts...')
+      // Fetch ALL contacts (not just current page)
+      const params = new URLSearchParams({ export: 'all' })
+      if (search) params.set('search', search)
+      if (categoryFilter) params.set('category', categoryFilter)
+      if (priorityFilter) params.set('priority', priorityFilter)
+
+      const res = await fetch(`/api/admin/crm?${params}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (!res.ok) throw new Error('Failed to fetch')
+      const data = await res.json()
+      const allContacts: CrmContact[] = data.contacts
+
+      if (allContacts.length === 0) {
+        showToast('No contacts to export', 'error')
+        return
+      }
+
+      const headers = ['Name', 'Category', 'Email', 'Email 2', 'Phone', 'Phone 2', 'Country', 'Location', 'Website', 'Instagram', 'Priority', 'Tags', 'Notes']
+      const rows = allContacts.map(c => [
+        c.name, c.category, c.email || '', c.email2 || '', c.phone || '', c.phone2 || '',
+        c.country || '', c.location || '', c.website || '', c.instagram || '',
+        c.priority, c.tags || '', c.notes?.replace(/\n/g, ' ') || '',
+      ])
+      const csv = [headers.join(','), ...rows.map(r => r.map(v => `"${v.replace(/"/g, '""')}"`).join(','))].join('\n')
+      const blob = new Blob([csv], { type: 'text/csv' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `crm-contacts-${new Date().toISOString().slice(0, 10)}.csv`
+      a.click()
+      URL.revokeObjectURL(url)
+      showToast(`Exported ${allContacts.length} contacts`)
+    } catch {
+      showToast('Failed to export contacts', 'error')
+    }
   }
 
   // ─── Campaign send ──────────────────────────────────────────────────────
