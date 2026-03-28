@@ -24,357 +24,321 @@ interface ScrapedCompany {
   email2: string
   phone: string
   phone2: string
+  fax: string
   address: string
   country: string
   location: string
+  region: string
   services: string
   profileUrl: string
+  category: string
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
-const BASE = 'https://www.yachting-pages.com'
+const WAYBACK_BASE = 'https://web.archive.org/web/2026'
+const YP_BASE = 'https://www.yachting-pages.com'
 
-async function fetchPage(url: string): Promise<string> {
-  const res = await fetch(url, {
-    headers: { 'User-Agent': UA, Accept: 'text/html' },
-  })
-  if (!res.ok) throw new Error(`HTTP ${res.status} fetching ${url}`)
-  return res.text()
+async function fetchPage(url: string): Promise<string | null> {
+  try {
+    const res = await fetch(url, {
+      headers: { 'User-Agent': UA, Accept: 'text/html' },
+      signal: AbortSignal.timeout(30000),
+    })
+    if (!res.ok) return null
+    return await res.text()
+  } catch {
+    return null
+  }
 }
 
 function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-function text(el: Element | null): string {
-  return el?.textContent?.trim().replace(/\s+/g, ' ') ?? ''
+function ogMeta(card: Element, property: string): string {
+  const el = card.querySelector(`meta[property="${property}"]`)
+  return el?.getAttribute('content')?.trim() ?? ''
 }
 
-// ── Extract listing links from a category page ──────────────────────────────
-function extractListingLinks(doc: Document): string[] {
-  const links: string[] = []
-  // Yachting Pages listing links are typically in search result cards
-  const anchors = doc.querySelectorAll('a[href]')
-  for (const a of anchors) {
-    const href = a.getAttribute('href') || ''
-    // Company profile links typically follow pattern /company/company-name or /superyacht-services/company-name
-    if (
-      (href.includes('/superyacht-services/') || href.includes('/company/') || href.includes('/listing/')) &&
-      !href.includes('/provisioning') &&
-      !href.includes('/category/') &&
-      !href.includes('javascript:')
-    ) {
-      const fullUrl = href.startsWith('http') ? href : `${BASE}${href.startsWith('/') ? '' : '/'}${href}`
-      if (!links.includes(fullUrl)) links.push(fullUrl)
-    }
-  }
-  return links
+function nameMeta(card: Element, name: string): string {
+  const el = card.querySelector(`meta[name="${name}"]`)
+  return el?.getAttribute('content')?.trim() ?? ''
 }
 
-// ── Extract pagination links ─────────────────────────────────────────────────
-function extractPaginationLinks(doc: Document): string[] {
-  const links: string[] = []
-  const pageAnchors = doc.querySelectorAll('a[href*="page="], a[href*="/page/"], .pagination a, .pager a, nav a[href]')
-  for (const a of pageAnchors) {
-    const href = a.getAttribute('href') || ''
-    if (href && !href.includes('javascript:')) {
-      const fullUrl = href.startsWith('http') ? href : `${BASE}${href.startsWith('/') ? '' : '/'}${href}`
-      if (!links.includes(fullUrl) && fullUrl.includes('yachting-pages.com')) {
-        links.push(fullUrl)
-      }
-    }
-  }
-  return links
+function stripWayback(url: string): string {
+  return url.replace(/.*\/https:\/\/www\.yachting-pages\.com/, YP_BASE)
 }
 
-// ── Extract all emails from a page ───────────────────────────────────────────
-function extractEmails(doc: Document, html: string): string[] {
-  const emails: string[] = []
-
-  // From mailto: links
-  const mailtoLinks = doc.querySelectorAll('a[href^="mailto:"]')
-  for (const a of mailtoLinks) {
-    const href = a.getAttribute('href') || ''
-    const email = href.replace('mailto:', '').split('?')[0].trim().toLowerCase()
-    if (email && email.includes('@') && !emails.includes(email)) emails.push(email)
-  }
-
-  // Regex scan the HTML for email patterns
-  const emailRegex = /[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/g
-  const matches = html.match(emailRegex) || []
-  for (const m of matches) {
-    const email = m.toLowerCase()
-    if (
-      !emails.includes(email) &&
-      !email.endsWith('.png') &&
-      !email.endsWith('.jpg') &&
-      !email.endsWith('.gif') &&
-      !email.includes('example.com') &&
-      !email.includes('yachting-pages.com')
-    ) {
-      emails.push(email)
-    }
-  }
-
-  return emails
+function slugToTitle(slug: string): string {
+  return slug
+    .replace(/-/g, ' ')
+    .replace(/\b\w/g, c => c.toUpperCase())
 }
 
-// ── Extract all phone numbers from a page ────────────────────────────────────
-function extractPhones(doc: Document, html: string): string[] {
-  const phones: string[] = []
+// ── All known category slugs on yachting-pages.com ──────────────────────────
+const CATEGORY_SLUGS = [
+  'accommodation-crew-houses',
+  'art-management-logistics',
+  'associations-organisations',
+  'aviation',
+  'awnings-canopies-covers',
+  'bathrooms-spas',
+  'beds-linen-suppliers',
+  'berths-sales-rental-mgmt',
+  'carpenters-joiners',
+  'carpets-flooring',
+  'chandlers',
+  'cleaning-services',
+  'composite-services',
+  'concierge-services',
+  'crew-agents',
+  'crew-products-services',
+  'crew-training',
+  'davits-hydraulics',
+  'deck-exterior-equipment',
+  'doors-hatches',
+  'electrical-engineers',
+  'eng1-medical-certificate',
+  'engine-services',
+  'engineering-equipment-services',
+  'engineering-supplies-services',
+  'entertainment-av-systems',
+  'entertainment-luxury-events',
+  'fabrication-materials',
+  'fenders-fender-covers',
+  'fire-protection',
+  'fitness',
+  'florists',
+  'fuel-bunkering-additives',
+  'furniture-furnishings',
+  'galley-catering-equipment',
+  'galley-chef',
+  'generators-power-management',
+  'glass-suppliers-services',
+  'hair-beauty',
+  'health-fitness',
+  'hvac-refrigeration',
+  'insurance',
+  'interior-design',
+  'interior-equipment-services',
+  'laundry-equipment',
+  'lawyers',
+  'legal-financial-professional-services',
+  'lifts-elevators',
+  'lights-lighting-consultants',
+  'limousines-car-hire',
+  'luxury-goods',
+  'maintenance-services',
+  'marine-communications-connectivity',
+  'marine-electronics',
+  'marine-finance',
+  'marine-marketing-services',
+  'maritime-security',
+  'massage-therapy',
+  'medical-supplies-services',
+  'metal-works-fabrication-supply',
+  'model-makers',
+  'naval-architects',
+  'navigation-charts-equipment',
+  'painting-coating-wrapping',
+  'passerelles-boarding-systems',
+  'pet-services',
+  'photographers',
+  'port-marina-dock-equipment',
+  'ports-and-marinas',
+  'project-management-owners-reps',
+  'propellers-propulsion',
+  'provisioning',
+  'refit-repair',
+  'registration-classification-ism',
+  'sailing-rigging',
+  'security-safety',
+  'shipping-logistics-storage',
+  'shipyards-marina-equipment',
+  'shipyards-new-construction',
+  'shipyards-refit-repair',
+  'shore-support-services',
+  'sign-makers-name-plates',
+  'stabilisers',
+  'surveyors',
+  'tableware',
+  'technology',
+  'tenders-toys',
+  'toiletries',
+  'transport-travel-leisure',
+  'travel-agents',
+  'uniforms-clothing',
+  'upholstery-fabrics',
+  'water-treatment',
+  'wine-spirits-soft-drinks',
+  'yacht-agents',
+  'yacht-boat-transport',
+  'yacht-charter-brokerage',
+  'yacht-designers',
+  'yacht-management-ism',
+]
 
-  // From tel: links
-  const telLinks = doc.querySelectorAll('a[href^="tel:"]')
-  for (const a of telLinks) {
-    const href = a.getAttribute('href') || ''
-    const phone = href.replace('tel:', '').trim()
-    if (phone && !phones.includes(phone)) phones.push(phone)
-  }
+// ── Extract companies from a listing page using summary-item cards ──────────
+function extractCompaniesFromPage(doc: Document, categorySlug: string): ScrapedCompany[] {
+  const companies: ScrapedCompany[] = []
+  const summaryItems = doc.querySelectorAll('.summary-item')
+  const categoryName = slugToTitle(categorySlug)
 
-  // Look for phone numbers near phone icons / labels
-  const phoneRegex = /(?:Tel|Phone|Mob|Fax|Call)[:\s]*([+\d\s().\-]{7,20})/gi
-  const phoneMatches = html.match(phoneRegex) || []
-  for (const m of phoneMatches) {
-    const cleaned = m.replace(/^(?:Tel|Phone|Mob|Fax|Call)[:\s]*/i, '').trim()
-    if (cleaned && !phones.includes(cleaned)) phones.push(cleaned)
-  }
+  for (const card of summaryItems) {
+    const titleEl = card.querySelector('title')
+    const name = titleEl?.textContent?.trim() || ogMeta(card, 'og:title')
+    if (!name) continue
 
-  return phones
-}
+    const description = nameMeta(card, 'description') || ogMeta(card, 'og:description')
+    const services = nameMeta(card, 'keywords')
 
-// ── Extract website URLs from a page ─────────────────────────────────────────
-function extractWebsite(doc: Document): string {
-  // Look for external website links
-  const anchors = doc.querySelectorAll('a[href]')
-  for (const a of anchors) {
-    const href = a.getAttribute('href') || ''
-    const linkText = text(a).toLowerCase()
-    if (
-      (linkText.includes('visit website') || linkText.includes('website') || linkText.includes('www')) &&
-      href.startsWith('http') &&
-      !href.includes('yachting-pages.com') &&
-      !href.includes('facebook.com') &&
-      !href.includes('twitter.com') &&
-      !href.includes('instagram.com') &&
-      !href.includes('linkedin.com')
-    ) {
-      return href
+    const street = ogMeta(card, 'business:contact_data:street_address')
+    const locality = ogMeta(card, 'business:contact_data:locality')
+    const region = ogMeta(card, 'business:contact_data:region')
+    const postal = ogMeta(card, 'business:contact_data:postal_code')
+    const country = ogMeta(card, 'business:contact_data:country_name')
+    const email = ogMeta(card, 'business:contact_data:email')
+    const phone = ogMeta(card, 'business:contact_data:phone_number')
+    const website = ogMeta(card, 'business:contact_data:website')
+    const fax = ogMeta(card, 'business:contact_data:fax_number')
+
+    const profileUrl = stripWayback(ogMeta(card, 'og:url'))
+    const address = [street, locality, region, postal, country].filter(Boolean).join(', ')
+
+    // Additional emails/phones from links in the card
+    const emails = [email]
+    for (const a of card.querySelectorAll('a[href^="mailto:"]')) {
+      const em = (a.getAttribute('href') || '').replace('mailto:', '').split('?')[0].trim().toLowerCase()
+      if (em && em.includes('@') && !emails.includes(em)) emails.push(em)
     }
-  }
 
-  // Fallback: find any external link that isn't social media
-  for (const a of anchors) {
-    const href = a.getAttribute('href') || ''
-    if (
-      href.startsWith('http') &&
-      !href.includes('yachting-pages.com') &&
-      !href.includes('google.com') &&
-      !href.includes('facebook.com') &&
-      !href.includes('twitter.com') &&
-      !href.includes('instagram.com') &&
-      !href.includes('linkedin.com') &&
-      !href.includes('youtube.com')
-    ) {
-      return href
-    }
-  }
-
-  return ''
-}
-
-// ── Scrape a single company profile page ─────────────────────────────────────
-async function scrapeCompanyPage(url: string): Promise<ScrapedCompany | null> {
-  try {
-    const html = await fetchPage(url)
-    const dom = new JSDOM(html)
-    const doc = dom.window.document
-
-    // Company name — try various selectors
-    const nameEl =
-      doc.querySelector('h1') ||
-      doc.querySelector('.company-name') ||
-      doc.querySelector('.listing-title') ||
-      doc.querySelector('[itemprop="name"]')
-    const name = text(nameEl)
-    if (!name) return null
-
-    // Description
-    const descEl =
-      doc.querySelector('.company-description') ||
-      doc.querySelector('.listing-description') ||
-      doc.querySelector('[itemprop="description"]') ||
-      doc.querySelector('.about-text') ||
-      doc.querySelector('.description') ||
-      doc.querySelector('article p') ||
-      doc.querySelector('.content p')
-    const description = text(descEl)
-
-    // Emails & phones
-    const emails = extractEmails(doc, html)
-    const phones = extractPhones(doc, html)
-
-    // Website
-    const website = extractWebsite(doc)
-
-    // Address / location
-    const addressEl =
-      doc.querySelector('[itemprop="address"]') ||
-      doc.querySelector('.address') ||
-      doc.querySelector('.company-address') ||
-      doc.querySelector('.location')
-    const address = text(addressEl)
-
-    // Country — often in structured data or address
-    let country = ''
-    const countryEl = doc.querySelector('[itemprop="addressCountry"]')
-    if (countryEl) {
-      country = text(countryEl)
-    } else if (address) {
-      // Try to extract country from the end of the address
-      const parts = address.split(',').map(p => p.trim())
-      if (parts.length >= 2) country = parts[parts.length - 1]
+    const phones = [phone]
+    for (const a of card.querySelectorAll('a[href^="tel:"]')) {
+      const ph = (a.getAttribute('href') || '').replace('tel:', '').trim()
+      if (ph && !phones.includes(ph)) phones.push(ph)
     }
 
-    // Location / city
-    let location = ''
-    const localityEl = doc.querySelector('[itemprop="addressLocality"]')
-    if (localityEl) {
-      location = text(localityEl)
-    } else if (address) {
-      const parts = address.split(',').map(p => p.trim())
-      if (parts.length >= 2) location = parts[0]
-    }
-
-    // Services / tags
-    const tagEls = doc.querySelectorAll('.tag, .category-tag, .service-tag, .badge, [itemprop="category"]')
-    const services = Array.from(tagEls).map(e => text(e)).filter(Boolean).join(', ')
-
-    return {
+    companies.push({
       name,
-      description,
-      website,
+      description: description.substring(0, 2000),
+      website: website || '',
       email: emails[0] || '',
       email2: emails[1] || '',
       phone: phones[0] || '',
       phone2: phones[1] || '',
+      fax: fax || '',
       address,
-      country,
-      location,
-      services,
-      profileUrl: url,
-    }
-  } catch (err) {
-    console.error(`[scrape-yp] Error scraping ${url}:`, err)
-    return null
+      country: country || '',
+      location: locality || '',
+      region: region || '',
+      services: services.substring(0, 2000),
+      profileUrl,
+      category: categoryName,
+    })
   }
+
+  return companies
+}
+
+// ── Detect max page number from pagination links ─────────────────────────────
+function getMaxPage(doc: Document): number {
+  let maxPage = 1
+  for (const a of doc.querySelectorAll('a[href]')) {
+    const href = a.getAttribute('href') || ''
+    const match = href.match(/\/p:(\d+)/)
+    if (match) {
+      const num = parseInt(match[1])
+      if (num > maxPage) maxPage = num
+    }
+  }
+  return maxPage
+}
+
+// ── Scrape a single category across all its pages ────────────────────────────
+async function scrapeCategory(
+  slug: string,
+  seenNames: Set<string>,
+  log: (msg: string) => void
+): Promise<ScrapedCompany[]> {
+  const companies: ScrapedCompany[] = []
+
+  // Fetch page 1
+  const page1Url = `${WAYBACK_BASE}/${YP_BASE}/listing/${slug}`
+  log(`  Fetching ${slug} page 1...`)
+  const html1 = await fetchPage(page1Url)
+
+  if (!html1 || html1.length < 10000 || html1.includes('<title>Wayback Machine</title>')) {
+    log(`  No cached data for ${slug}, skipping`)
+    return companies
+  }
+
+  const dom1 = new JSDOM(html1)
+  const doc1 = dom1.window.document
+  const page1Companies = extractCompaniesFromPage(doc1, slug)
+
+  for (const c of page1Companies) {
+    if (!seenNames.has(c.name)) {
+      seenNames.add(c.name)
+      companies.push(c)
+    }
+  }
+
+  // Detect total pages
+  const maxPage = getMaxPage(doc1)
+  log(`  ${slug}: page 1 = ${page1Companies.length} companies, ${maxPage} pages total`)
+
+  // Fetch remaining pages
+  for (let p = 2; p <= maxPage; p++) {
+    await sleep(1500)
+    const pageUrl = `${WAYBACK_BASE}/${YP_BASE}/listing/${slug}/p:${p}`
+    log(`  Fetching ${slug} page ${p}/${maxPage}...`)
+
+    const html = await fetchPage(pageUrl)
+    if (!html || html.length < 10000) {
+      log(`  No data for ${slug} page ${p}, stopping`)
+      break
+    }
+
+    const dom = new JSDOM(html)
+    const doc = dom.window.document
+    const pageCompanies = extractCompaniesFromPage(doc, slug)
+
+    if (pageCompanies.length === 0) break
+
+    for (const c of pageCompanies) {
+      if (!seenNames.has(c.name)) {
+        seenNames.add(c.name)
+        companies.push(c)
+      }
+    }
+  }
+
+  return companies
 }
 
 // ── Main scraping flow ───────────────────────────────────────────────────────
-async function scrapeProvisioningDirectory(): Promise<ScrapedCompany[]> {
+async function scrapeAllCategories(
+  log: (msg: string) => void
+): Promise<ScrapedCompany[]> {
   const allCompanies: ScrapedCompany[] = []
-  const visitedPages = new Set<string>()
-  const visitedProfiles = new Set<string>()
+  const seenNames = new Set<string>()
 
-  // Start with the provisioning category page
-  const startUrl = `${BASE}/provisioning`
-  const pagesToVisit = [startUrl]
+  log(`Starting scrape of ${CATEGORY_SLUGS.length} categories...`)
 
-  // Also try common sub-category URLs for provisioning
-  const subCategories = [
-    '/superyacht-services/provisioning',
-    '/category/provisioning',
-    '/categories/provisioning',
-    '/search?category=provisioning',
-    '/search?q=provisioning',
-  ]
-  for (const sub of subCategories) {
-    pagesToVisit.push(`${BASE}${sub}`)
-  }
-
-  // Crawl category / listing pages
-  while (pagesToVisit.length > 0) {
-    const pageUrl = pagesToVisit.shift()!
-    if (visitedPages.has(pageUrl)) continue
-    visitedPages.add(pageUrl)
-
-    console.log(`[scrape-yp] Crawling listing page: ${pageUrl}`)
+  for (let i = 0; i < CATEGORY_SLUGS.length; i++) {
+    const slug = CATEGORY_SLUGS[i]
+    log(`[${i + 1}/${CATEGORY_SLUGS.length}] Category: ${slug}`)
 
     try {
-      const html = await fetchPage(pageUrl)
-      const dom = new JSDOM(html)
-      const doc = dom.window.document
-
-      // Extract company profile links
-      const profileLinks = extractListingLinks(doc)
-      for (const link of profileLinks) {
-        if (!visitedProfiles.has(link)) {
-          visitedProfiles.add(link)
-        }
-      }
-
-      // Extract pagination links (only follow pages under yachting-pages.com)
-      if (visitedPages.size < 30) {
-        const paginationLinks = extractPaginationLinks(doc)
-        for (const link of paginationLinks) {
-          if (!visitedPages.has(link) && link.includes('provisioning')) {
-            pagesToVisit.push(link)
-          }
-        }
-      }
-
-      // Also try to extract inline company data from the listing page itself
-      // Many directory sites show summary cards with contact info
-      const cards = doc.querySelectorAll('.listing-item, .search-result, .company-card, .result-item, .listing, article.listing')
-      for (const card of cards) {
-        const cardName = text(card.querySelector('h2, h3, h4, .company-name, .title'))
-        if (cardName && !allCompanies.some(c => c.name === cardName)) {
-          const cardEmails = extractEmails(card as unknown as Document, card.innerHTML)
-          const cardPhones = extractPhones(card as unknown as Document, card.innerHTML)
-          const cardDesc = text(card.querySelector('p, .description, .summary'))
-          const cardLink = card.querySelector('a[href]')
-          const cardWebsite = cardLink?.getAttribute('href') || ''
-
-          if (cardName && (cardEmails.length > 0 || cardPhones.length > 0 || cardDesc)) {
-            allCompanies.push({
-              name: cardName,
-              description: cardDesc,
-              website: cardWebsite.startsWith('http') && !cardWebsite.includes('yachting-pages.com') ? cardWebsite : '',
-              email: cardEmails[0] || '',
-              email2: cardEmails[1] || '',
-              phone: cardPhones[0] || '',
-              phone2: cardPhones[1] || '',
-              address: '',
-              country: '',
-              location: '',
-              services: 'Provisioning',
-              profileUrl: '',
-            })
-          }
-        }
-      }
-
-      // Be respectful — wait between requests
-      await sleep(1500)
+      const companies = await scrapeCategory(slug, seenNames, log)
+      allCompanies.push(...companies)
+      log(`  => ${companies.length} new companies (total: ${allCompanies.length})`)
     } catch (err) {
-      console.error(`[scrape-yp] Error on listing page ${pageUrl}:`, err)
-    }
-  }
-
-  // Now scrape individual company profile pages
-  const profileUrls = Array.from(visitedProfiles)
-  console.log(`[scrape-yp] Found ${profileUrls.length} company profiles to scrape`)
-
-  for (let i = 0; i < profileUrls.length; i++) {
-    const url = profileUrls[i]
-    console.log(`[scrape-yp] Scraping profile ${i + 1}/${profileUrls.length}: ${url}`)
-
-    const company = await scrapeCompanyPage(url)
-    if (company && !allCompanies.some(c => c.name === company.name)) {
-      allCompanies.push(company)
+      log(`  Error on ${slug}: ${err instanceof Error ? err.message : 'Unknown'}`)
     }
 
-    // Rate limit — 2 seconds between profile page requests
+    // Rate limit between categories
     await sleep(2000)
   }
 
@@ -391,17 +355,13 @@ async function upsertCompanies(companies: ScrapedCompany[]) {
     if (!company.name) { skipped++; continue }
 
     try {
-      // Check if contact already exists by name + category
       const existing = await prisma.crmContact.findFirst({
-        where: {
-          name: company.name,
-          category: 'Provisioning',
-        },
+        where: { name: company.name },
       })
 
       const data = {
         name: company.name,
-        category: 'Provisioning',
+        category: company.category,
         country: company.country || null,
         location: company.location || null,
         website: company.website || null,
@@ -412,20 +372,17 @@ async function upsertCompanies(companies: ScrapedCompany[]) {
         notes: [
           company.description,
           company.address ? `Address: ${company.address}` : '',
-          company.services ? `Services: ${company.services}` : '',
+          company.region ? `Region: ${company.region}` : '',
+          company.fax ? `Fax: ${company.fax}` : '',
+          company.services ? `Services: ${company.services.substring(0, 500)}` : '',
           company.profileUrl ? `YP Profile: ${company.profileUrl}` : '',
         ].filter(Boolean).join('\n'),
         source: 'scraped',
-        tags: [
-          'provisioning',
-          'yachting-pages',
-          company.services ? company.services.toLowerCase() : '',
-        ].filter(Boolean).join(','),
+        tags: ['yachting-pages', company.category.toLowerCase().replace(/\s+/g, '-')].join(','),
         lastScraped: new Date(),
       }
 
       if (existing) {
-        // Update if we have new info
         await prisma.crmContact.update({
           where: { id: existing.id },
           data,
@@ -433,10 +390,7 @@ async function upsertCompanies(companies: ScrapedCompany[]) {
         updated++
       } else {
         await prisma.crmContact.create({
-          data: {
-            ...data,
-            priority: 'medium',
-          },
+          data: { ...data, priority: 'medium' },
         })
         created++
       }
@@ -455,32 +409,44 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  try {
-    console.log('[scrape-yp] Starting Yachting Pages provisioning scrape...')
+  const logs: string[] = []
+  const log = (msg: string) => {
+    console.log(`[scrape-yp] ${msg}`)
+    logs.push(msg)
+  }
 
-    const companies = await scrapeProvisioningDirectory()
-    console.log(`[scrape-yp] Scraped ${companies.length} companies total`)
+  try {
+    log('Starting full Yachting Pages directory scrape...')
+
+    const companies = await scrapeAllCategories(log)
+    log(`Scraped ${companies.length} unique companies across ${CATEGORY_SLUGS.length} categories`)
 
     const results = await upsertCompanies(companies)
-    console.log(`[scrape-yp] Upsert complete:`, results)
+    log(`Upsert complete: ${results.created} created, ${results.updated} updated, ${results.skipped} skipped`)
 
     return NextResponse.json({
       success: true,
       scraped: companies.length,
+      categories: CATEGORY_SLUGS.length,
       ...results,
+      logs,
       companies: companies.map(c => ({
         name: c.name,
         email: c.email,
+        email2: c.email2,
         phone: c.phone,
+        phone2: c.phone2,
         website: c.website,
         country: c.country,
         location: c.location,
+        category: c.category,
+        profileUrl: c.profileUrl,
       })),
     })
   } catch (error) {
     console.error('[scrape-yp] Fatal error:', error)
     return NextResponse.json(
-      { error: 'Scraping failed', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Scraping failed', details: error instanceof Error ? error.message : 'Unknown error', logs },
       { status: 500 },
     )
   }
