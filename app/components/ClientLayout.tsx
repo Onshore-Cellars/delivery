@@ -12,15 +12,15 @@ import { ReactNode } from 'react'
 
 function Footer() {
   return (
-    <footer className="border-t border-white/[0.06] bg-[#0B1F2A]">
+    <footer className="border-t border-black/[0.06] bg-[var(--c-canvas)]">
       <div className="site-container py-8">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#6B7C86]">
-          <p className="font-[family-name:var(--font-display)] text-sm font-light text-[#6B7C86]">&copy; {new Date().getFullYear()} Onshore Group · ON.SHORE Delivery</p>
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[var(--c-text-3)]">
+          <p className="font-[family-name:var(--font-display)] text-sm font-light text-[var(--c-text-3)]">&copy; {new Date().getFullYear()} Onshore Group · ON.SHORE Delivery</p>
           <div className="flex gap-6">
-            <Link href="/about" className="text-[#6B7C86] hover:text-white hover:no-underline transition-colors">About</Link>
-            <Link href="/terms" className="text-[#6B7C86] hover:text-white hover:no-underline transition-colors">Terms</Link>
-            <Link href="/privacy" className="text-[#6B7C86] hover:text-white hover:no-underline transition-colors">Privacy</Link>
-            <Link href="/help" className="text-[#6B7C86] hover:text-white hover:no-underline transition-colors">Support</Link>
+            <Link href="/about" className="text-[var(--c-text-3)] hover:text-white hover:no-underline transition-colors">About</Link>
+            <Link href="/terms" className="text-[var(--c-text-3)] hover:text-white hover:no-underline transition-colors">Terms</Link>
+            <Link href="/privacy" className="text-[var(--c-text-3)] hover:text-white hover:no-underline transition-colors">Privacy</Link>
+            <Link href="/help" className="text-[var(--c-text-3)] hover:text-white hover:no-underline transition-colors">Support</Link>
           </div>
         </div>
       </div>
@@ -50,7 +50,7 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
               ? ''
               : isAuthPage
                 ? 'pt-16 pb-20 md:pb-0 min-h-screen'
-                : 'pt-16 pb-20 md:pb-0 min-h-screen bg-[#0B1F2A]'
+                : 'pt-16 pb-20 md:pb-0 min-h-screen bg-[var(--c-canvas)]'
           }
         >
           {children}

@@ -4,14 +4,14 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 const findUnique = vi.fn()
 const update = vi.fn(() => Promise.resolve({}))
 vi.mock('@/lib/prisma', () => ({
-  default: { booking: { findUnique: (...a: unknown[]) => findUnique(...a), update: (...a: unknown[]) => update(...a) } },
+  default: { booking: { findUnique: (...a: any[]) => (findUnique as any)(...a), update: (...a: any[]) => (update as any)(...a) } },
 }))
 
 const createTransfer = vi.fn(() => Promise.resolve({ id: 'tr_test' }))
 const reverseTransfer = vi.fn(() => Promise.resolve({ id: 'trr_test' }))
 vi.mock('@/lib/stripe', () => ({
-  createTransfer: (...a: unknown[]) => createTransfer(...a),
-  reverseTransfer: (...a: unknown[]) => reverseTransfer(...a),
+  createTransfer: (...a: any[]) => (createTransfer as any)(...a),
+  reverseTransfer: (...a: any[]) => (reverseTransfer as any)(...a),
   currencySymbol: () => '€',
   calculateCarrierPayout: (n: number) => Math.round(n * 0.9 * 100) / 100,
 }))
@@ -35,9 +35,9 @@ describe('releaseCarrierPayout', () => {
     findUnique.mockResolvedValue(paidBooking())
     await releaseCarrierPayout('b1')
     expect(createTransfer).toHaveBeenCalledOnce()
-    expect(createTransfer.mock.calls[0][0]).toMatchObject({ amount: 90, destination: 'acct_1', bookingId: 'b1' })
+    expect((createTransfer.mock.calls[0] as any[])[0]).toMatchObject({ amount: 90, destination: 'acct_1', bookingId: 'b1' })
     expect(update).toHaveBeenCalledOnce()
-    expect(update.mock.calls[0][0].data).toMatchObject({ stripeTransferId: 'tr_test' })
+    expect((update.mock.calls[0] as any[])[0].data).toMatchObject({ stripeTransferId: 'tr_test' })
   })
 
   it('is idempotent — does nothing if already paid out', async () => {

@@ -151,9 +151,9 @@ const SORT_OPTIONS = [
 ]
 
 const inputClass =
-  'w-full px-4 py-3 rounded-xl border border-white/10 bg-[#162E3D] text-[15px] text-[#F7F9FB] placeholder:text-slate-400 focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10 transition-all outline-none'
+  'w-full px-4 py-3 rounded-xl border border-black/10 bg-[var(--c-surface)] text-[15px] text-[var(--c-ink)] placeholder:text-[var(--c-text-2)] focus:border-[var(--c-accent)] focus:ring-2 focus:ring-[var(--c-accent)]/10 transition-all outline-none'
 const selectClass =
-  'w-full px-4 py-3 rounded-xl border border-white/10 bg-[#162E3D] text-[15px] text-[#F7F9FB] focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10 transition-all outline-none appearance-none'
+  'w-full px-4 py-3 rounded-xl border border-black/10 bg-[var(--c-surface)] text-[15px] text-[var(--c-ink)] focus:border-[var(--c-accent)] focus:ring-2 focus:ring-[var(--c-accent)]/10 transition-all outline-none appearance-none'
 
 export default function MarketplacePage() {
   const { user, token } = useAuth()
@@ -461,25 +461,25 @@ export default function MarketplacePage() {
       {/* Radius filter — only show when a location with coordinates is selected */}
       {(filters.originLat || filters.destLat) && (
         <div>
-          <label className="block text-sm font-semibold text-[#F7F9FB] mb-2">Search Radius</label>
+          <label className="block text-sm font-semibold text-[var(--c-ink)] mb-2">Search Radius</label>
           <div className="flex items-center gap-3">
             <input
               type="range"
               min="10"
               max="200"
               step="10"
-              className="flex-1 accent-[#FF6A2A]"
+              className="flex-1 accent-[var(--c-accent)]"
               value={filters.radiusKm || '50'}
               onChange={(e) => setFilters({ ...filters, radiusKm: e.target.value })}
             />
-            <span className="text-sm font-semibold text-[#F7F9FB] min-w-[52px] text-right">{filters.radiusKm || '50'} km</span>
+            <span className="text-sm font-semibold text-[var(--c-ink)] min-w-[52px] text-right">{filters.radiusKm || '50'} km</span>
           </div>
-          <p className="text-xs text-slate-400 mt-1">Includes nearby ports within this distance</p>
+          <p className="text-xs text-[var(--c-text-2)] mt-1">Includes nearby ports within this distance</p>
         </div>
       )}
 
       <div>
-        <label className="block text-sm font-semibold text-[#F7F9FB] mb-2">Route Direction</label>
+        <label className="block text-sm font-semibold text-[var(--c-ink)] mb-2">Route Direction</label>
         <select className={selectClass} value={filters.direction} onChange={(e) => setFilters({ ...filters, direction: e.target.value })}>
           <option value="">All Directions</option>
           <option value="outbound">Outbound (to yacht/marina)</option>
@@ -489,14 +489,14 @@ export default function MarketplacePage() {
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-[#F7F9FB] mb-2">Vehicle Type</label>
+        <label className="block text-sm font-semibold text-[var(--c-ink)] mb-2">Vehicle Type</label>
         <select className={selectClass} value={filters.vehicleType} onChange={(e) => setFilters({ ...filters, vehicleType: e.target.value })}>
           {VEHICLE_TYPES.map(vt => <option key={vt.value} value={vt.value}>{vt.label}</option>)}
         </select>
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-[#F7F9FB] mb-2">Price Range</label>
+        <label className="block text-sm font-semibold text-[var(--c-ink)] mb-2">Price Range</label>
         <div className="grid grid-cols-2 gap-2">
           <input type="number" placeholder="Min" min="0" className={inputClass} value={filters.minPrice} onChange={(e) => setFilters({ ...filters, minPrice: e.target.value })} />
           <input type="number" placeholder="Max" min="0" className={inputClass} value={filters.maxPrice} onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })} />
@@ -504,21 +504,21 @@ export default function MarketplacePage() {
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-[#F7F9FB] mb-2">Min Capacity</label>
+        <label className="block text-sm font-semibold text-[var(--c-ink)] mb-2">Min Capacity</label>
         <div className="grid grid-cols-2 gap-2">
           <div className="relative">
             <input type="number" placeholder="Weight" min="0" className={inputClass + ' pr-10'} value={filters.minWeight} onChange={(e) => setFilters({ ...filters, minWeight: e.target.value })} />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 font-medium">kg</span>
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[var(--c-text-2)] font-medium">kg</span>
           </div>
           <div className="relative">
             <input type="number" placeholder="Volume" min="0" step="0.1" className={inputClass + ' pr-10'} value={filters.minVolume} onChange={(e) => setFilters({ ...filters, minVolume: e.target.value })} />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 font-medium">m&sup3;</span>
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[var(--c-text-2)] font-medium">m&sup3;</span>
           </div>
         </div>
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-[#F7F9FB] mb-2">Features</label>
+        <label className="block text-sm font-semibold text-[var(--c-ink)] mb-2">Features</label>
         <div className="flex flex-wrap gap-2">
           {([
             { key: 'refrigerated' as const, label: 'Refrigerated' },
@@ -531,8 +531,8 @@ export default function MarketplacePage() {
               onClick={() => setFilters({ ...filters, features: { ...filters.features, [key]: !filters.features[key] } })}
               className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
                 filters.features[key]
-                  ? 'bg-[#FF6A2A] text-white shadow-sm'
-                  : 'bg-[#102535] text-[#9AADB8] hover:bg-[#162E3D]'
+                  ? 'bg-[var(--c-accent)] text-white shadow-sm'
+                  : 'bg-[var(--c-canvas-2)] text-[var(--c-text-2)] hover:bg-[var(--c-surface)]'
               }`}
             >
               {label}
@@ -542,7 +542,7 @@ export default function MarketplacePage() {
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-[#F7F9FB] mb-2">Sort By</label>
+        <label className="block text-sm font-semibold text-[var(--c-ink)] mb-2">Sort By</label>
         <select className={selectClass} value={filters.sort} onChange={(e) => setFilters({ ...filters, sort: e.target.value })}>
           {SORT_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
         </select>
@@ -556,12 +556,12 @@ export default function MarketplacePage() {
   )
 
   const ListingCard = ({ listing, featured = false }: { listing: Listing; featured?: boolean }) => (
-    <div className={`bg-[#162E3D] rounded-2xl border p-5 sm:p-6 card-hover transition-all ${
-      listing.featured || featured ? 'border-[#FF6A2A]/30 shadow-sm shadow-[#FF6A2A]/5' : 'border-white/10'
+    <div className={`bg-[var(--c-surface)] rounded-2xl border p-5 sm:p-6 card-hover transition-all ${
+      listing.featured || featured ? 'border-[var(--c-accent)]/30 shadow-sm shadow-[var(--c-accent)]/5' : 'border-black/10'
     }`}>
       {(listing.featured || featured) && (
         <div className="mb-3">
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#FF6A2A]/10 text-[#FF6A2A] rounded-lg text-xs font-semibold">
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-[var(--c-accent)]/10 text-[var(--c-accent)] rounded-lg text-xs font-semibold">
             <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
             Featured
           </span>
@@ -570,7 +570,7 @@ export default function MarketplacePage() {
 
       {listing.listingType === 'SPACE_NEEDED' && (
         <div className="mb-3">
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#FF6A2A]/10 text-[#FF6A2A] rounded-lg text-xs font-semibold">
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-[var(--c-accent)]/10 text-[var(--c-accent)] rounded-lg text-xs font-semibold">
             Load Board
           </span>
         </div>
@@ -578,22 +578,22 @@ export default function MarketplacePage() {
 
       <div className="flex items-start justify-between gap-3 mb-4">
         <div className="min-w-0 flex-1">
-          <h3 className="font-bold text-[#F7F9FB] text-base sm:text-lg truncate">{listing.title}</h3>
-          <p className="text-sm text-[#8FA1AB] mt-0.5">{listing.listingType === 'SPACE_NEEDED' ? 'Needs delivery' : `${listing.vehicleType} route`}</p>
+          <h3 className="font-bold text-[var(--c-ink)] text-base sm:text-lg truncate">{listing.title}</h3>
+          <p className="text-sm text-[var(--c-text-2)] mt-0.5">{listing.listingType === 'SPACE_NEEDED' ? 'Needs delivery' : `${listing.vehicleType} route`}</p>
         </div>
         <div className="flex flex-col items-end gap-1">
           {listing.listingType !== 'SPACE_NEEDED' && (
-          <span className="badge bg-[#102535] text-[#9AADB8] whitespace-nowrap text-xs">
+          <span className="badge bg-[var(--c-canvas-2)] text-[var(--c-text-2)] whitespace-nowrap text-xs">
             {listing.vehicleType}
           </span>
           )}
           {listing.routeDirection === 'BOTH' && (
-            <span className="badge bg-[#FF6A2A]/10 text-[#FF6A2A] border border-[#FF6A2A]/20 whitespace-nowrap text-[10px]">
+            <span className="badge bg-[var(--c-accent)]/10 text-[var(--c-accent)] border border-[var(--c-accent)]/20 whitespace-nowrap text-[10px]">
               Two-way
             </span>
           )}
           {listing.routeDirection === 'RETURN' && (
-            <span className="badge bg-[#102535] text-[#9AADB8] border border-white/10 whitespace-nowrap text-[10px]">
+            <span className="badge bg-[var(--c-canvas-2)] text-[var(--c-text-2)] border border-black/10 whitespace-nowrap text-[10px]">
               Return
             </span>
           )}
@@ -601,25 +601,25 @@ export default function MarketplacePage() {
       </div>
 
       {/* Route */}
-      <div className="flex items-center gap-3 mb-4 bg-[#162E3D] rounded-xl p-3">
+      <div className="flex items-center gap-3 mb-4 bg-[var(--c-surface)] rounded-xl p-3">
         <div className="flex-1 min-w-0">
-          <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">From</div>
-          <div className="font-bold text-[#F7F9FB] text-sm truncate">{listing.originPort}</div>
-          {listing.originRegion && <div className="text-xs text-slate-400 truncate">{listing.originRegion}</div>}
+          <div className="text-[10px] font-semibold text-[var(--c-text-2)] uppercase tracking-wider">From</div>
+          <div className="font-bold text-[var(--c-ink)] text-sm truncate">{listing.originPort}</div>
+          {listing.originRegion && <div className="text-xs text-[var(--c-text-2)] truncate">{listing.originRegion}</div>}
         </div>
-        <div className="flex-shrink-0 text-slate-300">
+        <div className="flex-shrink-0 text-[var(--c-text-3)]">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
           </svg>
         </div>
         <div className="flex-1 min-w-0">
-          <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">To</div>
-          <div className="font-bold text-[#F7F9FB] text-sm truncate">{listing.destinationPort}</div>
-          {listing.destinationRegion && <div className="text-xs text-slate-400 truncate">{listing.destinationRegion}</div>}
+          <div className="text-[10px] font-semibold text-[var(--c-text-2)] uppercase tracking-wider">To</div>
+          <div className="font-bold text-[var(--c-ink)] text-sm truncate">{listing.destinationPort}</div>
+          {listing.destinationRegion && <div className="text-xs text-[var(--c-text-2)] truncate">{listing.destinationRegion}</div>}
         </div>
-        <div className="text-right flex-shrink-0 border-l border-white/10 pl-3">
-          <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">{listing.listingType === 'SPACE_NEEDED' ? 'Pickup by' : 'Departs'}</div>
-          <div className="font-bold text-[#F7F9FB] text-sm">{formatDate(listing.departureDate)}</div>
+        <div className="text-right flex-shrink-0 border-l border-black/10 pl-3">
+          <div className="text-[10px] font-semibold text-[var(--c-text-2)] uppercase tracking-wider">{listing.listingType === 'SPACE_NEEDED' ? 'Pickup by' : 'Departs'}</div>
+          <div className="font-bold text-[var(--c-ink)] text-sm">{formatDate(listing.departureDate)}</div>
         </div>
       </div>
 
@@ -627,27 +627,27 @@ export default function MarketplacePage() {
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2 min-w-0">
           {listing.carrier.name && (
-            <span className="text-xs text-[#8FA1AB] truncate">{listing.carrier.name}{listing.carrier.company ? ` · ${listing.carrier.company}` : ''}</span>
+            <span className="text-xs text-[var(--c-text-2)] truncate">{listing.carrier.name}{listing.carrier.company ? ` · ${listing.carrier.company}` : ''}</span>
           )}
           {listing.carrier.receivedReviews && listing.carrier.receivedReviews.length > 0 && (() => {
             const avg = listing.carrier.receivedReviews!.reduce((s, r) => s + r.rating, 0) / listing.carrier.receivedReviews!.length
             return (
               <span className="inline-flex items-center gap-0.5 text-xs">
-                <svg className="w-3 h-3 text-[#FF6A2A]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
-                <span className="font-semibold text-[#F7F9FB]">{avg.toFixed(1)}</span>
-                <span className="text-slate-400">({listing.carrier.receivedReviews!.length})</span>
+                <svg className="w-3 h-3 text-[var(--c-accent)]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                <span className="font-semibold text-[var(--c-ink)]">{avg.toFixed(1)}</span>
+                <span className="text-[var(--c-text-2)]">({listing.carrier.receivedReviews!.length})</span>
               </span>
             )
           })()}
         </div>
         <div className="flex items-center gap-1.5">
           {listing.flexibleRoute && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#9ED36A]/15 text-[#9ED36A] rounded text-[10px] font-semibold">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-[var(--c-success)]/15 text-[var(--c-success)] rounded text-[10px] font-semibold">
               Flexible{listing.maxDetourKm ? ` ±${listing.maxDetourKm}km` : ''}
             </span>
           )}
           {listing.routeStops && listing.routeStops.length > 0 && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#102535] text-[#9AADB8] rounded text-[10px] font-semibold">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-[var(--c-canvas-2)] text-[var(--c-text-2)] rounded text-[10px] font-semibold">
               {listing.routeStops.length} stop{listing.routeStops.length > 1 ? 's' : ''}
             </span>
           )}
@@ -664,7 +664,7 @@ export default function MarketplacePage() {
                 navigator.clipboard.writeText(url)
               }
             }}
-            className="p-1.5 rounded-lg hover:bg-[#102535] text-slate-400 hover:text-[#9AADB8] transition-colors"
+            className="p-1.5 rounded-lg hover:bg-[var(--c-canvas-2)] text-[var(--c-text-2)] hover:text-[var(--c-text-2)] transition-colors"
             title="Share"
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
@@ -673,37 +673,37 @@ export default function MarketplacePage() {
       </div>
 
       {/* Capacity & Price footer */}
-      <div className="flex items-end justify-between pt-3 border-t border-white/10">
+      <div className="flex items-end justify-between pt-3 border-t border-black/10">
         <div className="flex gap-4">
           <div>
-            <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">{listing.listingType === 'SPACE_NEEDED' ? 'Cargo' : 'Weight'}</div>
-            <div className="text-sm font-bold text-[#F7F9FB]">{listing.availableKg.toFixed(0)} kg</div>
+            <div className="text-[10px] font-semibold text-[var(--c-text-2)] uppercase tracking-wider">{listing.listingType === 'SPACE_NEEDED' ? 'Cargo' : 'Weight'}</div>
+            <div className="text-sm font-bold text-[var(--c-ink)]">{listing.availableKg.toFixed(0)} kg</div>
           </div>
           <div>
-            <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Volume</div>
-            <div className="text-sm font-bold text-[#F7F9FB]">{listing.availableM3.toFixed(1)} m&sup3;</div>
+            <div className="text-[10px] font-semibold text-[var(--c-text-2)] uppercase tracking-wider">Volume</div>
+            <div className="text-sm font-bold text-[var(--c-ink)]">{listing.availableM3.toFixed(1)} m&sup3;</div>
           </div>
         </div>
         <div className="flex items-center gap-3">
           <div className="text-right">
             {listing.listingType === 'SPACE_NEEDED' ? (
-              <div className="text-lg font-bold text-[#F7F9FB]">
+              <div className="text-lg font-bold text-[var(--c-ink)]">
                 {listing.flatRate ? (
                   <span>Budget: {formatCurrency(listing.flatRate, listing.currency)}</span>
                 ) : listing.pricePerKg ? (
                   <span>Budget: {formatCurrency(listing.pricePerKg, listing.currency)}/kg</span>
                 ) : (
-                  <span className="text-sm text-slate-400">Budget TBD</span>
+                  <span className="text-sm text-[var(--c-text-2)]">Budget TBD</span>
                 )}
               </div>
             ) : (
               <>
                 {listing.flatRate ? (
-                  <div className="text-lg font-bold text-[#F7F9FB]">{formatCurrency(listing.flatRate, listing.currency)}</div>
+                  <div className="text-lg font-bold text-[var(--c-ink)]">{formatCurrency(listing.flatRate, listing.currency)}</div>
                 ) : (
-                  <div className="text-sm font-semibold text-[#F7F9FB]">
+                  <div className="text-sm font-semibold text-[var(--c-ink)]">
                     {listing.pricePerKg && <span>{formatCurrency(listing.pricePerKg, listing.currency)}/kg</span>}
-                    {listing.pricePerKg && listing.pricePerM3 && <span className="text-slate-300 mx-1">&middot;</span>}
+                    {listing.pricePerKg && listing.pricePerM3 && <span className="text-[var(--c-text-3)] mx-1">&middot;</span>}
                     {listing.pricePerM3 && <span>{formatCurrency(listing.pricePerM3, listing.currency)}/m&sup3;</span>}
                   </div>
                 )}
@@ -734,26 +734,26 @@ export default function MarketplacePage() {
     <div>
       {fetchError && (
         <div className="site-container pt-4">
-          <div className="px-4 py-3 rounded-xl bg-red-900/20 border border-red-500/30">
-            <p className="text-sm font-medium text-red-300">{fetchError}</p>
+          <div className="px-4 py-3 rounded-xl bg-[#B23A2E]/10 border border-[#B23A2E]/30">
+            <p className="text-sm font-medium text-[var(--c-error)]">{fetchError}</p>
           </div>
         </div>
       )}
       {/* Search header */}
-      <div className="bg-[#162E3D] border-b border-white/10">
+      <div className="bg-[var(--c-surface)] border-b border-black/10">
         <div className="site-container py-8 sm:py-10">
           <div className="flex items-center justify-between mb-4 sm:mb-5">
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-[#F7F9FB] tracking-tight">Marketplace</h1>
-              <p className="text-sm text-[#8FA1AB] mt-1">{activeTab === 'SPACE_NEEDED' ? 'Loads needing drivers' : 'Find van space to any destination'}</p>
+              <h1 className="text-xl sm:text-2xl font-bold text-[var(--c-ink)] tracking-tight">Marketplace</h1>
+              <p className="text-sm text-[var(--c-text-2)] mt-1">{activeTab === 'SPACE_NEEDED' ? 'Loads needing drivers' : 'Find van space to any destination'}</p>
             </div>
             <div className="flex items-center gap-2">
               {/* View toggle */}
-              <div className="hidden sm:flex items-center bg-[#102535] rounded-lg p-0.5">
-                <button onClick={() => setViewMode('list')} className={`p-2 rounded-md transition-colors ${viewMode === 'list' ? 'bg-[#162E3D] shadow-sm text-[#F7F9FB]' : 'text-slate-400'}`} title="List view">
+              <div className="hidden sm:flex items-center bg-[var(--c-canvas-2)] rounded-lg p-0.5">
+                <button onClick={() => setViewMode('list')} className={`p-2 rounded-md transition-colors ${viewMode === 'list' ? 'bg-[var(--c-surface)] shadow-sm text-[var(--c-ink)]' : 'text-[var(--c-text-2)]'}`} title="List view">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
                 </button>
-                <button onClick={() => setViewMode('calendar')} className={`p-2 rounded-md transition-colors ${viewMode === 'calendar' ? 'bg-[#162E3D] shadow-sm text-[#F7F9FB]' : 'text-slate-400'}`} title="Calendar view">
+                <button onClick={() => setViewMode('calendar')} className={`p-2 rounded-md transition-colors ${viewMode === 'calendar' ? 'bg-[var(--c-surface)] shadow-sm text-[var(--c-ink)]' : 'text-[var(--c-text-2)]'}`} title="Calendar view">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                 </button>
               </div>
@@ -762,7 +762,7 @@ export default function MarketplacePage() {
               {user && (filters.origin || filters.destination) && (
                 <button
                   onClick={() => setShowAlertModal(true)}
-                  className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-[#FF6A2A]/30 bg-[#FF6A2A]/5 text-sm font-semibold text-[#FF6A2A] hover:bg-[#FF6A2A]/10 transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-[var(--c-accent)]/30 bg-[var(--c-accent)]/5 text-sm font-semibold text-[var(--c-accent)] hover:bg-[var(--c-accent)]/10 transition-colors"
                   title="Get notified when matching listings appear"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
@@ -772,25 +772,25 @@ export default function MarketplacePage() {
 
               <button
                 onClick={() => setFiltersOpen(true)}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-white/10 bg-[#162E3D] text-sm font-semibold text-[#F7F9FB] hover:bg-[#162E3D] active:bg-[#102535] transition-colors"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-black/10 bg-[var(--c-surface)] text-sm font-semibold text-[var(--c-ink)] hover:bg-[var(--c-surface)] active:bg-[var(--c-canvas-2)] transition-colors"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                 </svg>
                 Filters
-                {hasActiveFilters && <span className="w-2 h-2 rounded-full bg-[#FF6A2A]" />}
+                {hasActiveFilters && <span className="w-2 h-2 rounded-full bg-[var(--c-accent)]" />}
               </button>
             </div>
           </div>
 
           {/* Listing type tabs */}
-          <div className="flex gap-1 p-1 bg-[#102535] rounded-xl mb-4">
+          <div className="flex gap-1 p-1 bg-[var(--c-canvas-2)] rounded-xl mb-4">
             <button
               onClick={() => { setActiveTab('SPACE_AVAILABLE'); setCurrentPage(1) }}
               className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-semibold transition-all ${
                 activeTab === 'SPACE_AVAILABLE'
-                  ? 'bg-[#162E3D] text-[#F7F9FB] shadow-sm'
-                  : 'text-[#8FA1AB] hover:text-[#9AADB8]'
+                  ? 'bg-[var(--c-surface)] text-[var(--c-ink)] shadow-sm'
+                  : 'text-[var(--c-text-2)] hover:text-[var(--c-text-2)]'
               }`}
             >
               Available Space
@@ -799,8 +799,8 @@ export default function MarketplacePage() {
               onClick={() => { setActiveTab('SPACE_NEEDED'); setCurrentPage(1) }}
               className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-semibold transition-all ${
                 activeTab === 'SPACE_NEEDED'
-                  ? 'bg-[#162E3D] text-[#F7F9FB] shadow-sm'
-                  : 'text-[#8FA1AB] hover:text-[#9AADB8]'
+                  ? 'bg-[var(--c-surface)] text-[var(--c-ink)] shadow-sm'
+                  : 'text-[var(--c-text-2)] hover:text-[var(--c-text-2)]'
               }`}
             >
               Loads Needing Drivers
@@ -814,7 +814,7 @@ export default function MarketplacePage() {
               className="flex gap-2"
             >
               <div className="relative flex-1">
-                <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#FF6A2A]">
+                <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--c-accent)]">
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
                   </svg>
@@ -824,13 +824,13 @@ export default function MarketplacePage() {
                   value={aiQuery}
                   onChange={(e) => setAiQuery(e.target.value)}
                   placeholder="Try: 'wine delivery from Antibes to Palma next week under €200'"
-                  className="w-full pl-11 pr-4 py-3 rounded-xl border border-[#FF6A2A]/30 bg-[#FF6A2A]/[0.03] text-[15px] text-[#F7F9FB] placeholder:text-slate-400 focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10 transition-all outline-none"
+                  className="w-full pl-11 pr-4 py-3 rounded-xl border border-[var(--c-accent)]/30 bg-[var(--c-accent)]/[0.03] text-[15px] text-[var(--c-ink)] placeholder:text-[var(--c-text-2)] focus:border-[var(--c-accent)] focus:ring-2 focus:ring-[var(--c-accent)]/10 transition-all outline-none"
                 />
               </div>
               <button
                 type="submit"
                 disabled={aiSearching || !aiQuery.trim()}
-                className="flex items-center gap-2 px-5 py-3 rounded-xl bg-[#FF6A2A] text-white text-sm font-semibold hover:bg-[#E85A1C] disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
+                className="flex items-center gap-2 px-5 py-3 rounded-xl bg-[var(--c-accent)] text-white text-sm font-semibold hover:bg-[var(--c-accent-hover)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
               >
                 {aiSearching ? (
                   <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
@@ -842,20 +842,20 @@ export default function MarketplacePage() {
             </form>
             {aiParsedSummary && (
               <div className="flex items-center gap-2 mt-2">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#FF6A2A]/10 text-[#FF6A2A] rounded-full text-xs font-medium">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[var(--c-accent)]/10 text-[var(--c-accent)] rounded-full text-xs font-medium">
                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" /></svg>
                   {aiParsedSummary}
                 </span>
                 <button
                   onClick={() => { setAiParsedSummary(''); setAiQuery(''); resetFilters() }}
-                  className="text-xs text-slate-400 hover:text-[#9AADB8] transition-colors"
+                  className="text-xs text-[var(--c-text-2)] hover:text-[var(--c-text-2)] transition-colors"
                 >
                   Clear
                 </button>
               </div>
             )}
             {aiError && (
-              <p className="mt-2 text-xs text-red-500">{aiError}</p>
+              <p className="mt-2 text-xs text-[var(--c-error)]">{aiError}</p>
             )}
           </div>
 
@@ -884,11 +884,11 @@ export default function MarketplacePage() {
           </div>
           {(filters.originLat || filters.destLat) && (
             <div className="flex items-center gap-2 mt-2">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#FF6A2A]/10 text-[#FF6A2A] rounded-full text-xs font-medium">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[var(--c-accent)]/10 text-[var(--c-accent)] rounded-full text-xs font-medium">
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /></svg>
                 {filters.radiusKm || '50'} km radius
               </span>
-              <button onClick={() => setFilters(f => ({ ...f, originLat: null, originLng: null, destLat: null, destLng: null }))} className="text-xs text-slate-400 hover:text-[#9AADB8]">Clear radius</button>
+              <button onClick={() => setFilters(f => ({ ...f, originLat: null, originLng: null, destLat: null, destLng: null }))} className="text-xs text-[var(--c-text-2)] hover:text-[var(--c-text-2)]">Clear radius</button>
             </div>
           )}
         </div>
@@ -898,10 +898,10 @@ export default function MarketplacePage() {
       {filtersOpen && (
         <div className="fixed inset-0 z-50">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setFiltersOpen(false)} />
-          <div ref={mobileFilterRef} className="absolute right-0 top-0 bottom-0 w-full max-w-md bg-[#162E3D] shadow-2xl overflow-y-auto animate-slide-in-right">
-            <div className="sticky top-0 bg-[#162E3D] border-b border-white/10 px-5 py-4 flex items-center justify-between z-10">
-              <h2 className="text-lg font-bold text-[#F7F9FB]">Filters</h2>
-              <button onClick={() => setFiltersOpen(false)} className="p-2 rounded-xl hover:bg-[#102535] text-slate-400 transition-colors">
+          <div ref={mobileFilterRef} className="absolute right-0 top-0 bottom-0 w-full max-w-md bg-[var(--c-surface)] shadow-2xl overflow-y-auto animate-slide-in-right">
+            <div className="sticky top-0 bg-[var(--c-surface)] border-b border-black/10 px-5 py-4 flex items-center justify-between z-10">
+              <h2 className="text-lg font-bold text-[var(--c-ink)]">Filters</h2>
+              <button onClick={() => setFiltersOpen(false)} className="p-2 rounded-xl hover:bg-[var(--c-canvas-2)] text-[var(--c-text-2)] transition-colors">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -920,10 +920,10 @@ export default function MarketplacePage() {
         {featuredListings.length > 0 && (
           <div className="mb-8 sm:mb-10">
             <div className="flex items-center gap-2.5 mb-4">
-              <svg className="w-5 h-5 text-[#F7F9FB]" fill="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-[var(--c-ink)]" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
               </svg>
-              <h2 className="text-lg font-bold text-[#F7F9FB]">Featured Routes</h2>
+              <h2 className="text-lg font-bold text-[var(--c-ink)]">Featured Routes</h2>
             </div>
             {featuredLoading ? (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -940,12 +940,12 @@ export default function MarketplacePage() {
         {/* Results header */}
         {!loading && (
           <div className="flex items-center justify-between mb-4">
-            <p className="text-sm text-[#8FA1AB] font-medium">
+            <p className="text-sm text-[var(--c-text-2)] font-medium">
               {pagination.total === 0 ? 'No routes found' : `${pagination.total} route${pagination.total !== 1 ? 's' : ''} found`}
             </p>
             <div className="flex items-center gap-2">
               <select
-                className="px-3 py-2 rounded-xl border border-white/10 bg-[#162E3D] text-sm text-[#F7F9FB] focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 outline-none"
+                className="px-3 py-2 rounded-xl border border-black/10 bg-[var(--c-surface)] text-sm text-[var(--c-ink)] focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 outline-none"
                 value={filters.sort}
                 onChange={(e) => { setFilters({ ...filters, sort: e.target.value }); setCurrentPage(1) }}
               >
@@ -958,10 +958,10 @@ export default function MarketplacePage() {
         {/* Calendar View */}
         {viewMode === 'calendar' && !loading && listings.length > 0 && (
           <div className="mb-8">
-            <div className="bg-[#162E3D] rounded-2xl border border-white/10 overflow-hidden">
-              <div className="grid grid-cols-7 border-b border-white/10">
+            <div className="bg-[var(--c-surface)] rounded-2xl border border-black/10 overflow-hidden">
+              <div className="grid grid-cols-7 border-b border-black/10">
                 {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(d => (
-                  <div key={d} className="py-2 text-center text-[10px] font-semibold text-slate-400 uppercase tracking-wider">{d}</div>
+                  <div key={d} className="py-2 text-center text-[10px] font-semibold text-[var(--c-text-2)] uppercase tracking-wider">{d}</div>
                 ))}
               </div>
               <div className="grid grid-cols-7">
@@ -980,17 +980,17 @@ export default function MarketplacePage() {
                     const dayListings = listings.filter(l => l.departureDate.split('T')[0] === dayStr)
                     const isToday = day.toDateString() === today.toDateString()
                     return (
-                      <div key={i} className={`min-h-[80px] p-1.5 border-b border-r border-white/10 ${isToday ? 'bg-[#FF6A2A]/5' : ''}`}>
-                        <div className={`text-xs font-medium mb-1 ${isToday ? 'text-[#FF6A2A] font-bold' : 'text-[#8FA1AB]'}`}>
+                      <div key={i} className={`min-h-[80px] p-1.5 border-b border-r border-black/10 ${isToday ? 'bg-[var(--c-accent)]/5' : ''}`}>
+                        <div className={`text-xs font-medium mb-1 ${isToday ? 'text-[var(--c-accent)] font-bold' : 'text-[var(--c-text-2)]'}`}>
                           {day.getDate()}
                         </div>
                         {dayListings.slice(0, 2).map(l => (
-                          <div key={l.id} onClick={() => openBooking(l)} className="cursor-pointer text-[9px] leading-tight px-1 py-0.5 mb-0.5 rounded bg-[#FF6A2A]/10 text-[#FF6A2A] truncate font-medium hover:bg-[#FF6A2A]/20 transition-colors">
+                          <div key={l.id} onClick={() => openBooking(l)} className="cursor-pointer text-[9px] leading-tight px-1 py-0.5 mb-0.5 rounded bg-[var(--c-accent)]/10 text-[var(--c-accent)] truncate font-medium hover:bg-[var(--c-accent)]/20 transition-colors">
                             {l.originPort.split(',')[0]} → {l.destinationPort.split(',')[0]}
                           </div>
                         ))}
                         {dayListings.length > 2 && (
-                          <div className="text-[9px] text-slate-400 px-1">+{dayListings.length - 2} more</div>
+                          <div className="text-[9px] text-[var(--c-text-2)] px-1">+{dayListings.length - 2} more</div>
                         )}
                       </div>
                     )
@@ -1009,14 +1009,14 @@ export default function MarketplacePage() {
             <span className="sr-only">Loading listings...</span>
           </div>
         ) : listings.length === 0 ? (
-          <div className="bg-[#162E3D] rounded-2xl border border-white/10 p-12 sm:p-16 text-center">
-            <div className="w-16 h-16 rounded-2xl bg-[#102535] flex items-center justify-center mx-auto mb-5">
-              <svg className="w-7 h-7 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-[var(--c-surface)] rounded-2xl border border-black/10 p-12 sm:p-16 text-center">
+            <div className="w-16 h-16 rounded-2xl bg-[var(--c-canvas-2)] flex items-center justify-center mx-auto mb-5">
+              <svg className="w-7 h-7 text-[var(--c-text-2)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
-            <p className="text-[#F7F9FB] font-semibold text-lg mb-2">No routes found</p>
-            <p className="text-sm text-[#8FA1AB] mb-6">Try adjusting your search or filters</p>
+            <p className="text-[var(--c-ink)] font-semibold text-lg mb-2">No routes found</p>
+            <p className="text-sm text-[var(--c-text-2)] mb-6">Try adjusting your search or filters</p>
             {hasActiveFilters && (
               <button onClick={resetFilters} className="btn-primary !text-sm !py-2.5 !px-6">Clear All Filters</button>
             )}
@@ -1033,24 +1033,24 @@ export default function MarketplacePage() {
                 <button
                   onClick={() => goToPage(pagination.page - 1)}
                   disabled={pagination.page <= 1}
-                  className="p-2.5 rounded-xl border border-white/10 bg-[#162E3D] text-[#9AADB8] hover:bg-[#162E3D] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  className="p-2.5 rounded-xl border border-black/10 bg-[var(--c-surface)] text-[var(--c-text-2)] hover:bg-[var(--c-surface)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                   aria-label="Previous page"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                 </button>
                 {pageNumbers().map((p, i) =>
                   typeof p === 'string' ? (
-                    <span key={`e-${i}`} className="px-2 text-slate-400 text-sm">...</span>
+                    <span key={`e-${i}`} className="px-2 text-[var(--c-text-2)] text-sm">...</span>
                   ) : (
                     <button key={p} onClick={() => goToPage(p)} className={`min-w-[40px] h-10 rounded-xl text-sm font-semibold transition-colors ${
-                      p === pagination.page ? 'bg-[#FF6A2A] text-white' : 'border border-white/10 bg-[#162E3D] text-[#9AADB8] hover:bg-[#162E3D]'
+                      p === pagination.page ? 'bg-[var(--c-accent)] text-white' : 'border border-black/10 bg-[var(--c-surface)] text-[var(--c-text-2)] hover:bg-[var(--c-surface)]'
                     }`}>{p}</button>
                   )
                 )}
                 <button
                   onClick={() => goToPage(pagination.page + 1)}
                   disabled={pagination.page >= pagination.pages}
-                  className="p-2.5 rounded-xl border border-white/10 bg-[#162E3D] text-[#9AADB8] hover:bg-[#162E3D] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  className="p-2.5 rounded-xl border border-black/10 bg-[var(--c-surface)] text-[var(--c-text-2)] hover:bg-[var(--c-surface)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                   aria-label="Next page"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
@@ -1066,17 +1066,17 @@ export default function MarketplacePage() {
       {bookingModal && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setBookingModal(null)} />
-          <div className="relative bg-[#162E3D] w-full sm:max-w-lg sm:rounded-2xl rounded-t-2xl shadow-2xl max-h-[90vh] overflow-y-auto animate-slide-up sm:animate-fade-up">
+          <div className="relative bg-[var(--c-surface)] w-full sm:max-w-lg sm:rounded-2xl rounded-t-2xl shadow-2xl max-h-[90vh] overflow-y-auto animate-slide-up sm:animate-fade-up">
             {/* Header */}
-            <div className="sticky top-0 bg-[#162E3D] border-b border-white/10 px-5 sm:px-6 py-4 rounded-t-2xl z-10">
+            <div className="sticky top-0 bg-[var(--c-surface)] border-b border-black/10 px-5 sm:px-6 py-4 rounded-t-2xl z-10">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-lg font-bold text-[#F7F9FB]">Book Space</h2>
-                  <p className="text-sm text-[#8FA1AB] mt-0.5">
+                  <h2 className="text-lg font-bold text-[var(--c-ink)]">Book Space</h2>
+                  <p className="text-sm text-[var(--c-text-2)] mt-0.5">
                     {bookingModal.originPort} &rarr; {bookingModal.destinationPort} &middot; {formatDate(bookingModal.departureDate)}
                   </p>
                 </div>
-                <button onClick={() => setBookingModal(null)} className="p-2 rounded-xl hover:bg-[#102535] text-slate-400 transition-colors">
+                <button onClick={() => setBookingModal(null)} className="p-2 rounded-xl hover:bg-[var(--c-canvas-2)] text-[var(--c-text-2)] transition-colors">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
               </div>
@@ -1084,13 +1084,13 @@ export default function MarketplacePage() {
 
             {bookingSuccess ? (
               <div className="p-8 text-center">
-                <div className="w-16 h-16 rounded-full bg-[#9ED36A]/10 flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-[#9ED36A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-16 h-16 rounded-full bg-[var(--c-success)]/10 flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-[var(--c-success)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold text-[#F7F9FB] mb-2">Booking Confirmed!</h3>
-                <p className="text-[#8FA1AB] mb-6">Your space has been reserved. Check your dashboard for details.</p>
+                <h3 className="text-xl font-bold text-[var(--c-ink)] mb-2">Booking Confirmed!</h3>
+                <p className="text-[var(--c-text-2)] mb-6">Your space has been reserved. Check your dashboard for details.</p>
                 <div className="flex gap-3 justify-center">
                   <Link href="/dashboard" className="btn-primary !text-sm !py-2.5">View Dashboard</Link>
                   <button onClick={() => setBookingModal(null)} className="btn-secondary !text-sm !py-2.5">Close</button>
@@ -1099,18 +1099,18 @@ export default function MarketplacePage() {
             ) : (
               <form onSubmit={submitBooking} className="p-5 sm:p-6 space-y-4">
                 {bookingError && (
-                  <div className="px-4 py-3 rounded-xl bg-red-900/20 border border-red-500/30">
-                    <p className="text-sm text-red-300">{bookingError}</p>
+                  <div className="px-4 py-3 rounded-xl bg-[#B23A2E]/10 border border-[#B23A2E]/30">
+                    <p className="text-sm text-[var(--c-error)]">{bookingError}</p>
                   </div>
                 )}
 
                 <div>
-                  <label className="block text-sm font-semibold text-[#F7F9FB] mb-2">Cargo Description *</label>
+                  <label className="block text-sm font-semibold text-[var(--c-ink)] mb-2">Cargo Description *</label>
                   <input type="text" required className={inputClass} placeholder="e.g. Wine cases for MY Ocean Dream" value={bookingForm.cargoDescription} onChange={(e) => setBookingForm({ ...bookingForm, cargoDescription: e.target.value })} />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-[#F7F9FB] mb-2">Cargo Type</label>
+                  <label className="block text-sm font-semibold text-[var(--c-ink)] mb-2">Cargo Type</label>
                   <select className={selectClass} value={bookingForm.cargoType} onChange={(e) => setBookingForm({ ...bookingForm, cargoType: e.target.value })}>
                     <option value="">Select type...</option>
                     <option value="Provisions & Food">Provisions & Food</option>
@@ -1130,11 +1130,11 @@ export default function MarketplacePage() {
                 </div>
 
                 {/* Package Builder */}
-                <div className="border border-white/10 rounded-xl p-4">
+                <div className="border border-black/10 rounded-xl p-4">
                   <div className="flex items-center justify-between mb-3">
-                    <label className="text-sm font-semibold text-[#F7F9FB]">Packages</label>
+                    <label className="text-sm font-semibold text-[var(--c-ink)]">Packages</label>
                     <button type="button" onClick={() => setShowPackagePicker(!showPackagePicker)}
-                      className="text-xs text-[#FF6A2A] font-medium hover:underline">
+                      className="text-xs text-[var(--c-accent)] font-medium hover:underline">
                       {showPackagePicker ? 'Hide presets' : 'Add packages'}
                     </button>
                   </div>
@@ -1143,7 +1143,7 @@ export default function MarketplacePage() {
                     <div className="space-y-3 mb-3">
                       {['Pallets', 'Boxes', 'Other'].map(group => (
                         <div key={group}>
-                          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">{group}</p>
+                          <p className="text-[10px] font-semibold text-[var(--c-text-2)] uppercase tracking-wider mb-1.5">{group}</p>
                           <div className="grid grid-cols-2 gap-2">
                       {Object.entries(PACKAGE_PRESETS).filter(([, p]) => p.group === group).map(([key, preset]) => (
                         <button
@@ -1169,10 +1169,10 @@ export default function MarketplacePage() {
                               itemCount: String(updated.reduce((sum, p) => sum + p.quantity, 0)),
                             }))
                           }}
-                          className="text-left p-2 rounded-lg border border-white/10 hover:border-[#FF6A2A] hover:bg-[#FF6A2A]/5 transition-colors"
+                          className="text-left p-2 rounded-lg border border-black/10 hover:border-[var(--c-accent)] hover:bg-[var(--c-accent)]/5 transition-colors"
                         >
-                          <div className="text-xs font-medium text-[#F7F9FB]">{preset.label}</div>
-                          <div className="text-[10px] text-slate-400">{preset.weightKg}kg &middot; {(preset.lengthCm * preset.widthCm * preset.heightCm / 1000000).toFixed(2)}m&sup3;</div>
+                          <div className="text-xs font-medium text-[var(--c-ink)]">{preset.label}</div>
+                          <div className="text-[10px] text-[var(--c-text-2)]">{preset.weightKg}kg &middot; {(preset.lengthCm * preset.widthCm * preset.heightCm / 1000000).toFixed(2)}m&sup3;</div>
                         </button>
                       ))}
                           </div>
@@ -1185,7 +1185,7 @@ export default function MarketplacePage() {
                   {packages.length > 0 && (
                     <div className="space-y-2">
                       {packages.map((pkg, idx) => (
-                        <div key={idx} className="flex items-center gap-2 bg-[#162E3D] rounded-lg p-2">
+                        <div key={idx} className="flex items-center gap-2 bg-[var(--c-surface)] rounded-lg p-2">
                           <select
                             value={pkg.quantity}
                             onChange={(e) => {
@@ -1201,17 +1201,17 @@ export default function MarketplacePage() {
                                 itemCount: String(updated.reduce((sum, p) => sum + p.quantity, 0)),
                               }))
                             }}
-                            className="w-16 px-2 py-1 rounded border border-white/10 text-sm"
+                            className="w-16 px-2 py-1 rounded border border-black/10 text-sm"
                           >
                             {[1,2,3,4,5,6,7,8,9,10].map(n => <option key={n} value={n}>{n}×</option>)}
                           </select>
-                          <div className="flex-1 text-xs text-[#F7F9FB]">
+                          <div className="flex-1 text-xs text-[var(--c-ink)]">
                             {PACKAGE_PRESETS[Object.keys(PACKAGE_PRESETS).find(k => {
                               const p = PACKAGE_PRESETS[k]
                               return p.lengthCm === pkg.lengthCm && p.widthCm === pkg.widthCm && p.heightCm === pkg.heightCm
                             }) || '']?.label || `${pkg.lengthCm}×${pkg.widthCm}×${pkg.heightCm}cm`}
                           </div>
-                          <span className="text-xs text-[#8FA1AB]">{(pkg.weightKg * pkg.quantity).toFixed(1)}kg</span>
+                          <span className="text-xs text-[var(--c-text-2)]">{(pkg.weightKg * pkg.quantity).toFixed(1)}kg</span>
                           <button type="button" onClick={() => {
                             const updated = packages.filter((_, i) => i !== idx)
                             setPackages(updated)
@@ -1223,12 +1223,12 @@ export default function MarketplacePage() {
                               volumeM3: totalVolume.toFixed(2),
                               itemCount: String(updated.reduce((sum, p) => sum + p.quantity, 0)),
                             }))
-                          }} className="text-red-400 hover:text-red-400">
+                          }} className="text-[var(--c-error)] hover:text-[var(--c-error)]">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                           </button>
                         </div>
                       ))}
-                      <div className="flex justify-between text-xs text-[#8FA1AB] pt-1 border-t border-white/10">
+                      <div className="flex justify-between text-xs text-[var(--c-text-2)] pt-1 border-t border-black/10">
                         <span>Total: {packages.reduce((s, p) => s + p.quantity, 0)} items</span>
                         <span>{packages.reduce((s, p) => s + p.weightKg * p.quantity, 0).toFixed(1)} kg / {packages.reduce((s, p) => s + (p.lengthCm * p.widthCm * p.heightCm * p.quantity) / 1000000, 0).toFixed(2)} m³</span>
                       </div>
@@ -1236,36 +1236,36 @@ export default function MarketplacePage() {
                   )}
                 </div>
 
-                <p className="text-xs text-slate-400 -mb-2">Or enter weight and volume manually below</p>
+                <p className="text-xs text-[var(--c-text-2)] -mb-2">Or enter weight and volume manually below</p>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-sm font-semibold text-[#F7F9FB] mb-2">Weight (kg) *</label>
+                    <label className="block text-sm font-semibold text-[var(--c-ink)] mb-2">Weight (kg) *</label>
                     <input type="number" required step="0.1" min="0.1" max={bookingModal.availableKg} className={inputClass} placeholder={`Max ${bookingModal.availableKg}kg`} value={bookingForm.weightKg} onChange={(e) => setBookingForm({ ...bookingForm, weightKg: e.target.value })} />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-[#F7F9FB] mb-2">Volume (m&sup3;) *</label>
+                    <label className="block text-sm font-semibold text-[var(--c-ink)] mb-2">Volume (m&sup3;) *</label>
                     <input type="number" required step="0.1" min="0.1" max={bookingModal.availableM3} className={inputClass} placeholder={`Max ${bookingModal.availableM3}m\u00B3`} value={bookingForm.volumeM3} onChange={(e) => setBookingForm({ ...bookingForm, volumeM3: e.target.value })} />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-sm font-semibold text-[#F7F9FB] mb-2">Items</label>
+                    <label className="block text-sm font-semibold text-[var(--c-ink)] mb-2">Items</label>
                     <input type="number" min="1" step="1" className={inputClass} placeholder="1" value={bookingForm.itemCount} onChange={(e) => setBookingForm({ ...bookingForm, itemCount: e.target.value })} />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-[#F7F9FB] mb-2">Declared Value</label>
+                    <label className="block text-sm font-semibold text-[var(--c-ink)] mb-2">Declared Value</label>
                     <input type="number" min="0" step="0.01" className={inputClass} placeholder="e.g. 5000" value={bookingForm.declaredValue} onChange={(e) => setBookingForm({ ...bookingForm, declaredValue: e.target.value })} />
                   </div>
                 </div>
 
                 {/* Cargo Dimensions — auto-calculates volume */}
-                <div className="pt-3 border-t border-white/10">
-                  <p className="text-xs font-semibold text-[#8FA1AB] uppercase tracking-wider mb-3">Cargo Size (optional — auto-fills volume)</p>
+                <div className="pt-3 border-t border-black/10">
+                  <p className="text-xs font-semibold text-[var(--c-text-2)] uppercase tracking-wider mb-3">Cargo Size (optional — auto-fills volume)</p>
                   <div className="grid grid-cols-3 gap-3">
                     <div>
-                      <label className="block text-[11px] text-slate-400 mb-1">Length (cm)</label>
+                      <label className="block text-[11px] text-[var(--c-text-2)] mb-1">Length (cm)</label>
                       <input type="number" min="0" step="1" className={inputClass} placeholder="cm" value={bookingForm.cargoLengthCm} onChange={(e) => {
                         const l = parseFloat(e.target.value) || 0
                         const w = parseFloat(bookingForm.cargoWidthCm) || 0
@@ -1276,7 +1276,7 @@ export default function MarketplacePage() {
                       }} />
                     </div>
                     <div>
-                      <label className="block text-[11px] text-slate-400 mb-1">Width (cm)</label>
+                      <label className="block text-[11px] text-[var(--c-text-2)] mb-1">Width (cm)</label>
                       <input type="number" min="0" step="1" className={inputClass} placeholder="cm" value={bookingForm.cargoWidthCm} onChange={(e) => {
                         const l = parseFloat(bookingForm.cargoLengthCm) || 0
                         const w = parseFloat(e.target.value) || 0
@@ -1287,7 +1287,7 @@ export default function MarketplacePage() {
                       }} />
                     </div>
                     <div>
-                      <label className="block text-[11px] text-slate-400 mb-1">Height (cm)</label>
+                      <label className="block text-[11px] text-[var(--c-text-2)] mb-1">Height (cm)</label>
                       <input type="number" min="0" step="1" className={inputClass} placeholder="cm" value={bookingForm.cargoHeightCm} onChange={(e) => {
                         const l = parseFloat(bookingForm.cargoLengthCm) || 0
                         const w = parseFloat(bookingForm.cargoWidthCm) || 0
@@ -1299,7 +1299,7 @@ export default function MarketplacePage() {
                     </div>
                   </div>
                   {bookingForm.cargoLengthCm && bookingForm.cargoWidthCm && bookingForm.cargoHeightCm && (
-                    <p className="text-[11px] text-slate-400 mt-1.5">
+                    <p className="text-[11px] text-[var(--c-text-2)] mt-1.5">
                       {(parseFloat(bookingForm.cargoLengthCm) * parseFloat(bookingForm.cargoWidthCm) / 10000).toFixed(2)} m&sup2; floor area &middot;{' '}
                       {(parseFloat(bookingForm.cargoLengthCm) * parseFloat(bookingForm.cargoWidthCm) * parseFloat(bookingForm.cargoHeightCm) / 1000000).toFixed(3)} m&sup3; volume
                     </p>
@@ -1307,8 +1307,8 @@ export default function MarketplacePage() {
                 </div>
 
                 {/* Cargo Photos */}
-                <div className="pt-3 border-t border-white/10">
-                  <p className="text-xs font-semibold text-[#8FA1AB] uppercase tracking-wider mb-3">Cargo Photos (optional)</p>
+                <div className="pt-3 border-t border-black/10">
+                  <p className="text-xs font-semibold text-[var(--c-text-2)] uppercase tracking-wider mb-3">Cargo Photos (optional)</p>
                   <CargoImageUpload
                     images={bookingForm.cargoImages}
                     onChange={(imgs) => setBookingForm({ ...bookingForm, cargoImages: imgs })}
@@ -1317,8 +1317,8 @@ export default function MarketplacePage() {
                 </div>
 
                 {/* Pickup Details */}
-                <div className="pt-3 border-t border-white/10">
-                  <p className="text-xs font-semibold text-[#8FA1AB] uppercase tracking-wider mb-3">Pickup Details</p>
+                <div className="pt-3 border-t border-black/10">
+                  <p className="text-xs font-semibold text-[var(--c-text-2)] uppercase tracking-wider mb-3">Pickup Details</p>
                   <div className="space-y-3">
                     <input type="text" className={inputClass} placeholder="Pickup address" value={bookingForm.pickupAddress} onChange={(e) => setBookingForm({ ...bookingForm, pickupAddress: e.target.value })} />
                     <div className="grid grid-cols-2 gap-3">
@@ -1329,8 +1329,8 @@ export default function MarketplacePage() {
                 </div>
 
                 {/* Delivery Details */}
-                <div className="pt-3 border-t border-white/10">
-                  <p className="text-xs font-semibold text-[#8FA1AB] uppercase tracking-wider mb-3">Delivery Details</p>
+                <div className="pt-3 border-t border-black/10">
+                  <p className="text-xs font-semibold text-[var(--c-text-2)] uppercase tracking-wider mb-3">Delivery Details</p>
                   <div className="space-y-3">
                     <input type="text" className={inputClass} placeholder="Delivery address (marina, port, etc.)" value={bookingForm.deliveryAddress} onChange={(e) => setBookingForm({ ...bookingForm, deliveryAddress: e.target.value })} />
                     <div className="grid grid-cols-2 gap-3">
@@ -1348,35 +1348,35 @@ export default function MarketplacePage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-[#F7F9FB] mb-2">Special Handling</label>
+                  <label className="block text-sm font-semibold text-[var(--c-ink)] mb-2">Special Handling</label>
                   <input type="text" className={inputClass} placeholder="e.g. Refrigerated, fragile" value={bookingForm.specialHandling} onChange={(e) => setBookingForm({ ...bookingForm, specialHandling: e.target.value })} />
                 </div>
 
                 {/* Yacht / Vessel Details */}
-                <div className="pt-3 border-t border-white/10">
-                  <p className="text-xs font-semibold text-[#FF6A2A] uppercase tracking-wider mb-3">Delivery Location</p>
+                <div className="pt-3 border-t border-black/10">
+                  <p className="text-xs font-semibold text-[var(--c-accent)] uppercase tracking-wider mb-3">Delivery Location</p>
                   <div className="space-y-3">
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-xs font-medium text-[#F7F9FB] mb-1">Yacht Name</label>
+                        <label className="block text-xs font-medium text-[var(--c-ink)] mb-1">Yacht Name</label>
                         <input type="text" className={inputClass} placeholder="e.g. MY Serenity" value={bookingForm.yachtName} onChange={(e) => setBookingForm({ ...bookingForm, yachtName: e.target.value })} />
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-[#F7F9FB] mb-1">Berth Number</label>
+                        <label className="block text-xs font-medium text-[var(--c-ink)] mb-1">Berth Number</label>
                         <input type="text" className={inputClass} placeholder="e.g. B-24" value={bookingForm.berthNumber} onChange={(e) => setBookingForm({ ...bookingForm, berthNumber: e.target.value })} />
                       </div>
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-[#F7F9FB] mb-1">Marina</label>
+                      <label className="block text-xs font-medium text-[var(--c-ink)] mb-1">Marina</label>
                       <input type="text" className={inputClass} placeholder="e.g. Port Vauban" value={bookingForm.marinaName} onChange={(e) => setBookingForm({ ...bookingForm, marinaName: e.target.value })} />
                     </div>
                     {/* MMSI — only shown for yacht accounts */}
                     {user && (user.role === 'YACHT_OWNER' || user.role === 'CREW') && (
                       <div>
-                        <label className="block text-xs font-medium text-[#F7F9FB] mb-1">MMSI Number</label>
+                        <label className="block text-xs font-medium text-[var(--c-ink)] mb-1">MMSI Number</label>
                         <input type="text" className={inputClass} placeholder="9-digit MMSI for vessel tracking" maxLength={9} pattern="\d{9}" value={bookingForm.yachtMMSI} onChange={(e) => setBookingForm({ ...bookingForm, yachtMMSI: e.target.value.replace(/\D/g, '').slice(0, 9) })} />
                         {bookingForm.yachtMMSI && bookingForm.yachtMMSI.length === 9 && (
-                          <div className="flex items-center gap-2 text-xs text-[#F7F9FB] mt-1.5">
+                          <div className="flex items-center gap-2 text-xs text-[var(--c-ink)] mt-1.5">
                             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
                             <a href={`https://www.marinetraffic.com/en/ais/details/ships/mmsi:${bookingForm.yachtMMSI}`} target="_blank" rel="noopener noreferrer" className="hover:underline">
                               Track vessel on MarineTraffic
@@ -1391,16 +1391,16 @@ export default function MarketplacePage() {
                 {/* Route direction selection for two-way listings */}
                 {bookingModal.routeDirection === 'BOTH' && (
                   <div>
-                    <label className="block text-sm font-semibold text-[#F7F9FB] mb-2">Which leg?</label>
+                    <label className="block text-sm font-semibold text-[var(--c-ink)] mb-2">Which leg?</label>
                     <div className="grid grid-cols-2 gap-3">
                       {[
                         { value: 'outbound', label: 'Outbound', desc: `To ${bookingModal.destinationPort}` },
                         { value: 'return', label: 'Return', desc: `Back to ${bookingModal.originPort}` },
                       ].map(opt => (
-                        <label key={opt.value} className={`flex flex-col items-center p-3 rounded-xl border-2 cursor-pointer transition-all text-center ${bookingForm.routeDirection === opt.value ? 'border-[#FF6A2A] bg-[#FF6A2A]/10/50' : 'border-white/10'}`}>
+                        <label key={opt.value} className={`flex flex-col items-center p-3 rounded-xl border-2 cursor-pointer transition-all text-center ${bookingForm.routeDirection === opt.value ? 'border-[var(--c-accent)] bg-[var(--c-accent)]/10/50' : 'border-black/10'}`}>
                           <input type="radio" name="routeDirection" value={opt.value} checked={bookingForm.routeDirection === opt.value} onChange={(e) => setBookingForm({ ...bookingForm, routeDirection: e.target.value })} className="sr-only" />
-                          <span className="text-sm font-semibold text-[#F7F9FB]">{opt.label}</span>
-                          <span className="text-[11px] text-slate-400">{opt.desc}</span>
+                          <span className="text-sm font-semibold text-[var(--c-ink)]">{opt.label}</span>
+                          <span className="text-[11px] text-[var(--c-text-2)]">{opt.desc}</span>
                         </label>
                       ))}
                     </div>
@@ -1409,9 +1409,9 @@ export default function MarketplacePage() {
 
                 {/* Price estimate */}
                 {bookingForm.weightKg && bookingForm.volumeM3 && (
-                  <div className="bg-[#162E3D] rounded-xl p-4 border border-white/10">
-                    <div className="text-xs font-semibold text-[#F7F9FB] uppercase tracking-wider mb-1">Estimated Price</div>
-                    <div className="text-2xl font-bold text-[#F7F9FB]">
+                  <div className="bg-[var(--c-surface)] rounded-xl p-4 border border-black/10">
+                    <div className="text-xs font-semibold text-[var(--c-ink)] uppercase tracking-wider mb-1">Estimated Price</div>
+                    <div className="text-2xl font-bold text-[var(--c-ink)]">
                       {bookingModal.flatRate
                         ? formatCurrency(bookingModal.flatRate, bookingModal.currency)
                         : formatCurrency(
@@ -1436,25 +1436,25 @@ export default function MarketplacePage() {
       {showAlertModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowAlertModal(false)} />
-          <div className="relative bg-[#162E3D] rounded-2xl shadow-2xl w-full max-w-sm p-6 animate-fade-up">
+          <div className="relative bg-[var(--c-surface)] rounded-2xl shadow-2xl w-full max-w-sm p-6 animate-fade-up">
             {alertSuccess ? (
               <div className="text-center py-4">
-                <div className="w-12 h-12 rounded-full bg-[#9ED36A]/15 flex items-center justify-center mx-auto mb-3">
-                  <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                <div className="w-12 h-12 rounded-full bg-[var(--c-success)]/15 flex items-center justify-center mx-auto mb-3">
+                  <svg className="w-6 h-6 text-[var(--c-success)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
                 </div>
-                <p className="font-semibold text-[#F7F9FB]">Alert saved!</p>
-                <p className="text-xs text-[#8FA1AB] mt-1">We&apos;ll notify you when matching listings appear.</p>
+                <p className="font-semibold text-[var(--c-ink)]">Alert saved!</p>
+                <p className="text-xs text-[var(--c-text-2)] mt-1">We&apos;ll notify you when matching listings appear.</p>
               </div>
             ) : (
               <>
-                <h3 className="text-lg font-bold text-[#F7F9FB] mb-1">Set Listing Alert</h3>
-                <p className="text-xs text-[#8FA1AB] mb-4">Get notified when new listings match your search.</p>
+                <h3 className="text-lg font-bold text-[var(--c-ink)] mb-1">Set Listing Alert</h3>
+                <p className="text-xs text-[var(--c-text-2)] mb-4">Get notified when new listings match your search.</p>
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-xs font-semibold text-[#F7F9FB] mb-1">Alert Name (optional)</label>
+                    <label className="block text-xs font-semibold text-[var(--c-ink)] mb-1">Alert Name (optional)</label>
                     <input type="text" className={inputClass} placeholder={`${filters.origin || 'Any'} → ${filters.destination || 'Any'}`} value={alertName} onChange={e => setAlertName(e.target.value)} />
                   </div>
-                  <div className="bg-[#162E3D] rounded-xl p-3 text-xs text-[#9AADB8] space-y-1">
+                  <div className="bg-[var(--c-surface)] rounded-xl p-3 text-xs text-[var(--c-text-2)] space-y-1">
                     {filters.origin && <div><span className="font-semibold">From:</span> {filters.origin}</div>}
                     {filters.destination && <div><span className="font-semibold">To:</span> {filters.destination}</div>}
                     {filters.dateFrom && <div><span className="font-semibold">After:</span> {filters.dateFrom}</div>}
@@ -1477,7 +1477,7 @@ export default function MarketplacePage() {
       {/* Share toast */}
       {shareToast && (
         <div className="fixed bottom-24 md:bottom-6 left-1/2 -translate-x-1/2 z-50 animate-fade-up">
-          <div className="bg-[#FF6A2A] text-white text-sm font-medium px-4 py-2.5 rounded-xl shadow-lg">
+          <div className="bg-[var(--c-accent)] text-white text-sm font-medium px-4 py-2.5 rounded-xl shadow-lg">
             Link copied to clipboard
           </div>
         </div>
