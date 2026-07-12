@@ -71,7 +71,7 @@ marketplace. Pair this with `.env.example` (the canonical list of variables).
 ### 3.1 Payments & escrow
 - Checkout charges the **platform** balance (separate charges & transfers), not a destination charge.
 - The carrier's payout is **held** until the booking is `DELIVERED`, then transferred (`lib/payout.ts`).
-- Platform fee: `PLATFORM_FEE_PERCENT` (10%) in `lib/stripe.ts`.
+- Platform fee: default 10% (`PLATFORM_FEE_PERCENT` env), **editable in Admin → Settings → Platform VAT & fee**; applied to new bookings. Existing bookings keep their captured fee/payout.
 
 ### 3.2 VAT (`lib/vat.ts`)
 - 27 EU standard rates (2026) + GB. Determination follows place-of-supply: **domestic**, **reverse charge** (intra-EU B2B with a VIES-verified number), **B2C** (supplier-country or Art. 50 departure country for transport of goods), **export/out-of-scope**.

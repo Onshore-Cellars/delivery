@@ -18,6 +18,15 @@ describe('platform fee / carrier payout math', () => {
     expect(calculateCarrierPayout(1000)).toBe(900)
   })
 
+  it('honours a custom (admin-configured) fee percentage', () => {
+    expect(calculatePlatformFee(1000, 15)).toBe(150)
+    expect(calculateCarrierPayout(1000, 15)).toBe(850)
+    expect(calculatePlatformFee(1000, 0)).toBe(0)
+    expect(calculateCarrierPayout(1000, 0)).toBe(1000)
+    // fee + payout still reconciles at any rate
+    expect(calculatePlatformFee(777.77, 12.5) + calculateCarrierPayout(777.77, 12.5)).toBeCloseTo(777.77, 2)
+  })
+
   it('fee + payout always reconciles to the gross amount', () => {
     for (const amount of [0, 12.34, 99.99, 250, 1000.5, 4823.17]) {
       const sum = calculatePlatformFee(amount) + calculateCarrierPayout(amount)

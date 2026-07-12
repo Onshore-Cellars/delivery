@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react'
 
 type Settings = {
-  vatCountry: string; vatNumber: string; vatRegistered: boolean
-  source: { vatCountry: string; vatNumber: string; vatRegistered: string }
+  vatCountry: string; vatNumber: string; vatRegistered: boolean; platformFeePercent: number
+  source: { vatCountry: string; vatNumber: string; vatRegistered: string; platformFeePercent: string }
 }
 
 export default function AdminVatSettings({ token }: { token: string }) {
@@ -12,6 +12,7 @@ export default function AdminVatSettings({ token }: { token: string }) {
   const [country, setCountry] = useState('')
   const [number, setNumber] = useState('')
   const [registered, setRegistered] = useState(true)
+  const [feePercent, setFeePercent] = useState('10')
   const [saving, setSaving] = useState(false)
   const [msg, setMsg] = useState('')
   const [err, setErr] = useState('')
@@ -19,7 +20,7 @@ export default function AdminVatSettings({ token }: { token: string }) {
   useEffect(() => {
     fetch('/api/admin/settings', { headers: { Authorization: `Bearer ${token}` } })
       .then(r => r.ok ? r.json() : null)
-      .then(d => { if (d?.settings) { setS(d.settings); setCountry(d.settings.vatCountry); setNumber(d.settings.vatNumber); setRegistered(d.settings.vatRegistered) } })
+      .then(d => { if (d?.settings) { setS(d.settings); setCountry(d.settings.vatCountry); setNumber(d.settings.vatNumber); setRegistered(d.settings.vatRegistered); setFeePercent(String(d.settings.platformFeePercent)) } })
       .catch(() => {})
   }, [token])
 
@@ -29,10 +30,10 @@ export default function AdminVatSettings({ token }: { token: string }) {
       const res = await fetch('/api/admin/settings', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ vatCountry: country.trim(), vatNumber: number.trim(), vatRegistered: registered }),
+        body: JSON.stringify({ vatCountry: country.trim(), vatNumber: number.trim(), vatRegistered: registered, platformFeePercent: Number(feePercent) }),
       })
       const d = await res.json()
-      if (res.ok) { setS(d.settings); setMsg('Saved. New bookings will use these settings.') }
+      if (res.ok) { setS(d.settings); setFeePercent(String(d.settings.platformFeePercent)); setMsg('Saved. New bookings will use these settings.') }
       else setErr(d.error || 'Failed to save')
     } catch { setErr('Failed to save') }
     finally { setSaving(false) }
@@ -42,7 +43,7 @@ export default function AdminVatSettings({ token }: { token: string }) {
 
   return (
     <div className="bg-[var(--c-surface)] rounded-2xl border border-black/10 shadow-sm p-6">
-      <h3 className="text-lg font-bold text-[var(--c-ink)] mb-1">Platform VAT</h3>
+      <h3 className="text-lg font-bold text-[var(--c-ink)] mb-1">Platform VAT &amp; fee</h3>
       <p className="text-xs text-[var(--c-text-2)] mb-5">
         Where Onshore is VAT-established. Applies to VAT on new bookings from now on (existing bookings keep their captured snapshot). Overrides the <code className="text-[11px]">PLATFORM_VAT_*</code> environment defaults.
       </p>
@@ -66,6 +67,14 @@ export default function AdminVatSettings({ token }: { token: string }) {
           <span className={`absolute top-[2px] left-[2px] h-5 w-5 rounded-full bg-[var(--c-surface)] shadow transition-transform ${registered ? 'translate-x-5' : ''}`} />
         </button>
       </div>
+      <div className="mt-4 pt-4 border-t border-[var(--c-border)]">
+        <label className="block text-xs font-medium text-[var(--c-text-2)] mb-1">Platform fee % {s && tag(s.source.platformFeePercent)}</label>
+        <div className="flex items-center gap-2">
+          <input type="number" step="0.1" min="0" max="99" value={feePercent} onChange={e => setFeePercent(e.target.value)} className="w-28 px-3 py-2 rounded-lg border border-black/10 text-sm text-[var(--c-ink)] outline-none focus:border-[var(--c-accent)]" />
+          <span className="text-sm text-[var(--c-text-3)]">% of each booking — the rest is the carrier payout.</span>
+        </div>
+      </div>
+
       {msg && <p className="mt-4 text-sm text-[var(--c-success)]">{msg}</p>}
       {err && <p className="mt-4 text-sm text-[var(--c-error)]">{err}</p>}
       <button onClick={save} disabled={saving} className="mt-4 px-5 py-2.5 rounded-xl bg-[var(--c-accent)] text-white text-sm font-medium hover:bg-[var(--c-accent-hover)] disabled:opacity-50">{saving ? 'Saving…' : 'Save VAT settings'}</button>

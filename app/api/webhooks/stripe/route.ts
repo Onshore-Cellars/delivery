@@ -7,6 +7,7 @@ import { queueEmail } from '@/lib/email-queue'
 import { ensureInvoiceNumber } from '@/lib/invoice'
 import { generateInvoiceToken } from '@/lib/auth'
 import { recordTransaction } from '@/lib/ledger'
+import { getPlatformFeePercent } from '@/lib/settings'
 
 export async function POST(request: NextRequest) {
   try {
@@ -48,6 +49,7 @@ export async function POST(request: NextRequest) {
             break
           }
 
+          const feePercent = await getPlatformFeePercent()
           const booking = await prisma.booking.update({
             where: { id: bookingId },
             data: {
@@ -55,8 +57,8 @@ export async function POST(request: NextRequest) {
               paidAt: new Date(),
               status: 'CONFIRMED',
               stripePaymentIntentId: session.payment_intent as string,
-              platformFee: calculatePlatformFee(totalPrice),
-              carrierPayout: calculateCarrierPayout(totalPrice),
+              platformFee: calculatePlatformFee(totalPrice, feePercent),
+              carrierPayout: calculateCarrierPayout(totalPrice, feePercent),
             },
             include: {
               shipper: { select: { id: true, name: true, email: true } },

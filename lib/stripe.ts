@@ -24,7 +24,9 @@ function createStripeClient(): Stripe {
 const stripe = createStripeClient()
 export default stripe
 
-const PLATFORM_FEE_PERCENT = 10 // 10% platform fee
+// Default platform fee %, overridable per-call (the admin-configured value is
+// read from settings and passed in by the booking-creation routes).
+export const PLATFORM_FEE_PERCENT = Number(process.env.PLATFORM_FEE_PERCENT) || 10
 
 // ─── CUSTOMER ─────────────────────────────────────────────────────────────────
 
@@ -233,11 +235,11 @@ export function currencySymbol(currency: string | null | undefined): string {
   }
 }
 
-export function calculatePlatformFee(amount: number): number {
-  return Math.round(amount * (PLATFORM_FEE_PERCENT / 100) * 100) / 100
+export function calculatePlatformFee(amount: number, percent: number = PLATFORM_FEE_PERCENT): number {
+  return Math.round(amount * (percent / 100) * 100) / 100
 }
 
-export function calculateCarrierPayout(amount: number): number {
-  const fee = calculatePlatformFee(amount)
+export function calculateCarrierPayout(amount: number, percent: number = PLATFORM_FEE_PERCENT): number {
+  const fee = calculatePlatformFee(amount, percent)
   return Math.round((amount - fee) * 100) / 100
 }

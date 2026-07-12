@@ -3,7 +3,7 @@ import prisma from '@/lib/prisma'
 import { verifyToken, getTokenFromHeader } from '@/lib/auth'
 import { createCheckoutSession, calculatePlatformFee, calculateCarrierPayout } from '@/lib/stripe'
 import { snapshotBookingVat } from '@/lib/vat'
-import { getPlatformVatConfig } from '@/lib/settings'
+import { getPlatformVatConfig, getPlatformFeePercent } from '@/lib/settings'
 import { createRateLimiter, getClientIP } from '@/lib/rate-limit'
 
 const checkoutLimiter = createRateLimiter({ interval: 15 * 60_000, limit: 10 })
@@ -67,6 +67,7 @@ export async function POST(request: NextRequest) {
     }
 
     const appUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
+    const feePercent = await getPlatformFeePercent()
 
     // Determine VAT for this supply (platform → shipper). net = booking.totalPrice.
     const vat = snapshotBookingVat(booking.totalPrice, {
@@ -100,8 +101,8 @@ export async function POST(request: NextRequest) {
       data: {
         stripePaymentId: session.id,
         paymentStatus: 'PROCESSING',
-        platformFee: calculatePlatformFee(booking.totalPrice),
-        carrierPayout: calculateCarrierPayout(booking.totalPrice),
+        platformFee: calculatePlatformFee(booking.totalPrice, feePercent),
+        carrierPayout: calculateCarrierPayout(booking.totalPrice, feePercent),
         // Persist the VAT snapshot so the invoice is stable regardless of later changes.
         vatAmount: vat.vatAmount,
         vatRate: vat.vatRate,

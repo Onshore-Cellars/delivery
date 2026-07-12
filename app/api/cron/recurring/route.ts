@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { verifyToken, getTokenFromHeader, generateTrackingCode } from '@/lib/auth'
 import { calculatePlatformFee, calculateCarrierPayout } from '@/lib/stripe'
+import { getPlatformFeePercent } from '@/lib/settings'
 import { createNotification } from '@/lib/notifications'
 import { advanceRun, Frequency } from '@/lib/recurring'
 
@@ -53,6 +54,7 @@ export async function POST(request: NextRequest) {
 
       if (capacityOk) {
         const totalPrice = priceFor(listing, r.weightKg, r.volumeM3)
+        const feePercent = await getPlatformFeePercent()
         try {
           await prisma.$transaction(async (tx) => {
             const fresh = await tx.listing.findUnique({ where: { id: listing.id }, select: { availableKg: true, availableM3: true } })
@@ -67,8 +69,8 @@ export async function POST(request: NextRequest) {
                 volumeM3: r.volumeM3,
                 deliveryTimeWindow: r.timeWindow,
                 totalPrice,
-                platformFee: calculatePlatformFee(totalPrice),
-                carrierPayout: calculateCarrierPayout(totalPrice),
+                platformFee: calculatePlatformFee(totalPrice, feePercent),
+                carrierPayout: calculateCarrierPayout(totalPrice, feePercent),
                 currency: listing.currency,
                 trackingCode: generateTrackingCode(),
                 status: 'PENDING',

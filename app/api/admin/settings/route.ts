@@ -24,10 +24,11 @@ export async function PATCH(request: NextRequest) {
   if (!requireAdmin(request)) return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
   try {
     const body = await request.json().catch(() => ({}))
-    const input: { vatCountry?: string; vatNumber?: string; vatRegistered?: boolean } = {}
+    const input: { vatCountry?: string; vatNumber?: string; vatRegistered?: boolean; platformFeePercent?: number } = {}
     if (typeof body.vatCountry === 'string') input.vatCountry = body.vatCountry
     if (typeof body.vatNumber === 'string') input.vatNumber = body.vatNumber
     if (typeof body.vatRegistered === 'boolean') input.vatRegistered = body.vatRegistered
+    if (typeof body.platformFeePercent === 'number') input.platformFeePercent = body.platformFeePercent
     await savePlatformVatSettings(input)
     return NextResponse.json({ settings: await getPlatformSettingsForAdmin() })
   } catch (e) {

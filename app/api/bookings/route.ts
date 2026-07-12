@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma'
 import { verifyToken, getTokenFromHeader, generateTrackingCode } from '@/lib/auth'
 import { notifyBookingCreated } from '@/lib/notifications'
 import { calculatePlatformFee, calculateCarrierPayout } from '@/lib/stripe'
+import { getPlatformFeePercent } from '@/lib/settings'
 import { createRateLimiter, getClientIP } from '@/lib/rate-limit'
 
 const bookingLimiter = createRateLimiter({ interval: 15 * 60_000, limit: 10 })
@@ -300,9 +301,10 @@ export async function POST(request: NextRequest) {
         totalPrice = listing.minimumCharge
       }
 
-      // Calculate platform fee and carrier payout
-      const platformFee = calculatePlatformFee(totalPrice)
-      const carrierPayout = calculateCarrierPayout(totalPrice)
+      // Calculate platform fee and carrier payout (admin-configurable %)
+      const feePercent = await getPlatformFeePercent()
+      const platformFee = calculatePlatformFee(totalPrice, feePercent)
+      const carrierPayout = calculateCarrierPayout(totalPrice, feePercent)
 
       // Create booking
       const booking = await tx.booking.create({

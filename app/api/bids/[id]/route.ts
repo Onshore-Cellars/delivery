@@ -4,7 +4,7 @@ import { verifyToken, getTokenFromHeader, generateTrackingCode } from '@/lib/aut
 import { createNotification } from '@/lib/notifications'
 import { createCheckoutSession, calculatePlatformFee, calculateCarrierPayout } from '@/lib/stripe'
 import { snapshotBookingVat } from '@/lib/vat'
-import { getPlatformVatConfig } from '@/lib/settings'
+import { getPlatformVatConfig, getPlatformFeePercent } from '@/lib/settings'
 
 // Accept, reject, counter, or withdraw a bid
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -48,8 +48,9 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
       const acceptAmount = bid.counterOffer ?? bid.amount
       const trackingCode = generateTrackingCode()
-      const platformFee = calculatePlatformFee(acceptAmount)
-      const carrierPayout = calculateCarrierPayout(acceptAmount)
+      const feePercent = await getPlatformFeePercent()
+      const platformFee = calculatePlatformFee(acceptAmount, feePercent)
+      const carrierPayout = calculateCarrierPayout(acceptAmount, feePercent)
 
       let updatedBid, booking
       try {
@@ -188,8 +189,9 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
       const acceptAmount = bid.counterOffer
       const trackingCode = generateTrackingCode()
-      const platformFee = calculatePlatformFee(acceptAmount)
-      const carrierPayout = calculateCarrierPayout(acceptAmount)
+      const feePercent = await getPlatformFeePercent()
+      const platformFee = calculatePlatformFee(acceptAmount, feePercent)
+      const carrierPayout = calculateCarrierPayout(acceptAmount, feePercent)
 
       let booking
       try {
