@@ -311,6 +311,47 @@ export default function TrackingPage() {
               </div>
             </div>
 
+            {/* Lifecycle progress stepper */}
+            {(() => {
+              const STEPS = [
+                { key: 'PENDING', label: 'Booked' },
+                { key: 'CONFIRMED', label: 'Confirmed' },
+                { key: 'PICKED_UP', label: 'Picked up' },
+                { key: 'IN_TRANSIT', label: 'In transit' },
+                { key: 'DELIVERED', label: 'Delivered' },
+              ]
+              const order: Record<string, number> = { PENDING: 0, CONFIRMED: 1, PICKED_UP: 2, IN_TRANSIT: 3, CUSTOMS_HOLD: 3, DELIVERED: 4 }
+              const s = data.booking.status
+              const offPath = s === 'CANCELLED' || s === 'DISPUTED'
+              const active = order[s] ?? 0
+              return (
+                <div className="bg-[var(--c-surface)] rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.3)] border border-black/10 p-6">
+                  {offPath ? (
+                    <div className="flex items-center gap-2 text-sm font-semibold" style={{ color: s === 'DISPUTED' ? 'var(--c-warning)' : 'var(--c-error)' }}>
+                      <span className="w-2.5 h-2.5 rounded-full" style={{ background: 'currentColor' }} />
+                      {s === 'DISPUTED' ? 'This shipment is under dispute' : 'This booking was cancelled'}
+                    </div>
+                  ) : (
+                    <div className="flex items-start">
+                      {STEPS.map((step, i) => {
+                        const done = i <= active
+                        const isCurrent = i === active
+                        return (
+                          <div key={step.key} className="flex-1 flex flex-col items-center relative">
+                            {i > 0 && <div className="absolute top-[9px] right-1/2 w-full h-0.5" style={{ background: i <= active ? 'var(--c-accent)' : 'var(--c-canvas-2)' }} />}
+                            <div className="relative z-10 w-5 h-5 rounded-full flex items-center justify-center" style={{ background: done ? 'var(--c-accent)' : 'var(--c-canvas-2)', boxShadow: isCurrent ? '0 0 0 4px color-mix(in srgb, var(--c-accent) 20%, transparent)' : 'none' }}>
+                              {done && <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
+                            </div>
+                            <div className={`mt-2 text-[11px] text-center ${isCurrent ? 'font-bold text-[var(--c-ink)]' : done ? 'font-medium text-[var(--c-text-2)]' : 'text-[var(--c-text-3)]'}`}>{step.label}</div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )}
+                </div>
+              )
+            })()}
+
             {/* Timeline */}
             {data.events.length > 0 && (
               <div className="bg-[var(--c-surface)] rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.3)] border border-black/10 p-6">
