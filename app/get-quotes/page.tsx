@@ -46,9 +46,9 @@ const URGENCY_OPTIONS = [
   { value: 'same_day', label: 'Same day (premium)' },
 ]
 
-const inputClass = "w-full px-4 py-3 rounded border border-white/10 bg-[#162E3D] text-[15px] text-[#F7F9FB] placeholder:text-[#9a9a9a] focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10 transition-all outline-none"
+const inputClass = "w-full px-4 py-3 rounded border border-black/10 bg-[var(--c-surface)] text-[15px] text-[var(--c-ink)] placeholder:text-[#9a9a9a] focus:border-[var(--c-accent)] focus:ring-2 focus:ring-[var(--c-accent)]/10 transition-all outline-none"
 const selectClass = inputClass + " appearance-none"
-const labelClass = "block text-sm font-semibold text-[#F7F9FB] mb-2"
+const labelClass = "block text-sm font-semibold text-[var(--c-ink)] mb-2"
 
 export default function GetQuotesPage() {
   const { user, token } = useAuth()
@@ -193,13 +193,13 @@ export default function GetQuotesPage() {
     return (
       <div className="page-container">
         <div className="text-center py-16">
-          <div className="w-16 h-16 rounded-full bg-[#9ED36A]/10 flex items-center justify-center mx-auto mb-6">
-            <svg className="w-8 h-8 text-[#9ED36A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-16 h-16 rounded-full bg-[var(--c-success)]/10 flex items-center justify-center mx-auto mb-6">
+            <svg className="w-8 h-8 text-[var(--c-success)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h1 className="text-2xl font-light text-[#F7F9FB] tracking-wide mb-3" style={{ fontFamily: 'var(--font-display)' }}>Quote Request Submitted</h1>
-          <p className="text-[#6B7C86] mb-8 max-w-md mx-auto">
+          <h1 className="text-2xl font-light text-[var(--c-ink)] tracking-wide mb-3" style={{ fontFamily: 'var(--font-display)' }}>Quote Request Submitted</h1>
+          <p className="text-[var(--c-text-3)] mb-8 max-w-md mx-auto">
             Carriers on matching routes will receive your request. You&apos;ll get notifications as quotes come in.
           </p>
           <div className="flex gap-3 justify-center">
@@ -216,10 +216,10 @@ export default function GetQuotesPage() {
   return (
     <div className="page-container">
       <div className="mb-8">
-        <h1 className="text-xl sm:text-2xl font-light text-[#F7F9FB] tracking-wide" style={{ fontFamily: 'var(--font-display)' }}>
+        <h1 className="text-xl sm:text-2xl font-light text-[var(--c-ink)] tracking-wide" style={{ fontFamily: 'var(--font-display)' }}>
           Get Delivery Quotes
         </h1>
-        <p className="text-sm text-[#6B7C86] mt-1">
+        <p className="text-sm text-[var(--c-text-3)] mt-1">
           Describe your shipment and receive quotes from carriers on matching routes.
         </p>
       </div>
@@ -232,13 +232,13 @@ export default function GetQuotesPage() {
             onClick={() => setStep(i + 1)}
             className={`flex items-center gap-2 px-4 py-2 rounded text-sm font-medium transition-colors ${
               step === i + 1
-                ? 'bg-[#FF6A2A] text-white'
+                ? 'bg-[var(--c-accent)] text-white'
                 : step > i + 1
-                  ? 'bg-[#9ED36A]/10 text-[#9ED36A]'
-                  : 'bg-[#162E3D] text-[#6B7C86]'
+                  ? 'bg-[var(--c-success)]/10 text-[var(--c-success)]'
+                  : 'bg-[var(--c-surface)] text-[var(--c-text-3)]'
             }`}
           >
-            <span className="w-5 h-5 rounded-full bg-[#162E3D]/20 flex items-center justify-center text-xs font-bold">
+            <span className="w-5 h-5 rounded-full bg-[var(--c-surface)]/20 flex items-center justify-center text-xs font-bold">
               {step > i + 1 ? '✓' : i + 1}
             </span>
             <span className="hidden sm:inline">{label}</span>
@@ -247,16 +247,16 @@ export default function GetQuotesPage() {
       </div>
 
       {error && (
-        <div className="mb-6 px-4 py-3 rounded bg-red-900/20 border border-red-500/30">
-          <p className="text-sm text-red-300">{error}</p>
+        <div className="mb-6 px-4 py-3 rounded bg-[#B23A2E]/10 border border-[#B23A2E]/30">
+          <p className="text-sm text-[var(--c-error)]">{error}</p>
         </div>
       )}
 
       {/* Step 1: Cargo Details */}
       {step === 1 && (
         <div className="space-y-6">
-          <div className="bg-[#162E3D] rounded-lg border border-white/10 p-6">
-            <h2 className="text-base font-semibold text-[#F7F9FB] mb-5">What are you shipping?</h2>
+          <div className="bg-[var(--c-surface)] rounded-lg border border-black/10 p-6">
+            <h2 className="text-base font-semibold text-[var(--c-ink)] mb-5">What are you shipping?</h2>
 
             <div className="space-y-4">
               <div>
@@ -275,15 +275,15 @@ export default function GetQuotesPage() {
           </div>
 
           {/* Packages */}
-          <div className="bg-[#162E3D] rounded-lg border border-white/10 p-6">
+          <div className="bg-[var(--c-surface)] rounded-lg border border-black/10 p-6">
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-base font-semibold text-[#F7F9FB]">Packages & Items</h2>
-              <button type="button" onClick={() => addPackage('box')} className="text-sm font-semibold text-[#FF6A2A] hover:text-[#FF8F5A] transition-colors">+ Add Package</button>
+              <h2 className="text-base font-semibold text-[var(--c-ink)]">Packages & Items</h2>
+              <button type="button" onClick={() => addPackage('box')} className="text-sm font-semibold text-[var(--c-accent)] hover:text-[#FF8F5A] transition-colors">+ Add Package</button>
             </div>
 
             {packages.length === 0 ? (
-              <div className="text-center py-6 border-2 border-dashed border-white/10 rounded-lg">
-                <p className="text-sm text-[#6B7C86] mb-4">Add your packages to get accurate quotes</p>
+              <div className="text-center py-6 border-2 border-dashed border-black/10 rounded-lg">
+                <p className="text-sm text-[var(--c-text-3)] mb-4">Add your packages to get accurate quotes</p>
                 <div className="flex flex-wrap justify-center gap-2">
                   {[
                     { type: 'box', label: '+ Box' },
@@ -297,7 +297,7 @@ export default function GetQuotesPage() {
                       key={btn.type}
                       type="button"
                       onClick={() => addPackage(btn.type)}
-                      className="px-3 py-2 rounded border border-white/10 text-sm font-medium text-[#F7F9FB] hover:border-[#FF6A2A] hover:bg-[#FF6A2A]/10 transition-all"
+                      className="px-3 py-2 rounded border border-black/10 text-sm font-medium text-[var(--c-ink)] hover:border-[var(--c-accent)] hover:bg-[var(--c-accent)]/10 transition-all"
                     >
                       {btn.label}
                     </button>
@@ -309,14 +309,14 @@ export default function GetQuotesPage() {
                 {packages.map((pkg, idx) => {
                   const typeInfo = PACKAGE_TYPES.find(t => t.value === pkg.type)
                   return (
-                    <div key={pkg.id} className="p-4 bg-[#0B1F2A] rounded-lg border border-white/10">
+                    <div key={pkg.id} className="p-4 bg-[var(--c-canvas)] rounded-lg border border-black/10">
                       <div className="flex items-center justify-between mb-3">
-                        <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Package {idx + 1}</span>
-                        <button type="button" onClick={() => removePackage(pkg.id)} className="text-xs text-red-500 hover:text-red-300 font-medium transition-colors">Remove</button>
+                        <span className="text-xs font-semibold text-[var(--c-text-2)] uppercase tracking-wider">Package {idx + 1}</span>
+                        <button type="button" onClick={() => removePackage(pkg.id)} className="text-xs text-[var(--c-error)] hover:text-[var(--c-error)] font-medium transition-colors">Remove</button>
                       </div>
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                         <div className="col-span-2 sm:col-span-1">
-                          <label className="block text-xs font-medium text-[#6B7C86] mb-1">Type</label>
+                          <label className="block text-xs font-medium text-[var(--c-text-3)] mb-1">Type</label>
                           <select
                             className={selectClass + " !py-2 !text-sm"}
                             value={pkg.type}
@@ -326,39 +326,39 @@ export default function GetQuotesPage() {
                           </select>
                         </div>
                         <div>
-                          <label className="block text-xs font-medium text-[#6B7C86] mb-1">Quantity</label>
+                          <label className="block text-xs font-medium text-[var(--c-text-3)] mb-1">Quantity</label>
                           <input type="number" min="1" className={inputClass + " !py-2 !text-sm"} value={pkg.quantity} onChange={e => updatePackage(pkg.id, 'quantity', parseInt(e.target.value) || 1)} />
                         </div>
                         <div>
-                          <label className="block text-xs font-medium text-[#6B7C86] mb-1">Weight (kg ea.)</label>
+                          <label className="block text-xs font-medium text-[var(--c-text-3)] mb-1">Weight (kg ea.)</label>
                           <input type="number" min="0" step="0.1" className={inputClass + " !py-2 !text-sm"} value={pkg.weightKg} onChange={e => updatePackage(pkg.id, 'weightKg', parseFloat(e.target.value) || 0)} />
                         </div>
                         <div>
-                          <label className="block text-xs font-medium text-[#6B7C86] mb-1">Note</label>
+                          <label className="block text-xs font-medium text-[var(--c-text-3)] mb-1">Note</label>
                           <input type="text" className={inputClass + " !py-2 !text-sm"} placeholder="Optional" value={pkg.description} onChange={e => updatePackage(pkg.id, 'description', e.target.value)} />
                         </div>
                       </div>
                       {/* Dimensions — always shown; L/W locked for pallets */}
                       <div className="grid grid-cols-3 gap-3 mt-3">
                         <div>
-                          <label className="block text-xs font-medium text-[#6B7C86] mb-1">Length (cm)</label>
-                          <input type="number" min="1" max="2400" disabled={typeInfo?.isPallet} className={inputClass + " !py-2 !text-sm" + (typeInfo?.isPallet ? ' !bg-[#102535] !text-[#6B7C86] !cursor-not-allowed' : '')} value={pkg.lengthCm} onChange={e => updatePackage(pkg.id, 'lengthCm', parseInt(e.target.value) || 0)} />
+                          <label className="block text-xs font-medium text-[var(--c-text-3)] mb-1">Length (cm)</label>
+                          <input type="number" min="1" max="2400" disabled={typeInfo?.isPallet} className={inputClass + " !py-2 !text-sm" + (typeInfo?.isPallet ? ' !bg-[var(--c-canvas-2)] !text-[var(--c-text-3)] !cursor-not-allowed' : '')} value={pkg.lengthCm} onChange={e => updatePackage(pkg.id, 'lengthCm', parseInt(e.target.value) || 0)} />
                         </div>
                         <div>
-                          <label className="block text-xs font-medium text-[#6B7C86] mb-1">Width (cm)</label>
-                          <input type="number" min="1" max="2400" disabled={typeInfo?.isPallet} className={inputClass + " !py-2 !text-sm" + (typeInfo?.isPallet ? ' !bg-[#102535] !text-[#6B7C86] !cursor-not-allowed' : '')} value={pkg.widthCm} onChange={e => updatePackage(pkg.id, 'widthCm', parseInt(e.target.value) || 0)} />
+                          <label className="block text-xs font-medium text-[var(--c-text-3)] mb-1">Width (cm)</label>
+                          <input type="number" min="1" max="2400" disabled={typeInfo?.isPallet} className={inputClass + " !py-2 !text-sm" + (typeInfo?.isPallet ? ' !bg-[var(--c-canvas-2)] !text-[var(--c-text-3)] !cursor-not-allowed' : '')} value={pkg.widthCm} onChange={e => updatePackage(pkg.id, 'widthCm', parseInt(e.target.value) || 0)} />
                         </div>
                         <div>
-                          <label className="block text-xs font-medium text-[#6B7C86] mb-1">Height (cm){typeInfo?.isPallet ? ' ✎' : ''}</label>
+                          <label className="block text-xs font-medium text-[var(--c-text-3)] mb-1">Height (cm){typeInfo?.isPallet ? ' ✎' : ''}</label>
                           <input type="number" min="1" max="2400" className={inputClass + " !py-2 !text-sm"} value={pkg.heightCm} onChange={e => updatePackage(pkg.id, 'heightCm', parseInt(e.target.value) || 0)} />
                         </div>
                       </div>
                       {/* Per-item CBM */}
                       {pkg.lengthCm > 0 && pkg.widthCm > 0 && pkg.heightCm > 0 && (
-                        <p className="text-[11px] text-slate-400 mt-1.5">
+                        <p className="text-[11px] text-[var(--c-text-2)] mt-1.5">
                           {calcCubicMetres(pkg.lengthCm, pkg.widthCm, pkg.heightCm)} m³ per unit
                           {pkg.quantity > 1 && (
-                            <> · <strong className="text-[#FF6A2A]">{(calcCubicMetres(pkg.lengthCm, pkg.widthCm, pkg.heightCm) * pkg.quantity).toFixed(4)} m³ total</strong></>
+                            <> · <strong className="text-[var(--c-accent)]">{(calcCubicMetres(pkg.lengthCm, pkg.widthCm, pkg.heightCm) * pkg.quantity).toFixed(4)} m³ total</strong></>
                           )}
                         </p>
                       )}
@@ -382,7 +382,7 @@ export default function GetQuotesPage() {
                       key={btn.type}
                       type="button"
                       onClick={() => addPackage(btn.type)}
-                      className="px-2.5 py-1.5 rounded border border-white/10 text-xs font-medium text-[#9AADB8] hover:border-[#FF6A2A] hover:text-[#FF6A2A] transition-all"
+                      className="px-2.5 py-1.5 rounded border border-black/10 text-xs font-medium text-[var(--c-text-2)] hover:border-[var(--c-accent)] hover:text-[var(--c-accent)] transition-all"
                     >
                       {btn.label}
                     </button>
@@ -390,17 +390,17 @@ export default function GetQuotesPage() {
                 </div>
 
                 {/* Totals */}
-                <div className="flex gap-6 pt-3 border-t border-white/10 text-sm">
-                  <div><span className="text-[#6B7C86]">Total items:</span> <strong className="text-[#F7F9FB]">{packages.reduce((s, p) => s + p.quantity, 0)}</strong></div>
-                  <div><span className="text-[#6B7C86]">Total weight:</span> <strong className="text-[#F7F9FB]">{totalWeight.toFixed(1)} kg</strong></div>
-                  <div><span className="text-[#6B7C86]">Total volume:</span> <strong className="text-[#F7F9FB]">{totalVolume.toFixed(2)} m&sup3;</strong></div>
+                <div className="flex gap-6 pt-3 border-t border-black/10 text-sm">
+                  <div><span className="text-[var(--c-text-3)]">Total items:</span> <strong className="text-[var(--c-ink)]">{packages.reduce((s, p) => s + p.quantity, 0)}</strong></div>
+                  <div><span className="text-[var(--c-text-3)]">Total weight:</span> <strong className="text-[var(--c-ink)]">{totalWeight.toFixed(1)} kg</strong></div>
+                  <div><span className="text-[var(--c-text-3)]">Total volume:</span> <strong className="text-[var(--c-ink)]">{totalVolume.toFixed(2)} m&sup3;</strong></div>
                 </div>
               </div>
             )}
           </div>
 
-          <div className="bg-[#162E3D] rounded-lg border border-white/10 p-6">
-            <h2 className="text-base font-semibold text-[#F7F9FB] mb-5">Special Requirements</h2>
+          <div className="bg-[var(--c-surface)] rounded-lg border border-black/10 p-6">
+            <h2 className="text-base font-semibold text-[var(--c-ink)] mb-5">Special Requirements</h2>
             <div className="space-y-3">
               {[
                 { key: 'isFragile', label: 'Fragile — requires careful handling' },
@@ -409,8 +409,8 @@ export default function GetQuotesPage() {
               ].map(({ key, label }) => (
                 <label key={key} className="flex items-center gap-3 cursor-pointer">
                   <input type="checkbox" checked={form[key as keyof typeof form] as boolean} onChange={(e) => updateForm(key, e.target.checked)}
-                    className="w-4 h-4 rounded border-white/10 text-[#FF6A2A] focus:ring-[#FF6A2A]/20" />
-                  <span className="text-sm text-[#F7F9FB]">{label}</span>
+                    className="w-4 h-4 rounded border-black/10 text-[var(--c-accent)] focus:ring-[var(--c-accent)]/20" />
+                  <span className="text-sm text-[var(--c-ink)]">{label}</span>
                 </label>
               ))}
               <div className="pt-2">
@@ -433,8 +433,8 @@ export default function GetQuotesPage() {
       {/* Step 2: Pickup & Delivery */}
       {step === 2 && (
         <div className="space-y-6">
-          <div className="bg-[#162E3D] rounded-lg border border-white/10 p-6">
-            <h2 className="text-base font-semibold text-[#F7F9FB] mb-5">Pickup Details</h2>
+          <div className="bg-[var(--c-surface)] rounded-lg border border-black/10 p-6">
+            <h2 className="text-base font-semibold text-[var(--c-ink)] mb-5">Pickup Details</h2>
             <div className="space-y-4">
               <div>
                 <label className={labelClass}>Pickup Location / Port</label>
@@ -479,8 +479,8 @@ export default function GetQuotesPage() {
             </div>
           </div>
 
-          <div className="bg-[#162E3D] rounded-lg border border-white/10 p-6">
-            <h2 className="text-base font-semibold text-[#F7F9FB] mb-5">Delivery Details</h2>
+          <div className="bg-[var(--c-surface)] rounded-lg border border-black/10 p-6">
+            <h2 className="text-base font-semibold text-[var(--c-ink)] mb-5">Delivery Details</h2>
             <div className="space-y-4">
               <div>
                 <label className={labelClass}>Delivery Location / Port</label>
@@ -509,8 +509,8 @@ export default function GetQuotesPage() {
                 </div>
               </div>
 
-              <div className="pt-2 border-t border-white/10">
-                <p className="text-xs font-semibold text-[#FF6A2A] uppercase tracking-wider mb-3">Yacht / Marina Details</p>
+              <div className="pt-2 border-t border-black/10">
+                <p className="text-xs font-semibold text-[var(--c-accent)] uppercase tracking-wider mb-3">Yacht / Marina Details</p>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
@@ -553,8 +553,8 @@ export default function GetQuotesPage() {
       {/* Step 3: Preferences & Submit */}
       {step === 3 && (
         <div className="space-y-6">
-          <div className="bg-[#162E3D] rounded-lg border border-white/10 p-6">
-            <h2 className="text-base font-semibold text-[#F7F9FB] mb-5">Transport Preferences</h2>
+          <div className="bg-[var(--c-surface)] rounded-lg border border-black/10 p-6">
+            <h2 className="text-base font-semibold text-[var(--c-ink)] mb-5">Transport Preferences</h2>
             <div className="space-y-4">
               <div>
                 <label className={labelClass}>Method of Transport</label>
@@ -575,8 +575,8 @@ export default function GetQuotesPage() {
             </div>
           </div>
 
-          <div className="bg-[#162E3D] rounded-lg border border-white/10 p-6">
-            <h2 className="text-base font-semibold text-[#F7F9FB] mb-5">Pricing</h2>
+          <div className="bg-[var(--c-surface)] rounded-lg border border-black/10 p-6">
+            <h2 className="text-base font-semibold text-[var(--c-ink)] mb-5">Pricing</h2>
             <div className="space-y-4">
               <div>
                 <label className={labelClass}>How would you like to receive pricing?</label>
@@ -585,21 +585,21 @@ export default function GetQuotesPage() {
                     onClick={() => updateForm('pricingType', 'quotes')}
                     className={`p-4 rounded border-2 text-left transition-all ${
                       form.pricingType === 'quotes'
-                        ? 'border-[#FF6A2A] bg-[#FF6A2A]/10'
-                        : 'border-white/10 hover:border-white/15'
+                        ? 'border-[var(--c-accent)] bg-[var(--c-accent)]/10'
+                        : 'border-black/10 hover:border-black/15'
                     }`}>
-                    <div className="text-sm font-semibold text-[#F7F9FB]">Get Quotes</div>
-                    <div className="text-xs text-[#6B7C86] mt-1">Carriers bid — you choose</div>
+                    <div className="text-sm font-semibold text-[var(--c-ink)]">Get Quotes</div>
+                    <div className="text-xs text-[var(--c-text-3)] mt-1">Carriers bid — you choose</div>
                   </button>
                   <button type="button"
                     onClick={() => updateForm('pricingType', 'fixed')}
                     className={`p-4 rounded border-2 text-left transition-all ${
                       form.pricingType === 'fixed'
-                        ? 'border-[#FF6A2A] bg-[#FF6A2A]/10'
-                        : 'border-white/10 hover:border-white/15'
+                        ? 'border-[var(--c-accent)] bg-[var(--c-accent)]/10'
+                        : 'border-black/10 hover:border-black/15'
                     }`}>
-                    <div className="text-sm font-semibold text-[#F7F9FB]">Fixed Price</div>
-                    <div className="text-xs text-[#6B7C86] mt-1">Set your budget — instant match</div>
+                    <div className="text-sm font-semibold text-[var(--c-ink)]">Fixed Price</div>
+                    <div className="text-xs text-[var(--c-text-3)] mt-1">Set your budget — instant match</div>
                   </button>
                 </div>
               </div>
@@ -612,8 +612,8 @@ export default function GetQuotesPage() {
             </div>
           </div>
 
-          <div className="bg-[#162E3D] rounded-lg border border-white/10 p-6">
-            <h2 className="text-base font-semibold text-[#F7F9FB] mb-5">Additional Information (Optional)</h2>
+          <div className="bg-[var(--c-surface)] rounded-lg border border-black/10 p-6">
+            <h2 className="text-base font-semibold text-[var(--c-ink)] mb-5">Additional Information (Optional)</h2>
             <textarea className={inputClass + " min-h-[100px] resize-none"}
               placeholder="Any other details carriers should know..."
               value={form.additionalInfo} onChange={(e) => updateForm('additionalInfo', e.target.value)} />
@@ -621,9 +621,9 @@ export default function GetQuotesPage() {
 
           {/* AI Price Estimate */}
           {token && totalWeight > 0 && form.pickupLocation && form.deliveryLocation && (
-            <div className="bg-gradient-to-br from-[#FF6A2A]/5 to-transparent rounded-lg border border-[#FF6A2A]/20 p-6">
+            <div className="bg-gradient-to-br from-[var(--c-accent)]/5 to-transparent rounded-lg border border-[var(--c-accent)]/20 p-6">
               <div className="flex items-center justify-between mb-3">
-                <h2 className="text-base font-semibold text-[#F7F9FB]">AI Price Estimate</h2>
+                <h2 className="text-base font-semibold text-[var(--c-ink)]">AI Price Estimate</h2>
                 <button
                   onClick={async () => {
                     setEstimatingAI(true)
@@ -649,39 +649,39 @@ export default function GetQuotesPage() {
                     finally { setEstimatingAI(false) }
                   }}
                   disabled={estimatingAI}
-                  className="px-4 py-2 bg-[#FF6A2A] text-white rounded-lg text-xs font-semibold hover:bg-[#E85A1C] disabled:opacity-50 transition-colors"
+                  className="px-4 py-2 bg-[var(--c-accent)] text-white rounded-lg text-xs font-semibold hover:bg-[var(--c-accent-hover)] disabled:opacity-50 transition-colors"
                 >
                   {estimatingAI ? 'Estimating...' : aiEstimate ? 'Re-estimate' : 'Get AI Estimate'}
                 </button>
               </div>
               {aiEstimate && (
                 <div>
-                  <div className="text-2xl font-bold text-[#F7F9FB] mb-1">
+                  <div className="text-2xl font-bold text-[var(--c-ink)] mb-1">
                     {aiEstimate.currency === 'GBP' ? '\u00A3' : '\u20AC'}{aiEstimate.estimatedPriceMin.toFixed(0)} — {aiEstimate.currency === 'GBP' ? '\u00A3' : '\u20AC'}{aiEstimate.estimatedPriceMax.toFixed(0)}
                   </div>
-                  <p className="text-xs text-[#6B7C86] mb-2">Confidence: {aiEstimate.confidence}</p>
-                  <p className="text-xs text-[#6B7C86]">{aiEstimate.reasoning}</p>
+                  <p className="text-xs text-[var(--c-text-3)] mb-2">Confidence: {aiEstimate.confidence}</p>
+                  <p className="text-xs text-[var(--c-text-3)]">{aiEstimate.reasoning}</p>
                 </div>
               )}
               {!aiEstimate && !estimatingAI && (
-                <p className="text-xs text-[#6B7C86]">Get an instant AI-powered price estimate based on your cargo details and route.</p>
+                <p className="text-xs text-[var(--c-text-3)]">Get an instant AI-powered price estimate based on your cargo details and route.</p>
               )}
             </div>
           )}
 
           {/* Summary */}
-          <div className="bg-[#0B1F2A] rounded-lg border border-white/10 p-6">
-            <h2 className="text-base font-semibold text-[#F7F9FB] mb-4">Summary</h2>
+          <div className="bg-[var(--c-canvas)] rounded-lg border border-black/10 p-6">
+            <h2 className="text-base font-semibold text-[var(--c-ink)] mb-4">Summary</h2>
             <div className="space-y-2 text-sm">
-              {form.cargoType && <div><span className="text-[#6B7C86]">Cargo:</span> <span className="font-medium text-[#F7F9FB]">{form.cargoType}</span></div>}
-              {totalWeight > 0 && <div><span className="text-[#6B7C86]">Weight:</span> <span className="font-medium text-[#F7F9FB]">{totalWeight.toFixed(1)} kg</span></div>}
-              {packages.length > 0 && <div><span className="text-[#6B7C86]">Packages:</span> <span className="font-medium text-[#F7F9FB]">{packages.reduce((s, p) => s + p.quantity, 0)} items ({packages.length} types)</span></div>}
-              {form.pickupLocation && <div><span className="text-[#6B7C86]">From:</span> <span className="font-medium text-[#F7F9FB]">{form.pickupLocation}</span></div>}
-              {form.deliveryLocation && <div><span className="text-[#6B7C86]">To:</span> <span className="font-medium text-[#F7F9FB]">{form.deliveryLocation}</span></div>}
-              {form.yachtName && <div><span className="text-[#6B7C86]">Yacht:</span> <span className="font-medium text-[#F7F9FB]">{form.yachtName}</span></div>}
-              {form.marinaName && <div><span className="text-[#6B7C86]">Marina:</span> <span className="font-medium text-[#F7F9FB]">{form.marinaName}</span></div>}
-              {form.preferredDate && <div><span className="text-[#6B7C86]">Date:</span> <span className="font-medium text-[#F7F9FB]">{new Date(form.preferredDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span></div>}
-              <div><span className="text-[#6B7C86]">Pricing:</span> <span className="font-medium text-[#F7F9FB]">{form.pricingType === 'quotes' ? 'Open for quotes (bidding)' : `Fixed budget: €${form.maxBudget || '—'}`}</span></div>
+              {form.cargoType && <div><span className="text-[var(--c-text-3)]">Cargo:</span> <span className="font-medium text-[var(--c-ink)]">{form.cargoType}</span></div>}
+              {totalWeight > 0 && <div><span className="text-[var(--c-text-3)]">Weight:</span> <span className="font-medium text-[var(--c-ink)]">{totalWeight.toFixed(1)} kg</span></div>}
+              {packages.length > 0 && <div><span className="text-[var(--c-text-3)]">Packages:</span> <span className="font-medium text-[var(--c-ink)]">{packages.reduce((s, p) => s + p.quantity, 0)} items ({packages.length} types)</span></div>}
+              {form.pickupLocation && <div><span className="text-[var(--c-text-3)]">From:</span> <span className="font-medium text-[var(--c-ink)]">{form.pickupLocation}</span></div>}
+              {form.deliveryLocation && <div><span className="text-[var(--c-text-3)]">To:</span> <span className="font-medium text-[var(--c-ink)]">{form.deliveryLocation}</span></div>}
+              {form.yachtName && <div><span className="text-[var(--c-text-3)]">Yacht:</span> <span className="font-medium text-[var(--c-ink)]">{form.yachtName}</span></div>}
+              {form.marinaName && <div><span className="text-[var(--c-text-3)]">Marina:</span> <span className="font-medium text-[var(--c-ink)]">{form.marinaName}</span></div>}
+              {form.preferredDate && <div><span className="text-[var(--c-text-3)]">Date:</span> <span className="font-medium text-[var(--c-ink)]">{new Date(form.preferredDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span></div>}
+              <div><span className="text-[var(--c-text-3)]">Pricing:</span> <span className="font-medium text-[var(--c-ink)]">{form.pricingType === 'quotes' ? 'Open for quotes (bidding)' : `Fixed budget: €${form.maxBudget || '—'}`}</span></div>
             </div>
           </div>
 

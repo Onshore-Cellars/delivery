@@ -94,24 +94,24 @@ export default function HelpPage() {
   return (
     <div className="page-container narrow">
       <div className="mb-8">
-        <p className="text-[11px] font-semibold text-[#FF6A2A] uppercase tracking-[0.15em] mb-1">Support</p>
-        <h1 className="text-xl sm:text-2xl font-semibold text-[#F7F9FB] tracking-[-0.02em]">Help & Support</h1>
-        <p className="mt-1.5 text-sm text-[#6B7C86]">Find answers to common questions or chat with our AI assistant</p>
+        <p className="text-[11px] font-semibold text-[var(--c-accent)] uppercase tracking-[0.15em] mb-1">Support</p>
+        <h1 className="text-xl sm:text-2xl font-semibold text-[var(--c-ink)] tracking-[-0.02em]">Help & Support</h1>
+        <p className="mt-1.5 text-sm text-[var(--c-text-3)]">Find answers to common questions or chat with our AI assistant</p>
       </div>
 
       {/* FAQ Section */}
       <div className="mb-8">
-        <h2 className="text-sm font-semibold text-[#F7F9FB] uppercase tracking-wider mb-3">Frequently Asked Questions</h2>
-        <div className="bg-[#162E3D] rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.3)] border border-white/10 divide-y divide-white/10">
+        <h2 className="text-sm font-semibold text-[var(--c-ink)] uppercase tracking-wider mb-3">Frequently Asked Questions</h2>
+        <div className="bg-[var(--c-surface)] rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.3)] border border-black/10 divide-y divide-black/10">
           {faqs.map((faq, i) => (
             <div key={i}>
               <button
                 onClick={() => toggleFaq(i)}
-                className="w-full flex items-center justify-between px-4 sm:px-6 py-3.5 sm:py-4 text-left hover:bg-[#162E3D] active:bg-[#102535] transition-colors"
+                className="w-full flex items-center justify-between px-4 sm:px-6 py-3.5 sm:py-4 text-left hover:bg-[var(--c-surface)] active:bg-[var(--c-canvas-2)] transition-colors"
               >
-                <span className="text-sm font-medium text-[#F7F9FB] pr-4">{faq.q}</span>
+                <span className="text-sm font-medium text-[var(--c-ink)] pr-4">{faq.q}</span>
                 <svg
-                  className={`w-5 h-5 text-slate-400 flex-shrink-0 transition-transform ${openFaq === i ? 'rotate-180' : ''}`}
+                  className={`w-5 h-5 text-[var(--c-text-2)] flex-shrink-0 transition-transform ${openFaq === i ? 'rotate-180' : ''}`}
                   fill="none" stroke="currentColor" viewBox="0 0 24 24"
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -119,7 +119,7 @@ export default function HelpPage() {
               </button>
               {openFaq === i && (
                 <div className="px-4 sm:px-6 pb-4">
-                  <p className="text-sm text-[#9AADB8] leading-relaxed">{faq.a}</p>
+                  <p className="text-sm text-[var(--c-text-2)] leading-relaxed">{faq.a}</p>
                 </div>
               )}
             </div>
@@ -129,16 +129,16 @@ export default function HelpPage() {
 
       {/* AI Chat Section */}
       <div className="mb-8">
-        <h2 className="text-sm font-semibold text-[#F7F9FB] uppercase tracking-wider mb-3">AI Support Assistant</h2>
-        <div className="bg-[#162E3D] rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.3)] border border-white/10 overflow-hidden flex flex-col" style={{ height: '480px' }}>
+        <h2 className="text-sm font-semibold text-[var(--c-ink)] uppercase tracking-wider mb-3">AI Support Assistant</h2>
+        <div className="bg-[var(--c-surface)] rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.3)] border border-black/10 overflow-hidden flex flex-col" style={{ height: '480px' }}>
           {/* Chat messages */}
           <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
             {messages.map((msg, i) => (
               <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm ${
                   msg.role === 'user'
-                    ? 'bg-[#FF6A2A] text-white rounded-br-md'
-                    : 'bg-[#162E3D] text-[#F7F9FB] rounded-bl-md'
+                    ? 'bg-[var(--c-accent)] text-white rounded-br-md'
+                    : 'bg-[var(--c-surface)] text-[var(--c-ink)] rounded-bl-md'
                 }`}>
                   <p className="whitespace-pre-wrap">{msg.content}</p>
                 </div>
@@ -146,7 +146,7 @@ export default function HelpPage() {
             ))}
             {sending && (
               <div className="flex justify-start">
-                <div className="bg-[#162E3D] text-[#F7F9FB] px-4 py-2.5 rounded-2xl rounded-bl-md">
+                <div className="bg-[var(--c-surface)] text-[var(--c-ink)] px-4 py-2.5 rounded-2xl rounded-bl-md">
                   <div className="flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                     <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
@@ -163,7 +163,7 @@ export default function HelpPage() {
             <div className="flex gap-2">
               <input
                 type="text"
-                className="flex-1 px-4 py-2.5 rounded-xl border border-white/10 text-sm text-[#F7F9FB] focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10 outline-none"
+                className="flex-1 px-4 py-2.5 rounded-xl border border-black/10 text-sm text-[var(--c-ink)] focus:border-[var(--c-accent)] focus:ring-2 focus:ring-[var(--c-accent)]/10 outline-none"
                 placeholder="Ask a question..."
                 value={input}
                 onChange={e => setInput(e.target.value)}

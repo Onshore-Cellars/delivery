@@ -43,15 +43,15 @@ interface Booking {
 }
 
 const statusColors: Record<string, string> = {
-  ACTIVE: 'bg-[#9ED36A]/10 text-[#9ED36A] border-green-500/30',
-  FULL: 'bg-[#FF6A2A]/10 text-[#FF6A2A] border-[#FF6A2A]/20',
-  COMPLETED: 'bg-[#102535] text-[#9AADB8] border-white/10',
-  CANCELLED: 'bg-red-900/20 text-red-300 border-red-500/30',
-  IN_TRANSIT: 'bg-[#268CB5]/15 text-[#5FB3C4] border-[#268CB5]/25',
-  PENDING: 'bg-[#E6A93C]/15 text-[#E6A93C] border-[#E6A93C]/25',
-  CONFIRMED: 'bg-[#9ED36A]/10 text-[#9ED36A] border-green-500/30',
-  PICKED_UP: 'bg-[#268CB5]/15 text-[#5FB3C4] border-[#268CB5]/25',
-  DELIVERED: 'bg-[#102535] text-[#9AADB8] border-white/10',
+  ACTIVE: 'bg-[var(--c-success)]/10 text-[var(--c-success)] border-green-500/30',
+  FULL: 'bg-[var(--c-accent)]/10 text-[var(--c-accent)] border-[var(--c-accent)]/20',
+  COMPLETED: 'bg-[var(--c-canvas-2)] text-[var(--c-text-2)] border-black/10',
+  CANCELLED: 'bg-[#B23A2E]/10 text-[var(--c-error)] border-[#B23A2E]/30',
+  IN_TRANSIT: 'bg-[var(--c-info)]/15 text-[var(--c-info)] border-[var(--c-info)]/25',
+  PENDING: 'bg-[var(--c-warning)]/15 text-[var(--c-warning)] border-[var(--c-warning)]/25',
+  CONFIRMED: 'bg-[var(--c-success)]/10 text-[var(--c-success)] border-green-500/30',
+  PICKED_UP: 'bg-[var(--c-info)]/15 text-[var(--c-info)] border-[var(--c-info)]/25',
+  DELIVERED: 'bg-[var(--c-canvas-2)] text-[var(--c-text-2)] border-black/10',
 }
 
 function PaymentBanner() {
@@ -60,15 +60,15 @@ function PaymentBanner() {
   if (!payment) return null
   if (payment === 'success') {
     return (
-      <div className="mb-6 px-4 py-3 rounded-xl bg-[#9ED36A]/10 border border-green-500/30">
-        <p className="text-sm font-medium text-[#9ED36A]">Payment successful! Your booking is confirmed. Check your email for the receipt.</p>
+      <div className="mb-6 px-4 py-3 rounded-xl bg-[var(--c-success)]/10 border border-green-500/30">
+        <p className="text-sm font-medium text-[var(--c-success)]">Payment successful! Your booking is confirmed. Check your email for the receipt.</p>
       </div>
     )
   }
   if (payment === 'cancelled') {
     return (
-      <div className="mb-6 px-4 py-3 rounded-xl bg-[#FF6A2A]/10 border border-[#FF6A2A]/20">
-        <p className="text-sm font-medium text-[#FF6A2A]">Payment was cancelled. Your booking has been created — you can pay from your dashboard.</p>
+      <div className="mb-6 px-4 py-3 rounded-xl bg-[var(--c-accent)]/10 border border-[var(--c-accent)]/20">
+        <p className="text-sm font-medium text-[var(--c-accent)]">Payment was cancelled. Your booking has been created — you can pay from your dashboard.</p>
       </div>
     )
   }
@@ -201,7 +201,7 @@ export default function DashboardPage() {
       <Suspense><PaymentBanner /></Suspense>
 
       {error && (
-        <div className="mb-6 px-4 py-3 rounded-xl bg-red-900/20 border border-red-500/30">
+        <div className="mb-6 px-4 py-3 rounded-xl bg-[#B23A2E]/10 border border-[#B23A2E]/30">
           <p className="text-sm font-medium text-red-800">{error}</p>
         </div>
       )}
@@ -209,8 +209,8 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8 gap-3">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-[#F7F9FB] tracking-tight">Welcome back, {user.name}</h1>
-          <p className="text-sm text-[#6B7C86] mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-[var(--c-ink)] tracking-tight">Welcome back, {user.name}</h1>
+          <p className="text-sm text-[var(--c-text-3)] mt-1">
             {user.company && <span>{user.company} &middot; </span>}
             {user.canCarry ? 'Manage your routes and bookings' : 'Track your deliveries'}
           </p>
@@ -239,8 +239,8 @@ export default function DashboardPage() {
             onClick={() => setTab(t as typeof tab)}
             className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all whitespace-nowrap ${
               tab === t
-                ? 'bg-[#FF6A2A] text-white'
-                : 'text-[#6B7C86] hover:text-white hover:bg-[#102535]'
+                ? 'bg-[var(--c-accent)] text-white'
+                : 'text-[var(--c-text-3)] hover:text-white hover:bg-[var(--c-canvas-2)]'
             }`}
           >
             {t.charAt(0).toUpperCase() + t.slice(1)}
@@ -282,24 +282,24 @@ export default function DashboardPage() {
 
                 {/* Quick Links */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-                  <Link href="/analytics" className="px-4 py-3 rounded-xl border border-white/10 text-center text-sm font-medium text-[#F7F9FB] hover:bg-[#162E3D] transition-colors hover:no-underline">
+                  <Link href="/analytics" className="px-4 py-3 rounded-xl border border-black/10 text-center text-sm font-medium text-[var(--c-ink)] hover:bg-[var(--c-surface)] transition-colors hover:no-underline">
                     Analytics
                   </Link>
-                  <Link href="/notifications" className="px-4 py-3 rounded-xl border border-white/10 text-center text-sm font-medium text-[#F7F9FB] hover:bg-[#162E3D] transition-colors hover:no-underline">
+                  <Link href="/notifications" className="px-4 py-3 rounded-xl border border-black/10 text-center text-sm font-medium text-[var(--c-ink)] hover:bg-[var(--c-surface)] transition-colors hover:no-underline">
                     Notifications
                   </Link>
-                  <Link href="/insurance" className="px-4 py-3 rounded-xl border border-white/10 text-center text-sm font-medium text-[#F7F9FB] hover:bg-[#162E3D] transition-colors hover:no-underline">
+                  <Link href="/insurance" className="px-4 py-3 rounded-xl border border-black/10 text-center text-sm font-medium text-[var(--c-ink)] hover:bg-[var(--c-surface)] transition-colors hover:no-underline">
                     Insurance
                   </Link>
-                  <Link href="/disputes" className="px-4 py-3 rounded-xl border border-white/10 text-center text-sm font-medium text-[#F7F9FB] hover:bg-[#162E3D] transition-colors hover:no-underline">
+                  <Link href="/disputes" className="px-4 py-3 rounded-xl border border-black/10 text-center text-sm font-medium text-[var(--c-ink)] hover:bg-[var(--c-surface)] transition-colors hover:no-underline">
                     Disputes
                   </Link>
                   {user.canCarry && (
                     <>
-                      <Link href="/earnings" className="px-4 py-3 rounded-xl border border-white/10 text-center text-sm font-medium text-[#F7F9FB] hover:bg-[#162E3D] transition-colors hover:no-underline">
+                      <Link href="/earnings" className="px-4 py-3 rounded-xl border border-black/10 text-center text-sm font-medium text-[var(--c-ink)] hover:bg-[var(--c-surface)] transition-colors hover:no-underline">
                         Earnings
                       </Link>
-                      <Link href="/vehicles" className="px-4 py-3 rounded-xl border border-white/10 text-center text-sm font-medium text-[#F7F9FB] hover:bg-[#162E3D] transition-colors hover:no-underline">
+                      <Link href="/vehicles" className="px-4 py-3 rounded-xl border border-black/10 text-center text-sm font-medium text-[var(--c-ink)] hover:bg-[var(--c-surface)] transition-colors hover:no-underline">
                         Vehicles
                       </Link>
                     </>
@@ -308,11 +308,11 @@ export default function DashboardPage() {
 
                 {/* AI Consolidation Suggestions */}
                 {bookings.length >= 2 && (
-                  <div className="bg-gradient-to-br from-[#FF6A2A]/5 to-transparent rounded-2xl border border-[#FF6A2A]/20 p-5 sm:p-6">
+                  <div className="bg-gradient-to-br from-[var(--c-accent)]/5 to-transparent rounded-2xl border border-[var(--c-accent)]/20 p-5 sm:p-6">
                     <div className="flex items-center justify-between mb-3">
                       <div>
-                        <h2 className="font-bold text-[#F7F9FB] text-base">AI Insights</h2>
-                        <p className="text-xs text-[#6B7C86] mt-0.5">Smart suggestions to optimise your deliveries</p>
+                        <h2 className="font-bold text-[var(--c-ink)] text-base">AI Insights</h2>
+                        <p className="text-xs text-[var(--c-text-3)] mt-0.5">Smart suggestions to optimise your deliveries</p>
                       </div>
                       <button
                         onClick={async () => {
@@ -338,7 +338,7 @@ export default function DashboardPage() {
                           finally { setLoadingConsolidation(false) }
                         }}
                         disabled={loadingConsolidation}
-                        className="px-4 py-2 bg-[#FF6A2A] text-white rounded-lg text-xs font-semibold hover:bg-[#E85A1C] disabled:opacity-50 transition-colors"
+                        className="px-4 py-2 bg-[var(--c-accent)] text-white rounded-lg text-xs font-semibold hover:bg-[var(--c-accent-hover)] disabled:opacity-50 transition-colors"
                       >
                         {loadingConsolidation ? 'Analysing...' : aiConsolidation ? 'Refresh' : 'Analyse'}
                       </button>
@@ -346,72 +346,72 @@ export default function DashboardPage() {
                     {aiConsolidation ? (
                       <div className="space-y-2">
                         {aiConsolidation.suggestions?.map((s, i) => (
-                          <div key={i} className="flex items-start gap-2 text-sm text-[#9AADB8]">
-                            <span className="text-[#FF6A2A] mt-0.5">*</span>{s}
+                          <div key={i} className="flex items-start gap-2 text-sm text-[var(--c-text-2)]">
+                            <span className="text-[var(--c-accent)] mt-0.5">*</span>{s}
                           </div>
                         ))}
                         {aiConsolidation.potentialSavings && (
-                          <p className="text-xs font-medium text-[#9ED36A] mt-2">Potential savings: {aiConsolidation.potentialSavings}</p>
+                          <p className="text-xs font-medium text-[var(--c-success)] mt-2">Potential savings: {aiConsolidation.potentialSavings}</p>
                         )}
-                        <p className="text-xs text-slate-400 mt-1">{aiConsolidation.reasoning}</p>
+                        <p className="text-xs text-[var(--c-text-2)] mt-1">{aiConsolidation.reasoning}</p>
                       </div>
                     ) : !loadingConsolidation ? (
-                      <p className="text-xs text-[#6B7C86]">Analyse your bookings and listings for consolidation opportunities and cost savings.</p>
+                      <p className="text-xs text-[var(--c-text-3)]">Analyse your bookings and listings for consolidation opportunities and cost savings.</p>
                     ) : null}
                   </div>
                 )}
 
                 {/* Recent bookings */}
-                <div className="bg-[#162E3D] rounded-2xl border border-white/10 overflow-hidden">
-                  <div className="px-5 sm:px-6 py-4 border-b border-white/10">
-                    <h2 className="font-bold text-[#F7F9FB] text-base">Recent Bookings</h2>
+                <div className="bg-[var(--c-surface)] rounded-2xl border border-black/10 overflow-hidden">
+                  <div className="px-5 sm:px-6 py-4 border-b border-black/10">
+                    <h2 className="font-bold text-[var(--c-ink)] text-base">Recent Bookings</h2>
                   </div>
                   {bookings.length === 0 ? (
                     <div className="p-10 sm:p-14 text-center">
-                      <div className="w-14 h-14 rounded-2xl bg-[#102535] flex items-center justify-center mx-auto mb-4">
-                        <svg className="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+                      <div className="w-14 h-14 rounded-2xl bg-[var(--c-canvas-2)] flex items-center justify-center mx-auto mb-4">
+                        <svg className="w-6 h-6 text-[var(--c-text-2)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
                       </div>
-                      <p className="text-[#F7F9FB] font-semibold mb-1.5">No bookings yet</p>
-                      <p className="text-sm text-[#6B7C86] mb-5">Browse available listings to get started</p>
+                      <p className="text-[var(--c-ink)] font-semibold mb-1.5">No bookings yet</p>
+                      <p className="text-sm text-[var(--c-text-3)] mb-5">Browse available listings to get started</p>
                       <Link href="/marketplace" className="btn-primary !text-sm !py-2.5 !px-6">Browse Marketplace</Link>
                     </div>
                   ) : (
                     <div>
                       {bookings.slice((bookingPage - 1) * BOOKINGS_PER_PAGE, bookingPage * BOOKINGS_PER_PAGE).map(b => (
-                        <div key={b.id} className="px-5 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between hover:bg-[#162E3D] transition-colors gap-2 border-b border-white/10 last:border-0">
+                        <div key={b.id} className="px-5 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between hover:bg-[var(--c-surface)] transition-colors gap-2 border-b border-black/10 last:border-0">
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2.5 flex-wrap">
-                              <span className={`badge border ${statusColors[b.status] || 'bg-[#102535] text-[#9AADB8]'}`}>
+                              <span className={`badge border ${statusColors[b.status] || 'bg-[var(--c-canvas-2)] text-[var(--c-text-2)]'}`}>
                                 {b.status.replace('_', ' ')}
                               </span>
-                              <span className="text-sm font-semibold text-[#F7F9FB] truncate">{b.cargoDescription}</span>
+                              <span className="text-sm font-semibold text-[var(--c-ink)] truncate">{b.cargoDescription}</span>
                             </div>
-                            <div className="mt-1.5 text-xs text-[#6B7C86]">
+                            <div className="mt-1.5 text-xs text-[var(--c-text-3)]">
                               {b.listing.originPort} &rarr; {b.listing.destinationPort} &middot; {formatDate(b.listing.departureDate)}
                             </div>
                           </div>
                           <div className="text-left sm:text-right">
-                            <div className="text-sm font-bold text-[#F7F9FB]">{formatCurrency(b.totalPrice, b.currency)}</div>
-                            {b.trackingCode && <div className="text-xs text-slate-400 font-mono mt-0.5">{b.trackingCode}</div>}
+                            <div className="text-sm font-bold text-[var(--c-ink)]">{formatCurrency(b.totalPrice, b.currency)}</div>
+                            {b.trackingCode && <div className="text-xs text-[var(--c-text-2)] font-mono mt-0.5">{b.trackingCode}</div>}
                           </div>
                         </div>
                       ))}
                       {bookings.length > BOOKINGS_PER_PAGE && (
-                        <div className="flex items-center justify-between px-5 sm:px-6 py-3 border-t border-white/10">
+                        <div className="flex items-center justify-between px-5 sm:px-6 py-3 border-t border-black/10">
                           <button
                             onClick={() => setBookingPage(p => Math.max(1, p - 1))}
                             disabled={bookingPage === 1}
-                            className="px-3 py-1.5 text-xs font-medium rounded-lg border border-white/10 text-[#9AADB8] hover:bg-[#162E3D] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                            className="px-3 py-1.5 text-xs font-medium rounded-lg border border-black/10 text-[var(--c-text-2)] hover:bg-[var(--c-surface)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                           >
                             Previous
                           </button>
-                          <span className="text-xs text-[#6B7C86]">
+                          <span className="text-xs text-[var(--c-text-3)]">
                             Page {bookingPage} of {Math.ceil(bookings.length / BOOKINGS_PER_PAGE)}
                           </span>
                           <button
                             onClick={() => setBookingPage(p => Math.min(Math.ceil(bookings.length / BOOKINGS_PER_PAGE), p + 1))}
                             disabled={bookingPage >= Math.ceil(bookings.length / BOOKINGS_PER_PAGE)}
-                            className="px-3 py-1.5 text-xs font-medium rounded-lg border border-white/10 text-[#9AADB8] hover:bg-[#162E3D] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                            className="px-3 py-1.5 text-xs font-medium rounded-lg border border-black/10 text-[var(--c-text-2)] hover:bg-[var(--c-surface)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                           >
                             Next
                           </button>
@@ -427,25 +427,25 @@ export default function DashboardPage() {
             {tab === 'listings' && user.canCarry && (
               <div className="space-y-4">
                 {listings.length === 0 ? (
-                  <div className="bg-[#162E3D] rounded-2xl border border-white/10 p-10 sm:p-12 text-center">
-                    <p className="text-[#6B7C86] font-medium mb-4">You haven&apos;t created any listings yet</p>
+                  <div className="bg-[var(--c-surface)] rounded-2xl border border-black/10 p-10 sm:p-12 text-center">
+                    <p className="text-[var(--c-text-3)] font-medium mb-4">You haven&apos;t created any listings yet</p>
                     <Link href="/listings/create" className="btn-primary !text-sm !py-2.5 !px-6">Create Your First Listing</Link>
                   </div>
                 ) : (
                   listings.map(l => (
-                    <div key={l.id} className="bg-[#162E3D] rounded-2xl border border-white/10 p-5 sm:p-6 card-hover">
+                    <div key={l.id} className="bg-[var(--c-surface)] rounded-2xl border border-black/10 p-5 sm:p-6 card-hover">
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                         <div>
                           <div className="flex items-center gap-2.5 mb-2 flex-wrap">
-                            <h3 className="font-bold text-[#F7F9FB]">{l.title}</h3>
+                            <h3 className="font-bold text-[var(--c-ink)]">{l.title}</h3>
                             <span className={`badge border ${statusColors[l.status]}`}>{l.status}</span>
                           </div>
-                          <p className="text-sm text-[#6B7C86]">{l.originPort} &rarr; {l.destinationPort} &middot; {formatDate(l.departureDate)}</p>
+                          <p className="text-sm text-[var(--c-text-3)]">{l.originPort} &rarr; {l.destinationPort} &middot; {formatDate(l.departureDate)}</p>
                         </div>
                         <div className="sm:text-right">
-                          <div className="text-sm text-[#6B7C86] mb-1.5">{l.availableKg.toFixed(0)} kg / {l.availableM3.toFixed(1)} m&sup3; available</div>
-                          <div className="w-full sm:w-32 h-2 bg-[#102535] rounded-full overflow-hidden">
-                            <div className="h-full bg-[#FF6A2A] rounded-full transition-all" style={{ width: `${((l.totalCapacityKg - l.availableKg) / l.totalCapacityKg * 100)}%` }} />
+                          <div className="text-sm text-[var(--c-text-3)] mb-1.5">{l.availableKg.toFixed(0)} kg / {l.availableM3.toFixed(1)} m&sup3; available</div>
+                          <div className="w-full sm:w-32 h-2 bg-[var(--c-canvas-2)] rounded-full overflow-hidden">
+                            <div className="h-full bg-[var(--c-accent)] rounded-full transition-all" style={{ width: `${((l.totalCapacityKg - l.availableKg) / l.totalCapacityKg * 100)}%` }} />
                           </div>
                         </div>
                       </div>
@@ -459,37 +459,37 @@ export default function DashboardPage() {
             {tab === 'bookings' && (
               <div className="space-y-4">
                 {bookings.length === 0 ? (
-                  <div className="bg-[#162E3D] rounded-2xl border border-white/10 p-10 sm:p-12 text-center">
-                    <p className="text-[#6B7C86] font-medium mb-4">No bookings yet</p>
+                  <div className="bg-[var(--c-surface)] rounded-2xl border border-black/10 p-10 sm:p-12 text-center">
+                    <p className="text-[var(--c-text-3)] font-medium mb-4">No bookings yet</p>
                     <Link href="/marketplace" className="btn-primary !text-sm !py-2.5 !px-6">Browse Marketplace</Link>
                   </div>
                 ) : (
                   bookings.map(b => (
-                    <div key={b.id} className="bg-[#162E3D] rounded-2xl border border-white/10 p-5 sm:p-6 card-hover">
+                    <div key={b.id} className="bg-[var(--c-surface)] rounded-2xl border border-black/10 p-5 sm:p-6 card-hover">
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                         <div>
                           <div className="flex items-center gap-2.5 mb-2 flex-wrap">
                             <span className={`badge border ${statusColors[b.status]}`}>{b.status.replace('_', ' ')}</span>
-                            <h3 className="font-bold text-[#F7F9FB]">{b.cargoDescription}</h3>
+                            <h3 className="font-bold text-[var(--c-ink)]">{b.cargoDescription}</h3>
                           </div>
-                          <p className="text-sm text-[#6B7C86]">{b.listing.originPort} &rarr; {b.listing.destinationPort} &middot; {formatDate(b.listing.departureDate)}</p>
-                          <p className="text-xs text-slate-400 mt-1">
+                          <p className="text-sm text-[var(--c-text-3)]">{b.listing.originPort} &rarr; {b.listing.destinationPort} &middot; {formatDate(b.listing.departureDate)}</p>
+                          <p className="text-xs text-[var(--c-text-2)] mt-1">
                             Carrier: {b.listing.carrier.name}{b.listing.carrier.company && ` (${b.listing.carrier.company})`}
                           </p>
                         </div>
                         <div className="sm:text-right">
-                          <div className="text-lg font-bold text-[#F7F9FB]">{formatCurrency(b.totalPrice, b.currency)}</div>
-                          <div className="text-xs text-slate-400 mt-0.5">{b.weightKg} kg &middot; {b.volumeM3} m&sup3;</div>
+                          <div className="text-lg font-bold text-[var(--c-ink)]">{formatCurrency(b.totalPrice, b.currency)}</div>
+                          <div className="text-xs text-[var(--c-text-2)] mt-0.5">{b.weightKg} kg &middot; {b.volumeM3} m&sup3;</div>
                           {b.paymentStatus && (
                             <span className={`inline-block text-[10px] font-bold uppercase tracking-wider mt-1 px-2 py-0.5 rounded ${
-                              b.paymentStatus === 'PAID' ? 'bg-[#9ED36A]/10 text-[#9ED36A]' :
-                              b.paymentStatus === 'FAILED' ? 'bg-red-900/20 text-red-300' :
-                              b.paymentStatus === 'REFUNDED' ? 'bg-purple-50 text-purple-700' :
-                              'bg-[#FF6A2A]/10 text-[#FF6A2A]'
+                              b.paymentStatus === 'PAID' ? 'bg-[var(--c-success)]/10 text-[var(--c-success)]' :
+                              b.paymentStatus === 'FAILED' ? 'bg-[#B23A2E]/10 text-[var(--c-error)]' :
+                              b.paymentStatus === 'REFUNDED' ? 'bg-[#1F5E86]/10 text-[var(--c-info)]' :
+                              'bg-[var(--c-accent)]/10 text-[var(--c-accent)]'
                             }`}>{b.paymentStatus}</span>
                           )}
                           {b.trackingCode && (
-                            <div className="mt-1.5 inline-flex text-xs font-mono text-[#F7F9FB] bg-[#102535] px-2.5 py-1 rounded-lg">{b.trackingCode}</div>
+                            <div className="mt-1.5 inline-flex text-xs font-mono text-[var(--c-ink)] bg-[var(--c-canvas-2)] px-2.5 py-1 rounded-lg">{b.trackingCode}</div>
                           )}
                           <div className="mt-2 flex gap-2 justify-end flex-wrap items-center">
                             {/* Carrier: accept / reject a pending request */}
@@ -498,14 +498,14 @@ export default function DashboardPage() {
                                 <button
                                   onClick={() => handleAcceptReject(b.id, 'accept')}
                                   disabled={actioning === b.id + ':accept'}
-                                  className="rounded-lg bg-[#9ED36A] px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-[#0B1F2A] hover:brightness-95 disabled:opacity-60"
+                                  className="rounded-lg bg-[var(--c-success)] px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-[var(--c-canvas)] hover:brightness-95 disabled:opacity-60"
                                 >
                                   {actioning === b.id + ':accept' ? '…' : 'Accept'}
                                 </button>
                                 <button
                                   onClick={() => handleAcceptReject(b.id, 'reject')}
                                   disabled={actioning === b.id + ':reject'}
-                                  className="rounded-lg border border-red-500/40 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-red-300 hover:bg-red-500/10 disabled:opacity-60"
+                                  className="rounded-lg border border-[#B23A2E]/30 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-[var(--c-error)] hover:bg-[#B23A2E]/10 disabled:opacity-60"
                                 >
                                   Decline
                                 </button>
@@ -516,7 +516,7 @@ export default function DashboardPage() {
                               <button
                                 onClick={() => handlePay(b.id)}
                                 disabled={actioning === b.id + ':pay'}
-                                className="rounded-lg bg-[#FF6A2A] px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-wide text-white hover:bg-[#E85A1C] disabled:opacity-60"
+                                className="rounded-lg bg-[var(--c-accent)] px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-wide text-white hover:bg-[var(--c-accent-hover)] disabled:opacity-60"
                               >
                                 {actioning === b.id + ':pay' ? 'Redirecting…' : `Pay ${formatCurrency(b.totalPrice, b.currency)}`}
                               </button>
@@ -525,14 +525,14 @@ export default function DashboardPage() {
                               href={`/api/bookings/${b.id}/invoice/pdf`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-[11px] font-medium text-[#FF6A2A] hover:text-[#FF8F5A] transition-colors"
+                              className="text-[11px] font-medium text-[var(--c-accent)] hover:text-[#FF8F5A] transition-colors"
                             >
                               Download Invoice
                             </a>
                             {(b.status === 'DELIVERED' || b.status === 'COMPLETED') && (
                               <Link
                                 href={`/marketplace?origin=${encodeURIComponent(b.listing.originPort)}&destination=${encodeURIComponent(b.listing.destinationPort)}`}
-                                className="text-[11px] font-medium text-[#6B7C86] hover:text-white transition-colors"
+                                className="text-[11px] font-medium text-[var(--c-text-3)] hover:text-white transition-colors"
                               >
                                 Book Again
                               </Link>
@@ -553,9 +553,9 @@ export default function DashboardPage() {
 
 function StatCard({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
-    <div className={`rounded-2xl border p-5 sm:p-6 transition-shadow hover:shadow-md ${accent ? 'bg-[#FF6A2A] border-[#FF6A2A]' : 'bg-[#162E3D] border-white/10'}`}>
-      <div className={`text-xs font-semibold uppercase tracking-wider ${accent ? 'text-[#e8c994]' : 'text-slate-400'}`}>{label}</div>
-      <div className={`mt-2 text-2xl sm:text-3xl font-bold tracking-tight ${accent ? 'text-white' : 'text-[#F7F9FB]'}`}>{value}</div>
+    <div className={`rounded-2xl border p-5 sm:p-6 transition-shadow hover:shadow-md ${accent ? 'bg-[var(--c-accent)] border-[var(--c-accent)]' : 'bg-[var(--c-surface)] border-black/10'}`}>
+      <div className={`text-xs font-semibold uppercase tracking-wider ${accent ? 'text-[#e8c994]' : 'text-[var(--c-text-2)]'}`}>{label}</div>
+      <div className={`mt-2 text-2xl sm:text-3xl font-bold tracking-tight ${accent ? 'text-white' : 'text-[var(--c-ink)]'}`}>{value}</div>
     </div>
   )
 }

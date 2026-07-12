@@ -95,7 +95,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex flex-col bg-[#162E3D]">
+    <div className="flex flex-col bg-[var(--c-surface)]">
       <div className="flex-1 flex items-center justify-center px-5 sm:px-8 py-12">
         <div className="w-full max-w-sm">
           {/* Logo */}
@@ -103,33 +103,33 @@ export default function LoginPage() {
             <Image src="/logo.png" alt="ON.SHORE Delivery" width={36} height={36} className="rounded-sm" />
           </Link>
 
-          <h1 className="text-2xl sm:text-3xl font-light text-[#F7F9FB] tracking-wide" style={{ fontFamily: 'var(--font-display)' }}>Welcome back</h1>
-          <p className="mt-2 text-sm sm:text-base text-[#6B7C86]">Sign in to manage your deliveries.</p>
+          <h1 className="text-2xl sm:text-3xl font-light text-[var(--c-ink)] tracking-wide" style={{ fontFamily: 'var(--font-display)' }}>Welcome back</h1>
+          <p className="mt-2 text-sm sm:text-base text-[var(--c-text-3)]">Sign in to manage your deliveries.</p>
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-4">
             {error && (
-              <div className="px-4 py-3 rounded-xl bg-red-900/20 border border-red-500/30" role="alert">
-                <p className="text-sm text-red-300">{error}</p>
+              <div className="px-4 py-3 rounded-xl bg-[#B23A2E]/10 border border-[#B23A2E]/30" role="alert">
+                <p className="text-sm text-[var(--c-error)]">{error}</p>
               </div>
             )}
 
             <div>
-              <label htmlFor="email" className="block text-sm font-semibold text-[#F7F9FB] mb-2">Email</label>
+              <label htmlFor="email" className="block text-sm font-semibold text-[var(--c-ink)] mb-2">Email</label>
               <input id="email" type="email" required autoComplete="email"
-                className="w-full px-4 py-3.5 rounded-xl border border-white/10 bg-[#162E3D] text-[#F7F9FB] text-[15px] placeholder:text-slate-400 focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10 transition-all outline-none"
+                className="w-full px-4 py-3.5 rounded-xl border border-black/10 bg-[var(--c-surface)] text-[var(--c-ink)] text-[15px] placeholder:text-[var(--c-text-2)] focus:border-[var(--c-accent)] focus:ring-2 focus:ring-[var(--c-accent)]/10 transition-all outline-none"
                 placeholder="you@company.com" value={email} onChange={(e) => setEmail(e.target.value)} />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-semibold text-[#F7F9FB] mb-2">Password</label>
+              <label htmlFor="password" className="block text-sm font-semibold text-[var(--c-ink)] mb-2">Password</label>
               <div className="relative">
                 <input id="password" type={showPassword ? 'text' : 'password'} required autoComplete="current-password"
-                  className="w-full px-4 py-3.5 pr-12 rounded-xl border border-white/10 bg-[#162E3D] text-[#F7F9FB] text-[15px] placeholder:text-slate-400 focus:border-[#FF6A2A] focus:ring-2 focus:ring-[#FF6A2A]/10 transition-all outline-none"
+                  className="w-full px-4 py-3.5 pr-12 rounded-xl border border-black/10 bg-[var(--c-surface)] text-[var(--c-ink)] text-[15px] placeholder:text-[var(--c-text-2)] focus:border-[var(--c-accent)] focus:ring-2 focus:ring-[var(--c-accent)]/10 transition-all outline-none"
                   placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-[#9AADB8] transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[var(--c-text-2)] hover:text-[var(--c-text-2)] transition-colors"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? (
@@ -142,7 +142,7 @@ export default function LoginPage() {
             </div>
 
             <div className="flex justify-end">
-              <Link href="/forgot-password" className="text-sm text-[#FF6A2A] hover:underline">Forgot password?</Link>
+              <Link href="/forgot-password" className="text-sm text-[var(--c-accent)] hover:underline">Forgot password?</Link>
             </div>
 
             <button type="submit" disabled={loading} className="w-full btn-primary !py-3.5 !text-[15px] disabled:opacity-50">
@@ -156,8 +156,8 @@ export default function LoginPage() {
           </form>
 
           <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/10" /></div>
-            <div className="relative flex justify-center text-xs"><span className="bg-[#162E3D] px-3 text-slate-400 uppercase tracking-wider font-medium">or</span></div>
+            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-black/10" /></div>
+            <div className="relative flex justify-center text-xs"><span className="bg-[var(--c-surface)] px-3 text-[var(--c-text-2)] uppercase tracking-wider font-medium">or</span></div>
           </div>
 
           {/* Google Sign-in: show real button if ready, otherwise fallback */}
@@ -166,20 +166,20 @@ export default function LoginPage() {
           )}
           {googleLoading && !googleReady && (
             <div className="flex justify-center py-3">
-              <svg className="animate-spin h-5 w-5 text-slate-300" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+              <svg className="animate-spin h-5 w-5 text-[var(--c-text-3)]" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
             </div>
           )}
           {!googleLoading && !googleReady && (
             <div className="text-center">
-              <p className="text-xs text-slate-400 mb-2">Google sign-in is not available right now</p>
-              <p className="text-xs text-slate-400">Please use email and password to sign in</p>
+              <p className="text-xs text-[var(--c-text-2)] mb-2">Google sign-in is not available right now</p>
+              <p className="text-xs text-[var(--c-text-2)]">Please use email and password to sign in</p>
             </div>
           )}
 
           {/* Role Selection for Google Sign-in (new users) */}
           {showRoleSelect && (
-            <div className="mt-4 p-4 rounded-xl border border-[#FF6A2A]/20 bg-[#0B1F2A]">
-              <p className="text-sm font-semibold text-[#F7F9FB] mb-3">Select your account type to continue:</p>
+            <div className="mt-4 p-4 rounded-xl border border-[var(--c-accent)]/20 bg-[var(--c-canvas)]">
+              <p className="text-sm font-semibold text-[var(--c-ink)] mb-3">Select your account type to continue:</p>
               <div className="grid grid-cols-2 gap-2">
                 {[
                   { role: 'SUPPLIER', label: 'Shipper', desc: 'Send goods' },
@@ -192,20 +192,20 @@ export default function LoginPage() {
                     type="button"
                     disabled={loading}
                     onClick={() => handleRoleSelect(role)}
-                    className="flex flex-col items-center gap-1 p-3 rounded-lg border border-white/10 bg-[#162E3D] hover:border-[#FF6A2A] hover:bg-[#FF6A2A]/5 transition-all text-center disabled:opacity-50"
+                    className="flex flex-col items-center gap-1 p-3 rounded-lg border border-black/10 bg-[var(--c-surface)] hover:border-[var(--c-accent)] hover:bg-[var(--c-accent)]/5 transition-all text-center disabled:opacity-50"
                   >
-                    <span className="text-sm font-semibold text-[#F7F9FB]">{label}</span>
-                    <span className="text-xs text-[#6B7C86]">{desc}</span>
+                    <span className="text-sm font-semibold text-[var(--c-ink)]">{label}</span>
+                    <span className="text-xs text-[var(--c-text-3)]">{desc}</span>
                   </button>
                 ))}
               </div>
-              <button type="button" onClick={() => { setShowRoleSelect(false); setPendingGoogleToken(null) }} className="mt-2 w-full text-xs text-slate-400 hover:text-[#9AADB8]">Cancel</button>
+              <button type="button" onClick={() => { setShowRoleSelect(false); setPendingGoogleToken(null) }} className="mt-2 w-full text-xs text-[var(--c-text-2)] hover:text-[var(--c-text-2)]">Cancel</button>
             </div>
           )}
 
-          <p className="mt-8 text-center text-sm text-[#6B7C86]">
+          <p className="mt-8 text-center text-sm text-[var(--c-text-3)]">
             Don&apos;t have an account?{' '}
-            <Link href="/register" className="font-semibold text-[#FF6A2A] hover:text-[#FF8F5A]">Create one</Link>
+            <Link href="/register" className="font-semibold text-[var(--c-accent)] hover:text-[#FF8F5A]">Create one</Link>
           </p>
         </div>
       </div>

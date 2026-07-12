@@ -76,25 +76,25 @@ export default function NotificationsPage() {
     SYSTEM: 'System',
   }
 
-  if (authLoading) return <div className="min-h-screen bg-[#0B1F2A]" />
+  if (authLoading) return <div className="min-h-screen bg-[var(--c-canvas)]" />
   if (!user) return (
-    <div className="min-h-screen bg-[#0B1F2A] flex items-center justify-center">
-      <p className="text-[#6B7C86]">Please <Link href="/login" className="text-[#FF6A2A]">sign in</Link></p>
+    <div className="min-h-screen bg-[var(--c-canvas)] flex items-center justify-center">
+      <p className="text-[var(--c-text-3)]">Please <Link href="/login" className="text-[var(--c-accent)]">sign in</Link></p>
     </div>
   )
 
   const unreadCount = notifications.filter(n => !n.read).length
 
   return (
-    <div id="main-content" className="min-h-screen bg-[#0B1F2A] py-8 px-4">
+    <div id="main-content" className="min-h-screen bg-[var(--c-canvas)] py-8 px-4">
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-[#F7F9FB]" style={{ fontFamily: 'var(--font-display)' }}>Notifications</h1>
-            {unreadCount > 0 && <p className="text-xs text-slate-400 mt-1">{unreadCount} unread</p>}
+            <h1 className="text-2xl font-bold text-[var(--c-ink)]" style={{ fontFamily: 'var(--font-display)' }}>Notifications</h1>
+            {unreadCount > 0 && <p className="text-xs text-[var(--c-text-2)] mt-1">{unreadCount} unread</p>}
           </div>
           {unreadCount > 0 && (
-            <button onClick={markAllRead} className="px-4 py-2 border border-white/10 rounded-lg text-sm font-medium text-[#F7F9FB] hover:bg-[#162E3D] transition-colors">
+            <button onClick={markAllRead} className="px-4 py-2 border border-black/10 rounded-lg text-sm font-medium text-[var(--c-ink)] hover:bg-[var(--c-surface)] transition-colors">
               Mark all read
             </button>
           )}
@@ -103,37 +103,37 @@ export default function NotificationsPage() {
         <div className="flex gap-2 mb-6">
           {(['all', 'unread'] as const).map(f => (
             <button key={f} onClick={() => setFilter(f)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${filter === f ? 'bg-[#FF6A2A] text-white' : 'bg-[#162E3D] border border-white/10 text-[#F7F9FB] hover:bg-[#0B1F2A]'}`}>
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${filter === f ? 'bg-[var(--c-accent)] text-white' : 'bg-[var(--c-surface)] border border-black/10 text-[var(--c-ink)] hover:bg-[var(--c-canvas)]'}`}>
               {f === 'all' ? 'All' : 'Unread'}
             </button>
           ))}
         </div>
 
         {loading ? (
-          <div className="space-y-3">{[1,2,3,4].map(i => <div key={i} className="h-20 bg-[#162E3D] rounded-lg border border-white/10 animate-pulse" />)}</div>
+          <div className="space-y-3">{[1,2,3,4].map(i => <div key={i} className="h-20 bg-[var(--c-surface)] rounded-lg border border-black/10 animate-pulse" />)}</div>
         ) : notifications.length === 0 ? (
-          <div className="text-center py-16 bg-[#162E3D] rounded-lg border border-white/10">
-            <p className="text-[#6B7C86]">{filter === 'unread' ? 'No unread notifications' : 'No notifications yet'}</p>
+          <div className="text-center py-16 bg-[var(--c-surface)] rounded-lg border border-black/10">
+            <p className="text-[var(--c-text-3)]">{filter === 'unread' ? 'No unread notifications' : 'No notifications yet'}</p>
           </div>
         ) : (
           <div className="space-y-2">
             {notifications.map(n => (
               <div key={n.id}
                 onClick={() => { if (!n.read) markRead(n.id) }}
-                className={`p-4 rounded-lg border transition-colors cursor-pointer ${n.read ? 'bg-[#162E3D] border-white/10' : 'bg-[#FF6A2A]/10/50 border-[#FF6A2A]/20'}`}>
+                className={`p-4 rounded-lg border transition-colors cursor-pointer ${n.read ? 'bg-[var(--c-surface)] border-black/10' : 'bg-[var(--c-accent)]/10/50 border-[var(--c-accent)]/20'}`}>
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      {!n.read && <span className="w-2 h-2 rounded-full bg-[#FF6A2A] flex-shrink-0" />}
-                      <span className="text-xs text-slate-400 font-medium">{typeIcon[n.type] || n.type}</span>
+                      {!n.read && <span className="w-2 h-2 rounded-full bg-[var(--c-accent)] flex-shrink-0" />}
+                      <span className="text-xs text-[var(--c-text-2)] font-medium">{typeIcon[n.type] || n.type}</span>
                     </div>
-                    <div className="text-sm font-medium text-[#F7F9FB]">{n.title}</div>
-                    <div className="text-xs text-[#6B7C86] mt-0.5">{n.message}</div>
+                    <div className="text-sm font-medium text-[var(--c-ink)]">{n.title}</div>
+                    <div className="text-xs text-[var(--c-text-3)] mt-0.5">{n.message}</div>
                   </div>
                   <div className="flex items-center gap-3 ml-4">
-                    <span className="text-[10px] text-slate-400 whitespace-nowrap">{new Date(n.createdAt).toLocaleDateString()}</span>
+                    <span className="text-[10px] text-[var(--c-text-2)] whitespace-nowrap">{new Date(n.createdAt).toLocaleDateString()}</span>
                     {n.linkUrl && (
-                      <Link href={n.linkUrl} className="text-xs text-[#FF6A2A] font-medium hover:underline whitespace-nowrap"
+                      <Link href={n.linkUrl} className="text-xs text-[var(--c-accent)] font-medium hover:underline whitespace-nowrap"
                         onClick={e => e.stopPropagation()}>View</Link>
                     )}
                   </div>

@@ -2,40 +2,64 @@
 
 @theme inline {
   /* ── ON.SHORE DELIVERY — Brand Tokens ── */
-  --color-navy:        #0B1F2A;
-  --color-navy-mid:    #102535;
-  --color-navy-soft:   #162E3D;
-  --color-salt:        #F7F9FB;
-  --color-steel:       #6B7C86;
-  --color-steel-lt:    #9AADB8;
-  --color-harbour:     #1E6F8F;
-  --color-harbour-lt:  #268CB5;
-  --color-orange:      #FF6A2A;
-  --color-orange-hover:#E85A1C;
-  --color-green:       #9ED36A;
+  --color-navy:        var(--c-canvas);
+  --color-navy-mid:    var(--c-canvas-2);
+  --color-navy-soft:   var(--c-surface);
+  --color-salt:        var(--c-ink);
+  --color-steel:       var(--c-text-3);
+  --color-steel-lt:    var(--c-text-2);
+  --color-harbour:     var(--c-brand);
+  --color-harbour-lt:  var(--c-info);
+  --color-orange:      var(--c-accent);
+  --color-orange-hover:var(--c-accent-hover);
+  --color-green:       var(--c-success);
   --color-sand:        #D6C3A3;
   --color-espresso:    #3A2A22;
 
   /* Semantic mappings */
-  --color-primary:          #F7F9FB;
-  --color-primary-light:    #9AADB8;
-  --color-secondary:        #8FA1AB;
-  --color-accent:           #FF6A2A;
-  --color-accent-hover:     #E85A1C;
-  --color-surface:          #0B1F2A;
-  --color-surface-secondary:#102535;
-  --color-surface-tertiary: #162E3D;
+  --color-primary:          var(--c-ink);
+  --color-primary-light:    var(--c-text-2);
+  --color-secondary:        var(--c-text-2);
+  --color-accent:           var(--c-accent);
+  --color-accent-hover:     var(--c-accent-hover);
+  --color-surface:          var(--c-canvas);
+  --color-surface-secondary:var(--c-canvas-2);
+  --color-surface-tertiary: var(--c-surface);
   --color-border:           rgba(255,255,255,0.08);
   --color-border-light:     rgba(255,255,255,0.04);
-  --color-success:          #9ED36A;
+  --color-success:          var(--c-success);
   /* Warning is its OWN token — never the same hue as the CTA accent. */
-  --color-warning:          #E6A93C;
-  --color-error:            #ff5a4d;
-  --color-info:             #268CB5;
+  --color-warning:          var(--c-warning);
+  --color-error:            var(--c-error);
+  --color-info:             var(--c-info);
 
-  --font-sans:    'Syne', system-ui, -apple-system, sans-serif;
-  --font-display: 'Cormorant Garamond', Georgia, serif;
-  --font-mono:    'DM Mono', 'JetBrains Mono', monospace;
+  --font-sans:    'Switzer', system-ui, -apple-system, sans-serif;
+  --font-display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+  --font-mono:    'IBM Plex Mono', ui-monospace, monospace;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   ONSHORE BRAND TOKENS — single source of truth for the whole product.
+   To rebrand, retheme, or add a dark "Helm mode", edit ONLY these values.
+   Every colour in the app references one of these tokens.
+   ───────────────────────────────────────────────────────────────────────── */
+:root {
+  --c-canvas:       #F5F2EC; /* page background — Sailcloth */
+  --c-canvas-2:     #E7E9E3; /* recessed bands, tracks, zebra — Tide 200 */
+  --c-surface:      #FCFBF8; /* cards, inputs, modals — Sea Salt */
+  --c-ink:          #12302C; /* primary text — Deep Harbour */
+  --c-text-2:       #41524E; /* secondary text — Tide 700 */
+  --c-text-3:       #647672; /* muted / placeholder — Tide 500 */
+  --c-border:       #D3D8D1; /* borders, dividers, rules — Tide 300 */
+  --c-brand:        #0C5C54; /* hero brand — Marine Teal */
+  --c-accent:       #0C5C54; /* primary action = brand */
+  --c-accent-hover: #094A44; /* Deep Verdigris */
+  --c-brass:        #A8813C; /* premium accent — sparing */
+  --c-brass-text:   #8A6A2E; /* readable brass for small text */
+  --c-success:      #256B4A;
+  --c-warning:      #8A5A08;
+  --c-error:        #B23A2E;
+  --c-info:         #1F5E86;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -62,12 +86,12 @@ input, select, textarea {
   color: var(--color-salt);
   font-size: 16px;
   font-family: var(--font-sans);
-  background: var(--color-navy-soft);
-  border-color: rgba(255,255,255,0.1);
+  background: var(--c-surface);
+  border-color: var(--c-border);
 }
 
 input::placeholder, textarea::placeholder {
-  color: var(--color-steel);
+  color: var(--c-text-3);
 }
 
 /* Normalize date/datetime inputs to match text inputs */
@@ -98,11 +122,11 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 100px; border: 2px solid transparent; background-clip: padding-box; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); border: 2px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-thumb { background: rgba(18,48,44,0.18); border-radius: 100px; border: 2px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background: rgba(18,48,44,0.3); border: 2px solid transparent; background-clip: padding-box; }
 
 *:focus-visible {
-  outline: 3px solid #268CB5;
+  outline: 3px solid var(--c-info);
   outline-offset: 2px;
   border-radius: 6px;
 }
@@ -141,7 +165,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   min-height: 44px;
   white-space: nowrap;
 }
-.btn-primary:hover { background: var(--color-orange-hover); text-decoration: none; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(255, 106, 42, 0.35); }
+.btn-primary:hover { background: var(--color-orange-hover); text-decoration: none; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(12, 92, 84, 0.28); }
 .btn-primary:active { transform: translateY(0); box-shadow: none; }
 .btn-primary:disabled { opacity: 0.42; cursor: default; transform: none; box-shadow: none; }
 
@@ -150,8 +174,8 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--color-salt);
+  background: var(--c-surface);
+  color: var(--c-ink);
   padding: 12px 28px;
   border-radius: 8px;
   font-family: var(--font-sans);
@@ -160,13 +184,13 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   line-height: 1.2;
   letter-spacing: 0.005em;
   text-transform: none;
-  border: 1px solid rgba(255,255,255,0.1);
+  border: 1px solid var(--c-border);
   cursor: pointer;
   transition: all 0.2s ease;
   min-height: 44px;
   white-space: nowrap;
 }
-.btn-secondary:hover { background: rgba(255, 255, 255, 0.1); text-decoration: none; }
+.btn-secondary:hover { background: var(--c-canvas-2); text-decoration: none; }
 .btn-secondary:active { transform: translateY(0); }
 
 .btn-outline {
@@ -174,8 +198,8 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  background: rgba(255,255,255,0.06);
-  color: #fff;
+  background: transparent;
+  color: var(--c-ink);
   padding: 12px 28px;
   border-radius: 8px;
   font-family: var(--font-sans);
@@ -184,13 +208,13 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   line-height: 1.2;
   letter-spacing: 0.005em;
   text-transform: none;
-  border: 1px solid rgba(255,255,255,0.2);
+  border: 1px solid var(--c-border);
   cursor: pointer;
   transition: all 0.2s ease;
   min-height: 44px;
   white-space: nowrap;
 }
-.btn-outline:hover { background: rgba(255,255,255,0.12); text-decoration: none; border-color: rgba(255,255,255,0.3); }
+.btn-outline:hover { background: var(--c-canvas-2); text-decoration: none; border-color: var(--c-text-3); }
 .btn-outline:active { transform: translateY(0); }
 
 .btn-ghost {
@@ -243,7 +267,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 .animate-slide-in-right { animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) both; }
 
 .loading-shimmer {
-  background: linear-gradient(90deg, #162E3D 25%, #1E3A4D 37%, #162E3D 63%);
+  background: linear-gradient(90deg, var(--c-canvas-2) 25%, var(--c-canvas) 37%, var(--c-canvas-2) 63%);
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
   border-radius: 6px;
@@ -335,7 +359,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 /* ---- GLASS (vibrancy) ---- */
 
 .glass {
-  background: rgba(11, 31, 42, 0.85);
+  background: rgba(245, 242, 236, 0.82);
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
 }
@@ -351,7 +375,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 /* ---- GRADIENT TEXT ---- */
 
 .gradient-text {
-  background: linear-gradient(135deg, #FF6A2A, #FF8F5A, #FF6A2A);
+  background: linear-gradient(135deg, var(--c-accent), var(--c-brass), var(--c-accent));
   background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -361,16 +385,16 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 /* ---- SURFACE STYLES (marine dark-first) ---- */
 
 .surface-elevated {
-  background: var(--color-navy-soft);
+  background: var(--c-surface);
   border-radius: 10px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.3);
-  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 4px 24px rgba(18,48,44,0.08);
+  border: 1px solid var(--c-border);
 }
 
 .surface-grouped {
-  background: var(--color-navy-soft);
+  background: var(--c-surface);
   border-radius: 6px;
-  border: 1px solid rgba(255,255,255,0.06);
+  border: 1px solid var(--c-border);
 }
 
 /* Section headings */

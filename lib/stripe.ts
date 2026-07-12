@@ -60,8 +60,6 @@ export async function createCheckoutSession(params: {
 }): Promise<Stripe.Checkout.Session> {
   const customerId = await getOrCreateCustomer(params.customerEmail, params.customerName, params.bookingId)
 
-  const platformFee = Math.round(params.amount * 100 * (PLATFORM_FEE_PERCENT / 100))
-
   const sessionParams: Stripe.Checkout.SessionCreateParams = {
     customer: customerId,
     payment_method_types: ['card'],
@@ -87,23 +85,14 @@ export async function createCheckoutSession(params: {
     metadata: {
       bookingId: params.bookingId,
     },
-    // Always propagate bookingId onto the resulting PaymentIntent/Charge — Stripe
-    // does NOT copy session metadata, and the payment_failed / canceled / refunded
-    // webhook handlers key on payment_intent.metadata.bookingId.
+    // ESCROW: charge to the PLATFORM balance (no transfer_data / destination
+    // charge). The carrier payout is transferred separately on delivery
+    // confirmation (see lib/payout.ts). Always propagate bookingId onto the
+    // PaymentIntent/Charge — Stripe does NOT copy session metadata, and the
+    // payment_failed / canceled / refunded webhook handlers key on it.
     payment_intent_data: {
       metadata: { bookingId: params.bookingId },
     },
-  }
-
-  // If carrier has Stripe Connect, use platform fees (destination charge)
-  if (params.carrierStripeAccountId) {
-    sessionParams.payment_intent_data = {
-      ...sessionParams.payment_intent_data,
-      application_fee_amount: platformFee,
-      transfer_data: {
-        destination: params.carrierStripeAccountId,
-      },
-    }
   }
 
   return stripe.checkout.sessions.create(sessionParams)
@@ -152,6 +141,37 @@ export async function getAccountStatus(accountId: string) {
     payoutsEnabled: account.payouts_enabled,
     detailsSubmitted: account.details_submitted,
   }
+}
+
+// ─── TRANSFERS (escrow payout) ──────────────────────────────────────────────
+
+/**
+ * Transfer a carrier's payout from the platform balance to their connected
+ * account. Used to release escrowed funds once a delivery is confirmed.
+ */
+export async function createTransfer(params: {
+  amount: number
+  currency: string
+  destination: string
+  bookingId: string
+}): Promise<Stripe.Transfer> {
+  return stripe.transfers.create({
+    amount: Math.round(params.amount * 100),
+    currency: params.currency.toLowerCase(),
+    destination: params.destination,
+    metadata: { bookingId: params.bookingId },
+  })
+}
+
+/**
+ * Reverse a carrier payout transfer (fully or partially) — used when a
+ * delivered booking is later refunded and the platform needs to claw the
+ * carrier's payout back.
+ */
+export async function reverseTransfer(transferId: string, amount?: number): Promise<Stripe.TransferReversal> {
+  return stripe.transfers.createReversal(transferId, {
+    amount: amount != null ? Math.round(amount * 100) : undefined,
+  })
 }
 
 // ─── REFUND ───────────────────────────────────────────────────────────────────

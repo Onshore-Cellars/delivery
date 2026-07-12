@@ -386,6 +386,10 @@ model Booking {
   stripePaymentIntentId String?
   paymentStatus         PaymentStatus @default(PENDING)
   paidAt                DateTime?
+  // Escrow payout (separate charges & transfers): funds are held on the
+  // platform balance at checkout and transferred to the carrier on delivery.
+  stripeTransferId      String?
+  payoutTransferredAt   DateTime?
 
   // Status & Tracking
   status            BookingStatus @default(PENDING)

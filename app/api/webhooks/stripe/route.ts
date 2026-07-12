@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { constructWebhookEvent, calculatePlatformFee, calculateCarrierPayout, currencySymbol } from '@/lib/stripe'
 import { createNotification } from '@/lib/notifications'
-import { sendEmail, paymentReceiptEmail, carrierPayoutEmail } from '@/lib/email'
+import { paymentReceiptEmail } from '@/lib/email'
 import { queueEmail } from '@/lib/email-queue'
 
 export async function POST(request: NextRequest) {
@@ -85,8 +85,8 @@ export async function POST(request: NextRequest) {
           await createNotification({
             userId: booking.listing.carrierId,
             type: 'PAYMENT_RECEIVED',
-            title: 'Payment Received',
-            message: `${booking.shipper.name} paid for ${booking.listing.title}`,
+            title: 'Booking Paid',
+            message: `${booking.shipper.name} paid for ${booking.listing.title}. Your payout is held and released on delivery confirmation.`,
             linkUrl: '/dashboard',
           })
 
@@ -112,18 +112,8 @@ export async function POST(request: NextRequest) {
             await queueEmail({ to: booking.shipper.email, ...receiptEmail })
           } catch (e) { console.error('Receipt email error:', e) }
 
-          // Send carrier payout notification email
-          try {
-            const payoutEmail = carrierPayoutEmail({
-              carrierName: booking.listing.carrier.name,
-              trackingCode: booking.trackingCode || bookingId,
-              bookingTotal: fmtMoney(booking.totalPrice),
-              platformFee: fmtMoney(booking.platformFee),
-              payoutAmount: fmtMoney(booking.carrierPayout),
-              deliveredAt: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
-            })
-            await queueEmail({ to: booking.listing.carrier.email, ...payoutEmail })
-          } catch (e) { console.error('Payout email error:', e) }
+          // NB: the carrier payout email is sent later, when the escrowed funds
+          // are actually released on delivery (see lib/payout.ts) — not here.
         }
         break
       }

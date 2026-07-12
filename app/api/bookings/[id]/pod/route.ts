@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { getTokenFromHeader, verifyToken } from '@/lib/auth'
+import { releaseCarrierPayout } from '@/lib/payout'
 
 // POST /api/bookings/[id]/pod - Submit proof of delivery
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -75,6 +76,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         data: { status: 'COMPLETED' },
       }).catch(() => {})
     }
+
+    // Escrow: release the held carrier payout now that delivery is confirmed.
+    await releaseCarrierPayout(id).catch(e => console.error('Payout release error:', e))
 
     // Create tracking event
     await prisma.trackingEvent.create({
