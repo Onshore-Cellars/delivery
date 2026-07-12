@@ -727,3 +727,75 @@ Return JSON:
     4096
   )
 }
+
+// ─── CRM: contact enrichment & EU yacht-supplier discovery ──────────────────
+
+export interface ContactEnrichment {
+  domain: string | null
+  suggestedEmails: Array<{ email: string; pattern: string; confidence: 'high' | 'medium' | 'low' }>
+  category: string
+  country: string | null
+  region: string | null
+  isYachtSupplier: boolean
+  priority: 'high' | 'medium' | 'low'
+  tags: string[]
+  reasoning: string
+}
+
+/**
+ * Enrich a single CRM contact: derive the email domain from the website, suggest
+ * the most likely generic business emails, normalise the yacht-supplier category,
+ * and infer EU/UK country/region. Never fabricates a domain or a named person's
+ * address — only generic mailboxes at a domain derived from the website.
+ */
+export async function enrichContact(input: {
+  name: string; website?: string; category?: string; country?: string; location?: string
+}): Promise<ContactEnrichment | null> {
+  const system = `You enrich B2B contacts for a yacht-logistics CRM covering the EU & UK superyacht-supplier market — provisioners, chandlers, wine merchants, spare-parts distributors, marine engineers, yacht agents, florists, crew services, interior/decor, electronics.
+
+Rules:
+- domain: derive strictly from the website (strip protocol/www/path). If no website is given, domain is null and suggestedEmails is empty. NEVER invent a domain.
+- suggestedEmails: only generic mailboxes at the derived domain (info@, sales@, contact@, enquiries@, hello@). Rank by how commonly a small EU marine business uses each. NEVER guess a specific person's address.
+- category: normalise to exactly one of: Provisioning, Chandlery, Wine & Spirits, Spare Parts, Marine Equipment, Yacht Agents, Crew Services, Florist, Cleaning, Electronics, Interior & Decor, Other.
+- country/region: EU/UK country and yachting region (e.g. French Riviera, Balearics, Liguria, Solent) if inferable.
+- isYachtSupplier: does this plausibly serve superyachts?
+- priority: high for a strong fit in a core Med/UK hub, else medium/low.
+Return ONLY JSON.`
+  const prompt = `Company: ${input.name}
+Website: ${input.website || '(none)'}
+Current category: ${input.category || '(none)'}
+Country: ${input.country || '(unknown)'}
+Location: ${input.location || '(unknown)'}
+
+Return JSON: {"domain":string|null,"suggestedEmails":[{"email":string,"pattern":string,"confidence":"high|medium|low"}],"category":string,"country":string|null,"region":string|null,"isYachtSupplier":boolean,"priority":"high|medium|low","tags":[string],"reasoning":string}`
+  return askJSON<ContactEnrichment>(prompt, system, MODEL, 800)
+}
+
+export interface DiscoveredSupplier {
+  name: string; website?: string; category: string; country: string; location?: string; why: string
+}
+
+/**
+ * Suggest REAL EU/UK yacht-industry suppliers to grow the prospect list. Results
+ * are prospects to VERIFY (stored as source='ai-discovered', tagged unverified) —
+ * the model is instructed not to invent companies, but outputs must be checked.
+ */
+export async function discoverSuppliers(input: {
+  category?: string; country?: string; existingNames: string[]; limit?: number
+}): Promise<{ suppliers: DiscoveredSupplier[] } | null> {
+  const system = `You help build a B2B prospect list of REAL, established yacht-industry suppliers across the EU & UK for a yacht-logistics marketplace — provisioners, chandlers, wine merchants, marine spare-parts distributors, yacht agents, crew services, etc.
+
+Rules:
+- Only suggest companies you are reasonably confident actually exist. Do NOT invent companies.
+- EU & UK only. Prefer core yachting hubs: Antibes, Cannes, Nice, Monaco, Golfe-Juan, Palma, Barcelona, Genoa, La Spezia, Viareggio, Athens, Split, Southampton, Palma.
+- Never repeat a name in the exclude list.
+- Include a website domain ONLY if you are confident of it; otherwise omit it.
+Return ONLY JSON.`
+  const prompt = `Category: ${input.category || 'any yacht supplier'}
+Country/region: ${input.country || 'anywhere in the EU or UK'}
+Exclude (already in our list): ${input.existingNames.slice(0, 150).join(', ') || '(none)'}
+Suggest up to ${input.limit || 12} suppliers.
+
+Return JSON: {"suppliers":[{"name":string,"website":string?,"category":string,"country":string,"location":string?,"why":string}]}`
+  return askJSON<{ suppliers: DiscoveredSupplier[] }>(prompt, system, MODEL, 1500)
+}
