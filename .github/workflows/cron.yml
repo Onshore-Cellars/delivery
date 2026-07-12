@@ -15,6 +15,7 @@ on:
     - cron: '17 * * * *'     # hourly — generate due recurring shipments
     - cron: '30 6 * * *'     # daily 06:30 UTC — expiries, docs, cleanup
     - cron: '45 6 * * *'     # daily 06:45 UTC — operations agents
+    - cron: '15 7 * * *'     # daily 07:15 UTC — morning ops digest to admins
     - cron: '0 7 * * 1'      # Mondays 07:00 UTC — weekly digest
   workflow_dispatch:
     inputs:
@@ -22,7 +23,7 @@ on:
         description: 'Run a single job now (leave blank to run the daily set)'
         required: false
         type: choice
-        options: ['', expire-checkouts, recurring, expire-listings, check-documents, cleanup-stale, digest, agents]
+        options: ['', expire-checkouts, recurring, expire-listings, check-documents, cleanup-stale, digest, agents, ops-digest]
 
 jobs:
   run:
@@ -60,6 +61,7 @@ jobs:
             "17 * * * *")   hit recurring ;;
             "0 7 * * 1")    hit digest ;;
             "45 6 * * *")   hit agents ;;
+            "15 7 * * *")   hit ops-digest ;;
             "30 6 * * *")   hit expire-listings; hit check-documents; hit cleanup-stale ;;
             *)              # workflow_dispatch with no input → run the daily set
                             hit expire-listings; hit check-documents; hit cleanup-stale ;;

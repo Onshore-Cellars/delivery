@@ -1,8 +1,8 @@
 // Shared types for the autonomous operations layer.
 
-export type Team = 'SUPPORT' | 'OPS' | 'MARKETING' | 'FINANCE' | 'IT'
+export type Team = 'SUPPORT' | 'OPS' | 'MARKETING' | 'FINANCE' | 'IT' | 'GROWTH'
 
-export const TEAMS: Team[] = ['SUPPORT', 'OPS', 'MARKETING', 'FINANCE', 'IT']
+export const TEAMS: Team[] = ['SUPPORT', 'OPS', 'MARKETING', 'FINANCE', 'IT', 'GROWTH']
 
 /** A proposal an agent wants a human (or policy) to approve before it runs. */
 export interface ProposedTask {

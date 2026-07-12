@@ -106,8 +106,11 @@ Agent "teams" run daily (`/api/cron/agents`) and propose actions into an
 - **Marketing** — draft on-brand re-engagement campaigns.
 - **Finance** — backfill missing CHARGE/PAYOUT ledger rows (reconciliation), flag over-refunds.
 - **IT** — nudge carriers with no connected Stripe account to onboard so payouts unblock, flag paid bookings stuck in PENDING, fix oversold (negative-capacity) listings.
+- **Growth** — surface routes with quote demand but no active supply, re-engage dormant shippers (60+ days), nudge idle carriers to list again.
 
-AI-backed agents (triage, customer reply, campaign copy) need `ANTHROPIC_API_KEY`; without it they stay dormant and the rule-based agents still run. Nothing
+A daily **morning ops digest** (`/api/cron/ops-digest`, 07:15 UTC) sends every admin one brief — what all teams did in the last 24h, revenue taken (per currency), disputes/unpaid/payouts outstanding, and how many proposals await approval (AI-written when a key is set, deterministic template otherwise). Run on demand via the workflow's **Run workflow → ops-digest**.
+
+AI-backed agents (triage, customer reply, campaign copy, digest narrative) need `ANTHROPIC_API_KEY`; without it they stay dormant/templated and the rule-based agents still run. Nothing
 with side-effects runs until you Approve (which executes it) or a per-category
 **Automation** policy auto-approves proposals above a confidence threshold.
 Approve/reject decisions + feedback are stored and fed back to the agents as

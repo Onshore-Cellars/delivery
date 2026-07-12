@@ -15,6 +15,7 @@ const TEAM_STYLE: Record<string, string> = {
   MARKETING: 'bg-[var(--c-success)]/12 text-[var(--c-success)]',
   FINANCE: 'bg-[var(--c-accent)]/12 text-[var(--c-accent)]',
   IT: 'bg-[var(--c-error)]/12 text-[var(--c-error)]',
+  GROWTH: 'bg-[var(--c-warning)]/12 text-[var(--c-warning)]',
 }
 const STATUSES = ['PENDING', 'ALL', 'EXECUTED', 'REJECTED', 'FAILED']
 
