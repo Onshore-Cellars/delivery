@@ -1,7 +1,13 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import dynamic from 'next/dynamic'
 import { useAuth } from '../components/AuthProvider'
+
+const LiveMap = dynamic(() => import('../components/LiveMap'), {
+  ssr: false,
+  loading: () => <div className="w-full h-72 sm:h-96 rounded-2xl bg-[var(--c-canvas-2)] animate-pulse" />,
+})
 
 interface TrackingEvent {
   id: string
@@ -31,6 +37,7 @@ interface TrackingData {
     carrier: { name: string; company?: string }
   }
   events: TrackingEvent[]
+  live?: { lat: number; lng: number; heading?: number | null; speed?: number | null; etaMinutes?: number | null; lastUpdated?: string | null } | null
 }
 
 const statusSteps = ['PENDING', 'CONFIRMED', 'PICKED_UP', 'IN_TRANSIT', 'DELIVERED']
@@ -236,6 +243,21 @@ export default function TrackingPage() {
                 </div>
               )}
             </div>
+
+            {/* Live map */}
+            {data.live && (
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-sm font-semibold text-[var(--c-text-2)] uppercase tracking-wider">Live position</h3>
+                  <div className="flex items-center gap-3 text-xs text-[var(--c-text-2)]">
+                    {typeof data.live.etaMinutes === 'number' && <span>ETA <span className="font-[family-name:var(--font-mono)] font-semibold text-[var(--c-ink)]">{data.live.etaMinutes} min</span></span>}
+                    {typeof data.live.speed === 'number' && <span className="font-[family-name:var(--font-mono)]">{Math.round(data.live.speed)} km/h</span>}
+                    <span className="inline-flex items-center gap-1.5 font-medium text-[var(--c-success)]"><span className="w-1.5 h-1.5 rounded-full bg-[var(--c-success)] animate-pulse" />Live</span>
+                  </div>
+                </div>
+                <LiveMap lat={data.live.lat} lng={data.live.lng} />
+              </div>
+            )}
 
             {/* Route & Details */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">

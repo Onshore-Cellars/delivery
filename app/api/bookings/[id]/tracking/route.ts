@@ -27,6 +27,12 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         trackingEvents: {
           orderBy: { timestamp: 'desc' },
         },
+        liveTracking: {
+          where: { isActive: true },
+          orderBy: { lastUpdated: 'desc' },
+          take: 1,
+          select: { lat: true, lng: true, heading: true, speed: true, etaMinutes: true, lastUpdated: true },
+        },
       },
     })
 
@@ -72,6 +78,16 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         carrier: booking.listing.carrier,
       },
       events: booking.trackingEvents,
+      live: booking.liveTracking[0]?.lat != null && booking.liveTracking[0]?.lng != null
+        ? {
+            lat: booking.liveTracking[0].lat,
+            lng: booking.liveTracking[0].lng,
+            heading: booking.liveTracking[0].heading,
+            speed: booking.liveTracking[0].speed,
+            etaMinutes: booking.liveTracking[0].etaMinutes,
+            lastUpdated: booking.liveTracking[0].lastUpdated,
+          }
+        : null,
     })
   } catch (error) {
     console.error('Tracking fetch error:', error)
