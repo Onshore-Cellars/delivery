@@ -107,6 +107,21 @@ describe('determineVat — place of supply', () => {
   it('GB supplier → non-EU customer is out of scope', () => {
     expect(determineVat({ country: 'GB', ...registered }, { country: 'US' }).ratePercent).toBe(0)
   })
+  it('Art. 50: intra-EU B2C transport of goods is taxed in the departure country', () => {
+    // FR supplier, DE consumer, goods departing from Italy → charge IT VAT (22%)
+    const d = determineVat({ country: 'FR', ...registered }, { country: 'DE' }, { departureCountry: 'IT' })
+    expect(d.ratePercent).toBe(22)              // Italy, not France (20) or Germany
+    expect(d.legalRef).toMatch(/50/)
+    // GB supplier, EU consumer, goods departing from Spain → charge ES VAT (21%)
+    const gb = determineVat({ country: 'GB', ...registered }, { country: 'FR' }, { departureCountry: 'ES' })
+    expect(gb.ratePercent).toBe(21)
+    // A verified B2B customer is still reverse charge regardless of departure
+    const b2b = determineVat({ country: 'FR', ...registered }, { country: 'DE', vatNumber: 'DE811569869', vatValid: true }, { departureCountry: 'IT' })
+    expect(b2b.treatment).toBe('REVERSE_CHARGE')
+    // Non-EU departure (GB) does not trigger Art. 50 — falls back to general rule
+    const nonEuDep = determineVat({ country: 'FR', ...registered }, { country: 'DE' }, { departureCountry: 'GB' })
+    expect(nonEuDep.ratePercent).toBe(20)       // France (supplier) general rule
+  })
   it('unregistered supplier → never charges VAT', () => {
     const d = determineVat({ country: 'FR', registered: false }, { country: 'FR' })
     expect(d.treatment).toBe('NOT_REGISTERED')

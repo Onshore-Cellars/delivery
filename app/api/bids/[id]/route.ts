@@ -144,7 +144,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         })
         if (bidder && acceptAmount > 0) {
           const appUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
-          const vat = snapshotBookingVat(acceptAmount, bidder)
+          const vat = snapshotBookingVat(acceptAmount, bidder, { departureCountry: bid.listing.originCountry })
           await prisma.booking.update({ where: { id: booking.id }, data: {
             vatAmount: vat.vatAmount, vatRate: vat.vatRate, vatTreatment: vat.treatment, vatNote: vat.note,
             vatSupplierNumber: vat.vatSupplierNumber, vatCustomerNumber: vat.vatCustomerNumber, vatCustomerCountry: vat.vatCustomerCountry,
@@ -263,7 +263,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         })
         if (bidder && acceptAmount > 0) {
           const appUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
-          const vat = snapshotBookingVat(acceptAmount, bidder)
+          const vat = snapshotBookingVat(acceptAmount, bidder, { departureCountry: bid.listing.originCountry })
           await prisma.booking.update({ where: { id: booking.id }, data: {
             vatAmount: vat.vatAmount, vatRate: vat.vatRate, vatTreatment: vat.treatment, vatNote: vat.note,
             vatSupplierNumber: vat.vatSupplierNumber, vatCustomerNumber: vat.vatCustomerNumber, vatCustomerCountry: vat.vatCustomerCountry,

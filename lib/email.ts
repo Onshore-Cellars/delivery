@@ -3,11 +3,18 @@
 import nodemailer from 'nodemailer'
 import { sanitizeHtml } from './sanitize'
 
+export interface EmailAttachment {
+  filename: string
+  content: Buffer   // raw bytes
+  contentType?: string
+}
+
 interface EmailOptions {
   to: string
   subject: string
   html: string
   text?: string
+  attachments?: EmailAttachment[]
 }
 
 interface EmailTemplate {
@@ -50,6 +57,7 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
         subject: options.subject,
         html: options.html,
         text: options.text,
+        attachments: options.attachments?.map(a => ({ filename: a.filename, content: a.content, contentType: a.contentType })),
       })
       return true
     }
@@ -68,13 +76,14 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
           subject: options.subject,
           html: options.html,
           text: options.text,
+          attachments: options.attachments?.map(a => ({ filename: a.filename, content: a.content.toString('base64') })),
         }),
       })
       return res.ok
     }
 
-    // Fallback: log the email
-    console.log(`[EMAIL] To: ${options.to} | Subject: ${options.subject}`)
+    // Fallback: log the email (no provider configured — set SMTP_* or RESEND_API_KEY)
+    console.log(`[EMAIL] To: ${options.to} | Subject: ${options.subject}${options.attachments?.length ? ` | ${options.attachments.length} attachment(s)` : ''}`)
     return true
   } catch (error) {
     console.error('Email send error:', error)

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '../components/AuthProvider'
 import AdminCRM from '../components/AdminCRM'
 import AdminFinance from '../components/AdminFinance'
+import AdminTestEmail from '../components/AdminTestEmail'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -1458,6 +1459,7 @@ export default function AdminPage() {
         {/* ─── SETTINGS TAB ─── */}
         {tab === 'settings' && (
           <div className="space-y-6">
+            {token && <AdminTestEmail token={token} />}
             {/* Platform Settings */}
             <div className="bg-[var(--c-surface)] rounded-2xl border border-black/10 shadow-sm p-6">
               <h3 className="text-lg font-bold text-[var(--c-ink)] mb-1">Platform Settings</h3>

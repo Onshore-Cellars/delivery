@@ -37,6 +37,7 @@ export async function POST(request: NextRequest) {
             title: true,
             originPort: true,
             destinationPort: true,
+            originCountry: true,
             carrier: { select: { stripeAccountId: true } },
           },
         },
@@ -72,7 +73,7 @@ export async function POST(request: NextRequest) {
       vatNumber: booking.shipper.vatNumber,
       vatValid: booking.shipper.vatNumberValid,
       isBusiness: booking.shipper.isBusiness,
-    })
+    }, { departureCountry: booking.listing.originCountry })
 
     const session = await createCheckoutSession({
       bookingId: booking.id,

@@ -268,11 +268,32 @@ export function platformVatConfig(): PlatformVatConfig {
  * The general place-of-supply rule for services is used (Art. 44 B2B / Art. 45
  * B2C EU VAT Directive). Treats a customer with a valid VAT number as a
  * business (B2B).
+ *
+ * `opts.departureCountry` enables the transport-of-goods special rule: for a
+ * B2C intra-EU transport of goods, the place of supply is the country of
+ * DEPARTURE (Art. 50), not the supplier's country. Pass the shipment's origin
+ * country to apply it.
  */
-export function determineVat(supplier: VatParty & { registered?: boolean }, customer: VatParty): VatDetermination {
+export function determineVat(
+  supplier: VatParty & { registered?: boolean },
+  customer: VatParty,
+  opts?: { departureCountry?: string | null },
+): VatDetermination {
   const supplierCountry = toVatCountryCode(supplier.country)
   const customerCountry = toVatCountryCode(customer.country)
+  const departureCountry = toVatCountryCode(opts?.departureCountry)
   const base = { supplierCountry, customerCountry }
+
+  // Art. 50 — intra-EU transport of goods to a consumer is taxed where the
+  // transport begins. Only applies when departure is an EU member state.
+  const b2cTransport = (): VatDetermination | null => {
+    if (departureCountry && EU_CODES.has(departureCountry)) {
+      return { treatment: 'B2C_EU', ratePercent: standardRate(departureCountry) ?? 0, reverseCharge: false,
+        note: `Intra-EU transport of goods for a consumer — taxed in the country of departure (${departureCountry} VAT).`,
+        legalRef: 'Art. 50 EU VAT Directive 2006/112/EC', ...base }
+    }
+    return null
+  }
 
   if (supplier.registered === false) {
     return { treatment: 'NOT_REGISTERED', ratePercent: 0, reverseCharge: false,
@@ -316,9 +337,9 @@ export function determineVat(supplier: VatParty & { registered?: boolean }, cust
         note: 'Reverse charge — VAT to be accounted for by the customer (intra-EU B2B service).',
         legalRef: 'Art. 196 EU VAT Directive 2006/112/EC', ...base }
     }
-    // Cross-border EU consumer — general rule: place of supply is the
-    // supplier's country, so supplier-country VAT is charged.
-    return { treatment: 'B2C_EU', ratePercent: standardRate(supplierCountry) ?? 0, reverseCharge: false,
+    // Cross-border EU consumer. For transport of goods the place of supply is
+    // the departure country (Art. 50); otherwise the general rule (supplier).
+    return b2cTransport() || { treatment: 'B2C_EU', ratePercent: standardRate(supplierCountry) ?? 0, reverseCharge: false,
       note: `Supplied to an EU consumer — ${supplierCountry} VAT applied (general place-of-supply rule).${B2C_TRANSPORT_CAVEAT}`,
       legalRef: 'Art. 45 EU VAT Directive 2006/112/EC', ...base }
   }
@@ -339,8 +360,10 @@ export function determineVat(supplier: VatParty & { registered?: boolean }, cust
       note: `Outside the scope of ${supplierCountry} VAT — reverse charge applies in the customer's country.`,
       legalRef: 'Customer to self-account under Art. 196 EU VAT Directive', ...base }
   }
-  // Non-EU supplier → EU consumer: supplier-country VAT under the general rule.
-  return { treatment: 'DOMESTIC', ratePercent: standardRate(supplierCountry) ?? 0, reverseCharge: false,
+  // Non-EU (e.g. GB) supplier → EU consumer. Intra-EU transport of goods is
+  // taxed in the EU country of departure (Art. 50 — the supplier may need to
+  // register there); otherwise supplier-country VAT under the general rule.
+  return b2cTransport() || { treatment: 'DOMESTIC', ratePercent: standardRate(supplierCountry) ?? 0, reverseCharge: false,
     note: `Supplied to an EU consumer — ${supplierCountry} VAT applied (general place-of-supply rule).${B2C_TRANSPORT_CAVEAT}`,
     legalRef: null, ...base }
 }
@@ -372,6 +395,7 @@ export type BookingVatSnapshot = {
 export function snapshotBookingVat(
   net: number,
   customer: { country: string | null; vatNumber?: string | null; vatValid?: boolean | null; isBusiness?: boolean | null },
+  opts?: { departureCountry?: string | null },
 ): BookingVatSnapshot {
   const platform = platformVatConfig()
   // When the customer has a verified VAT number, trust the country encoded in
@@ -383,6 +407,7 @@ export function snapshotBookingVat(
   const det = determineVat(
     { country: platform.country, vatNumber: platform.vatNumber, registered: platform.registered },
     { ...customer, country: verifiedVatCountry || customer.country },
+    { departureCountry: opts?.departureCountry },
   )
   const { vat, gross } = calcVat(net, det.ratePercent)
   return {
