@@ -47,10 +47,10 @@ const statusColors: Record<string, string> = {
   FULL: 'bg-[#FF6A2A]/10 text-[#FF6A2A] border-[#FF6A2A]/20',
   COMPLETED: 'bg-[#102535] text-[#9AADB8] border-white/10',
   CANCELLED: 'bg-red-900/20 text-red-300 border-red-500/30',
-  IN_TRANSIT: 'bg-indigo-50 text-indigo-700 border-indigo-200',
-  PENDING: 'bg-[#FF6A2A]/10 text-[#FF6A2A] border-[#FF6A2A]/20',
+  IN_TRANSIT: 'bg-[#268CB5]/15 text-[#5FB3C4] border-[#268CB5]/25',
+  PENDING: 'bg-[#E6A93C]/15 text-[#E6A93C] border-[#E6A93C]/25',
   CONFIRMED: 'bg-[#9ED36A]/10 text-[#9ED36A] border-green-500/30',
-  PICKED_UP: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+  PICKED_UP: 'bg-[#268CB5]/15 text-[#5FB3C4] border-[#268CB5]/25',
   DELIVERED: 'bg-[#102535] text-[#9AADB8] border-white/10',
 }
 
@@ -363,7 +363,7 @@ export default function DashboardPage() {
 
                 {/* Recent bookings */}
                 <div className="bg-[#162E3D] rounded-2xl border border-white/10 overflow-hidden">
-                  <div className="px-5 sm:px-6 py-4 border-b border-slate-100">
+                  <div className="px-5 sm:px-6 py-4 border-b border-white/10">
                     <h2 className="font-bold text-[#F7F9FB] text-base">Recent Bookings</h2>
                   </div>
                   {bookings.length === 0 ? (
@@ -397,7 +397,7 @@ export default function DashboardPage() {
                         </div>
                       ))}
                       {bookings.length > BOOKINGS_PER_PAGE && (
-                        <div className="flex items-center justify-between px-5 sm:px-6 py-3 border-t border-slate-100">
+                        <div className="flex items-center justify-between px-5 sm:px-6 py-3 border-t border-white/10">
                           <button
                             onClick={() => setBookingPage(p => Math.max(1, p - 1))}
                             disabled={bookingPage === 1}

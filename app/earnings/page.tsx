@@ -26,12 +26,12 @@ interface EarningsData {
 
 const statusColors: Record<string, string> = {
   PENDING: 'bg-[#FF6A2A]/15 text-[#FF6A2A]',
-  CONFIRMED: 'bg-blue-100 text-[#268CB5]',
-  PICKED_UP: 'bg-indigo-100 text-indigo-700',
-  IN_TRANSIT: 'bg-purple-100 text-purple-700',
+  CONFIRMED: 'bg-[#268CB5]/15 text-[#5FB3C4]',
+  PICKED_UP: 'bg-[#268CB5]/15 text-[#5FB3C4]',
+  IN_TRANSIT: 'bg-[#268CB5]/15 text-[#5FB3C4]',
   DELIVERED: 'bg-[#9ED36A]/15 text-[#9ED36A]',
-  CANCELLED: 'bg-[#102535] text-[#6B7C86]',
-  DISPUTED: 'bg-red-100 text-red-400',
+  CANCELLED: 'bg-[#102535] text-[#9AADB8]',
+  DISPUTED: 'bg-red-500/15 text-red-300',
 }
 
 interface PayoutStatus {

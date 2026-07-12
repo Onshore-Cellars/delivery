@@ -19,7 +19,7 @@
   /* Semantic mappings */
   --color-primary:          #F7F9FB;
   --color-primary-light:    #9AADB8;
-  --color-secondary:        #6B7C86;
+  --color-secondary:        #8FA1AB;
   --color-accent:           #FF6A2A;
   --color-accent-hover:     #E85A1C;
   --color-surface:          #0B1F2A;
@@ -28,8 +28,9 @@
   --color-border:           rgba(255,255,255,0.08);
   --color-border-light:     rgba(255,255,255,0.04);
   --color-success:          #9ED36A;
-  --color-warning:          #FF6A2A;
-  --color-error:            #ff3b30;
+  /* Warning is its OWN token — never the same hue as the CTA accent. */
+  --color-warning:          #E6A93C;
+  --color-error:            #ff5a4d;
   --color-info:             #268CB5;
 
   --font-sans:    'Syne', system-ui, -apple-system, sans-serif;
@@ -101,7 +102,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); border: 2px solid transparent; background-clip: padding-box; }
 
 *:focus-visible {
-  outline: 3px solid rgba(30, 111, 143, 0.5);
+  outline: 3px solid #268CB5;
   outline-offset: 2px;
   border-radius: 6px;
 }
@@ -129,11 +130,11 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   padding: 12px 28px;
   border-radius: 8px;
   font-family: var(--font-sans);
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 600;
   line-height: 1.2;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: 0.005em;
+  text-transform: none;
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -154,11 +155,11 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   padding: 12px 28px;
   border-radius: 8px;
   font-family: var(--font-sans);
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 600;
   line-height: 1.2;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: 0.005em;
+  text-transform: none;
   border: 1px solid rgba(255,255,255,0.1);
   cursor: pointer;
   transition: all 0.2s ease;
@@ -178,11 +179,11 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   padding: 12px 28px;
   border-radius: 8px;
   font-family: var(--font-sans);
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 600;
   line-height: 1.2;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: 0.005em;
+  text-transform: none;
   border: 1px solid rgba(255,255,255,0.2);
   cursor: pointer;
   transition: all 0.2s ease;
@@ -202,11 +203,11 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   padding: 12px 28px;
   border-radius: 8px;
   font-family: var(--font-sans);
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 600;
   line-height: 1.2;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: 0.005em;
+  text-transform: none;
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;

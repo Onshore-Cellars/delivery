@@ -148,7 +148,6 @@ export default function DriverPage() {
     // Update each active tracking session
     for (const stop of stops) {
       if (stop.liveTracking.length > 0) {
-        const session = stop.liveTracking[0]
         try {
           const res = await fetch('/api/tracking/live', {
             method: 'PATCH',

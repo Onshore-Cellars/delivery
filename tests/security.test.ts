@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, afterEach } from 'vitest'
 import type { NextRequest } from 'next/server'
 import { getClientIP } from '@/lib/rate-limit'
 import { generateToken, verifyToken } from '@/lib/auth'
