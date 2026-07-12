@@ -35,16 +35,20 @@ export async function POST(request: NextRequest) {
     const parts = normaliseVatNumber(raw)
 
     if (save) {
-      // Only mark as a business when the number is at least structurally valid.
-      const accepted = result.source === 'format' ? false : result.valid
+      // vatNumberValid is TRUE only when VIES positively confirmed it. Format-only
+      // or downtime results are stored as null ("unverified"), never true — the
+      // checkout VAT gate requires a positively-verified number for reverse
+      // charge, so an unverified number is charged VAT (fail-safe).
+      const viesConfirmed = result.source === 'vies' && result.valid
       await prisma.user.update({
         where: { id: decoded.userId },
         data: {
           vatNumber: parts?.full ?? raw.toUpperCase(),
-          vatNumberValid: result.source === 'vies' ? result.valid : (result.valid ? null : false),
+          vatNumberValid: result.source === 'vies' ? result.valid : (result.valid === false ? false : null),
           vatNumberCheckedAt: new Date(result.checkedAt),
           vatBusinessName: result.name ?? undefined,
-          isBusiness: accepted || result.source === 'unavailable',
+          // Display/marker flag only — does NOT by itself grant reverse charge.
+          isBusiness: !!parts,
         },
       })
     }

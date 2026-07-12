@@ -286,47 +286,62 @@ export function determineVat(supplier: VatParty & { registered?: boolean }, cust
   const supplierEU = EU_CODES.has(supplierCountry)
   const customerEU = !!customerCountry && EU_CODES.has(customerCountry)
   const sameCountry = !!customerCountry && supplierCountry === customerCountry
-  // A business is a customer that provided a VAT number we accepted.
-  const customerIsBusiness = !!(customer.vatNumber && customer.vatValid !== false) || customer.isBusiness === true
+  // Reverse charge (and B2B treatment) requires a *positively verified* VAT
+  // number — a present number that VIES confirmed valid (vatValid === true).
+  // Anything less (unverified during a VIES outage, format-only, missing, or a
+  // bare isBusiness flag) is treated as B2C and CHARGED VAT. This fails safe:
+  // relying on Art. 196 with an unverified customer VAT ID would leave the
+  // supplier liable for the uncollected VAT.
+  const customerHasVerifiedVat = !!customer.vatNumber && customer.vatValid === true
+  // A B2C transport-of-goods caveat we surface but do not auto-encode.
+  const B2C_TRANSPORT_CAVEAT = ' Note: intra-EU transport of goods to a consumer may instead be taxable in the country of departure (Art. 50) — review if applicable.'
 
   // 1) Domestic — same country (works for GB→GB and EU→same-EU).
   if (sameCountry) {
     return { treatment: 'DOMESTIC', ratePercent: standardRate(supplierCountry) ?? 0, reverseCharge: false,
       note: `Domestic supply — ${supplierCountry} VAT applied.`,
-      legalRef: 'Art. 44 EU VAT Directive 2006/112/EC', ...base }
+      legalRef: 'Arts. 44–45 EU VAT Directive 2006/112/EC', ...base }
   }
 
   // 2) Supplier in the EU.
   if (supplierEU) {
-    if (customerEU) {
-      if (customerIsBusiness) {
-        return { treatment: 'REVERSE_CHARGE', ratePercent: 0, reverseCharge: true,
-          note: 'Reverse charge — VAT to be accounted for by the customer (intra-EU B2B service).',
-          legalRef: 'Art. 196 EU VAT Directive 2006/112/EC', ...base }
-      }
-      // Cross-border EU consumer — general rule: place of supply is the
-      // supplier's country, so supplier-country VAT is charged.
-      return { treatment: 'B2C_EU', ratePercent: standardRate(supplierCountry) ?? 0, reverseCharge: false,
-        note: `Supplied to an EU consumer — ${supplierCountry} VAT applied (general place-of-supply rule).`,
-        legalRef: 'Art. 45 EU VAT Directive 2006/112/EC', ...base }
-    }
     // Customer outside the EU — export of services, outside scope.
-    return { treatment: 'ZERO_RATED_EXPORT', ratePercent: 0, reverseCharge: false,
-      note: 'Outside the scope of EU VAT — customer established outside the EU.',
-      legalRef: 'Art. 44 / 59 EU VAT Directive 2006/112/EC', ...base }
+    if (!customerEU) {
+      return { treatment: 'ZERO_RATED_EXPORT', ratePercent: 0, reverseCharge: false,
+        note: 'Outside the scope of EU VAT — customer established outside the EU.',
+        legalRef: 'Art. 44 / 59 EU VAT Directive 2006/112/EC', ...base }
+    }
+    if (customerHasVerifiedVat) {
+      return { treatment: 'REVERSE_CHARGE', ratePercent: 0, reverseCharge: true,
+        note: 'Reverse charge — VAT to be accounted for by the customer (intra-EU B2B service).',
+        legalRef: 'Art. 196 EU VAT Directive 2006/112/EC', ...base }
+    }
+    // Cross-border EU consumer — general rule: place of supply is the
+    // supplier's country, so supplier-country VAT is charged.
+    return { treatment: 'B2C_EU', ratePercent: standardRate(supplierCountry) ?? 0, reverseCharge: false,
+      note: `Supplied to an EU consumer — ${supplierCountry} VAT applied (general place-of-supply rule).${B2C_TRANSPORT_CAVEAT}`,
+      legalRef: 'Art. 45 EU VAT Directive 2006/112/EC', ...base }
   }
 
-  // 3) Supplier outside the EU (e.g. GB, post-Brexit).
-  //    Domestic handled above. Everything cross-border is outside the supplier's
-  //    VAT scope; for a business customer the reverse charge applies in their
-  //    country.
-  if (customerEU && customerIsBusiness) {
+  // 3) Supplier outside the EU (e.g. GB, post-Brexit). Domestic handled above.
+  //    - Customer outside the EU → outside the supplier's VAT scope.
+  //    - EU business (verified VAT) → outside supplier scope; customer reverse
+  //      charges in their own country.
+  //    - EU consumer → general rule places supply in the supplier's country, so
+  //      supplier-country VAT IS charged (e.g. GB→EU consumer = 20% UK VAT).
+  if (!customerEU) {
+    return { treatment: 'ZERO_RATED_EXPORT', ratePercent: 0, reverseCharge: false,
+      note: `Outside the scope of ${supplierCountry} VAT — cross-border supply of services.`,
+      legalRef: null, ...base }
+  }
+  if (customerHasVerifiedVat) {
     return { treatment: 'REVERSE_CHARGE', ratePercent: 0, reverseCharge: true,
       note: `Outside the scope of ${supplierCountry} VAT — reverse charge applies in the customer's country.`,
       legalRef: 'Customer to self-account under Art. 196 EU VAT Directive', ...base }
   }
-  return { treatment: 'ZERO_RATED_EXPORT', ratePercent: 0, reverseCharge: false,
-    note: `Outside the scope of ${supplierCountry} VAT — cross-border supply of services.`,
+  // Non-EU supplier → EU consumer: supplier-country VAT under the general rule.
+  return { treatment: 'DOMESTIC', ratePercent: standardRate(supplierCountry) ?? 0, reverseCharge: false,
+    note: `Supplied to an EU consumer — ${supplierCountry} VAT applied (general place-of-supply rule).${B2C_TRANSPORT_CAVEAT}`,
     legalRef: null, ...base }
 }
 
@@ -359,9 +374,15 @@ export function snapshotBookingVat(
   customer: { country: string | null; vatNumber?: string | null; vatValid?: boolean | null; isBusiness?: boolean | null },
 ): BookingVatSnapshot {
   const platform = platformVatConfig()
+  // When the customer has a verified VAT number, trust the country encoded in
+  // that number (VIES-validated) over the self-editable profile country — this
+  // stops a customer forcing reverse charge / export by mistyping their country.
+  const verifiedVatCountry = customer.vatNumber && customer.vatValid === true
+    ? normaliseVatNumber(customer.vatNumber)?.country ?? null
+    : null
   const det = determineVat(
     { country: platform.country, vatNumber: platform.vatNumber, registered: platform.registered },
-    customer,
+    { ...customer, country: verifiedVatCountry || customer.country },
   )
   const { vat, gross } = calcVat(net, det.ratePercent)
   return {
@@ -374,6 +395,8 @@ export function snapshotBookingVat(
     legalRef: det.legalRef,
     vatSupplierNumber: platform.vatNumber,
     vatCustomerNumber: customer.vatNumber ?? null,
-    vatCustomerCountry: toVatCountryCode(customer.country),
+    // Record the country actually used for the determination (the verified
+    // VAT-number country when available, else the profile country).
+    vatCustomerCountry: verifiedVatCountry || toVatCountryCode(customer.country),
   }
 }

@@ -63,12 +63,25 @@ describe('determineVat — place of supply', () => {
     expect(d.ratePercent).toBe(20)
     expect(d.reverseCharge).toBe(false)
   })
-  it('intra-EU B2B with a VAT number → reverse charge, 0%', () => {
+  it('intra-EU B2B with a VERIFIED VAT number → reverse charge, 0%', () => {
     const d = determineVat({ country: 'FR', ...registered }, { country: 'DE', vatNumber: 'DE811569869', vatValid: true })
     expect(d.treatment).toBe('REVERSE_CHARGE')
     expect(d.ratePercent).toBe(0)
     expect(d.reverseCharge).toBe(true)
     expect(d.legalRef).toMatch(/196/)
+  })
+  it('intra-EU with an UNVERIFIED or invalid VAT number → charges VAT (fail-safe, no reverse charge)', () => {
+    // vatValid null (VIES down / never checked) must NOT grant reverse charge
+    const unverified = determineVat({ country: 'FR', ...registered }, { country: 'DE', vatNumber: 'DE811569869', vatValid: null })
+    expect(unverified.treatment).toBe('B2C_EU')
+    expect(unverified.ratePercent).toBe(20)
+    // an explicitly-invalid number likewise gets charged VAT
+    const invalid = determineVat({ country: 'FR', ...registered }, { country: 'DE', vatNumber: 'DEbogus', vatValid: false })
+    expect(invalid.reverseCharge).toBe(false)
+    // a bare isBusiness flag with no VAT number must NOT grant reverse charge
+    const flagged = determineVat({ country: 'FR', ...registered }, { country: 'DE', isBusiness: true })
+    expect(flagged.reverseCharge).toBe(false)
+    expect(flagged.ratePercent).toBe(20)
   })
   it('intra-EU B2C (no VAT number) → supplier-country rate', () => {
     const d = determineVat({ country: 'FR', ...registered }, { country: 'DE' })
@@ -85,6 +98,14 @@ describe('determineVat — place of supply', () => {
     const eu = determineVat({ country: 'GB', ...registered }, { country: 'IE', vatNumber: 'IE1234567X', vatValid: true })
     expect(eu.treatment).toBe('REVERSE_CHARGE')
     expect(eu.ratePercent).toBe(0)
+  })
+  it('GB supplier → EU CONSUMER charges 20% UK VAT (general rule), not 0%', () => {
+    const d = determineVat({ country: 'GB', ...registered }, { country: 'DE' }) // no VAT number = consumer
+    expect(d.ratePercent).toBe(20)          // regression: was wrongly 0% (export)
+    expect(d.treatment).not.toBe('ZERO_RATED_EXPORT')
+  })
+  it('GB supplier → non-EU customer is out of scope', () => {
+    expect(determineVat({ country: 'GB', ...registered }, { country: 'US' }).ratePercent).toBe(0)
   })
   it('unregistered supplier → never charges VAT', () => {
     const d = determineVat({ country: 'FR', registered: false }, { country: 'FR' })
@@ -112,6 +133,20 @@ describe('snapshotBookingVat (platform config from env)', () => {
     expect(s.treatment).toBe('REVERSE_CHARGE')
     expect(s.vatAmount).toBe(0)
     expect(s.gross).toBe(1000)
+    expect(s.vatCustomerCountry).toBe('DE')
+  })
+  it('does NOT let an unverified VAT number escape VAT (fail-safe)', () => {
+    process.env.PLATFORM_VAT_COUNTRY = 'FR'
+    // number provided but never VIES-verified (vatValid null) → still charged VAT
+    const s = snapshotBookingVat(1000, { country: 'DE', vatNumber: 'DE811569869', vatValid: null })
+    expect(s.vatAmount).toBe(200)
+    expect(s.treatment).toBe('B2C_EU')
+  })
+  it('trusts the verified VAT-number country over a spoofed profile country', () => {
+    process.env.PLATFORM_VAT_COUNTRY = 'FR'
+    // customer claims to be in the US (to dodge VAT) but has a VERIFIED DE VAT number
+    const s = snapshotBookingVat(1000, { country: 'US', vatNumber: 'DE811569869', vatValid: true })
+    expect(s.treatment).toBe('REVERSE_CHARGE') // resolved as intra-EU B2B, not export
     expect(s.vatCustomerCountry).toBe('DE')
   })
 })
