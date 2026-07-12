@@ -95,6 +95,7 @@ export default function ListingDetailPage() {
   const [cargoWarnings, setCargoWarnings] = useState<string[]>([])
   const [bids, setBids] = useState<Array<{ id: string; amount: number; counterOffer?: number; currency: string; weightKg: number; volumeM3: number; message?: string; status: string; bidder?: { name?: string } }>>([])
   const [bidActioning, setBidActioning] = useState<string | null>(null)
+  const [routeCost, setRouteCost] = useState<{ distanceKm: number; fuelCost: number; tollEstimate: number; totalEstimate: number; currency: string; ferryWarning?: string } | null>(null)
 
   const isOwner = !!(user && listing && user.id === listing.carrier.id)
 
@@ -149,6 +150,13 @@ export default function ListingDetailPage() {
 
   useEffect(() => { fetchListing() }, [fetchListing])
   useEffect(() => { if (isOwner) fetchBids() }, [isOwner, fetchBids])
+  useEffect(() => {
+    if (!params.id) return
+    fetch(`/api/listings/${params.id}/route-cost`)
+      .then(r => (r.ok ? r.json() : null))
+      .then(d => setRouteCost(d?.estimate || null))
+      .catch(() => {})
+  }, [params.id])
 
   const formatDate = (d: string) => new Date(d).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
   const formatCurrency = (amount: number, currency: string = 'EUR') => {
@@ -325,6 +333,37 @@ export default function ListingDetailPage() {
                 )}
               </div>
             </div>
+
+            {/* Estimated journey cost — a guide for carriers pricing this run and bidders */}
+            {routeCost && (
+              <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-[#D3D8D1] p-6">
+                <div className="flex items-center justify-between mb-1">
+                  <h2 className="font-bold text-[var(--c-ink)]">Estimated journey cost</h2>
+                  <span className="font-[family-name:var(--font-mono)] text-xs text-[var(--c-text-3)]">~{routeCost.distanceKm} km</span>
+                </div>
+                <p className="text-xs text-[var(--c-text-3)] mb-4">Fuel &amp; tolls only — a guide for carriers pricing this route and bidders. Excludes the carrier&rsquo;s time and margin.</p>
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <div className="text-xs text-[var(--c-text-2)]">Fuel</div>
+                    <div className="font-[family-name:var(--font-mono)] font-bold text-[var(--c-ink)]">{formatCurrency(routeCost.fuelCost, routeCost.currency)}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-[var(--c-text-2)]">Tolls</div>
+                    <div className="font-[family-name:var(--font-mono)] font-bold text-[var(--c-ink)]">{formatCurrency(routeCost.tollEstimate, routeCost.currency)}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-[var(--c-text-2)]">Est. total</div>
+                    <div className="font-[family-name:var(--font-mono)] font-bold text-[var(--c-brand)]">{formatCurrency(routeCost.totalEstimate, routeCost.currency)}</div>
+                  </div>
+                </div>
+                {routeCost.ferryWarning && (
+                  <p className="mt-3 text-xs text-[var(--c-warning)] flex items-start gap-1.5">
+                    <svg className="w-4 h-4 flex-shrink-0 mt-px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zM12 15.75h.007v.008H12v-.008z" /></svg>
+                    {routeCost.ferryWarning}
+                  </p>
+                )}
+              </div>
+            )}
 
             {/* Capacity */}
             <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-[#D3D8D1] p-6">
