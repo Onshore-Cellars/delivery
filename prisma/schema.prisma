@@ -540,6 +540,51 @@ model PlatformSetting {
   updatedAt DateTime @updatedAt
 }
 
+// ─── AUTONOMOUS OPERATIONS ───────────────────────────────────────────────────
+// A proposal produced by an operations agent. Nothing with side-effects runs
+// until it is APPROVED (or AUTO_APPROVED by policy). Human decisions + feedback
+// train the agents over time.
+model AgentTask {
+  id            String   @id @default(cuid())
+  team          String   // SUPPORT | OPS | MARKETING | FINANCE | IT
+  kind          String   // action slug, e.g. 'release-payout'
+  title         String
+  summary       String
+  reasoning     String   @default("")
+  confidence    Float    @default(0.6)
+  payload       String   @default("{}") // JSON — the action's parameters
+  relatedType   String?
+  relatedId     String?
+  dedupeKey     String?  // suppress re-proposing the same thing while open
+
+  status        String   @default("PENDING") // PENDING|APPROVED|REJECTED|AUTO_APPROVED|EXECUTED|FAILED
+  decidedById   String?
+  decidedAt     DateTime?
+  feedback      String?  // human note on approve/reject (fed back to the agent)
+  executedAt    DateTime?
+  executionResult String?
+  error         String?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([status])
+  @@index([team, status])
+  @@index([kind])
+  @@index([dedupeKey])
+}
+
+// Per-(team,kind) automation policy. When autoApprove is on and a proposal's
+// confidence ≥ minConfidence, it executes without human review.
+model AgentPolicy {
+  key           String   @id // "team:kind"
+  team          String
+  kind          String
+  autoApprove   Boolean  @default(false)
+  minConfidence Float    @default(0.85)
+  updatedAt     DateTime @updatedAt
+}
+
 model Bid {
   id          String    @id @default(cuid())
   listingId   String

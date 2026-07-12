@@ -98,7 +98,18 @@ Cron endpoints (all `POST`, guarded by `x-cron-secret`): `expire-checkouts`, `re
 - Driven by a GitHub Actions schedule. **Set repo secrets** `APP_BASE_URL` and `CRON_SECRET` (Settings → Secrets and variables → Actions), and the same `CRON_SECRET` in Railway.
 - Run any job on demand via the workflow's **Run workflow** button.
 
-### 3.7 Storage, CRM/AI, notifications
+### 3.7 Operations agents (`lib/agents/`)
+Agent "teams" (Ops, Support, Marketing) run daily (`/api/cron/agents`) and
+propose actions into an **approval queue** — Admin → **Operations**. Nothing
+with side-effects runs until you Approve (which executes it) or a per-category
+**Automation** policy auto-approves proposals above a confidence threshold.
+Approve/reject decisions + feedback are stored and fed back to the agents as
+examples. Add a new action by dropping an `Agent` into `lib/agents/*` and the
+registry — it appears in the queue and Automation list automatically. Auto-
+approval executes real actions (payouts, notifications, listing changes), so
+enable it only per-category once you've watched it behave.
+
+### 3.8 Storage, CRM/AI, notifications
 - Uploads go to S3-compatible storage (`STORAGE_*`); without it, upload features degrade.
 - CRM supplier discovery/enrichment and campaign copy use `ANTHROPIC_API_KEY`; AI-guessed contacts are tagged `unverified` and excluded from campaign sends until a human verifies.
 - Notifications honour per-category user preferences (Profile → Notification preferences); the weekly digest respects its own toggle.

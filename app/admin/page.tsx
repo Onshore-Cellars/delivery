@@ -7,6 +7,7 @@ import AdminCRM from '../components/AdminCRM'
 import AdminFinance from '../components/AdminFinance'
 import AdminTransactions from '../components/AdminTransactions'
 import AdminPlatformTrends from '../components/AdminPlatformTrends'
+import AdminOperations from '../components/AdminOperations'
 import AdminTestEmail from '../components/AdminTestEmail'
 import AdminVatSettings from '../components/AdminVatSettings'
 
@@ -98,7 +99,7 @@ interface AIInsights {
   recommendations: string[]
 }
 
-type TabKey = 'overview' | 'users' | 'bookings' | 'listings' | 'documents' | 'notifications' | 'activity' | 'crm' | 'finance' | 'transactions' | 'settings'
+type TabKey = 'overview' | 'users' | 'bookings' | 'listings' | 'documents' | 'notifications' | 'activity' | 'crm' | 'finance' | 'transactions' | 'operations' | 'settings'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -143,6 +144,7 @@ const TAB_CONFIG: { key: TabKey; label: string; icon: string }[] = [
   { key: 'crm', label: 'CRM', icon: 'crm' },
   { key: 'finance', label: 'Finance', icon: 'overview' },
   { key: 'transactions', label: 'Transactions', icon: 'bookings' },
+  { key: 'operations', label: 'Operations', icon: 'activity' },
   { key: 'settings', label: 'Settings', icon: 'settings' },
 ]
 
@@ -1473,6 +1475,11 @@ export default function AdminPage() {
         {/* ─── TRANSACTIONS TAB ─── */}
         {tab === 'transactions' && token && (
           <AdminTransactions token={token} />
+        )}
+
+        {/* ─── OPERATIONS TAB ─── */}
+        {tab === 'operations' && token && (
+          <AdminOperations token={token} />
         )}
 
         {/* ─── SETTINGS TAB ─── */}
