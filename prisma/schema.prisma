@@ -196,6 +196,7 @@ model User {
   // Relations
   listings         Listing[]       @relation("carrierListings")
   bookings         Booking[]       @relation("shipperBookings")
+  recurringBookings RecurringBooking[]
   bids             Bid[]           @relation("bidder")
   reviews          Review[]        @relation("reviewAuthor")
   receivedReviews  Review[]        @relation("reviewTarget")
@@ -324,6 +325,7 @@ model Listing {
   routeStops         RouteStop[]
   favouritedBy       FavouriteListing[]
   integrationOrders  IntegrationOrder[]
+  recurringBookings  RecurringBooking[]
 
   @@index([carrierId])
   @@index([vehicleId])
@@ -470,6 +472,39 @@ model Booking {
   @@index([shipperId, status])
   @@index([stripePaymentIntentId])
   @@index([checkoutExpiresAt])
+}
+
+// A shipper's standing instruction to auto-create a booking on a schedule.
+// Each occurrence generates a PENDING booking and prompts the shipper to pay
+// through the normal secure checkout (no off-session card charging).
+model RecurringBooking {
+  id                String    @id @default(cuid())
+  shipperId         String
+  shipper           User      @relation(fields: [shipperId], references: [id], onDelete: Cascade)
+  listingId         String
+  listing           Listing   @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  cargoDescription  String
+  cargoType         String?
+  weightKg          Float
+  volumeM3          Float
+  timeWindow        String?
+  notes             String?
+
+  frequency         String    // weekly | biweekly | monthly
+  dayOfWeek         Int?      // 0=Sun..6=Sat (weekly/biweekly)
+  dayOfMonth        Int?      // 1..28 (monthly)
+
+  nextRunAt         DateTime
+  endDate           DateTime?
+  remainingCount    Int?      // null = unlimited; decremented each run
+  active            Boolean   @default(true)
+  lastGeneratedAt   DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([active, nextRunAt])
+  @@index([shipperId])
 }
 
 model Bid {

@@ -160,6 +160,7 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
                     {moreMenuOpen && (
                       <div className="absolute top-full right-0 mt-1 w-48 bg-[var(--c-surface)] rounded-lg shadow-lg border border-black/[0.08] py-1 z-50">
                         <Link href="/quotes" className="block px-4 py-2.5 text-sm text-[var(--c-ink)] hover:bg-[var(--c-surface)]/[0.06] hover:no-underline">Quotes</Link>
+                        <Link href="/recurring" className="block px-4 py-2.5 text-sm text-[var(--c-ink)] hover:bg-[var(--c-surface)]/[0.06] hover:no-underline">Recurring</Link>
                         <Link href="/analytics" className="block px-4 py-2.5 text-sm text-[var(--c-ink)] hover:bg-[var(--c-surface)]/[0.06] hover:no-underline">Analytics</Link>
                         <Link href="/insurance" className="block px-4 py-2.5 text-sm text-[var(--c-ink)] hover:bg-[var(--c-surface)]/[0.06] hover:no-underline">Insurance</Link>
                         <Link href="/disputes" className="block px-4 py-2.5 text-sm text-[var(--c-ink)] hover:bg-[var(--c-surface)]/[0.06] hover:no-underline">Disputes</Link>
