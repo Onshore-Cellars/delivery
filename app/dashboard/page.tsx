@@ -133,6 +133,15 @@ export default function DashboardPage() {
   }, [token, user])
 
   const [actioning, setActioning] = useState<string | null>(null)
+  const [pendingReviews, setPendingReviews] = useState<{ id: string; route: string; carrier: string }[]>([])
+
+  useEffect(() => {
+    if (!token) return
+    fetch('/api/reviews/pending', { headers: { Authorization: `Bearer ${token}` } })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d?.pending) setPendingReviews(d.pending) })
+      .catch(() => {})
+  }, [token])
 
   // Shipper: start Stripe checkout for an accepted booking.
   const handlePay = useCallback(async (bookingId: string) => {
@@ -203,6 +212,19 @@ export default function DashboardPage() {
       {error && (
         <div className="mb-6 px-4 py-3 rounded-xl bg-[var(--c-error)]/10 border border-[var(--c-error)]/30">
           <p className="text-sm font-medium text-[var(--c-error)]">{error}</p>
+        </div>
+      )}
+
+      {/* Review prompt — nudge the shipper to review delivered shipments */}
+      {pendingReviews.length > 0 && (
+        <div className="mb-6 rounded-xl border border-[var(--c-brass)]/30 bg-[var(--c-brass)]/[0.07] p-4 flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
+          <div className="flex items-center gap-3">
+            <span className="text-lg">★</span>
+            <p className="text-sm text-[var(--c-ink)]">
+              You have <strong>{pendingReviews.length}</strong> delivered {pendingReviews.length === 1 ? 'shipment' : 'shipments'} to review{pendingReviews[0] ? <> — starting with <strong>{pendingReviews[0].carrier}</strong> ({pendingReviews[0].route})</> : ''}.
+            </p>
+          </div>
+          <Link href={`/reviews?booking=${pendingReviews[0].id}`} className="shrink-0 px-4 py-2 rounded-lg bg-[var(--c-accent)] text-white text-sm font-medium hover:bg-[var(--c-accent-hover)] text-center">Leave a review</Link>
         </div>
       )}
 

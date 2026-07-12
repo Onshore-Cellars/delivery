@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { verifyToken, getTokenFromHeader } from '@/lib/auth'
-import { notifyStatusUpdate } from '@/lib/notifications'
+import { notifyStatusUpdate, createNotification } from '@/lib/notifications'
 import { deliveryConfirmationEmail } from '@/lib/email'
 import { queueEmail } from '@/lib/email-queue'
 import { createRefund, currencySymbol } from '@/lib/stripe'
@@ -324,6 +324,20 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       } catch (emailErr) {
         console.error('Delivery confirmation email error:', emailErr)
       }
+
+      // Prompt the shipper to review the carrier — only if they haven't already.
+      try {
+        const existingReview = await prisma.review.findFirst({ where: { bookingId: id }, select: { id: true } })
+        if (!existingReview) {
+          await createNotification({
+            userId: booking.shipperId,
+            type: 'SYSTEM',
+            title: 'How was your delivery?',
+            message: `Your shipment ${booking.trackingCode || ''} was delivered. Leave a quick review to help other shippers.`,
+            linkUrl: `/reviews?booking=${id}`,
+          })
+        }
+      } catch (e) { console.error('Review prompt error:', e) }
 
       const remaining = await prisma.booking.count({
         where: {
