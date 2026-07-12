@@ -4,6 +4,7 @@ import { verifyToken, getTokenFromHeader } from '@/lib/auth'
 import { notifyStatusUpdate } from '@/lib/notifications'
 import { deliveryConfirmationEmail } from '@/lib/email'
 import { queueEmail } from '@/lib/email-queue'
+import { createRefund, currencySymbol } from '@/lib/stripe'
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -29,7 +30,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
     const booking = await prisma.booking.findUnique({
       where: { id },
-      include: { listing: true },
+      include: { listing: { include: { carrier: { select: { stripeAccountId: true } } } } },
     })
 
     if (!booking) return NextResponse.json({ error: 'Booking not found' }, { status: 404 })
@@ -78,6 +79,42 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       return NextResponse.json({ error: 'Payment required before confirming booking' }, { status: 400 })
     }
 
+    // ── Cancellation refund ────────────────────────────────────────────────
+    // If a PAID booking is being cancelled, refund the shipper (minus any
+    // cancellation fee) BEFORE mutating state, so a refund failure aborts the
+    // cancellation cleanly instead of keeping the customer's money. Previously
+    // cancellation restored capacity but never issued the refund the
+    // cancel-preview endpoint promised.
+    let cancellationFee = 0
+    let cancellationPercent = ''
+    let refundedPaymentStatus: 'REFUNDED' | undefined
+    if (status === 'CANCELLED' && booking.paymentStatus === 'PAID' && booking.totalPrice > 0) {
+      const departure = booking.listing.departureDate
+      const hoursUntilDeparture = (departure.getTime() - Date.now()) / (1000 * 60 * 60)
+      if (hoursUntilDeparture < 24) { cancellationFee = booking.totalPrice * 0.5; cancellationPercent = '50%' }
+      else if (hoursUntilDeparture < 72) { cancellationFee = booking.totalPrice * 0.25; cancellationPercent = '25%' }
+      else if (hoursUntilDeparture < 168) { cancellationFee = booking.totalPrice * 0.1; cancellationPercent = '10%' }
+
+      const refundAmount = Math.max(0, Math.round((booking.totalPrice - cancellationFee) * 100) / 100)
+      if (booking.stripePaymentIntentId && refundAmount > 0) {
+        // Reverse the carrier transfer + platform fee only if this was a Connect
+        // destination charge (carrier has an onboarded Stripe account).
+        const isConnect = !!booking.listing.carrier?.stripeAccountId
+        try {
+          await createRefund(booking.stripePaymentIntentId, refundAmount, {
+            reverseTransfer: isConnect,
+            refundApplicationFee: isConnect,
+          })
+        } catch (refundErr) {
+          console.error('Cancellation refund error:', refundErr)
+          return NextResponse.json({ error: 'Failed to process refund. Cancellation aborted — please try again.' }, { status: 502 })
+        }
+      }
+      // Clear the paid state whether we refunded via Stripe or there was nothing
+      // left to refund after the fee.
+      refundedPaymentStatus = 'REFUNDED'
+    }
+
     const statusDescriptions: Record<string, string> = {
       ACCEPTED: 'Booking accepted by carrier — awaiting payment',
       REJECTED: 'Booking declined by carrier',
@@ -109,7 +146,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const [updatedBooking] = await prisma.$transaction([
       prisma.booking.update({
         where: { id },
-        data: { status, ...additionalData },
+        data: { status, ...additionalData, ...(refundedPaymentStatus ? { paymentStatus: refundedPaymentStatus } : {}) },
       }),
       prisma.trackingEvent.create({
         data: {
@@ -121,27 +158,10 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       }),
     ])
 
-    // If cancelled, restore listing capacity with cancellation fee logic
+    // If cancelled, restore listing capacity. Any refund + cancellation-fee
+    // computation already happened above, before state was mutated.
     if (status === 'CANCELLED') {
       const isReturnLeg = booking.routeDirection === 'return'
-
-      // Calculate cancellation fee based on time until departure
-      let cancellationFee = 0
-      let cancellationPercent = ''
-      if (booking.paymentStatus === 'PAID' && booking.totalPrice > 0) {
-        const departure = booking.listing.departureDate
-        const hoursUntilDeparture = (departure.getTime() - Date.now()) / (1000 * 60 * 60)
-        if (hoursUntilDeparture < 24) {
-          cancellationFee = booking.totalPrice * 0.5
-          cancellationPercent = '50%'
-        } else if (hoursUntilDeparture < 72) {
-          cancellationFee = booking.totalPrice * 0.25
-          cancellationPercent = '25%'
-        } else if (hoursUntilDeparture < 168) {
-          cancellationFee = booking.totalPrice * 0.1
-          cancellationPercent = '10%'
-        }
-      }
 
       // Restore capacity (with overflow guard — never exceed total)
       if (isReturnLeg) {
@@ -196,7 +216,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
           data: {
             bookingId: id,
             status: 'CANCELLED',
-            description: `Cancellation fee: €${cancellationFee.toFixed(2)} (${cancellationPercent} of booking total)`,
+            description: `Cancellation fee: ${currencySymbol(booking.currency)}${cancellationFee.toFixed(2)} (${cancellationPercent} of booking total)`,
           },
         })
       }

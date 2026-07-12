@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { verifyToken, getTokenFromHeader } from '@/lib/auth'
-import { createRefund } from '@/lib/stripe'
+import { createRefund, currencySymbol } from '@/lib/stripe'
 import { createNotification } from '@/lib/notifications'
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -36,6 +36,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       where: { id },
       include: {
         shipper: { select: { id: true, name: true, email: true } },
+        listing: { select: { carrier: { select: { stripeAccountId: true } } } },
       },
     })
 
@@ -61,8 +62,13 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       }
     }
 
-    // Call Stripe refund
-    await createRefund(booking.stripePaymentIntentId, amount)
+    // Call Stripe refund — reverse the carrier transfer + platform fee for
+    // Connect destination charges so the platform doesn't eat the refund.
+    const isConnect = !!booking.listing?.carrier?.stripeAccountId
+    await createRefund(booking.stripePaymentIntentId, amount, {
+      reverseTransfer: isConnect,
+      refundApplicationFee: isConnect,
+    })
 
     const isPartial = amount !== undefined && amount < booking.totalPrice
     const refundAmount = amount ?? booking.totalPrice
@@ -113,6 +119,22 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         where: { id: booking.listingId, status: 'FULL' },
         data: { status: 'ACTIVE' },
       }).catch(() => {})
+
+      // Clamp capacity so a double-restore can never push available above total.
+      const restored = await prisma.listing.findUnique({
+        where: { id: booking.listingId },
+        select: { totalCapacityKg: true, totalCapacityM3: true, availableKg: true, availableM3: true, returnAvailableKg: true, returnAvailableM3: true, returnTotalKg: true, returnTotalM3: true },
+      })
+      if (restored) {
+        const clamp: Record<string, number> = {}
+        if (restored.availableKg > restored.totalCapacityKg) clamp.availableKg = restored.totalCapacityKg
+        if (restored.availableM3 > restored.totalCapacityM3) clamp.availableM3 = restored.totalCapacityM3
+        if (restored.returnAvailableKg != null && restored.returnTotalKg != null && restored.returnAvailableKg > restored.returnTotalKg) clamp.returnAvailableKg = restored.returnTotalKg
+        if (restored.returnAvailableM3 != null && restored.returnTotalM3 != null && restored.returnAvailableM3 > restored.returnTotalM3) clamp.returnAvailableM3 = restored.returnTotalM3
+        if (Object.keys(clamp).length > 0) {
+          await prisma.listing.update({ where: { id: booking.listingId }, data: clamp })
+        }
+      }
     }
 
     // Notify shipper
@@ -120,7 +142,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       userId: booking.shipperId,
       type: 'PAYMENT_RECEIVED',
       title: 'Refund Processed',
-      message: `Refund of \u20AC${refundAmount.toFixed(2)} processed for booking ${booking.trackingCode || id}`,
+      message: `Refund of ${currencySymbol(booking.currency)}${refundAmount.toFixed(2)} processed for booking ${booking.trackingCode || id}`,
       linkUrl: `/tracking?code=${booking.trackingCode}`,
     })
 

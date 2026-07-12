@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '../components/AuthProvider'
+import ProofOfDelivery from '../components/ProofOfDelivery'
 
 interface Stop {
   id: string
@@ -49,7 +50,30 @@ export default function DriverPage() {
   const [tracking, setTracking] = useState(false)
   const [position, setPosition] = useState<{ lat: number; lng: number } | null>(null)
   const [error, setError] = useState('')
+  const [advancing, setAdvancing] = useState<string | null>(null)
+  const [podStop, setPodStop] = useState<Stop | null>(null)
   const watchRef = useRef<number | null>(null)
+
+  // Advance a stop through the delivery state machine (CONFIRMED → PICKED_UP → IN_TRANSIT).
+  const advanceStatus = async (stopId: string, status: 'PICKED_UP' | 'IN_TRANSIT') => {
+    if (!token) return
+    setAdvancing(stopId + ':' + status)
+    setError('')
+    try {
+      const res = await fetch(`/api/bookings/${stopId}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ status }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to update status')
+      await fetchRoute()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update status')
+    } finally {
+      setAdvancing(null)
+    }
+  }
 
   const fetchRoute = useCallback(async () => {
     if (!token) return
@@ -124,7 +148,6 @@ export default function DriverPage() {
     // Update each active tracking session
     for (const stop of stops) {
       if (stop.liveTracking.length > 0) {
-        const session = stop.liveTracking[0]
         try {
           const res = await fetch('/api/tracking/live', {
             method: 'PATCH',
@@ -328,6 +351,41 @@ export default function DriverPage() {
                     </div>
                   )}
                 </div>
+
+                {/* Delivery status actions */}
+                <div className="mt-4 pt-3 border-t border-white/10 flex flex-wrap gap-2">
+                  {stop.status === 'CONFIRMED' && (
+                    <button
+                      onClick={() => advanceStatus(stop.id, 'PICKED_UP')}
+                      disabled={advancing === stop.id + ':PICKED_UP'}
+                      className="rounded-lg bg-[#268CB5] px-3.5 py-2 text-xs font-bold uppercase tracking-wide text-white hover:brightness-110 disabled:opacity-60"
+                    >
+                      {advancing === stop.id + ':PICKED_UP' ? '…' : 'Mark picked up'}
+                    </button>
+                  )}
+                  {stop.status === 'PICKED_UP' && (
+                    <button
+                      onClick={() => advanceStatus(stop.id, 'IN_TRANSIT')}
+                      disabled={advancing === stop.id + ':IN_TRANSIT'}
+                      className="rounded-lg bg-[#268CB5] px-3.5 py-2 text-xs font-bold uppercase tracking-wide text-white hover:brightness-110 disabled:opacity-60"
+                    >
+                      {advancing === stop.id + ':IN_TRANSIT' ? '…' : 'Start transit'}
+                    </button>
+                  )}
+                  {(stop.status === 'PICKED_UP' || stop.status === 'IN_TRANSIT') && (
+                    <button
+                      onClick={() => setPodStop(stop)}
+                      className="rounded-lg bg-[#9ED36A] px-3.5 py-2 text-xs font-bold uppercase tracking-wide text-[#0B1F2A] hover:brightness-95"
+                    >
+                      Complete delivery
+                    </button>
+                  )}
+                  {stop.status === 'DELIVERED' && (
+                    <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#9ED36A]/15 px-3 py-2 text-xs font-bold uppercase tracking-wide text-[#9ED36A]">
+                      ✓ Delivered
+                    </span>
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -343,6 +401,17 @@ export default function DriverPage() {
             </button>
           )}
         </div>
+      )}
+
+      {/* Proof of delivery modal */}
+      {podStop && token && (
+        <ProofOfDelivery
+          bookingId={podStop.id}
+          trackingCode={podStop.trackingCode}
+          token={token}
+          onClose={() => setPodStop(null)}
+          onComplete={() => { setPodStop(null); fetchRoute() }}
+        />
       )}
     </div>
   )

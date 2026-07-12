@@ -7,6 +7,8 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "db:migrate": "prisma migrate deploy",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
@@ -45,6 +47,7 @@
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
     "typescript": "^5",
+    "vitest": "^3.2.7",
     "xlsx": "^0.18.5"
   }
 }

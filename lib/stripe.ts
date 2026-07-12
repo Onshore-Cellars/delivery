@@ -87,11 +87,18 @@ export async function createCheckoutSession(params: {
     metadata: {
       bookingId: params.bookingId,
     },
+    // Always propagate bookingId onto the resulting PaymentIntent/Charge — Stripe
+    // does NOT copy session metadata, and the payment_failed / canceled / refunded
+    // webhook handlers key on payment_intent.metadata.bookingId.
+    payment_intent_data: {
+      metadata: { bookingId: params.bookingId },
+    },
   }
 
-  // If carrier has Stripe Connect, use platform fees
+  // If carrier has Stripe Connect, use platform fees (destination charge)
   if (params.carrierStripeAccountId) {
     sessionParams.payment_intent_data = {
+      ...sessionParams.payment_intent_data,
       application_fee_amount: platformFee,
       transfer_data: {
         destination: params.carrierStripeAccountId,
@@ -149,11 +156,21 @@ export async function getAccountStatus(accountId: string) {
 
 // ─── REFUND ───────────────────────────────────────────────────────────────────
 
-export async function createRefund(paymentIntentId: string, amount?: number) {
-  return stripe.refunds.create({
+export async function createRefund(
+  paymentIntentId: string,
+  amount?: number,
+  opts?: { reverseTransfer?: boolean; refundApplicationFee?: boolean },
+) {
+  const refundParams: Stripe.RefundCreateParams = {
     payment_intent: paymentIntentId,
     amount: amount ? Math.round(amount * 100) : undefined,
-  })
+  }
+  // For Connect destination charges, claw the money back from the carrier's
+  // transfer and return the platform fee proportionally — otherwise the platform
+  // refunds the shipper out of its own balance while the carrier keeps the payout.
+  if (opts?.reverseTransfer) refundParams.reverse_transfer = true
+  if (opts?.refundApplicationFee) refundParams.refund_application_fee = true
+  return stripe.refunds.create(refundParams)
 }
 
 // ─── WEBHOOK VERIFICATION ─────────────────────────────────────────────────────
@@ -164,6 +181,15 @@ export function constructWebhookEvent(payload: string, signature: string): Strip
     throw new Error('STRIPE_WEBHOOK_SECRET is not configured')
   }
   return stripe.webhooks.constructEvent(payload, signature, secret)
+}
+
+/** Map an ISO currency code to its display symbol (EUR/GBP/USD supported). */
+export function currencySymbol(currency: string | null | undefined): string {
+  switch ((currency || 'EUR').toUpperCase()) {
+    case 'GBP': return '£'
+    case 'USD': return '$'
+    default: return '€'
+  }
 }
 
 export function calculatePlatformFee(amount: number): number {

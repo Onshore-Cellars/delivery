@@ -55,10 +55,26 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
           recipientName ? `Received by: ${recipientName}` : '',
           deliveryLocation ? `Location: ${deliveryLocation}` : '',
         ].filter(Boolean).join('\n') || null,
+        podRecipientName: recipientName || null,
         status: 'DELIVERED',
         actualDelivery: new Date(),
       },
     })
+
+    // Mark the listing COMPLETED when no active bookings remain — mirrors the
+    // status route so POD doesn't leave a stale ACTIVE/FULL listing behind.
+    const remaining = await prisma.booking.count({
+      where: {
+        listingId: booking.listingId,
+        status: { notIn: ['DELIVERED', 'CANCELLED', 'QUOTE_REQUESTED', 'QUOTED'] },
+      },
+    })
+    if (remaining === 0) {
+      await prisma.listing.update({
+        where: { id: booking.listingId },
+        data: { status: 'COMPLETED' },
+      }).catch(() => {})
+    }
 
     // Create tracking event
     await prisma.trackingEvent.create({

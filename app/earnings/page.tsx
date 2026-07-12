@@ -26,18 +26,57 @@ interface EarningsData {
 
 const statusColors: Record<string, string> = {
   PENDING: 'bg-[#FF6A2A]/15 text-[#FF6A2A]',
-  CONFIRMED: 'bg-blue-100 text-[#268CB5]',
-  PICKED_UP: 'bg-indigo-100 text-indigo-700',
-  IN_TRANSIT: 'bg-purple-100 text-purple-700',
+  CONFIRMED: 'bg-[#268CB5]/15 text-[#5FB3C4]',
+  PICKED_UP: 'bg-[#268CB5]/15 text-[#5FB3C4]',
+  IN_TRANSIT: 'bg-[#268CB5]/15 text-[#5FB3C4]',
   DELIVERED: 'bg-[#9ED36A]/15 text-[#9ED36A]',
-  CANCELLED: 'bg-[#102535] text-[#6B7C86]',
-  DISPUTED: 'bg-red-100 text-red-400',
+  CANCELLED: 'bg-[#102535] text-[#9AADB8]',
+  DISPUTED: 'bg-red-500/15 text-red-300',
+}
+
+interface PayoutStatus {
+  connected: boolean
+  chargesEnabled: boolean
+  payoutsEnabled: boolean
+  detailsSubmitted: boolean
 }
 
 export default function EarningsPage() {
   const { user, token, loading: authLoading } = useAuth()
   const [data, setData] = useState<EarningsData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [payout, setPayout] = useState<PayoutStatus | null>(null)
+  const [connecting, setConnecting] = useState(false)
+
+  const fetchPayout = useCallback(async () => {
+    if (!token) return
+    try {
+      const res = await fetch('/api/stripe/connect', { headers: { Authorization: `Bearer ${token}` } })
+      if (res.ok) setPayout(await res.json())
+    } catch { /* ignore */ }
+  }, [token])
+
+  const connectPayouts = useCallback(async () => {
+    if (!token) return
+    setConnecting(true)
+    try {
+      const res = await fetch('/api/stripe/connect', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: '{}',
+      })
+      const result = await res.json()
+      if (res.ok && result.url) {
+        window.location.href = result.url
+        return
+      }
+      alert(result.error || 'Could not start payout onboarding.')
+    } catch {
+      alert('Could not start payout onboarding.')
+    } finally {
+      setConnecting(false)
+    }
+  }, [token])
 
   const fetchEarnings = useCallback(async () => {
     if (!token) return
@@ -64,7 +103,7 @@ export default function EarningsPage() {
     finally { setLoading(false) }
   }, [token])
 
-  useEffect(() => { fetchEarnings() }, [fetchEarnings])
+  useEffect(() => { fetchEarnings(); fetchPayout() }, [fetchEarnings, fetchPayout])
 
   if (authLoading) return <div className="min-h-screen bg-[#0B1F2A]" />
   if (!user) return (
@@ -82,6 +121,35 @@ export default function EarningsPage() {
     <div id="main-content" className="min-h-screen bg-[#0B1F2A] py-8 px-4">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-2xl font-bold text-[#F7F9FB] mb-6" style={{ fontFamily: 'var(--font-display)' }}>Earnings</h1>
+
+        {/* Payout onboarding — carriers must connect Stripe to receive payouts */}
+        {payout && !payout.payoutsEnabled && (
+          <div className="mb-6 rounded-lg border border-[#FF6A2A]/30 bg-[#FF6A2A]/10 p-4 flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
+            <div>
+              <p className="text-sm font-semibold text-[#F7F9FB]">
+                {payout.connected ? 'Finish setting up payouts' : 'Set up payouts to get paid'}
+              </p>
+              <p className="text-xs text-[#9AADB8] mt-0.5">
+                {payout.connected
+                  ? 'Your Stripe account needs a few more details before you can receive payouts.'
+                  : 'Connect a Stripe account to receive your carrier payouts. Without it, bookings can’t pay out to you.'}
+              </p>
+            </div>
+            <button
+              onClick={connectPayouts}
+              disabled={connecting}
+              className="shrink-0 rounded-lg bg-[#FF6A2A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#E85A1C] disabled:opacity-60"
+            >
+              {connecting ? 'Redirecting…' : payout.connected ? 'Continue setup' : 'Connect payouts'}
+            </button>
+          </div>
+        )}
+        {payout?.payoutsEnabled && (
+          <div className="mb-6 rounded-lg border border-[#9ED36A]/30 bg-[#9ED36A]/10 p-3 flex items-center gap-2">
+            <span className="text-[#9ED36A]">✓</span>
+            <p className="text-sm text-[#F7F9FB]">Payouts are active — you’re all set to receive carrier payments.</p>
+          </div>
+        )}
 
         {loading ? (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">

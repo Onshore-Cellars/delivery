@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // One-off CommonJS data-scraping/seed helpers — not part of the app bundle.
+    "scripts/**",
+    "prisma/seed-*.js",
   ]),
 ]);
 

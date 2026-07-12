@@ -145,19 +145,28 @@ export const webhookLimiter = createRateLimiter({ interval: 60_000, limit: 100, 
 // ---------------------------------------------------------------------------
 
 /**
- * Extracts the client IP address from a Next.js request.
- * Checks `x-forwarded-for` first, then `x-real-ip`, and falls back to
- * `'unknown'` when neither header is present.
+ * Extracts the client IP address for rate limiting from a trusted position.
+ *
+ * The LEFTMOST X-Forwarded-For entry is supplied by the client and trivially
+ * forged — keying limiters on it lets an attacker reset their counter on every
+ * request. Instead we prefer the platform-set `x-real-ip`, and otherwise take a
+ * trusted hop from the RIGHT of X-Forwarded-For (the real client IP appended by
+ * our own proxy). `TRUSTED_PROXY_COUNT` (default 1) tunes how many proxy hops to
+ * skip from the right for the current deployment.
  */
 export function getClientIP(request: NextRequest): string {
+  const realIp = request.headers.get('x-real-ip')?.trim()
+  if (realIp) return realIp
+
   const forwarded = request.headers.get('x-forwarded-for')
   if (forwarded) {
-    const ip = forwarded.split(',')[0]?.trim()
-    if (ip) return ip
+    const parts = forwarded.split(',').map(p => p.trim()).filter(Boolean)
+    if (parts.length > 0) {
+      const hops = Math.max(1, parseInt(process.env.TRUSTED_PROXY_COUNT || '1', 10) || 1)
+      const idx = Math.max(0, parts.length - hops)
+      return parts[idx]
+    }
   }
-
-  const realIp = request.headers.get('x-real-ip')
-  if (realIp) return realIp.trim()
 
   return 'unknown'
 }

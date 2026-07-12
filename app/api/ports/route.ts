@@ -2,9 +2,17 @@ import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { Prisma } from '@prisma/client'
 
-let cachedPorts: unknown[] | null = null
-let cacheExpiry = 0
 const CACHE_TTL = 60 * 60 * 1000 // 1 hour
+const CACHE_MAX_ENTRIES = 500
+// Cache keyed by the full query-param tuple. Previously a single module-level
+// slot was checked BEFORE the params were considered, so the first request of
+// the hour poisoned every subsequent /api/ports call with its result set —
+// breaking port autocomplete (the top of the booking funnel).
+const portCache = new Map<string, { data: unknown[]; expiry: number }>()
+
+function cacheKey(parts: (string | number | null | undefined)[]): string {
+  return parts.map(p => (p ?? '')).join('|')
+}
 
 /**
  * GET /api/ports - Smart port search with prioritized results
@@ -29,8 +37,15 @@ export async function GET(request: NextRequest) {
     const popularParam = searchParams.get('popular')
     const limit = Math.min(parseInt(searchParams.get('limit') || '20'), 100)
 
-    if (cachedPorts && Date.now() < cacheExpiry) {
-      return NextResponse.json({ ports: cachedPorts })
+    const key = cacheKey([q, country, type, popularParam, limit])
+    const cached = portCache.get(key)
+    if (cached && Date.now() < cached.expiry) {
+      return NextResponse.json({ ports: cached.data })
+    }
+
+    const setCache = (data: unknown[]) => {
+      if (portCache.size >= CACHE_MAX_ENTRIES) portCache.clear()
+      portCache.set(key, { data, expiry: Date.now() + CACHE_TTL })
     }
 
     if (!q && !country && !type && !popularParam) {
@@ -40,8 +55,7 @@ export async function GET(request: NextRequest) {
         orderBy: { name: 'asc' },
         take: limit,
       })
-      cachedPorts = ports
-      cacheExpiry = Date.now() + CACHE_TTL
+      setCache(ports)
       return NextResponse.json({ ports })
     }
 
@@ -110,8 +124,7 @@ export async function GET(request: NextRequest) {
     // Strip score and limit
     const results = ranked.slice(0, limit).map(({ _score, ...port }) => port)
 
-    cachedPorts = results
-    cacheExpiry = Date.now() + CACHE_TTL
+    setCache(results)
 
     return NextResponse.json({ ports: results })
   } catch (error) {

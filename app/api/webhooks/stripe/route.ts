@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
-import { constructWebhookEvent, calculatePlatformFee, calculateCarrierPayout } from '@/lib/stripe'
+import { constructWebhookEvent, calculatePlatformFee, calculateCarrierPayout, currencySymbol } from '@/lib/stripe'
 import { createNotification } from '@/lib/notifications'
 import { sendEmail, paymentReceiptEmail, carrierPayoutEmail } from '@/lib/email'
 import { queueEmail } from '@/lib/email-queue'
@@ -29,15 +29,6 @@ export async function POST(request: NextRequest) {
     if (existingLog) {
       return NextResponse.json({ received: true, duplicate: true })
     }
-
-    // Log this webhook for idempotency
-    await prisma.auditLog.create({
-      data: {
-        action: 'STRIPE_WEBHOOK',
-        targetId: eventId,
-        details: JSON.stringify({ eventId, type: event.type }),
-      }
-    })
 
     switch (event.type) {
       case 'checkout.session.completed': {
@@ -79,7 +70,8 @@ export async function POST(request: NextRequest) {
           })
 
           const appUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
-          const fmtMoney = (n: number) => `€${n.toFixed(2)}`
+          const sym = currencySymbol(booking.currency)
+          const fmtMoney = (n: number) => `${sym}${n.toFixed(2)}`
 
           // Notify both parties (in-app)
           await createNotification({
@@ -307,6 +299,19 @@ export async function POST(request: NextRequest) {
         break
       }
     }
+
+    // Record the idempotency key ONLY after the handler's work has committed. If
+    // any handler above throws, we fall to the catch, return 500, and Stripe
+    // retries — this time not short-circuited as a duplicate. (Previously the key
+    // was written before handling, so a mid-handler failure permanently dropped
+    // the work.)
+    await prisma.auditLog.create({
+      data: {
+        action: 'STRIPE_WEBHOOK',
+        targetId: eventId,
+        details: JSON.stringify({ eventId, type: event.type }),
+      },
+    }).catch((e) => { console.error('Webhook idempotency-log write failed:', e) })
 
     return NextResponse.json({ received: true })
   } catch (error) {

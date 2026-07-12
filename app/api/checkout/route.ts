@@ -79,12 +79,13 @@ export async function POST(request: NextRequest) {
       carrierStripeAccountId: booking.listing.carrier.stripeAccountId || undefined,
     })
 
-    // Update booking with payment info
+    // Update booking with payment info. Note: session.payment_intent is null at
+    // session-creation time for mode:'payment' — the checkout.session.completed
+    // webhook populates stripePaymentIntentId once the customer actually pays.
     await prisma.booking.update({
       where: { id: bookingId },
       data: {
         stripePaymentId: session.id,
-        stripePaymentIntentId: session.payment_intent as string,
         paymentStatus: 'PROCESSING',
         platformFee: calculatePlatformFee(booking.totalPrice),
         carrierPayout: calculateCarrierPayout(booking.totalPrice),
