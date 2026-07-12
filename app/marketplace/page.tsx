@@ -712,7 +712,7 @@ export default function MarketplacePage() {
           </div>
           {user ? (
             listing.listingType === 'SPACE_NEEDED' ? (
-              <button onClick={() => openBooking(listing)} className="btn-primary !text-sm !py-2.5 !px-5 !min-h-0 !rounded-xl !bg-orange-600 hover:!bg-orange-700">
+              <button onClick={() => openBooking(listing)} className="btn-primary !text-sm !py-2.5 !px-5 !min-h-0 !rounded-xl !bg-[var(--c-accent)] hover:!bg-[var(--c-accent)]">
                 Offer to Deliver
               </button>
             ) : (
@@ -945,7 +945,7 @@ export default function MarketplacePage() {
             </p>
             <div className="flex items-center gap-2">
               <select
-                className="px-3 py-2 rounded-xl border border-black/10 bg-[var(--c-surface)] text-sm text-[var(--c-ink)] focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 outline-none"
+                className="px-3 py-2 rounded-xl border border-black/10 bg-[var(--c-surface)] text-sm text-[var(--c-ink)] focus:border-[#1F5E86] focus:ring-2 focus:ring-blue-500/10 outline-none"
                 value={filters.sort}
                 onChange={(e) => { setFilters({ ...filters, sort: e.target.value }); setCurrentPage(1) }}
               >

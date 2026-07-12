@@ -101,7 +101,7 @@ export default function ProfilePage() {
         </div>
 
         {success && (
-          <div className="mb-6 px-4 py-3 rounded-lg bg-[var(--c-success)]/10 border border-emerald-200" role="status">
+          <div className="mb-6 px-4 py-3 rounded-lg bg-[var(--c-success)]/10 border border-[#256B4A]/40" role="status">
             <p className="text-sm text-[var(--c-success)] font-medium">{success}</p>
           </div>
         )}
@@ -186,7 +186,7 @@ export default function ProfilePage() {
                   </div>
                 ))}
               </dl>
-              {profile.bio && <p className="mt-4 text-sm text-[var(--c-text-2)] leading-relaxed border-t border-slate-100 pt-4">{profile.bio}</p>}
+              {profile.bio && <p className="mt-4 text-sm text-[var(--c-text-2)] leading-relaxed border-t border-[#D3D8D1] pt-4">{profile.bio}</p>}
               <button onClick={() => setEditing(true)} className="mt-6 btn-primary text-sm !py-2 !px-5">Edit Profile</button>
             </>
           ) : (

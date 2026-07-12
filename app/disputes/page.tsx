@@ -20,7 +20,7 @@ interface Dispute {
 }
 
 const statusColors: Record<string, string> = {
-  OPEN: 'bg-red-100 text-[var(--c-error)]',
+  OPEN: 'bg-[#B23A2E]/10 text-[var(--c-error)]',
   UNDER_REVIEW: 'bg-[var(--c-accent)]/15 text-[var(--c-accent)]',
   RESOLVED: 'bg-[var(--c-success)]/15 text-[var(--c-success)]',
   APPEALED: 'bg-[#1F5E86]/15 text-[var(--c-info)]',
@@ -149,7 +149,7 @@ export default function DisputesPage() {
                 <input className={inputClass} type="number" step="0.01" placeholder="0.00" value={createForm.claimAmount} onChange={e => setCreateForm({...createForm, claimAmount: e.target.value})} />
               </div>
             </div>
-            <button onClick={handleCreate} disabled={creating} className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-semibold hover:bg-red-700 disabled:opacity-50 transition-colors">
+            <button onClick={handleCreate} disabled={creating} className="px-4 py-2 bg-[#B23A2E] text-white rounded-lg text-sm font-semibold hover:bg-[#B23A2E] disabled:opacity-50 transition-colors">
               {creating ? 'Submitting...' : 'Submit Dispute'}
             </button>
           </div>

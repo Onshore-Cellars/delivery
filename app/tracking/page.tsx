@@ -157,7 +157,7 @@ export default function TrackingPage() {
               ))}
             </div>
             {userBookings.length > SHIPMENTS_PER_PAGE && (
-              <div className="flex items-center justify-between px-4 pt-3 mt-2 border-t border-slate-100">
+              <div className="flex items-center justify-between px-4 pt-3 mt-2 border-t border-[#D3D8D1]">
                 <button
                   onClick={() => setShipmentsPage(p => Math.max(1, p - 1))}
                   disabled={shipmentsPage === 1}
@@ -194,9 +194,9 @@ export default function TrackingPage() {
                   <h2 className="text-lg font-bold text-[var(--c-ink)]">{data.booking.cargoDescription}</h2>
                 </div>
                 <span className={`badge border ${
-                  data.booking.status === 'DELIVERED' ? 'bg-[var(--c-success)]/10 text-[var(--c-success)] border-emerald-200' :
+                  data.booking.status === 'DELIVERED' ? 'bg-[var(--c-success)]/10 text-[var(--c-success)] border-[#256B4A]/40' :
                   data.booking.status === 'CANCELLED' ? 'bg-[#B23A2E]/10 text-[var(--c-error)] border-[#B23A2E]/30' :
-                  'bg-[#1F5E86]/10 text-[var(--c-info)] border-indigo-200'
+                  'bg-[#1F5E86]/10 text-[var(--c-info)] border-[#1F5E86]'
                 }`}>
                   {data.booking.status.replace('_', ' ')}
                 </span>

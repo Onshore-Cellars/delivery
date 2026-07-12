@@ -147,7 +147,7 @@ export default function VehiclesPage() {
         </div>
 
         {error && <div className="mb-4 p-3 bg-[#B23A2E]/10 border border-[#B23A2E]/30 rounded-lg text-sm text-[var(--c-error)] flex justify-between"><span>{error}</span><button onClick={() => setError('')} className="text-[var(--c-error)]">&times;</button></div>}
-        {success && <div className="mb-4 p-3 bg-[var(--c-success)]/10 border border-green-500/30 rounded-lg text-sm text-[var(--c-success)] flex justify-between"><span>{success}</span><button onClick={() => setSuccess('')} className="text-[var(--c-success)]">&times;</button></div>}
+        {success && <div className="mb-4 p-3 bg-[var(--c-success)]/10 border border-[#256B4A]/40/30 rounded-lg text-sm text-[var(--c-success)] flex justify-between"><span>{success}</span><button onClick={() => setSuccess('')} className="text-[var(--c-success)]">&times;</button></div>}
 
         {showAdd && (
           <div className="bg-[var(--c-surface)] rounded-lg border border-[rgba(255,255,255,0.08)] p-5 mb-6">
@@ -207,7 +207,7 @@ export default function VehiclesPage() {
                         {v.year && <span className="text-xs text-[var(--c-text-3)]">({v.year})</span>}
                         <span className="px-2 py-0.5 bg-black/10 rounded text-xs text-[var(--c-text-3)]">{v.vehicleType}</span>
                         {v.verified && <span className="px-2 py-0.5 bg-[var(--c-success)]/15 text-[var(--c-success)] rounded text-xs">Verified</span>}
-                        {!v.active && <span className="px-2 py-0.5 bg-red-100 text-[var(--c-error)] rounded text-xs">Inactive</span>}
+                        {!v.active && <span className="px-2 py-0.5 bg-[#B23A2E]/10 text-[var(--c-error)] rounded text-xs">Inactive</span>}
                       </div>
                       <div className="flex flex-wrap gap-3 text-xs text-[var(--c-text-3)] mt-2">
                         {v.registrationPlate && <span>Reg: {v.registrationPlate}</span>}

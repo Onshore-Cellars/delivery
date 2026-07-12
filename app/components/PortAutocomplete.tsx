@@ -46,7 +46,7 @@ interface CombinedResult {
 
 const typeLabels: Record<string, { label: string; color: string }> = {
   port: { label: 'Port', color: 'bg-[#1F5E86]/15 text-[var(--c-info)]' },
-  marina: { label: 'Marina', color: 'bg-emerald-100 text-[var(--c-success)]' },
+  marina: { label: 'Marina', color: 'bg-[var(--c-success)]/10 text-[var(--c-success)]' },
   shipyard: { label: 'Shipyard', color: 'bg-[var(--c-accent)]/15 text-[var(--c-accent)]' },
   address: { label: 'Address', color: 'bg-[var(--c-canvas-2)] text-[var(--c-text-2)]' },
 }
