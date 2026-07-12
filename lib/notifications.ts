@@ -35,10 +35,21 @@ export async function createNotification(params: CreateNotificationParams) {
       try {
         const user = await prisma.user.findUnique({
           where: { id: userId },
-          select: { email: true, name: true, phone: true, emailNotifications: true, smsNotifications: true },
+          select: {
+            email: true, name: true, phone: true, emailNotifications: true, smsNotifications: true,
+            notifyBookings: true, notifyPayments: true, notifyBids: true, notifyMessages: true,
+          },
         })
 
-        if (user?.emailNotifications) {
+        // Respect the per-category preference for this notification type.
+        const t = String(type)
+        const categoryAllowed =
+          t.includes('PAYMENT') || t.includes('PAYOUT') || t.includes('REFUND') ? user?.notifyPayments !== false
+          : t.includes('BID') || t.includes('QUOTE') ? user?.notifyBids !== false
+          : t.includes('MESSAGE') ? user?.notifyMessages !== false
+          : user?.notifyBookings !== false // bookings/status/delivery/other
+
+        if (user?.emailNotifications && categoryAllowed) {
           await queueEmail({
             to: user.email,
             subject: title,

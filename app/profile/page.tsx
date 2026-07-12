@@ -15,6 +15,7 @@ interface ProfileData {
   yachtLength?: number; yachtType?: string; homePort?: string
   preferredLanguage?: string
   emailNotifications: boolean; smsNotifications: boolean
+  notifyBookings?: boolean; notifyPayments?: boolean; notifyBids?: boolean; notifyMessages?: boolean; notifyMarketing?: boolean; weeklyDigest?: boolean
   verified: boolean; createdAt: string; stripeAccountId?: string
   vatNumber?: string; vatNumberValid?: boolean | null; vatNumberCheckedAt?: string; vatBusinessName?: string; isBusiness?: boolean
   _count: { listings: number; bookings: number; receivedReviews: number; documents: number; vehicles: number }
@@ -321,6 +322,48 @@ export default function ProfilePage() {
               )}
             </div>
           )}
+        </div>
+
+        {/* Notification preferences */}
+        <div className="bg-[var(--c-surface)] rounded-lg shadow-[0_2px_8px_rgba(0,0,0,0.3)] border border-black/10 p-6 sm:p-8 mb-6">
+          <h2 className="font-semibold text-[var(--c-ink)] mb-2" style={{ fontFamily: 'var(--font-display)' }}>Notification preferences</h2>
+          <p className="text-xs text-[var(--c-text-3)] mb-5">Choose which emails you receive.</p>
+          <div className="space-y-3">
+            {([
+              ['notifyBookings', 'Booking & delivery updates', 'Confirmations, status changes, proof of delivery'],
+              ['notifyPayments', 'Payments & payouts', 'Receipts, carrier payouts, refunds'],
+              ['notifyBids', 'Bids & quotes', 'New bids, counter-offers, quote requests'],
+              ['notifyMessages', 'Messages', 'New direct messages'],
+              ['weeklyDigest', 'Weekly digest', 'A summary of your activity each week'],
+              ['notifyMarketing', 'Product news & tips', 'Occasional updates about Onshore'],
+            ] as [keyof ProfileData, string, string][]).map(([key, label, desc]) => {
+              const on = profile[key] !== false
+              return (
+                <div key={key as string} className="flex items-center justify-between gap-4">
+                  <div>
+                    <div className="text-sm font-semibold text-[var(--c-ink)]">{label}</div>
+                    <div className="text-xs text-[var(--c-text-3)]">{desc}</div>
+                  </div>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={on}
+                    onClick={async () => {
+                      if (!token) return
+                      const next = !on
+                      setProfile(p => p ? { ...p, [key]: next } : p)
+                      try {
+                        await fetch('/api/profile', { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ [key]: next }) })
+                      } catch { setProfile(p => p ? { ...p, [key]: on } : p) }
+                    }}
+                    className={`relative w-11 h-6 rounded-full transition-colors shrink-0 ${on ? 'bg-[var(--c-accent)]' : 'bg-[var(--c-canvas-2)]'}`}
+                  >
+                    <span className={`absolute top-[2px] left-[2px] h-5 w-5 rounded-full bg-[var(--c-surface)] shadow transition-transform ${on ? 'translate-x-5' : ''}`} />
+                  </button>
+                </div>
+              )
+            })}
+          </div>
         </div>
 
         {/* Role & Capabilities */}

@@ -442,6 +442,32 @@ export function carrierPayoutEmail(data: {
   }
 }
 
+export function weeklyDigestEmail(data: {
+  name: string
+  rows: { label: string; value: string }[]
+  ctaLabel?: string
+  ctaUrl?: string
+}): EmailTemplate {
+  data = safeData(data)
+  const rows = (data.rows || []).map(r => `
+    <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #D3D8D1;">
+      <span style="color:#41524E;font-size:14px;">${r.label}</span>
+      <span style="color:#12302C;font-weight:600;">${r.value}</span>
+    </div>`).join('')
+  const html = wrapEmail(`
+    <h2 style="color:#12302C;font-size:24px;margin:0 0 8px;">Your week on Onshore</h2>
+    <p style="color:#41524E;font-size:15px;line-height:1.6;margin:0 0 20px;">Hi ${data.name}, here's a summary of your last 7 days.</p>
+    <div style="background:#FCFBF8;border:1px solid #D3D8D1;border-radius:12px;padding:8px 20px;margin:0 0 24px;">${rows}</div>
+    ${data.ctaUrl ? `<a href="${data.ctaUrl}" style="display:block;background:linear-gradient(135deg,#0C5C54,#094A44);color:white;text-align:center;padding:14px 24px;border-radius:8px;font-weight:600;text-decoration:none;">${data.ctaLabel || 'Open dashboard'}</a>` : ''}
+    <p style="color:#647672;font-size:12px;margin-top:20px;text-align:center;">You're receiving the weekly digest. Manage this in your profile notification settings.</p>
+  `)
+  return {
+    subject: 'Your week on Onshore',
+    html,
+    text: `Your week on Onshore:\n${(data.rows || []).map(r => `- ${r.label}: ${r.value}`).join('\n')}`,
+  }
+}
+
 export function welcomeEmail(data: { name: string; role: string }): EmailTemplate {
   data = safeData(data)
   const html = wrapEmail(`

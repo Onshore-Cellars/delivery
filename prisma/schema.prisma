@@ -161,6 +161,13 @@ model User {
   // Settings
   emailNotifications  Boolean  @default(true)
   smsNotifications    Boolean  @default(false)
+  // Granular email notification preferences (per category) + weekly digest.
+  notifyBookings      Boolean  @default(true)   // booking/status/delivery updates
+  notifyPayments      Boolean  @default(true)   // receipts, payouts, refunds
+  notifyBids          Boolean  @default(true)   // bids, quotes, counter-offers
+  notifyMessages      Boolean  @default(true)   // new direct messages
+  notifyMarketing     Boolean  @default(false)  // product news, tips
+  weeklyDigest        Boolean  @default(true)   // weekly activity summary
 
   // Transporter specializations & verification
   specializations     String[]  @default([])    // e.g. ["wine", "refrigerated", "hazmat", "oversized", "fine_art"]
