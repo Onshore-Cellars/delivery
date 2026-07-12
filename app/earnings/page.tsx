@@ -120,7 +120,20 @@ export default function EarningsPage() {
   return (
     <div id="main-content" className="min-h-screen bg-[var(--c-canvas)] py-8 px-4">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold text-[var(--c-ink)] mb-6" style={{ fontFamily: 'var(--font-display)' }}>Earnings</h1>
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+          <h1 className="text-2xl font-bold text-[var(--c-ink)]" style={{ fontFamily: 'var(--font-display)' }}>Earnings</h1>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-[var(--c-text-3)]">Statement {new Date().getFullYear()}:</span>
+            <button
+              onClick={() => token && window.open(`/api/earnings/statement?format=pdf&token=${token}`, '_blank')}
+              className="px-3 py-1.5 rounded-lg bg-[var(--c-accent)] text-white text-xs font-medium hover:bg-[var(--c-accent-hover)]"
+            >PDF</button>
+            <button
+              onClick={() => token && window.open(`/api/earnings/statement?format=csv&token=${token}`, '_blank')}
+              className="px-3 py-1.5 rounded-lg border border-black/10 text-xs font-medium text-[var(--c-text-2)] hover:bg-[var(--c-canvas-2)]"
+            >CSV</button>
+          </div>
+        </div>
 
         {/* Payout onboarding — carriers must connect Stripe to receive payouts */}
         {payout && !payout.payoutsEnabled && (
