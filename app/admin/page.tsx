@@ -1516,7 +1516,7 @@ export default function AdminPage() {
                           <span className="text-sm font-medium text-[var(--c-ink)]">{t.name}</span>
                           <span className="text-xs text-[var(--c-text-2)] ml-2">{t.trigger}</span>
                         </div>
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[var(--c-success)]/10 text-[var(--c-success)] border border-[#256B4A]/40/30">{t.status}</span>
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[var(--c-success)]/10 text-[var(--c-success)] border border-[#256B4A]/30">{t.status}</span>
                       </div>
                     ))}
                   </div>

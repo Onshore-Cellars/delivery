@@ -230,7 +230,7 @@ export default function InsurancePage() {
             {estimates && (
               <div className="grid sm:grid-cols-3 gap-4">
                 {estimates.map(e => (
-                  <div key={e.tier.id} className={`rounded-lg border-2 p-5 ${e.recommended ? 'border-[var(--c-accent)] bg-[var(--c-accent)]/10/30' : 'border-black/10'}`}>
+                  <div key={e.tier.id} className={`rounded-lg border-2 p-5 ${e.recommended ? 'border-[var(--c-accent)] bg-[var(--c-accent)]/30' : 'border-black/10'}`}>
                     {e.recommended && <div className="text-[10px] font-bold text-[var(--c-accent)] uppercase tracking-wider mb-2">Recommended</div>}
                     <div className="font-semibold text-[var(--c-ink)] mb-1">{e.tier.name}</div>
                     <div className="text-xs text-[var(--c-text-2)] mb-3">{e.tier.description}</div>

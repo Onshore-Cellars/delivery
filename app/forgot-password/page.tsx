@@ -61,7 +61,7 @@ export default function ForgotPasswordPage() {
             {loading ? 'Sending...' : 'Send Reset Link'}
           </button>
           <div className="text-center">
-            <Link href="/login" className="text-sm text-[var(--c-text-3)] hover:text-white">Back to Sign In</Link>
+            <Link href="/login" className="text-sm text-[var(--c-text-3)] hover:text-[var(--c-ink)]">Back to Sign In</Link>
           </div>
         </form>
       </div>

@@ -161,7 +161,7 @@ export default function Home() {
             <p className="mt-3 text-[15px] text-[#CFDDD9]">Insured cargo, vetted carriers, payment held until delivery.</p>
             <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
               <Link href="/register" className="rounded-lg bg-[#C79A4E] px-8 py-3 text-[15px] font-semibold text-[#12302C] hover:brightness-105 transition">Create free account</Link>
-              <Link href="/marketplace" className="rounded-lg border border-white/25 px-7 py-3 text-[15px] font-semibold text-white hover:bg-white/10 transition">Browse marketplace</Link>
+              <Link href="/marketplace" className="rounded-lg border border-white/25 px-7 py-3 text-[15px] font-semibold text-white hover:bg-black/10 transition">Browse marketplace</Link>
             </div>
           </div>
         </div>

@@ -17,10 +17,10 @@ function Footer() {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[var(--c-text-3)]">
           <p className="font-[family-name:var(--font-display)] text-sm font-light text-[var(--c-text-3)]">&copy; {new Date().getFullYear()} Onshore Group · ON.SHORE Delivery</p>
           <div className="flex gap-6">
-            <Link href="/about" className="text-[var(--c-text-3)] hover:text-white hover:no-underline transition-colors">About</Link>
-            <Link href="/terms" className="text-[var(--c-text-3)] hover:text-white hover:no-underline transition-colors">Terms</Link>
-            <Link href="/privacy" className="text-[var(--c-text-3)] hover:text-white hover:no-underline transition-colors">Privacy</Link>
-            <Link href="/help" className="text-[var(--c-text-3)] hover:text-white hover:no-underline transition-colors">Support</Link>
+            <Link href="/about" className="text-[var(--c-text-3)] hover:text-[var(--c-ink)] hover:no-underline transition-colors">About</Link>
+            <Link href="/terms" className="text-[var(--c-text-3)] hover:text-[var(--c-ink)] hover:no-underline transition-colors">Terms</Link>
+            <Link href="/privacy" className="text-[var(--c-text-3)] hover:text-[var(--c-ink)] hover:no-underline transition-colors">Privacy</Link>
+            <Link href="/help" className="text-[var(--c-text-3)] hover:text-[var(--c-ink)] hover:no-underline transition-colors">Support</Link>
           </div>
         </div>
       </div>

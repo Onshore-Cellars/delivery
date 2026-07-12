@@ -159,7 +159,7 @@ export default function CommunityPage() {
             className={`px-4 py-2 rounded text-xs font-medium uppercase tracking-wider whitespace-nowrap transition-colors ${
               category === c.value
                 ? 'bg-[var(--c-accent)] text-white'
-                : 'bg-[var(--c-surface)] text-[var(--c-text-3)] hover:text-white'
+                : 'bg-[var(--c-surface)] text-[var(--c-text-3)] hover:text-[var(--c-ink)]'
             }`}
           >
             {c.label}

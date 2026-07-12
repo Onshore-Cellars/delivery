@@ -305,7 +305,7 @@ export default function ProofOfDelivery({ bookingId, trackingCode, token, onComp
                     onTouchMove={draw}
                     onTouchEnd={endDraw}
                   />
-                  <button onClick={clearSignature} className="absolute top-2 right-2 px-3 py-1 bg-[var(--c-surface)] rounded border border-black/10 text-xs font-semibold text-[var(--c-text-3)] hover:text-white">
+                  <button onClick={clearSignature} className="absolute top-2 right-2 px-3 py-1 bg-[var(--c-surface)] rounded border border-black/10 text-xs font-semibold text-[var(--c-text-3)] hover:text-[var(--c-ink)]">
                     Clear
                   </button>
                 </div>

@@ -263,7 +263,7 @@ export default function ListingDetailPage() {
 
   return (
     <div className="page-container">
-        <Link href="/marketplace" className="text-sm text-[var(--c-text-3)] hover:text-white transition-colors">&larr; Back to Marketplace</Link>
+        <Link href="/marketplace" className="text-sm text-[var(--c-text-3)] hover:text-[var(--c-ink)] transition-colors">&larr; Back to Marketplace</Link>
 
         {formSuccess && (
           <div className="mt-4 px-4 py-3 rounded-lg bg-[var(--c-success)]/10 border border-[#256B4A]/40">

@@ -120,7 +120,7 @@ export default function NotificationsPage() {
             {notifications.map(n => (
               <div key={n.id}
                 onClick={() => { if (!n.read) markRead(n.id) }}
-                className={`p-4 rounded-lg border transition-colors cursor-pointer ${n.read ? 'bg-[var(--c-surface)] border-black/10' : 'bg-[var(--c-accent)]/10/50 border-[var(--c-accent)]/20'}`}>
+                className={`p-4 rounded-lg border transition-colors cursor-pointer ${n.read ? 'bg-[var(--c-surface)] border-black/10' : 'bg-[var(--c-accent)]/50 border-[var(--c-accent)]/20'}`}>
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">

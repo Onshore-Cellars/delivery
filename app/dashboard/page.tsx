@@ -43,13 +43,13 @@ interface Booking {
 }
 
 const statusColors: Record<string, string> = {
-  ACTIVE: 'bg-[var(--c-success)]/10 text-[var(--c-success)] border-[#256B4A]/40/30',
+  ACTIVE: 'bg-[var(--c-success)]/10 text-[var(--c-success)] border-[#256B4A]/30',
   FULL: 'bg-[var(--c-accent)]/10 text-[var(--c-accent)] border-[var(--c-accent)]/20',
   COMPLETED: 'bg-[var(--c-canvas-2)] text-[var(--c-text-2)] border-black/10',
   CANCELLED: 'bg-[#B23A2E]/10 text-[var(--c-error)] border-[#B23A2E]/30',
   IN_TRANSIT: 'bg-[var(--c-info)]/15 text-[var(--c-info)] border-[var(--c-info)]/25',
   PENDING: 'bg-[var(--c-warning)]/15 text-[var(--c-warning)] border-[var(--c-warning)]/25',
-  CONFIRMED: 'bg-[var(--c-success)]/10 text-[var(--c-success)] border-[#256B4A]/40/30',
+  CONFIRMED: 'bg-[var(--c-success)]/10 text-[var(--c-success)] border-[#256B4A]/30',
   PICKED_UP: 'bg-[var(--c-info)]/15 text-[var(--c-info)] border-[var(--c-info)]/25',
   DELIVERED: 'bg-[var(--c-canvas-2)] text-[var(--c-text-2)] border-black/10',
 }
@@ -60,7 +60,7 @@ function PaymentBanner() {
   if (!payment) return null
   if (payment === 'success') {
     return (
-      <div className="mb-6 px-4 py-3 rounded-xl bg-[var(--c-success)]/10 border border-[#256B4A]/40/30">
+      <div className="mb-6 px-4 py-3 rounded-xl bg-[var(--c-success)]/10 border border-[#256B4A]/30">
         <p className="text-sm font-medium text-[var(--c-success)]">Payment successful! Your booking is confirmed. Check your email for the receipt.</p>
       </div>
     )
@@ -240,7 +240,7 @@ export default function DashboardPage() {
             className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all whitespace-nowrap ${
               tab === t
                 ? 'bg-[var(--c-accent)] text-white'
-                : 'text-[var(--c-text-3)] hover:text-white hover:bg-[var(--c-canvas-2)]'
+                : 'text-[var(--c-text-3)] hover:text-[var(--c-ink)] hover:bg-[var(--c-canvas-2)]'
             }`}
           >
             {t.charAt(0).toUpperCase() + t.slice(1)}
@@ -532,7 +532,7 @@ export default function DashboardPage() {
                             {(b.status === 'DELIVERED' || b.status === 'COMPLETED') && (
                               <Link
                                 href={`/marketplace?origin=${encodeURIComponent(b.listing.originPort)}&destination=${encodeURIComponent(b.listing.destinationPort)}`}
-                                className="text-[11px] font-medium text-[var(--c-text-3)] hover:text-white transition-colors"
+                                className="text-[11px] font-medium text-[var(--c-text-3)] hover:text-[var(--c-ink)] transition-colors"
                               >
                                 Book Again
                               </Link>

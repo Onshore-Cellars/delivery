@@ -199,6 +199,7 @@ export default function MarketplacePage() {
   const [bookingLoading, setBookingLoading] = useState(false)
   const [bookingSuccess, setBookingSuccess] = useState(false)
   const [bookingError, setBookingError] = useState('')
+  const [bookingStep, setBookingStep] = useState<1 | 2 | 3>(1)
   const [fetchError, setFetchError] = useState('')
   const [packages, setPackages] = useState<Package[]>([])
   const [showPackagePicker, setShowPackagePicker] = useState(false)
@@ -300,7 +301,11 @@ export default function MarketplacePage() {
     setShowPackagePicker(false)
     setBookingSuccess(false)
     setBookingError('')
+    setBookingStep(1)
   }
+
+  // Step-1 (cargo) must be complete before advancing.
+  const canLeaveStep1 = !!(bookingForm.cargoDescription.trim() && parseFloat(bookingForm.weightKg) > 0 && parseFloat(bookingForm.volumeM3) > 0)
 
   const submitBooking = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -1104,6 +1109,22 @@ export default function MarketplacePage() {
                   </div>
                 )}
 
+                {/* Progress rail */}
+                <div className="flex items-center gap-2 pb-1">
+                  {[{ n: 1, label: 'Cargo' }, { n: 2, label: 'Pickup & delivery' }, { n: 3, label: 'Vessel & review' }].map((s, i) => (
+                    <div key={s.n} className="flex items-center gap-2 flex-1 last:flex-none">
+                      <div className={`flex items-center gap-2 ${bookingStep >= s.n ? '' : 'opacity-50'}`}>
+                        <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold font-[family-name:var(--font-mono)] ${bookingStep > s.n ? 'bg-[var(--c-success)] text-white' : bookingStep === s.n ? 'bg-[var(--c-accent)] text-white' : 'bg-[var(--c-canvas-2)] text-[var(--c-text-2)]'}`}>
+                          {bookingStep > s.n ? '✓' : s.n}
+                        </span>
+                        <span className={`text-xs font-semibold hidden sm:inline ${bookingStep === s.n ? 'text-[var(--c-ink)]' : 'text-[var(--c-text-2)]'}`}>{s.label}</span>
+                      </div>
+                      {i < 2 && <div className={`flex-1 h-px ${bookingStep > s.n ? 'bg-[var(--c-success)]' : 'bg-[var(--c-border)]'}`} />}
+                    </div>
+                  ))}
+                </div>
+
+                {bookingStep === 1 && (<>
                 <div>
                   <label className="block text-sm font-semibold text-[var(--c-ink)] mb-2">Cargo Description *</label>
                   <input type="text" required className={inputClass} placeholder="e.g. Wine cases for MY Ocean Dream" value={bookingForm.cargoDescription} onChange={(e) => setBookingForm({ ...bookingForm, cargoDescription: e.target.value })} />
@@ -1316,6 +1337,9 @@ export default function MarketplacePage() {
                   />
                 </div>
 
+                </>)}
+
+                {bookingStep === 2 && (<>
                 {/* Pickup Details */}
                 <div className="pt-3 border-t border-black/10">
                   <p className="text-xs font-semibold text-[var(--c-text-2)] uppercase tracking-wider mb-3">Pickup Details</p>
@@ -1352,6 +1376,9 @@ export default function MarketplacePage() {
                   <input type="text" className={inputClass} placeholder="e.g. Refrigerated, fragile" value={bookingForm.specialHandling} onChange={(e) => setBookingForm({ ...bookingForm, specialHandling: e.target.value })} />
                 </div>
 
+                </>)}
+
+                {bookingStep === 3 && (<>
                 {/* Yacht / Vessel Details */}
                 <div className="pt-3 border-t border-black/10">
                   <p className="text-xs font-semibold text-[var(--c-accent)] uppercase tracking-wider mb-3">Delivery Location</p>
@@ -1397,7 +1424,7 @@ export default function MarketplacePage() {
                         { value: 'outbound', label: 'Outbound', desc: `To ${bookingModal.destinationPort}` },
                         { value: 'return', label: 'Return', desc: `Back to ${bookingModal.originPort}` },
                       ].map(opt => (
-                        <label key={opt.value} className={`flex flex-col items-center p-3 rounded-xl border-2 cursor-pointer transition-all text-center ${bookingForm.routeDirection === opt.value ? 'border-[var(--c-accent)] bg-[var(--c-accent)]/10/50' : 'border-black/10'}`}>
+                        <label key={opt.value} className={`flex flex-col items-center p-3 rounded-xl border-2 cursor-pointer transition-all text-center ${bookingForm.routeDirection === opt.value ? 'border-[var(--c-accent)] bg-[var(--c-accent)]/50' : 'border-black/10'}`}>
                           <input type="radio" name="routeDirection" value={opt.value} checked={bookingForm.routeDirection === opt.value} onChange={(e) => setBookingForm({ ...bookingForm, routeDirection: e.target.value })} className="sr-only" />
                           <span className="text-sm font-semibold text-[var(--c-ink)]">{opt.label}</span>
                           <span className="text-[11px] text-[var(--c-text-2)]">{opt.desc}</span>
@@ -1407,7 +1434,9 @@ export default function MarketplacePage() {
                   </div>
                 )}
 
-                {/* Price estimate */}
+                </>)}
+
+                {/* Price estimate — persistent across steps once cargo is entered */}
                 {bookingForm.weightKg && bookingForm.volumeM3 && (
                   <div className="bg-[var(--c-surface)] rounded-xl p-4 border border-black/10">
                     <div className="text-xs font-semibold text-[var(--c-ink)] uppercase tracking-wider mb-1">Estimated Price</div>
@@ -1423,9 +1452,29 @@ export default function MarketplacePage() {
                   </div>
                 )}
 
-                <button type="submit" disabled={bookingLoading} className="w-full btn-primary !py-3.5 text-sm disabled:opacity-50">
-                  {bookingLoading ? 'Confirming...' : 'Confirm Booking'}
-                </button>
+                {/* Step navigation */}
+                <div className="flex gap-3 pt-1">
+                  {bookingStep > 1 && (
+                    <button type="button" onClick={() => { setBookingError(''); setBookingStep((s) => (s - 1) as 1 | 2 | 3) }} className="btn-secondary !py-3 !px-5 text-sm">Back</button>
+                  )}
+                  {bookingStep < 3 ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (bookingStep === 1 && !canLeaveStep1) { setBookingError('Add a cargo description, weight and volume to continue.'); return }
+                        setBookingError('')
+                        setBookingStep((s) => (s + 1) as 1 | 2 | 3)
+                      }}
+                      className="btn-primary flex-1 !py-3.5 text-sm"
+                    >
+                      {bookingStep === 1 ? 'Next — Pickup & delivery' : 'Next — Vessel & review'}
+                    </button>
+                  ) : (
+                    <button type="submit" disabled={bookingLoading} className="btn-primary flex-1 !py-3.5 text-sm disabled:opacity-50">
+                      {bookingLoading ? 'Confirming…' : 'Confirm booking'}
+                    </button>
+                  )}
+                </div>
               </form>
             )}
           </div>

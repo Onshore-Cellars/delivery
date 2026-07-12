@@ -147,7 +147,7 @@ export default function VehiclesPage() {
         </div>
 
         {error && <div className="mb-4 p-3 bg-[#B23A2E]/10 border border-[#B23A2E]/30 rounded-lg text-sm text-[var(--c-error)] flex justify-between"><span>{error}</span><button onClick={() => setError('')} className="text-[var(--c-error)]">&times;</button></div>}
-        {success && <div className="mb-4 p-3 bg-[var(--c-success)]/10 border border-[#256B4A]/40/30 rounded-lg text-sm text-[var(--c-success)] flex justify-between"><span>{success}</span><button onClick={() => setSuccess('')} className="text-[var(--c-success)]">&times;</button></div>}
+        {success && <div className="mb-4 p-3 bg-[var(--c-success)]/10 border border-[#256B4A]/30 rounded-lg text-sm text-[var(--c-success)] flex justify-between"><span>{success}</span><button onClick={() => setSuccess('')} className="text-[var(--c-success)]">&times;</button></div>}
 
         {showAdd && (
           <div className="bg-[var(--c-surface)] rounded-lg border border-[rgba(255,255,255,0.08)] p-5 mb-6">
