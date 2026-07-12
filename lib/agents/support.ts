@@ -141,5 +141,97 @@ Return JSON: { "priority": "LOW"|"MEDIUM"|"HIGH"|"URGENT", "recommendation": str
   },
 }
 
-export const supportAgents = [escalateDispute, nudgeUnpaid, triageDispute]
+// Find an existing 1:1 conversation between two users (either ordering) or
+// create one. The @@unique is on the ordered pair, so we probe both.
+async function findOrCreateConversation(aId: string, bId: string, subject: string, bookingRef?: string) {
+  const existing = await prisma.conversation.findFirst({
+    where: { OR: [{ user1Id: aId, user2Id: bId }, { user1Id: bId, user2Id: aId }] },
+    select: { id: true },
+  })
+  if (existing) return existing.id
+  const created = await prisma.conversation.create({
+    data: { user1Id: aId, user2Id: bId, subject, bookingRef: bookingRef || null },
+    select: { id: true },
+  })
+  return created.id
+}
+
+// LLM customer-service reply: draft the ACTUAL message to send the customer on
+// an open dispute, and — once approved — send it (posts a real message + emails
+// the customer). This is the "one-click reply" that removes the human writing
+// step while keeping a human approval gate. A sent marker on the dispute stops
+// it being re-proposed after the reply goes out.
+const REPLY_SENT_MARKER = '[cs-reply-sent]'
+const draftCustomerReply: Agent = {
+  team: 'SUPPORT',
+  kind: 'dispute-reply',
+  label: 'AI customer-service reply',
+  description: 'Draft (and on approval, send) a reply to the customer on an open dispute.',
+  async run(ctx) {
+    if (!aiEnabled()) return []
+    const disputes = await prisma.dispute.findMany({
+      where: {
+        status: { in: ['OPEN', 'UNDER_REVIEW'] },
+        NOT: { adminNotes: { contains: REPLY_SENT_MARKER } },
+      },
+      select: {
+        id: true, type: true, description: true, raisedById: true,
+        raisedBy: { select: { name: true } },
+        booking: { select: { trackingCode: true, status: true, currency: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 8,
+    })
+    const out: ProposedTask[] = []
+    for (const d of disputes) {
+      const first = (d.raisedBy?.name || 'there').split(' ')[0]
+      const rec = await llmJson<{ message: string; tone: string; confidence: number }>({
+        system: `You are Onshore's customer-service agent replying directly to a customer about their delivery dispute. Warm, professional, concrete. Acknowledge the issue, state the next step, set a realistic expectation. Cargo is insured and payment is held until delivery, so reassure without over-promising a specific refund (a human sets any refund). Sign off as "The Onshore team". Address the customer as ${first}.`,
+        prompt: `Dispute type: ${d.type}. Booking ${d.booking?.trackingCode || ''} status ${d.booking?.status}. The customer wrote: "${(d.description || '').slice(0, 800)}".
+Return JSON: { "message": string (the reply to send, plain text, 3-6 sentences), "tone": string (one word), "confidence": number 0..1 }.`,
+        decisions: ctx.recentDecisions,
+        maxTokens: 600,
+        smart: true,
+      })
+      if (!rec?.message) continue
+      out.push({
+        team: 'SUPPORT', kind: 'dispute-reply',
+        title: `Reply to ${first} · ${d.type.replace('_', ' ').toLowerCase()} on ${d.booking?.trackingCode || '—'}`,
+        summary: `Send a ${rec.tone || 'measured'} reply to the customer about their dispute. Approving posts the message and emails them.`,
+        reasoning: `Draft: "${rec.message.slice(0, 280)}"`,
+        confidence: Math.max(0, Math.min(1, rec.confidence ?? 0.6)),
+        payload: { disputeId: d.id, raisedById: d.raisedById, message: rec.message, trackingCode: d.booking?.trackingCode },
+        relatedType: 'dispute', relatedId: d.id,
+        dedupeKey: `dispute-reply:${d.id}`,
+      })
+    }
+    return out
+  },
+  async execute(payload) {
+    const disputeId = String(payload.disputeId || '')
+    const raisedById = String(payload.raisedById || '')
+    const message = String(payload.message || '').trim()
+    if (!disputeId || !raisedById || !message) return { ok: false, error: 'Missing dispute, recipient, or message' }
+    try {
+      const admin = await prisma.user.findFirst({ where: { role: 'ADMIN' }, orderBy: { createdAt: 'asc' }, select: { id: true } })
+      if (!admin) return { ok: false, error: 'No admin account to send from' }
+      if (admin.id === raisedById) return { ok: false, error: 'Recipient is the admin — nothing to send' }
+
+      const convId = await findOrCreateConversation(admin.id, raisedById, `Dispute update — ${payload.trackingCode || ''}`.trim(), String(payload.trackingCode || '') || undefined)
+      await prisma.message.create({ data: { conversationId: convId, senderId: admin.id, content: message, type: 'TEXT' } })
+      await prisma.conversation.update({ where: { id: convId }, data: { lastMessageAt: new Date() } })
+      await createNotification({
+        userId: raisedById, type: 'MESSAGE_RECEIVED', title: 'Reply about your dispute',
+        message: 'The Onshore team has replied about your dispute.', linkUrl: '/messages',
+      }).catch(() => {})
+      // Mark the dispute so this reply isn't proposed again.
+      const disp = await prisma.dispute.findUnique({ where: { id: disputeId }, select: { adminNotes: true } })
+      const notes = `${disp?.adminNotes || ''}\n${REPLY_SENT_MARKER} ${new Date().toISOString()}`.trim()
+      await prisma.dispute.update({ where: { id: disputeId }, data: { adminNotes: notes.slice(0, 2000) } })
+      return { ok: true, result: 'Reply sent to customer + they were notified' }
+    } catch (e) { return { ok: false, error: e instanceof Error ? e.message : 'Send failed' } }
+  },
+}
+
+export const supportAgents = [escalateDispute, nudgeUnpaid, triageDispute, draftCustomerReply]
 

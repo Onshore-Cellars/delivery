@@ -13,6 +13,8 @@ const TEAM_STYLE: Record<string, string> = {
   OPS: 'bg-[var(--c-info)]/12 text-[var(--c-info)]',
   SUPPORT: 'bg-[var(--c-brass)]/15 text-[var(--c-brass-text)]',
   MARKETING: 'bg-[var(--c-success)]/12 text-[var(--c-success)]',
+  FINANCE: 'bg-[var(--c-accent)]/12 text-[var(--c-accent)]',
+  IT: 'bg-[var(--c-error)]/12 text-[var(--c-error)]',
 }
 const STATUSES = ['PENDING', 'ALL', 'EXECUTED', 'REJECTED', 'FAILED']
 

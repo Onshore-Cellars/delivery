@@ -99,8 +99,15 @@ Cron endpoints (all `POST`, guarded by `x-cron-secret`): `expire-checkouts`, `re
 - Run any job on demand via the workflow's **Run workflow** button.
 
 ### 3.7 Operations agents (`lib/agents/`)
-Agent "teams" (Ops, Support, Marketing) run daily (`/api/cron/agents`) and
-propose actions into an **approval queue** — Admin → **Operations**. Nothing
+Agent "teams" run daily (`/api/cron/agents`) and propose actions into an
+**approval queue** — Admin → **Operations**:
+- **Ops** — release stuck carrier payouts, close sold-out listings.
+- **Support** — escalate ageing disputes, nudge unpaid bookings, **AI dispute triage** (recommend priority + resolution as internal notes), **AI customer-service reply** (draft and, on approval, send the customer a message).
+- **Marketing** — draft on-brand re-engagement campaigns.
+- **Finance** — backfill missing CHARGE/PAYOUT ledger rows (reconciliation), flag over-refunds.
+- **IT** — nudge carriers with no connected Stripe account to onboard so payouts unblock, flag paid bookings stuck in PENDING, fix oversold (negative-capacity) listings.
+
+AI-backed agents (triage, customer reply, campaign copy) need `ANTHROPIC_API_KEY`; without it they stay dormant and the rule-based agents still run. Nothing
 with side-effects runs until you Approve (which executes it) or a per-category
 **Automation** policy auto-approves proposals above a confidence threshold.
 Approve/reject decisions + feedback are stored and fed back to the agents as

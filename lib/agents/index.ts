@@ -3,10 +3,12 @@ import type { Agent, Team, DecisionExample, ExecutionOutcome } from './types'
 import { opsAgents } from './ops'
 import { supportAgents } from './support'
 import { marketingAgents } from './marketing'
+import { financeAgents } from './finance'
+import { itAgents } from './it'
 
 export * from './types'
 
-export const AGENTS: Agent[] = [...opsAgents, ...supportAgents, ...marketingAgents]
+export const AGENTS: Agent[] = [...opsAgents, ...supportAgents, ...marketingAgents, ...financeAgents, ...itAgents]
 
 export function findAgent(team: string, kind: string): Agent | undefined {
   return AGENTS.find(a => a.team === team && a.kind === kind)
