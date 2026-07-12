@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback, Suspense } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { useSearchParams } from 'next/navigation'
 import { useAuth } from '../components/AuthProvider'
 
@@ -119,12 +118,16 @@ function RegisterForm() {
       <div className="flex-1 flex items-center justify-center px-5 sm:px-8 py-12">
         <div className="w-full max-w-md">
           {/* Logo */}
-          <Link href="/" className="flex items-center mb-10 hover:no-underline">
-            <Image src="/logo.png" alt="ON.SHORE Delivery" width={36} height={36} className="rounded-sm" />
+          <Link href="/" className="flex items-center gap-2.5 mb-10 hover:no-underline" aria-label="Onshore home">
+            <svg width="28" height="28" viewBox="0 0 100 100" aria-hidden="true">
+              <line x1="16" y1="62" x2="84" y2="62" stroke="#0C5C54" strokeWidth="7" strokeLinecap="round" />
+              <circle cx="50" cy="41" r="9" fill="#A8813C" />
+            </svg>
+            <span className="text-[19px] font-semibold text-[var(--c-ink)] tracking-[-0.01em]">Onshore</span>
           </Link>
 
           <h1 className="text-2xl sm:text-3xl font-light text-[var(--c-ink)] tracking-wide" style={{ fontFamily: 'var(--font-display)' }}>Create your account</h1>
-          <p className="mt-2 text-sm sm:text-base text-[var(--c-text-3)]">Join the delivery logistics marketplace.</p>
+          <p className="mt-2 text-sm sm:text-base text-[var(--c-text-3)]">Join the yacht delivery network.</p>
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-5">
             {error && (
