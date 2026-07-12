@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '../components/AuthProvider'
 import AdminCRM from '../components/AdminCRM'
+import AdminFinance from '../components/AdminFinance'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -90,7 +91,7 @@ interface AIInsights {
   recommendations: string[]
 }
 
-type TabKey = 'overview' | 'users' | 'bookings' | 'listings' | 'documents' | 'notifications' | 'activity' | 'crm' | 'settings'
+type TabKey = 'overview' | 'users' | 'bookings' | 'listings' | 'documents' | 'notifications' | 'activity' | 'crm' | 'finance' | 'settings'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -133,6 +134,7 @@ const TAB_CONFIG: { key: TabKey; label: string; icon: string }[] = [
   { key: 'notifications', label: 'Broadcast', icon: 'notifications' },
   { key: 'activity', label: 'Activity', icon: 'activity' },
   { key: 'crm', label: 'CRM', icon: 'crm' },
+  { key: 'finance', label: 'Finance', icon: 'overview' },
   { key: 'settings', label: 'Settings', icon: 'settings' },
 ]
 
@@ -1446,6 +1448,11 @@ export default function AdminPage() {
         {/* ─── CRM TAB ─── */}
         {tab === 'crm' && token && (
           <AdminCRM token={token} />
+        )}
+
+        {/* ─── FINANCE TAB ─── */}
+        {tab === 'finance' && token && (
+          <AdminFinance token={token} />
         )}
 
         {/* ─── SETTINGS TAB ─── */}

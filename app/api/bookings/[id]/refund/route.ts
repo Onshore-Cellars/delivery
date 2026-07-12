@@ -53,25 +53,33 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       return NextResponse.json({ error: 'Booking payment status is not PAID' }, { status: 400 })
     }
 
+    // The customer paid the GROSS (net + VAT), so a full refund returns the
+    // gross and a partial refund may be up to the gross.
+    const gross = Math.round((booking.totalPrice + (booking.vatAmount || 0)) * 100) / 100
+
     // Validate partial refund amount
     if (amount !== undefined) {
       if (typeof amount !== 'number' || amount <= 0) {
         return NextResponse.json({ error: 'Refund amount must be a positive number' }, { status: 400 })
       }
-      if (amount > booking.totalPrice) {
-        return NextResponse.json({ error: 'Refund amount cannot exceed booking total' }, { status: 400 })
+      if (amount > gross) {
+        return NextResponse.json({ error: 'Refund amount cannot exceed booking total (incl. VAT)' }, { status: 400 })
       }
     }
 
-    const isPartial = amount !== undefined && amount < booking.totalPrice
-    const refundAmount = amount ?? booking.totalPrice
+    const isPartial = amount !== undefined && amount < gross
+    const refundAmount = amount ?? gross
 
-    // Escrow: the charge is on the platform balance, so refund it directly. If
-    // the payout was already released to the carrier (delivered-then-refunded),
-    // claw the corresponding portion of their transfer back so the platform
-    // doesn't eat the refund.
+    // Escrow: the charge is on the platform balance, so refund it directly
+    // (undefined amount = full gross refund by Stripe). If the payout was
+    // already released to the carrier, claw back only the carrier's share of
+    // the refund — VAT is the platform's liability, not the carrier's, so it is
+    // excluded from the payout reversal.
+    const carrierClaw = isPartial && gross > 0
+      ? Math.round((refundAmount * (booking.carrierPayout / gross)) * 100) / 100
+      : undefined // full reversal
     await createRefund(booking.stripePaymentIntentId, amount)
-    await reverseCarrierPayout(id, refundAmount).catch(e => console.error('Payout reversal error:', e))
+    await reverseCarrierPayout(id, carrierClaw).catch(e => console.error('Payout reversal error:', e))
 
     // Update booking payment status
     const updatedBooking = await prisma.booking.update({

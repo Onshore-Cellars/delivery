@@ -200,6 +200,29 @@ export default function MarketplacePage() {
   const [bookingSuccess, setBookingSuccess] = useState(false)
   const [bookingError, setBookingError] = useState('')
   const [bookingStep, setBookingStep] = useState<1 | 2 | 3>(1)
+  const [vatQuote, setVatQuote] = useState<{ net: number; vatAmount: number; vatRate: number; gross: number; treatment: string; note: string } | null>(null)
+
+  // Net price estimate for the current cargo (before VAT).
+  const estimateNet = (): number => {
+    if (!bookingModal) return 0
+    if (bookingModal.flatRate) return bookingModal.flatRate
+    const w = parseFloat(bookingForm.weightKg) || 0
+    const v = parseFloat(bookingForm.volumeM3) || 0
+    return (bookingModal.pricePerKg ? w * bookingModal.pricePerKg : 0) + (bookingModal.pricePerM3 ? v * bookingModal.pricePerM3 : 0)
+  }
+
+  // On the review step, fetch the VAT that will apply to this customer.
+  useEffect(() => {
+    const net = estimateNet()
+    if (bookingStep !== 3 || !token || net <= 0) { setVatQuote(null); return }
+    let cancelled = false
+    fetch(`/api/vat/quote?net=${net.toFixed(2)}`, { headers: { Authorization: `Bearer ${token}` } })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (!cancelled && d && typeof d.gross === 'number') setVatQuote(d) })
+      .catch(() => {})
+    return () => { cancelled = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bookingStep, token, bookingForm.weightKg, bookingForm.volumeM3, bookingModal?.id])
   const [fetchError, setFetchError] = useState('')
   const [packages, setPackages] = useState<Package[]>([])
   const [showPackagePicker, setShowPackagePicker] = useState(false)
@@ -1441,14 +1464,27 @@ export default function MarketplacePage() {
                   <div className="bg-[var(--c-surface)] rounded-xl p-4 border border-black/10">
                     <div className="text-xs font-semibold text-[var(--c-ink)] uppercase tracking-wider mb-1">Estimated Price</div>
                     <div className="text-2xl font-bold text-[var(--c-ink)]">
-                      {bookingModal.flatRate
-                        ? formatCurrency(bookingModal.flatRate, bookingModal.currency)
-                        : formatCurrency(
-                            (bookingModal.pricePerKg ? parseFloat(bookingForm.weightKg) * bookingModal.pricePerKg : 0) +
-                            (bookingModal.pricePerM3 ? parseFloat(bookingForm.volumeM3) * bookingModal.pricePerM3 : 0),
-                            bookingModal.currency
-                          )}
+                      {formatCurrency(estimateNet(), bookingModal.currency)}
                     </div>
+                    {/* VAT breakdown on the review step */}
+                    {bookingStep === 3 && vatQuote && (
+                      <div className="mt-3 pt-3 border-t border-[var(--c-border)] space-y-1.5">
+                        <div className="flex justify-between text-sm text-[var(--c-text-2)]">
+                          <span>Subtotal (net)</span><span>{formatCurrency(vatQuote.net, bookingModal.currency)}</span>
+                        </div>
+                        <div className="flex justify-between text-sm text-[var(--c-text-2)]">
+                          <span>VAT{vatQuote.vatRate > 0 ? ` (${vatQuote.vatRate}%)` : ''}</span>
+                          <span>{formatCurrency(vatQuote.vatAmount, bookingModal.currency)}</span>
+                        </div>
+                        <div className="flex justify-between text-base font-bold text-[var(--c-accent)] pt-1">
+                          <span>Total{vatQuote.vatAmount > 0 ? ' incl. VAT' : ''}</span>
+                          <span>{formatCurrency(vatQuote.gross, bookingModal.currency)}</span>
+                        </div>
+                        {vatQuote.vatAmount === 0 && (
+                          <p className="text-[11px] text-[var(--c-text-3)] pt-0.5">{vatQuote.note}</p>
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
 
