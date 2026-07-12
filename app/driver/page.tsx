@@ -209,7 +209,7 @@ export default function DriverPage() {
       </div>
 
       {error && (
-        <div className="px-4 py-3 rounded-lg bg-[#B23A2E]/10 border border-[#B23A2E]/30 mb-4 flex items-center justify-between">
+        <div className="px-4 py-3 rounded-lg bg-[var(--c-error)]/10 border border-[var(--c-error)]/30 mb-4 flex items-center justify-between">
           <p className="text-sm text-[var(--c-error)]">{error}</p>
           <button onClick={() => setError('')} className="text-[var(--c-error)] hover:text-[var(--c-error)] ml-3 flex-shrink-0">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
@@ -219,7 +219,7 @@ export default function DriverPage() {
 
       {/* Tracking Status */}
       {tracking && position && (
-        <div className="bg-[var(--c-success)]/10 border border-[#256B4A]/30 rounded-2xl p-4 mb-6">
+        <div className="bg-[var(--c-success)]/10 border border-[var(--c-success)]/30 rounded-2xl p-4 mb-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-3 h-3 rounded-full bg-[var(--c-success)]/100 animate-pulse" />
@@ -232,7 +232,7 @@ export default function DriverPage() {
             </div>
             <button
               onClick={stopTracking}
-              className="text-xs font-semibold text-[var(--c-error)] hover:text-[#B23A2E] px-3 py-1.5 rounded-lg hover:bg-[#B23A2E]/10 transition-colors"
+              className="text-xs font-semibold text-[var(--c-error)] hover:text-[var(--c-error)] px-3 py-1.5 rounded-lg hover:bg-[var(--c-error)]/10 transition-colors"
             >
               Stop Tracking
             </button>
@@ -284,7 +284,7 @@ export default function DriverPage() {
                   <div className="flex items-start gap-3">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold ${
                       stop.status === 'DELIVERED' ? 'bg-[var(--c-success)]/15 text-[var(--c-success)]' :
-                      stop.status === 'IN_TRANSIT' ? 'bg-[#1F5E86]/15 text-[var(--c-info)]' :
+                      stop.status === 'IN_TRANSIT' ? 'bg-[var(--c-info)]/15 text-[var(--c-info)]' :
                       'bg-[var(--c-canvas-2)] text-[var(--c-text-3)]'
                     }`}>
                       {index + 1}
@@ -345,7 +345,7 @@ export default function DriverPage() {
                   </div>
                   {stop.liveTracking.length > 0 && (
                     <div className="text-right flex-shrink-0">
-                      <span className="text-[10px] font-mono text-[var(--c-info)] bg-[#1F5E86]/10 px-2 py-0.5 rounded">
+                      <span className="text-[10px] font-mono text-[var(--c-info)] bg-[var(--c-info)]/10 px-2 py-0.5 rounded">
                         {stop.trackingCode}
                       </span>
                     </div>
@@ -394,7 +394,7 @@ export default function DriverPage() {
           {hasActiveTracking && !tracking && (
             <button
               onClick={startTracking}
-              className="w-full py-4 rounded-2xl bg-[var(--c-success)] text-white font-semibold text-sm hover:bg-[#256B4A] transition-colors flex items-center justify-center gap-2"
+              className="w-full py-4 rounded-2xl bg-[var(--c-success)] text-white font-semibold text-sm hover:bg-[var(--c-success)] transition-colors flex items-center justify-center gap-2"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
               Enable Live GPS Tracking

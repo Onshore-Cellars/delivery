@@ -805,7 +805,7 @@ export default function AdminCRM({ token }: { token: string }) {
 
   const priorityBadge = (p: string) => {
     const colors: Record<string, string> = {
-      high: 'bg-[#B23A2E]/10 text-[var(--c-error)] border-[#B23A2E]/30',
+      high: 'bg-[var(--c-error)]/10 text-[var(--c-error)] border-[var(--c-error)]/30',
       medium: 'bg-[var(--c-accent)]/10 text-[var(--c-accent)] border-[var(--c-accent)]/20',
       low: 'bg-[var(--c-surface)] text-[var(--c-text-3)] border-black/10',
     }
@@ -816,8 +816,8 @@ export default function AdminCRM({ token }: { token: string }) {
     const colors: Record<string, string> = {
       draft: 'bg-[var(--c-surface)] text-[var(--c-text-2)] border-black/10',
       sending: 'bg-[var(--c-brand)]/15 text-[var(--c-info)] border-[var(--c-brand)]/30',
-      sent: 'bg-[var(--c-success)]/10 text-[var(--c-success)] border-[#256B4A]/30',
-      failed: 'bg-[#B23A2E]/10 text-[var(--c-error)] border-[#B23A2E]/30',
+      sent: 'bg-[var(--c-success)]/10 text-[var(--c-success)] border-[var(--c-success)]/30',
+      failed: 'bg-[var(--c-error)]/10 text-[var(--c-error)] border-[var(--c-error)]/30',
     }
     return colors[s] || colors.draft
   }
@@ -826,26 +826,26 @@ export default function AdminCRM({ token }: { token: string }) {
     <div className="space-y-6">
       {/* Toast */}
       {toast && (
-        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-lg text-sm font-medium ${toast.type === 'success' ? 'bg-[var(--c-success)] text-white' : 'bg-[#B23A2E] text-white'}`}>
+        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-lg text-sm font-medium ${toast.type === 'success' ? 'bg-[var(--c-success)] text-white' : 'bg-[var(--c-error)] text-white'}`}>
           {toast.message}
         </div>
       )}
 
       {/* Stats Bar */}
       <div className="flex flex-wrap gap-4">
-        <div className="bg-[var(--c-surface)] rounded-xl border border-[#D3D8D1] shadow-sm px-5 py-4 flex-1 min-w-[140px]">
+        <div className="bg-[var(--c-surface)] rounded-xl border border-[var(--c-border)] shadow-sm px-5 py-4 flex-1 min-w-[140px]">
           <div className="text-2xl font-bold text-[var(--c-ink)]">{totalContacts.toLocaleString()}</div>
           <div className="text-xs text-[var(--c-text-2)] mt-0.5">Total Contacts</div>
         </div>
-        <div className="bg-[var(--c-surface)] rounded-xl border border-[#D3D8D1] shadow-sm px-5 py-4 flex-1 min-w-[140px]">
+        <div className="bg-[var(--c-surface)] rounded-xl border border-[var(--c-border)] shadow-sm px-5 py-4 flex-1 min-w-[140px]">
           <div className="text-2xl font-bold text-[var(--c-ink)]">{withEmail.toLocaleString()}</div>
           <div className="text-xs text-[var(--c-text-2)] mt-0.5">With Email</div>
         </div>
-        <div className="bg-[var(--c-surface)] rounded-xl border border-[#D3D8D1] shadow-sm px-5 py-4 flex-1 min-w-[140px]">
+        <div className="bg-[var(--c-surface)] rounded-xl border border-[var(--c-border)] shadow-sm px-5 py-4 flex-1 min-w-[140px]">
           <div className="text-2xl font-bold text-[var(--c-ink)]">{categories.length}</div>
           <div className="text-xs text-[var(--c-text-2)] mt-0.5">Categories</div>
         </div>
-        <div className="bg-[var(--c-surface)] rounded-xl border border-[#D3D8D1] shadow-sm px-5 py-4 flex-1 min-w-[140px]">
+        <div className="bg-[var(--c-surface)] rounded-xl border border-[var(--c-border)] shadow-sm px-5 py-4 flex-1 min-w-[140px]">
           <div className="text-2xl font-bold text-[var(--c-ink)]">{campaigns.length}</div>
           <div className="text-xs text-[var(--c-text-2)] mt-0.5">Campaigns</div>
         </div>
@@ -867,7 +867,7 @@ export default function AdminCRM({ token }: { token: string }) {
             onClick={() => setView(v.key)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
               view === v.key
-                ? 'bg-[#1d1d1f] text-white'
+                ? 'bg-[var(--c-accent)] text-white'
                 : 'text-[var(--c-text-3)] hover:text-[var(--c-ink)] hover:bg-[var(--c-surface)] border border-black/10'
             }`}
           >
@@ -880,7 +880,7 @@ export default function AdminCRM({ token }: { token: string }) {
       {view === 'contacts' && (
         <div className="bg-[var(--c-surface)] rounded-2xl border border-black/10 shadow-sm overflow-hidden">
           {/* Toolbar */}
-          <div className="p-4 border-b border-[#D3D8D1] space-y-3">
+          <div className="p-4 border-b border-[var(--c-border)] space-y-3">
             <div className="flex flex-wrap gap-3 items-center">
               <div className="flex-1 min-w-[200px]">
                 <input
@@ -939,10 +939,10 @@ export default function AdminCRM({ token }: { token: string }) {
               <div className="flex items-center gap-3 bg-[var(--c-brand)]/15 rounded-lg px-4 py-2">
                 <span className="text-sm font-medium text-[var(--c-info)]">{selected.size} selected</span>
                 <button onClick={aiEnrichSelected} disabled={actionLoading} className="px-3 py-1 rounded text-xs font-semibold bg-[var(--c-brass)]/15 text-[var(--c-brass-text)] hover:bg-[var(--c-brass)]/25 disabled:opacity-50">✦ AI enrich</button>
-                <button onClick={() => bulkUpdatePriority('high')} className="px-3 py-1 rounded text-xs font-medium bg-[#B23A2E]/10 text-[var(--c-error)] hover:bg-[#B23A2E]">Set High</button>
+                <button onClick={() => bulkUpdatePriority('high')} className="px-3 py-1 rounded text-xs font-medium bg-[var(--c-error)]/10 text-[var(--c-error)] hover:bg-[var(--c-error)]">Set High</button>
                 <button onClick={() => bulkUpdatePriority('medium')} className="px-3 py-1 rounded text-xs font-medium bg-[var(--c-accent)]/15 text-[var(--c-accent)] hover:bg-[var(--c-accent)]/20">Set Medium</button>
                 <button onClick={() => bulkUpdatePriority('low')} className="px-3 py-1 rounded text-xs font-medium bg-[var(--c-canvas-2)] text-[var(--c-text-2)] hover:bg-[var(--c-surface)]">Set Low</button>
-                <button onClick={() => deleteContacts(Array.from(selected))} className="px-3 py-1 rounded text-xs font-medium bg-[#B23A2E] text-white hover:bg-[#B23A2E] ml-auto">Delete</button>
+                <button onClick={() => deleteContacts(Array.from(selected))} className="px-3 py-1 rounded text-xs font-medium bg-[var(--c-error)] text-white hover:bg-[var(--c-error)] ml-auto">Delete</button>
               </div>
             )}
           </div>
@@ -956,7 +956,7 @@ export default function AdminCRM({ token }: { token: string }) {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-[#D3D8D1] bg-[var(--c-surface)]/50">
+                  <tr className="border-b border-[var(--c-border)] bg-[var(--c-surface)]/50">
                     <th className="px-4 py-3 text-left">
                       <input type="checkbox" checked={selected.size === contacts.length && contacts.length > 0} onChange={toggleAll} className="rounded border-black/15" />
                     </th>
@@ -1004,14 +1004,14 @@ export default function AdminCRM({ token }: { token: string }) {
                           {c.email && (
                             <button
                               onClick={() => { setEmailModal(c); setEmailSubject(''); setEmailBody('') }}
-                              className="px-2 py-1 rounded text-xs font-medium text-[var(--c-info)] hover:bg-[#1F5E86]/10"
+                              className="px-2 py-1 rounded text-xs font-medium text-[var(--c-info)] hover:bg-[var(--c-info)]/10"
                               title="Send Email"
                             >
                               <svg className="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" /></svg>
                             </button>
                           )}
                           <button onClick={() => setEditContact(c)} className="px-2 py-1 rounded text-xs font-medium text-[var(--c-info)] hover:bg-[var(--c-brand)]/15">Edit</button>
-                          <button onClick={() => deleteContacts([c.id])} className="px-2 py-1 rounded text-xs font-medium text-[var(--c-error)] hover:bg-[#B23A2E]/10">Del</button>
+                          <button onClick={() => deleteContacts([c.id])} className="px-2 py-1 rounded text-xs font-medium text-[var(--c-error)] hover:bg-[var(--c-error)]/10">Del</button>
                         </div>
                       </td>
                     </tr>
@@ -1023,7 +1023,7 @@ export default function AdminCRM({ token }: { token: string }) {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="p-4 border-t border-[#D3D8D1] flex items-center justify-between">
+            <div className="p-4 border-t border-[var(--c-border)] flex items-center justify-between">
               <span className="text-xs text-[var(--c-text-2)]">{total.toLocaleString()} contacts</span>
               <div className="flex gap-1">
                 <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="px-3 py-1.5 rounded-lg text-xs font-medium border border-black/10 hover:bg-[var(--c-surface)] disabled:opacity-40">Prev</button>
@@ -1038,7 +1038,7 @@ export default function AdminCRM({ token }: { token: string }) {
       {/* ═══════════════════ CAMPAIGNS VIEW ═══════════════════ */}
       {view === 'campaigns' && (
         <div className="bg-[var(--c-surface)] rounded-2xl border border-black/10 shadow-sm overflow-hidden">
-          <div className="p-4 border-b border-[#D3D8D1] flex justify-between items-center">
+          <div className="p-4 border-b border-[var(--c-border)] flex justify-between items-center">
             <h3 className="text-sm font-semibold text-[var(--c-ink)]">Email Campaigns</h3>
             <button onClick={() => setView('compose')} className="px-4 py-2 rounded-lg bg-[var(--c-accent)] text-white text-sm font-medium hover:bg-[var(--c-accent-hover)]">
               New Campaign
@@ -1079,7 +1079,7 @@ export default function AdminCRM({ token }: { token: string }) {
                           showToast('Failed to delete campaign', 'error')
                         }
                       }}
-                      className="px-2 py-1 rounded text-xs font-medium text-[var(--c-error)] hover:bg-[#B23A2E]/10"
+                      className="px-2 py-1 rounded text-xs font-medium text-[var(--c-error)] hover:bg-[var(--c-error)]/10"
                     >
                       Del
                     </button>
@@ -1181,7 +1181,7 @@ export default function AdminCRM({ token }: { token: string }) {
                 }
               }}
               disabled={actionLoading}
-              className="px-5 py-2.5 rounded-xl border border-[#1F5E86] text-[var(--c-info)] text-sm font-medium hover:bg-[#1F5E86]/10 disabled:opacity-50"
+              className="px-5 py-2.5 rounded-xl border border-[var(--c-info)] text-[var(--c-info)] text-sm font-medium hover:bg-[var(--c-info)]/10 disabled:opacity-50"
             >
               {actionLoading ? 'Generating...' : '✦ AI Draft'}
             </button>
@@ -1203,19 +1203,19 @@ export default function AdminCRM({ token }: { token: string }) {
           {/* Social Stats */}
           {socialStats && (
             <div className="flex flex-wrap gap-4">
-              <div className="bg-[var(--c-surface)] rounded-xl border border-[#D3D8D1] shadow-sm px-5 py-4 flex-1 min-w-[120px]">
+              <div className="bg-[var(--c-surface)] rounded-xl border border-[var(--c-border)] shadow-sm px-5 py-4 flex-1 min-w-[120px]">
                 <div className="text-2xl font-bold text-[var(--c-ink)]">{socialStats.total}</div>
                 <div className="text-xs text-[var(--c-text-2)] mt-0.5">Total Posts</div>
               </div>
-              <div className="bg-[var(--c-surface)] rounded-xl border border-[#D3D8D1] shadow-sm px-5 py-4 flex-1 min-w-[120px]">
+              <div className="bg-[var(--c-surface)] rounded-xl border border-[var(--c-border)] shadow-sm px-5 py-4 flex-1 min-w-[120px]">
                 <div className="text-2xl font-bold text-[var(--c-ink)]">{socialStats.engagement.impressions.toLocaleString()}</div>
                 <div className="text-xs text-[var(--c-text-2)] mt-0.5">Impressions</div>
               </div>
-              <div className="bg-[var(--c-surface)] rounded-xl border border-[#D3D8D1] shadow-sm px-5 py-4 flex-1 min-w-[120px]">
+              <div className="bg-[var(--c-surface)] rounded-xl border border-[var(--c-border)] shadow-sm px-5 py-4 flex-1 min-w-[120px]">
                 <div className="text-2xl font-bold text-[var(--c-ink)]">{socialStats.engagement.likes.toLocaleString()}</div>
                 <div className="text-xs text-[var(--c-text-2)] mt-0.5">Likes</div>
               </div>
-              <div className="bg-[var(--c-surface)] rounded-xl border border-[#D3D8D1] shadow-sm px-5 py-4 flex-1 min-w-[120px]">
+              <div className="bg-[var(--c-surface)] rounded-xl border border-[var(--c-border)] shadow-sm px-5 py-4 flex-1 min-w-[120px]">
                 <div className="text-2xl font-bold text-[var(--c-ink)]">{socialStats.engagement.shares.toLocaleString()}</div>
                 <div className="text-xs text-[var(--c-text-2)] mt-0.5">Shares</div>
               </div>
@@ -1224,7 +1224,7 @@ export default function AdminCRM({ token }: { token: string }) {
 
           <div className="bg-[var(--c-surface)] rounded-2xl border border-black/10 shadow-sm overflow-hidden">
             {/* Toolbar */}
-            <div className="p-4 border-b border-[#D3D8D1] flex flex-wrap gap-3 items-center justify-between">
+            <div className="p-4 border-b border-[var(--c-border)] flex flex-wrap gap-3 items-center justify-between">
               <div className="flex gap-2">
                 <select
                   value={socialPlatformFilter}
@@ -1279,14 +1279,14 @@ export default function AdminCRM({ token }: { token: string }) {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1.5">
                           <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${
-                            post.platform === 'linkedin' ? 'bg-[var(--c-brand)]/15 text-[var(--c-info)] border-[var(--c-brand)]/30' : 'bg-[#B23A2E]/20 text-[var(--c-error)] border-[#B23A2E]/30'
+                            post.platform === 'linkedin' ? 'bg-[var(--c-brand)]/15 text-[var(--c-info)] border-[var(--c-brand)]/30' : 'bg-[var(--c-error)]/20 text-[var(--c-error)] border-[var(--c-error)]/30'
                           }`}>
                             {post.platform}
                           </span>
                           <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${
-                            post.status === 'published' ? 'bg-[var(--c-success)]/10 text-[var(--c-success)] border-[#256B4A]/30' :
+                            post.status === 'published' ? 'bg-[var(--c-success)]/10 text-[var(--c-success)] border-[var(--c-success)]/30' :
                             post.status === 'scheduled' ? 'bg-[var(--c-accent)]/10 text-[var(--c-accent)] border-[var(--c-accent)]/20' :
-                            post.status === 'failed' ? 'bg-[#B23A2E]/10 text-[var(--c-error)] border-[#B23A2E]/30' :
+                            post.status === 'failed' ? 'bg-[var(--c-error)]/10 text-[var(--c-error)] border-[var(--c-error)]/30' :
                             'bg-[var(--c-surface)] text-[var(--c-text-2)] border-black/10'
                           }`}>
                             {post.status}
@@ -1346,7 +1346,7 @@ export default function AdminCRM({ token }: { token: string }) {
           {/* Queue Stats */}
           <div className="flex flex-wrap gap-4">
             {['pending', 'executed', 'rejected'].map(s => (
-              <div key={s} className="bg-[var(--c-surface)] rounded-xl border border-[#D3D8D1] shadow-sm px-5 py-4 flex-1 min-w-[120px]">
+              <div key={s} className="bg-[var(--c-surface)] rounded-xl border border-[var(--c-border)] shadow-sm px-5 py-4 flex-1 min-w-[120px]">
                 <div className="text-2xl font-bold text-[var(--c-ink)]">{aiQueueStats[s] || 0}</div>
                 <div className="text-xs text-[var(--c-text-2)] mt-0.5 capitalize">{s}</div>
               </div>
@@ -1355,7 +1355,7 @@ export default function AdminCRM({ token }: { token: string }) {
 
           <div className="bg-[var(--c-surface)] rounded-2xl border border-black/10 shadow-sm overflow-hidden">
             {/* Toolbar */}
-            <div className="p-4 border-b border-[#D3D8D1] flex flex-wrap gap-3 items-center justify-between">
+            <div className="p-4 border-b border-[var(--c-border)] flex flex-wrap gap-3 items-center justify-between">
               <div className="flex gap-2">
                 <select
                   value={aiQueueStatusFilter}
@@ -1440,18 +1440,18 @@ export default function AdminCRM({ token }: { token: string }) {
                         <div className="flex-1 min-w-0 cursor-pointer" onClick={() => setExpandedAction(isExpanded ? null : action.id)}>
                           <div className="flex items-center gap-2 mb-1">
                             <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${
-                              action.type.includes('social') ? 'bg-[#1F5E86]/10 text-[var(--c-info)] border-[#1F5E86]' :
+                              action.type.includes('social') ? 'bg-[var(--c-info)]/10 text-[var(--c-info)] border-[var(--c-info)]' :
                               action.type.includes('campaign') ? 'bg-[var(--c-brand)]/15 text-[var(--c-info)] border-[var(--c-brand)]/30' :
                               action.type.includes('followup') ? 'bg-[var(--c-accent)]/10 text-[var(--c-accent)] border-[var(--c-accent)]/20' :
-                              action.type.includes('analyze') ? 'bg-[var(--c-success)]/10 text-[var(--c-success)] border-[#256B4A]/40' :
+                              action.type.includes('analyze') ? 'bg-[var(--c-success)]/10 text-[var(--c-success)] border-[var(--c-success)]/40' :
                               'bg-[var(--c-surface)] text-[var(--c-text-2)] border-black/10'
                             }`}>
                               {action.type.replace(/_/g, ' ')}
                             </span>
                             <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${
                               action.status === 'pending' ? 'bg-[var(--c-accent)]/10 text-[var(--c-accent)] border-[var(--c-accent)]/20' :
-                              action.status === 'executed' ? 'bg-[var(--c-success)]/10 text-[var(--c-success)] border-[#256B4A]/30' :
-                              action.status === 'rejected' ? 'bg-[#B23A2E]/10 text-[var(--c-error)] border-[#B23A2E]/30' :
+                              action.status === 'executed' ? 'bg-[var(--c-success)]/10 text-[var(--c-success)] border-[var(--c-success)]/30' :
+                              action.status === 'rejected' ? 'bg-[var(--c-error)]/10 text-[var(--c-error)] border-[var(--c-error)]/30' :
                               'bg-[var(--c-surface)] text-[var(--c-text-2)] border-black/10'
                             }`}>
                               {action.status}
@@ -1471,7 +1471,7 @@ export default function AdminCRM({ token }: { token: string }) {
                               <button
                                 onClick={() => handleAiAction(action.id, 'approve')}
                                 disabled={actionLoading}
-                                className="px-3 py-1.5 rounded-lg text-xs font-medium bg-[var(--c-success)] text-white hover:bg-[#256B4A] disabled:opacity-50"
+                                className="px-3 py-1.5 rounded-lg text-xs font-medium bg-[var(--c-success)] text-white hover:bg-[var(--c-success)] disabled:opacity-50"
                               >
                                 ✓ Approve
                               </button>
@@ -1487,7 +1487,7 @@ export default function AdminCRM({ token }: { token: string }) {
                               <button
                                 onClick={() => handleAiAction(action.id, 'reject')}
                                 disabled={actionLoading}
-                                className="px-3 py-1.5 rounded-lg text-xs font-medium bg-[#B23A2E]/10 text-[var(--c-error)] hover:bg-[#B23A2E]/10 disabled:opacity-50"
+                                className="px-3 py-1.5 rounded-lg text-xs font-medium bg-[var(--c-error)]/10 text-[var(--c-error)] hover:bg-[var(--c-error)]/10 disabled:opacity-50"
                               >
                                 ✕ Reject
                               </button>
@@ -1559,7 +1559,7 @@ export default function AdminCRM({ token }: { token: string }) {
                             <pre className="whitespace-pre-wrap text-xs text-[var(--c-text-2)]">{JSON.stringify(payload, null, 2)}</pre>
                           )}
                           {action.error && (
-                            <div className="mt-2 text-[var(--c-error)] bg-[#B23A2E]/10 rounded-lg px-3 py-2">Error: {action.error}</div>
+                            <div className="mt-2 text-[var(--c-error)] bg-[var(--c-error)]/10 rounded-lg px-3 py-2">Error: {action.error}</div>
                           )}
                         </div>
                       )}
@@ -1603,15 +1603,15 @@ export default function AdminCRM({ token }: { token: string }) {
         <div className="space-y-4">
           {/* Inbox Stats */}
           <div className="flex flex-wrap gap-4">
-            <div className="bg-[var(--c-surface)] rounded-xl border border-[#D3D8D1] shadow-sm px-5 py-4 flex-1 min-w-[120px]">
+            <div className="bg-[var(--c-surface)] rounded-xl border border-[var(--c-border)] shadow-sm px-5 py-4 flex-1 min-w-[120px]">
               <div className="text-2xl font-bold text-[var(--c-ink)]">{inboxStats.unread}</div>
               <div className="text-xs text-[var(--c-text-2)] mt-0.5">Unread</div>
             </div>
-            <div className="bg-[var(--c-surface)] rounded-xl border border-[#D3D8D1] shadow-sm px-5 py-4 flex-1 min-w-[120px]">
+            <div className="bg-[var(--c-surface)] rounded-xl border border-[var(--c-border)] shadow-sm px-5 py-4 flex-1 min-w-[120px]">
               <div className="text-2xl font-bold text-[var(--c-ink)]">{inboxStats.starred}</div>
               <div className="text-xs text-[var(--c-text-2)] mt-0.5">Starred</div>
             </div>
-            <div className="bg-[var(--c-surface)] rounded-xl border border-[#D3D8D1] shadow-sm px-5 py-4 flex-1 min-w-[120px]">
+            <div className="bg-[var(--c-surface)] rounded-xl border border-[var(--c-border)] shadow-sm px-5 py-4 flex-1 min-w-[120px]">
               <div className="text-2xl font-bold text-[var(--c-ink)]">{inboxStats.total}</div>
               <div className="text-xs text-[var(--c-text-2)] mt-0.5">Total</div>
             </div>
@@ -1619,7 +1619,7 @@ export default function AdminCRM({ token }: { token: string }) {
 
           <div className="bg-[var(--c-surface)] rounded-2xl border border-black/10 shadow-sm overflow-hidden">
             {/* Toolbar */}
-            <div className="p-4 border-b border-[#D3D8D1] space-y-3">
+            <div className="p-4 border-b border-[var(--c-border)] space-y-3">
               <div className="flex flex-wrap gap-3 items-center">
                 <div className="flex-1 min-w-[200px]">
                   <input
@@ -1646,7 +1646,7 @@ export default function AdminCRM({ token }: { token: string }) {
                       onClick={() => { setInboxFilter(f); setInboxPage(1) }}
                       className={`px-3 py-2 rounded-lg text-xs font-medium capitalize transition-all ${
                         inboxFilter === f
-                          ? 'bg-[#1d1d1f] text-white'
+                          ? 'bg-[var(--c-accent)] text-white'
                           : 'border border-black/10 text-[var(--c-text-3)] hover:bg-[var(--c-surface)]'
                       }`}
                     >
@@ -1669,7 +1669,7 @@ export default function AdminCRM({ token }: { token: string }) {
                     setComposeEmailSubject('')
                     setComposeEmailBody('')
                   }}
-                  className="px-4 py-2 rounded-lg bg-[#1d1d1f] text-white text-sm font-medium hover:bg-[var(--c-accent-hover)]"
+                  className="px-4 py-2 rounded-lg bg-[var(--c-accent)] text-white text-sm font-medium hover:bg-[var(--c-accent-hover)]"
                 >
                   + Compose
                 </button>
@@ -1740,7 +1740,7 @@ export default function AdminCRM({ token }: { token: string }) {
 
             {/* Pagination */}
             {inboxTotalPages > 1 && (
-              <div className="p-4 border-t border-[#D3D8D1] flex items-center justify-between">
+              <div className="p-4 border-t border-[var(--c-border)] flex items-center justify-between">
                 <span className="text-xs text-[var(--c-text-2)]">{inboxStats.total} emails</span>
                 <div className="flex gap-1">
                   <button onClick={() => setInboxPage(p => Math.max(1, p - 1))} disabled={inboxPage === 1} className="px-3 py-1.5 rounded-lg text-xs font-medium border border-black/10 hover:bg-[var(--c-surface)] disabled:opacity-40">Prev</button>
@@ -1757,7 +1757,7 @@ export default function AdminCRM({ token }: { token: string }) {
       {view === 'inbox' && selectedEmail && (
         <div className="bg-[var(--c-surface)] rounded-2xl border border-black/10 shadow-sm overflow-hidden">
           {/* Header */}
-          <div className="p-4 border-b border-[#D3D8D1] flex items-center gap-3">
+          <div className="p-4 border-b border-[var(--c-border)] flex items-center gap-3">
             <button
               onClick={() => setSelectedEmail(null)}
               className="px-3 py-1.5 rounded-lg border border-black/10 text-sm text-[var(--c-text-2)] hover:bg-[var(--c-surface)]"
@@ -1839,7 +1839,7 @@ export default function AdminCRM({ token }: { token: string }) {
               </div>
             )}
 
-            <div className="border-t border-[#D3D8D1] pt-4">
+            <div className="border-t border-[var(--c-border)] pt-4">
               {selectedEmail.htmlBody ? (
                 <div
                   className="prose prose-sm max-w-none text-[var(--c-ink)]"
@@ -1859,7 +1859,7 @@ export default function AdminCRM({ token }: { token: string }) {
       {showComposeEmail && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setShowComposeEmail(false)}>
           <div className="bg-[var(--c-surface)] rounded-2xl shadow-2xl w-full max-w-lg" onClick={e => e.stopPropagation()}>
-            <div className="p-6 border-b border-[#D3D8D1]">
+            <div className="p-6 border-b border-[var(--c-border)]">
               <h3 className="text-lg font-bold text-[var(--c-ink)]">{replyTo ? 'Reply' : 'New Email'}</h3>
               <p className="text-xs text-[var(--c-text-2)] mt-1">From: info@onshoredelivery.com</p>
             </div>
@@ -1895,7 +1895,7 @@ export default function AdminCRM({ token }: { token: string }) {
                 />
               </div>
             </div>
-            <div className="p-6 border-t border-[#D3D8D1] flex gap-3">
+            <div className="p-6 border-t border-[var(--c-border)] flex gap-3">
               <button
                 onClick={() => setShowComposeEmail(false)}
                 className="flex-1 px-4 py-2.5 rounded-xl border border-black/10 text-sm font-medium text-[var(--c-text-2)] hover:bg-[var(--c-surface)]"
@@ -1917,7 +1917,7 @@ export default function AdminCRM({ token }: { token: string }) {
       {/* ═══════════════════ AI CHAT VIEW ═══════════════════ */}
       {view === 'ai' && (
         <div className="bg-[var(--c-surface)] rounded-2xl border border-black/10 shadow-sm overflow-hidden flex flex-col" style={{ height: '600px' }}>
-          <div className="p-4 border-b border-[#D3D8D1]">
+          <div className="p-4 border-b border-[var(--c-border)]">
             <h3 className="text-sm font-semibold text-[var(--c-ink)]">AI CRM Assistant</h3>
             <p className="text-xs text-[var(--c-text-2)] mt-0.5">
               Ask me to draft emails, plan campaigns, analyze contacts, or generate social content. All actions require your approval.
@@ -1971,7 +1971,7 @@ export default function AdminCRM({ token }: { token: string }) {
               <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[80%] rounded-2xl px-4 py-3 ${
                   msg.role === 'user'
-                    ? 'bg-[#1d1d1f] text-white'
+                    ? 'bg-[var(--c-accent)] text-white'
                     : 'bg-[var(--c-surface)] text-[var(--c-ink)]'
                 }`}>
                   <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
@@ -1997,9 +1997,9 @@ export default function AdminCRM({ token }: { token: string }) {
               <div className="flex justify-start">
                 <div className="bg-[var(--c-surface)] rounded-2xl px-4 py-3">
                   <div className="flex gap-1">
-                    <div className="w-2 h-2 rounded-full bg-[#1E3A4D] animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <div className="w-2 h-2 rounded-full bg-[#1E3A4D] animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <div className="w-2 h-2 rounded-full bg-[#1E3A4D] animate-bounce" style={{ animationDelay: '300ms' }} />
+                    <div className="w-2 h-2 rounded-full bg-[var(--c-canvas-2)] animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <div className="w-2 h-2 rounded-full bg-[var(--c-canvas-2)] animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <div className="w-2 h-2 rounded-full bg-[var(--c-canvas-2)] animate-bounce" style={{ animationDelay: '300ms' }} />
                   </div>
                 </div>
               </div>
@@ -2008,7 +2008,7 @@ export default function AdminCRM({ token }: { token: string }) {
           </div>
 
           {/* Input */}
-          <div className="p-4 border-t border-[#D3D8D1]">
+          <div className="p-4 border-t border-[var(--c-border)]">
             <div className="flex gap-2">
               <input
                 type="text"
@@ -2021,7 +2021,7 @@ export default function AdminCRM({ token }: { token: string }) {
               <button
                 onClick={sendAiMessage}
                 disabled={aiChatLoading || !aiInput.trim()}
-                className="px-5 py-2.5 rounded-xl bg-[#1d1d1f] text-white text-sm font-medium hover:bg-[var(--c-accent-hover)] disabled:opacity-50"
+                className="px-5 py-2.5 rounded-xl bg-[var(--c-accent)] text-white text-sm font-medium hover:bg-[var(--c-accent-hover)] disabled:opacity-50"
               >
                 Send
               </button>
@@ -2034,7 +2034,7 @@ export default function AdminCRM({ token }: { token: string }) {
       {emailModal && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setEmailModal(null)}>
           <div className="bg-[var(--c-surface)] rounded-2xl shadow-2xl w-full max-w-lg" onClick={e => e.stopPropagation()}>
-            <div className="p-6 border-b border-[#D3D8D1]">
+            <div className="p-6 border-b border-[var(--c-border)]">
               <h3 className="text-lg font-bold text-[var(--c-ink)]">Send Email</h3>
               <p className="text-xs text-[var(--c-text-2)] mt-1">To: {emailModal.name} &lt;{emailModal.email}&gt;</p>
             </div>
@@ -2067,7 +2067,7 @@ export default function AdminCRM({ token }: { token: string }) {
                 </div>
               )}
             </div>
-            <div className="p-6 border-t border-[#D3D8D1] flex gap-3">
+            <div className="p-6 border-t border-[var(--c-border)] flex gap-3">
               <button onClick={() => setEmailModal(null)} className="flex-1 px-4 py-2.5 rounded-xl border border-black/10 text-sm font-medium text-[var(--c-text-2)] hover:bg-[var(--c-surface)]">
                 Cancel
               </button>
@@ -2138,7 +2138,7 @@ function ContactForm({
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="bg-[var(--c-surface)] rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-        <div className="p-6 border-b border-[#D3D8D1]">
+        <div className="p-6 border-b border-[var(--c-border)]">
           <h3 className="text-lg font-bold text-[var(--c-ink)]">{contact ? 'Edit Contact' : 'Add Contact'}</h3>
         </div>
         <div className="p-6 space-y-4">
@@ -2217,10 +2217,10 @@ function ContactForm({
               className="w-full px-3 py-2 rounded-lg border border-black/10 text-sm outline-none focus:border-[var(--c-accent)] resize-none" />
           </div>
         </div>
-        <div className="p-6 border-t border-[#D3D8D1] flex gap-3">
+        <div className="p-6 border-t border-[var(--c-border)] flex gap-3">
           <button onClick={onClose} className="flex-1 px-4 py-2.5 rounded-xl border border-black/10 text-sm font-medium text-[var(--c-text-2)] hover:bg-[var(--c-surface)]">Cancel</button>
           <button onClick={handleSubmit} disabled={loading || !form.name || !form.category}
-            className="flex-1 px-4 py-2.5 rounded-xl bg-[#1d1d1f] text-white text-sm font-medium hover:bg-[var(--c-accent-hover)] disabled:opacity-50">
+            className="flex-1 px-4 py-2.5 rounded-xl bg-[var(--c-accent)] text-white text-sm font-medium hover:bg-[var(--c-accent-hover)] disabled:opacity-50">
             {loading ? 'Saving...' : contact ? 'Update' : 'Create'}
           </button>
         </div>

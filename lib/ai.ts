@@ -609,7 +609,7 @@ ${context ? `CONTEXT:
 - Recent campaigns: ${context.recentCampaigns.map(c => `"${c.subject}" [${c.status}]`).join(', ') || 'none'}` : ''}
 
 Create an email campaign. Use {{name}} for personalization.
-Write clean HTML with inline styles. Use Onshore Delivery brand colors (#C6904D gold, #1d1d1f dark).
+Write clean HTML with inline styles. Use Onshore Delivery brand colors (#0C5C54 Marine Teal, #A8813C brass accent, #12302C Deep Harbour text on a #F5F2EC Sailcloth background).
 Include a clear call-to-action button.
 
 Return JSON:

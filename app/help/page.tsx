@@ -148,9 +148,9 @@ export default function HelpPage() {
               <div className="flex justify-start">
                 <div className="bg-[var(--c-surface)] text-[var(--c-ink)] px-4 py-2.5 rounded-2xl rounded-bl-md">
                   <div className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 bg-[#647672] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <span className="w-1.5 h-1.5 bg-[#647672] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <span className="w-1.5 h-1.5 bg-[#647672] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                    <span className="w-1.5 h-1.5 bg-[var(--c-text-3)] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <span className="w-1.5 h-1.5 bg-[var(--c-text-3)] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <span className="w-1.5 h-1.5 bg-[var(--c-text-3)] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                   </div>
                 </div>
               </div>
@@ -159,7 +159,7 @@ export default function HelpPage() {
           </div>
 
           {/* Chat input */}
-          <form onSubmit={sendMessage} className="p-4 border-t border-[#D3D8D1]">
+          <form onSubmit={sendMessage} className="p-4 border-t border-[var(--c-border)]">
             <div className="flex gap-2">
               <input
                 type="text"

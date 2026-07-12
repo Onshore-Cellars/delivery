@@ -739,7 +739,7 @@ export default function MarketplacePage() {
     <div>
       {fetchError && (
         <div className="site-container pt-4">
-          <div className="px-4 py-3 rounded-xl bg-[#B23A2E]/10 border border-[#B23A2E]/30">
+          <div className="px-4 py-3 rounded-xl bg-[var(--c-error)]/10 border border-[var(--c-error)]/30">
             <p className="text-sm font-medium text-[var(--c-error)]">{fetchError}</p>
           </div>
         </div>
@@ -950,7 +950,7 @@ export default function MarketplacePage() {
             </p>
             <div className="flex items-center gap-2">
               <select
-                className="px-3 py-2 rounded-xl border border-black/10 bg-[var(--c-surface)] text-sm text-[var(--c-ink)] focus:border-[#1F5E86] focus:ring-2 focus:ring-blue-500/10 outline-none"
+                className="px-3 py-2 rounded-xl border border-black/10 bg-[var(--c-surface)] text-sm text-[var(--c-ink)] focus:border-[var(--c-info)] focus:ring-2 focus:ring-blue-500/10 outline-none"
                 value={filters.sort}
                 onChange={(e) => { setFilters({ ...filters, sort: e.target.value }); setCurrentPage(1) }}
               >
@@ -1104,7 +1104,7 @@ export default function MarketplacePage() {
             ) : (
               <form onSubmit={submitBooking} className="p-5 sm:p-6 space-y-4">
                 {bookingError && (
-                  <div className="px-4 py-3 rounded-xl bg-[#B23A2E]/10 border border-[#B23A2E]/30">
+                  <div className="px-4 py-3 rounded-xl bg-[var(--c-error)]/10 border border-[var(--c-error)]/30">
                     <p className="text-sm text-[var(--c-error)]">{bookingError}</p>
                   </div>
                 )}

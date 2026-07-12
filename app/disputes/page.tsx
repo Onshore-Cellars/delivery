@@ -20,10 +20,10 @@ interface Dispute {
 }
 
 const statusColors: Record<string, string> = {
-  OPEN: 'bg-[#B23A2E]/10 text-[var(--c-error)]',
+  OPEN: 'bg-[var(--c-error)]/10 text-[var(--c-error)]',
   UNDER_REVIEW: 'bg-[var(--c-accent)]/15 text-[var(--c-accent)]',
   RESOLVED: 'bg-[var(--c-success)]/15 text-[var(--c-success)]',
-  APPEALED: 'bg-[#1F5E86]/15 text-[var(--c-info)]',
+  APPEALED: 'bg-[var(--c-info)]/15 text-[var(--c-info)]',
 }
 
 const typeLabels: Record<string, string> = {
@@ -124,7 +124,7 @@ export default function DisputesPage() {
           </button>
         </div>
 
-        {error && <div className="mb-4 p-3 bg-[#B23A2E]/10 border border-[#B23A2E]/30 rounded-lg text-sm text-[var(--c-error)] flex justify-between"><span>{error}</span><button onClick={() => setError('')} className="text-[var(--c-error)]">&times;</button></div>}
+        {error && <div className="mb-4 p-3 bg-[var(--c-error)]/10 border border-[var(--c-error)]/30 rounded-lg text-sm text-[var(--c-error)] flex justify-between"><span>{error}</span><button onClick={() => setError('')} className="text-[var(--c-error)]">&times;</button></div>}
 
         {showCreate && (
           <div className="bg-[var(--c-surface)] rounded-lg border border-black/10 p-5 mb-6">
@@ -149,7 +149,7 @@ export default function DisputesPage() {
                 <input className={inputClass} type="number" step="0.01" placeholder="0.00" value={createForm.claimAmount} onChange={e => setCreateForm({...createForm, claimAmount: e.target.value})} />
               </div>
             </div>
-            <button onClick={handleCreate} disabled={creating} className="px-4 py-2 bg-[#B23A2E] text-white rounded-lg text-sm font-semibold hover:bg-[#B23A2E] disabled:opacity-50 transition-colors">
+            <button onClick={handleCreate} disabled={creating} className="px-4 py-2 bg-[var(--c-error)] text-white rounded-lg text-sm font-semibold hover:bg-[var(--c-error)] disabled:opacity-50 transition-colors">
               {creating ? 'Submitting...' : 'Submit Dispute'}
             </button>
           </div>

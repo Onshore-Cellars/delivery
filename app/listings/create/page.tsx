@@ -220,7 +220,7 @@ export default function CreateListingPage() {
 
         <form onSubmit={handleSubmit} className="space-y-8">
           {error && (
-            <div className="px-4 py-3 rounded-lg bg-[#B23A2E]/10 border border-[#B23A2E]/30" role="alert">
+            <div className="px-4 py-3 rounded-lg bg-[var(--c-error)]/10 border border-[var(--c-error)]/30" role="alert">
               <p className="text-sm text-[var(--c-error)]">{error}</p>
             </div>
           )}
@@ -405,7 +405,7 @@ export default function CreateListingPage() {
                     type="button"
                     onClick={handleGenerateDescription}
                     disabled={generatingDescription}
-                    className="inline-flex items-center gap-1 text-xs font-medium text-[var(--c-accent)] hover:text-[#FF8F5A] disabled:opacity-50 transition-colors"
+                    className="inline-flex items-center gap-1 text-xs font-medium text-[var(--c-accent)] hover:text-[var(--c-accent-hover)] disabled:opacity-50 transition-colors"
                   >
                     {generatingDescription ? (
                       <>
@@ -740,7 +740,7 @@ export default function CreateListingPage() {
 
               {/* Vehicle Features */}
               {!isSpaceNeeded && (
-              <div className="pt-4 border-t border-[#D3D8D1] grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="pt-4 border-t border-[var(--c-border)] grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input type="checkbox" name="hasRefrigeration" checked={form.hasRefrigeration} onChange={handleChange} className="w-4 h-4 rounded border-black/15 text-[var(--c-ink)] focus:ring-[var(--c-accent)]" />
                   <span className="text-sm text-[var(--c-ink)]">Refrigeration</span>
@@ -863,7 +863,7 @@ export default function CreateListingPage() {
                       }
                     } catch { /* ignore */ }
                   }}
-                  className="inline-flex items-center gap-2 text-sm font-medium text-[var(--c-accent)] hover:text-[#FF8F5A] transition-colors"
+                  className="inline-flex items-center gap-2 text-sm font-medium text-[var(--c-accent)] hover:text-[var(--c-accent-hover)] transition-colors"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                   Auto-suggest prices based on similar routes
@@ -899,7 +899,7 @@ export default function CreateListingPage() {
               </div>
 
               {/* Bidding */}
-              <div className="pt-4 border-t border-[#D3D8D1]">
+              <div className="pt-4 border-t border-[var(--c-border)]">
                 <div className="flex items-center justify-between">
                   <div>
                     <label className="text-sm font-medium text-[var(--c-ink)]">Enable Bidding</label>
@@ -913,7 +913,7 @@ export default function CreateListingPage() {
                       onChange={handleChange}
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-[#1E3A4D] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--c-surface)] after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#1d1d1f]"></div>
+                    <div className="w-11 h-6 bg-[var(--c-canvas-2)] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--c-surface)] after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--c-accent)]"></div>
                   </label>
                 </div>
                 {form.biddingEnabled && (
@@ -947,7 +947,7 @@ export default function CreateListingPage() {
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" name="flexibleRoute" checked={form.flexibleRoute} onChange={handleChange} className="sr-only peer" />
-                    <div className="w-11 h-6 bg-[#1E3A4D] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--c-surface)] after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#1d1d1f]"></div>
+                    <div className="w-11 h-6 bg-[var(--c-canvas-2)] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--c-surface)] after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--c-accent)]"></div>
                   </label>
                 </div>
                 {form.flexibleRoute && (
@@ -967,7 +967,7 @@ export default function CreateListingPage() {
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" name="flexibleStops" checked={form.flexibleStops} onChange={handleChange} className="sr-only peer" />
-                    <div className="w-11 h-6 bg-[#1E3A4D] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--c-surface)] after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#1d1d1f]"></div>
+                    <div className="w-11 h-6 bg-[var(--c-canvas-2)] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--c-surface)] after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--c-accent)]"></div>
                   </label>
                 </div>
               </div>
@@ -990,7 +990,7 @@ export default function CreateListingPage() {
               </span>
             </button>
             {estimateOpen && (
-              <div className="px-5 sm:px-6 pb-5 sm:pb-6 space-y-4 border-t border-[#D3D8D1] pt-4">
+              <div className="px-5 sm:px-6 pb-5 sm:pb-6 space-y-4 border-t border-[var(--c-border)] pt-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className={labelCls}>Distance (km)</label>
@@ -1045,7 +1045,7 @@ export default function CreateListingPage() {
                     )}
 
                     {form.totalCapacityKg && Number(form.totalCapacityKg) > 0 && (
-                      <div className="rounded-lg bg-[var(--c-accent)]/10 border border-[#8A5A08]/40 p-3">
+                      <div className="rounded-lg bg-[var(--c-accent)]/10 border border-[var(--c-warning)]/40 p-3">
                         <p className="text-xs text-[var(--c-accent)]">
                           <span className="font-medium">Suggested minimum price per kg:</span>{' '}
                           &euro;{(costEstimate.totalEstimate / Number(form.totalCapacityKg)).toFixed(2)}/kg

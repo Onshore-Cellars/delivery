@@ -136,7 +136,7 @@ export default function AboutPage() {
           </div>
         </div>
 
-        <div className="bg-[#1d1d1f] rounded-2xl p-6 sm:p-10 text-center relative overflow-hidden">
+        <div className="bg-[var(--c-accent)] rounded-2xl p-6 sm:p-10 text-center relative overflow-hidden">
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute top-1/3 right-1/4 w-[200px] h-[200px] bg-[var(--c-accent)]/[0.05] rounded-full blur-[80px]" />
           </div>

@@ -181,7 +181,7 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                     </svg>
                     {unreadNotifs > 0 && (
-                      <span className="absolute top-0.5 right-0.5 min-w-[18px] h-[18px] rounded-full bg-[#B23A2E] text-white text-[10px] font-bold flex items-center justify-center px-1">
+                      <span className="absolute top-0.5 right-0.5 min-w-[18px] h-[18px] rounded-full bg-[var(--c-error)] text-white text-[10px] font-bold flex items-center justify-center px-1">
                         {unreadNotifs > 9 ? '9+' : unreadNotifs}
                       </span>
                     )}
@@ -193,7 +193,7 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                     </svg>
                     {unreadMessages > 0 && (
-                      <span className="absolute top-0.5 right-0.5 min-w-[18px] h-[18px] rounded-full bg-[#B23A2E] text-white text-[10px] font-bold flex items-center justify-center px-1">
+                      <span className="absolute top-0.5 right-0.5 min-w-[18px] h-[18px] rounded-full bg-[var(--c-error)] text-white text-[10px] font-bold flex items-center justify-center px-1">
                         {unreadMessages > 9 ? '9+' : unreadMessages}
                       </span>
                     )}
@@ -214,7 +214,7 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
 
                   <button
                     onClick={logout}
-                    className="px-3 py-2 text-xs font-medium text-[var(--c-text-3)] hover:text-[var(--c-error)] hover:bg-[#B23A2E]/10 rounded transition-colors"
+                    className="px-3 py-2 text-xs font-medium text-[var(--c-text-3)] hover:text-[var(--c-error)] hover:bg-[var(--c-error)]/10 rounded transition-colors"
                     title="Sign out"
                     aria-label="Sign out"
                   >
@@ -243,7 +243,7 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
                   <svg className={`w-5 h-5 ${isTransparentMode ? 'text-white' : 'text-[var(--c-text-2)]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                   </svg>
-                  <span className="absolute top-0.5 right-0.5 min-w-[16px] h-[16px] rounded-full bg-[#B23A2E] text-white text-[9px] font-bold flex items-center justify-center">
+                  <span className="absolute top-0.5 right-0.5 min-w-[16px] h-[16px] rounded-full bg-[var(--c-error)] text-white text-[9px] font-bold flex items-center justify-center">
                     {unreadMessages > 9 ? '9+' : unreadMessages}
                   </span>
                 </Link>
@@ -315,7 +315,7 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
                       Messages
                     </span>
                     {unreadMessages > 0 && (
-                      <span className="min-w-[22px] h-[22px] rounded-full bg-[#B23A2E] text-white text-[11px] font-bold flex items-center justify-center px-1.5">
+                      <span className="min-w-[22px] h-[22px] rounded-full bg-[var(--c-error)] text-white text-[11px] font-bold flex items-center justify-center px-1.5">
                         {unreadMessages > 9 ? '9+' : unreadMessages}
                       </span>
                     )}
@@ -334,7 +334,7 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
                       Notifications
                     </span>
                     {unreadNotifs > 0 && (
-                      <span className="min-w-[22px] h-[22px] rounded-full bg-[#B23A2E] text-white text-[11px] font-bold flex items-center justify-center px-1.5">
+                      <span className="min-w-[22px] h-[22px] rounded-full bg-[var(--c-error)] text-white text-[11px] font-bold flex items-center justify-center px-1.5">
                         {unreadNotifs > 9 ? '9+' : unreadNotifs}
                       </span>
                     )}
@@ -407,7 +407,7 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
                   </div>
                   <button
                     onClick={() => { logout(); close() }}
-                    className="w-full px-4 py-3 text-sm font-semibold text-[var(--c-error)] rounded hover:bg-[#B23A2E]/10 transition-colors text-left"
+                    className="w-full px-4 py-3 text-sm font-semibold text-[var(--c-error)] rounded hover:bg-[var(--c-error)]/10 transition-colors text-left"
                   >
                     Sign Out
                   </button>
@@ -438,7 +438,7 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
                 <div className="relative w-5 h-5 flex items-center justify-center">
                   <TabIcon icon={tab.icon} className={active ? 'text-[var(--c-info)]' : 'text-[var(--c-text-3)]'} />
                   {'badge' in tab && tab.badge && tab.badge > 0 && (
-                    <span className="absolute -top-1 -right-2.5 min-w-[14px] h-[14px] rounded-full bg-[#B23A2E] text-white text-[8px] font-bold flex items-center justify-center leading-none">
+                    <span className="absolute -top-1 -right-2.5 min-w-[14px] h-[14px] rounded-full bg-[var(--c-error)] text-white text-[8px] font-bold flex items-center justify-center leading-none">
                       {tab.badge > 9 ? '9+' : tab.badge}
                     </span>
                   )}

@@ -274,12 +274,12 @@ export default function ListingDetailPage() {
         <Link href="/marketplace" className="text-sm text-[var(--c-text-3)] hover:text-[var(--c-ink)] transition-colors">&larr; Back to Marketplace</Link>
 
         {formSuccess && (
-          <div className="mt-4 px-4 py-3 rounded-lg bg-[var(--c-success)]/10 border border-[#256B4A]/40">
+          <div className="mt-4 px-4 py-3 rounded-lg bg-[var(--c-success)]/10 border border-[var(--c-success)]/40">
             <p className="text-sm text-[var(--c-success)] font-medium">{formSuccess}</p>
           </div>
         )}
         {formError && (
-          <div className="mt-4 px-4 py-3 rounded-lg bg-[#B23A2E]/10 border border-[#B23A2E]/30">
+          <div className="mt-4 px-4 py-3 rounded-lg bg-[var(--c-error)]/10 border border-[var(--c-error)]/30">
             <p className="text-sm text-[var(--c-error)]">{formError}</p>
           </div>
         )}
@@ -288,21 +288,21 @@ export default function ListingDetailPage() {
           {/* Main content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Header */}
-            <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-[#D3D8D1] p-6">
+            <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-[var(--c-border)] p-6">
               {listing.featured && <span className="badge bg-[var(--c-accent)]/10 text-[var(--c-accent)] border border-[var(--c-accent)]/20 mb-3">Featured</span>}
               <h1 className="text-xl sm:text-2xl font-semibold text-[var(--c-ink)]">{listing.title}</h1>              {listing.description && <p className="mt-2 text-[var(--c-text-2)] leading-relaxed">{listing.description}</p>}
 
               <div className="mt-6 flex flex-wrap gap-2">
                 <span className="badge bg-[var(--c-surface)] text-[var(--c-ink)] border border-black/10">{listing.vehicleType}</span>
-                {listing.hasRefrigeration && <span className="badge bg-[#1F5E86]/10 text-[var(--c-info)] border border-[#1F5E86]">Refrigerated</span>}
-                {listing.hasTailLift && <span className="badge bg-[#1F5E86]/10 text-[var(--c-info)] border border-[#1F5E86]">Tail Lift</span>}
-                {listing.hasGPS && <span className="badge bg-[var(--c-success)]/10 text-[var(--c-success)] border border-[#256B4A]/40">GPS Tracked</span>}
+                {listing.hasRefrigeration && <span className="badge bg-[var(--c-info)]/10 text-[var(--c-info)] border border-[var(--c-info)]">Refrigerated</span>}
+                {listing.hasTailLift && <span className="badge bg-[var(--c-info)]/10 text-[var(--c-info)] border border-[var(--c-info)]">Tail Lift</span>}
+                {listing.hasGPS && <span className="badge bg-[var(--c-success)]/10 text-[var(--c-success)] border border-[var(--c-success)]/40">GPS Tracked</span>}
                 {listing.isRecurring && <span className="badge bg-[var(--c-accent)]/10 text-[var(--c-accent)] border border-[var(--c-accent)]/20">Recurring: {listing.recurringSchedule}</span>}
               </div>
             </div>
 
             {/* Route */}
-            <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-[#D3D8D1] p-6">
+            <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-[var(--c-border)] p-6">
               <h2 className="font-bold text-[var(--c-ink)] mb-4">Route</h2>
               <div className="flex items-center gap-6">
                 <div className="flex-1">
@@ -311,7 +311,7 @@ export default function ListingDetailPage() {
                   {listing.originRegion && <div className="text-sm text-[var(--c-text-3)]">{listing.originRegion}{listing.originCountry && `, ${listing.originCountry}`}</div>}
                 </div>
                 <div className="flex flex-col items-center px-4">
-                  <div className="w-16 h-px bg-[#1E3A4D]" />
+                  <div className="w-16 h-px bg-[var(--c-canvas-2)]" />
                   <svg className="w-5 h-5 text-[var(--c-accent)] mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
                 </div>
                 <div className="flex-1">
@@ -320,7 +320,7 @@ export default function ListingDetailPage() {
                   {listing.destinationRegion && <div className="text-sm text-[var(--c-text-3)]">{listing.destinationRegion}{listing.destinationCountry && `, ${listing.destinationCountry}`}</div>}
                 </div>
               </div>
-              <div className="mt-4 grid grid-cols-2 sm:grid-cols-2 gap-3 sm:gap-4 pt-4 border-t border-[#D3D8D1]">
+              <div className="mt-4 grid grid-cols-2 sm:grid-cols-2 gap-3 sm:gap-4 pt-4 border-t border-[var(--c-border)]">
                 <div>
                   <div className="text-xs text-[var(--c-text-2)]">Departure</div>
                   <div className="font-semibold text-[var(--c-ink)]">{formatDate(listing.departureDate)}</div>
@@ -336,7 +336,7 @@ export default function ListingDetailPage() {
 
             {/* Estimated journey cost — a guide for carriers pricing this run and bidders */}
             {routeCost && (
-              <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-[#D3D8D1] p-6">
+              <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-[var(--c-border)] p-6">
                 <div className="flex items-center justify-between mb-1">
                   <h2 className="font-bold text-[var(--c-ink)]">Estimated journey cost</h2>
                   <span className="font-[family-name:var(--font-mono)] text-xs text-[var(--c-text-3)]">~{routeCost.distanceKm} km</span>
@@ -366,7 +366,7 @@ export default function ListingDetailPage() {
             )}
 
             {/* Capacity */}
-            <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-[#D3D8D1] p-6">
+            <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-[var(--c-border)] p-6">
               <h2 className="font-bold text-[var(--c-ink)] mb-4">Capacity</h2>
               <div className="mb-4">
                 <div className="flex justify-between text-sm mb-1">
@@ -374,7 +374,7 @@ export default function ListingDetailPage() {
                   <span className="font-semibold text-[var(--c-ink)]">{fillPercent}%</span>
                 </div>
                 <div className="w-full h-3 bg-[var(--c-canvas-2)] rounded-full overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-[var(--c-accent)] to-[#d4a76a] rounded-full transition-all" style={{ width: `${fillPercent}%` }} />
+                  <div className="h-full bg-gradient-to-r from-[var(--c-accent)] to-[var(--c-brass)] rounded-full transition-all" style={{ width: `${fillPercent}%` }} />
                 </div>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -384,7 +384,7 @@ export default function ListingDetailPage() {
                 <div><div className="text-xs text-[var(--c-text-2)]">Total Volume</div><div className="text-sm text-[var(--c-text-2)]">{listing.totalCapacityM3.toFixed(1)}m&sup3;</div></div>
               </div>
               {(listing.maxItemLength || listing.maxItemWidth || listing.maxItemHeight) && (
-                <div className="mt-4 pt-4 border-t border-[#D3D8D1]">
+                <div className="mt-4 pt-4 border-t border-[var(--c-border)]">
                   <div className="text-xs text-[var(--c-text-2)] mb-1">Max Item Dimensions</div>
                   <div className="text-sm text-[var(--c-ink)]">
                     {listing.maxItemLength && `${listing.maxItemLength}cm L`}
@@ -394,7 +394,7 @@ export default function ListingDetailPage() {
                 </div>
               )}
               {acceptedCargo.length > 0 && (
-                <div className="mt-4 pt-4 border-t border-[#D3D8D1]">
+                <div className="mt-4 pt-4 border-t border-[var(--c-border)]">
                   <div className="text-xs text-[var(--c-text-2)] mb-2">Accepted Cargo Types</div>
                   <div className="flex flex-wrap gap-1">{acceptedCargo.map((c: string) => <span key={c} className="badge bg-[var(--c-surface)] text-[var(--c-text-2)] border border-black/10">{c}</span>)}</div>
                 </div>
@@ -424,7 +424,7 @@ export default function ListingDetailPage() {
                   </div>
                 )}
                 {(listing.returnFlatRate || listing.returnPricePerKg || listing.returnPricePerM3) && (
-                  <div className="pt-3 border-t border-[#D3D8D1]">
+                  <div className="pt-3 border-t border-[var(--c-border)]">
                     <div className="text-xs text-[var(--c-text-2)] mb-1">Return Pricing</div>
                     {listing.returnFlatRate && <div className="text-sm font-semibold text-[var(--c-ink)]">{formatCurrency(listing.returnFlatRate, listing.currency)} flat</div>}
                     {listing.returnPricePerKg && <div className="text-sm text-[var(--c-text-2)]">{formatCurrency(listing.returnPricePerKg, listing.currency)}/kg</div>}
@@ -441,7 +441,7 @@ export default function ListingDetailPage() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Pricing Card */}
-            <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-[#D3D8D1] p-6 sticky top-24">
+            <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-[var(--c-border)] p-6 sticky top-24">
               <div className="text-xs text-[var(--c-text-2)] uppercase tracking-wider mb-2">Pricing</div>
               {listing.flatRate ? (
                 <div className="text-3xl font-semibold text-[var(--c-ink)]">{formatCurrency(listing.flatRate, listing.currency)}<span className="text-sm font-normal text-[var(--c-text-2)] ml-1">flat</span></div>
@@ -518,7 +518,7 @@ export default function ListingDetailPage() {
                               <button
                                 onClick={() => actOnBid(bid.id, 'reject')}
                                 disabled={bidActioning === bid.id + ':reject'}
-                                className="flex-1 rounded-lg border border-[#B23A2E]/30 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-[var(--c-error)] hover:bg-[#B23A2E]/10 disabled:opacity-60"
+                                className="flex-1 rounded-lg border border-[var(--c-error)]/30 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-[var(--c-error)] hover:bg-[var(--c-error)]/10 disabled:opacity-60"
                               >
                                 Reject
                               </button>
@@ -532,7 +532,7 @@ export default function ListingDetailPage() {
               )}
 
               {/* Carrier Info (anonymous until booking confirmed) */}
-              <div className="mt-6 pt-6 border-t border-[#D3D8D1]">
+              <div className="mt-6 pt-6 border-t border-[var(--c-border)]">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 rounded-full bg-[var(--c-surface)] flex items-center justify-center">
                     <svg className="w-5 h-5 text-[var(--c-text-2)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
@@ -566,7 +566,7 @@ export default function ListingDetailPage() {
         {showBooking && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
             <div className="bg-[var(--c-surface)] rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
-              <div className="p-6 border-b border-[#D3D8D1] flex justify-between items-center">
+              <div className="p-6 border-b border-[var(--c-border)] flex justify-between items-center">
                 <h2 className="text-xl font-bold text-[var(--c-ink)]">Book Space</h2>
                 <button onClick={() => setShowBooking(false)} className="p-2 hover:bg-[var(--c-canvas-2)] rounded-lg"><svg className="w-5 h-5 text-[var(--c-text-2)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
               </div>
@@ -578,7 +578,7 @@ export default function ListingDetailPage() {
                     <div>
                       <label className="block text-sm font-medium text-[var(--c-ink)] mb-1">Description *</label>
                       <input required className="w-full px-4 py-2.5 rounded-lg border border-black/10 text-sm outline-none focus:border-[var(--c-accent)]" placeholder="e.g. 12 cases premium wine, temperature sensitive" value={bookingForm.cargoDescription} onChange={e => setBookingForm({...bookingForm, cargoDescription: e.target.value})} />
-                      <button type="button" onClick={classifyCargo} disabled={classifying || !bookingForm.cargoDescription.trim()} className="mt-1.5 text-xs font-medium text-[var(--c-accent)] hover:text-[#FF8F5A] disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                      <button type="button" onClick={classifyCargo} disabled={classifying || !bookingForm.cargoDescription.trim()} className="mt-1.5 text-xs font-medium text-[var(--c-accent)] hover:text-[var(--c-accent-hover)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
                         {classifying ? 'Analyzing...' : 'Analyze with AI \u2726'}
                       </button>
                       {cargoWarnings.length > 0 && (
@@ -661,7 +661,7 @@ export default function ListingDetailPage() {
         {showBid && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
             <div className="bg-[var(--c-surface)] rounded-2xl shadow-2xl max-w-lg w-full">
-              <div className="p-6 border-b border-[#D3D8D1] flex justify-between items-center">
+              <div className="p-6 border-b border-[var(--c-border)] flex justify-between items-center">
                 <h2 className="text-xl font-bold text-[var(--c-ink)]">Place a Bid</h2>
                 <button onClick={() => setShowBid(false)} className="p-2 hover:bg-[var(--c-canvas-2)] rounded-lg"><svg className="w-5 h-5 text-[var(--c-text-2)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
               </div>
@@ -683,7 +683,7 @@ export default function ListingDetailPage() {
         {showContact && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
             <div className="bg-[var(--c-surface)] rounded-2xl shadow-2xl max-w-lg w-full">
-              <div className="p-6 border-b border-[#D3D8D1] flex justify-between items-center">
+              <div className="p-6 border-b border-[var(--c-border)] flex justify-between items-center">
                 <h2 className="text-xl font-bold text-[var(--c-ink)]">Message Carrier</h2>
                 <button onClick={() => setShowContact(false)} className="p-2 hover:bg-[var(--c-canvas-2)] rounded-lg"><svg className="w-5 h-5 text-[var(--c-text-2)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
               </div>

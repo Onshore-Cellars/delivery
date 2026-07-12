@@ -27,9 +27,9 @@ const CATEGORIES = [
 ]
 
 const CATEGORY_COLORS: Record<string, string> = {
-  routes: 'bg-[#1F5E86]/10 text-[var(--c-info)]',
-  wanted: 'bg-[#B23A2E]/10 text-[var(--c-error)]',
-  ports: 'bg-[#1F5E86]/10 text-[var(--c-info)]',
+  routes: 'bg-[var(--c-info)]/10 text-[var(--c-info)]',
+  wanted: 'bg-[var(--c-error)]/10 text-[var(--c-error)]',
+  ports: 'bg-[var(--c-info)]/10 text-[var(--c-info)]',
   customs: 'bg-[var(--c-accent)]/10 text-[var(--c-accent)]',
   tips: 'bg-[var(--c-success)]/10 text-[var(--c-success)]',
 }
@@ -103,7 +103,7 @@ export default function CommunityPage() {
     return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
   }
 
-  const inputClass = "w-full px-4 py-3 rounded border border-black/10 bg-[var(--c-surface)] text-[15px] text-[var(--c-ink)] placeholder:text-[#9a9a9a] focus:border-[var(--c-accent)] focus:ring-2 focus:ring-[var(--c-accent)]/10 transition-all outline-none"
+  const inputClass = "w-full px-4 py-3 rounded border border-black/10 bg-[var(--c-surface)] text-[15px] text-[var(--c-ink)] placeholder:text-[var(--c-text-3)] focus:border-[var(--c-accent)] focus:ring-2 focus:ring-[var(--c-accent)]/10 transition-all outline-none"
 
   return (
     <div className="page-container">
@@ -122,7 +122,7 @@ export default function CommunityPage() {
       </div>
 
       {error && (
-        <div className="mb-6 px-4 py-3 rounded-lg bg-[#B23A2E]/10 border border-[#B23A2E]/30">
+        <div className="mb-6 px-4 py-3 rounded-lg bg-[var(--c-error)]/10 border border-[var(--c-error)]/30">
           <p className="text-sm text-[var(--c-error)] font-medium">{error}</p>
         </div>
       )}

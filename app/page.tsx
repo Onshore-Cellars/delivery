@@ -32,7 +32,7 @@ export default function Home() {
             <span className="font-[family-name:var(--font-mono)] text-[11px] tracking-[0.16em] uppercase text-[#E7C98A]">Mediterranean &amp; UK South Coast</span>
           </div>
 
-          <h1 className="animate-fade-up text-[#FCFBF8] font-light tracking-[-0.02em] leading-[1.03] max-w-4xl" style={{ ...serif, fontSize: 'clamp(40px,7vw,78px)' }}>
+          <h1 className="animate-fade-up text-[var(--c-surface)] font-light tracking-[-0.02em] leading-[1.03] max-w-4xl" style={{ ...serif, fontSize: 'clamp(40px,7vw,78px)' }}>
             Space that&rsquo;s already<br className="hidden sm:block" /> <em className="italic text-[#E7C98A]">going your way.</em>
           </h1>
 
@@ -43,17 +43,17 @@ export default function Home() {
           {/* Live route search */}
           <form onSubmit={search} className="animate-fade-up mt-9 max-w-2xl" style={{ animationDelay: '140ms' }}>
             <div className="flex flex-col sm:flex-row gap-2.5 rounded-2xl border border-white/15 bg-white/[0.06] backdrop-blur p-2.5">
-              <div className="flex-1 flex items-center gap-2.5 rounded-xl bg-[#FCFBF8] px-4 py-3">
+              <div className="flex-1 flex items-center gap-2.5 rounded-xl bg-[var(--c-surface)] px-4 py-3">
                 <span className="font-[family-name:var(--font-mono)] text-[10px] uppercase tracking-[0.14em] text-[var(--c-text-3)] shrink-0">From</span>
                 <input value={from} onChange={e => setFrom(e.target.value)} placeholder="Antibes" aria-label="Origin port"
                   className="w-full bg-transparent border-0 p-0 text-[15px] text-[var(--c-ink)] placeholder:text-[var(--c-text-3)] focus:ring-0 outline-none" />
               </div>
-              <div className="flex-1 flex items-center gap-2.5 rounded-xl bg-[#FCFBF8] px-4 py-3">
+              <div className="flex-1 flex items-center gap-2.5 rounded-xl bg-[var(--c-surface)] px-4 py-3">
                 <span className="font-[family-name:var(--font-mono)] text-[10px] uppercase tracking-[0.14em] text-[var(--c-text-3)] shrink-0">To</span>
                 <input value={to} onChange={e => setTo(e.target.value)} placeholder="Monaco" aria-label="Destination port"
                   className="w-full bg-transparent border-0 p-0 text-[15px] text-[var(--c-ink)] placeholder:text-[var(--c-text-3)] focus:ring-0 outline-none" />
               </div>
-              <button type="submit" className="shrink-0 rounded-xl bg-[#C79A4E] px-7 py-3 text-[15px] font-semibold text-[#12302C] hover:brightness-105 transition">Find space</button>
+              <button type="submit" className="shrink-0 rounded-xl bg-[#C79A4E] px-7 py-3 text-[15px] font-semibold text-[var(--c-ink)] hover:brightness-105 transition">Find space</button>
             </div>
           </form>
 
@@ -94,7 +94,7 @@ export default function Home() {
             </Link>
             <Link href="/listings/create" className="group block rounded-2xl border border-[var(--c-border)] bg-[var(--c-surface)] p-7 sm:p-9 hover:no-underline hover:border-[var(--c-brass)]/50 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
               <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-5" style={{ background: 'var(--c-brass)' }}>
-                <svg className="w-6 h-6 text-[#12302C]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
+                <svg className="w-6 h-6 text-[var(--c-ink)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
               </div>
               <h3 className="text-lg font-bold text-[var(--c-ink)] mb-2">I have van space</h3>
               <p className="text-sm text-[var(--c-text-2)] leading-relaxed mb-5">Already driving to a port? List your spare capacity — outbound and return — and earn on journeys you&rsquo;re running anyway.</p>
@@ -157,10 +157,10 @@ export default function Home() {
       <section>
         <div className="site-container py-18 sm:py-24 text-center">
           <div className="max-w-2xl mx-auto rounded-3xl p-10 sm:p-14" style={{ background: 'var(--c-brand)' }}>
-            <h2 className="text-[#FCFBF8] tracking-[-0.02em] leading-tight" style={{ ...serif, fontWeight: 400, fontSize: 'clamp(26px,4vw,40px)' }}>The logistics layer the yachting trade trusts.</h2>
+            <h2 className="text-[var(--c-surface)] tracking-[-0.02em] leading-tight" style={{ ...serif, fontWeight: 400, fontSize: 'clamp(26px,4vw,40px)' }}>The logistics layer the yachting trade trusts.</h2>
             <p className="mt-3 text-[15px] text-[#CFDDD9]">Insured cargo, vetted carriers, payment held until delivery.</p>
             <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-              <Link href="/register" className="rounded-lg bg-[#C79A4E] px-8 py-3 text-[15px] font-semibold text-[#12302C] hover:brightness-105 transition">Create free account</Link>
+              <Link href="/register" className="rounded-lg bg-[#C79A4E] px-8 py-3 text-[15px] font-semibold text-[var(--c-ink)] hover:brightness-105 transition">Create free account</Link>
               <Link href="/marketplace" className="rounded-lg border border-white/25 px-7 py-3 text-[15px] font-semibold text-white hover:bg-black/10 transition">Browse marketplace</Link>
             </div>
           </div>

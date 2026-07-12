@@ -220,7 +220,7 @@ export default function ProofOfDelivery({ bookingId, trackingCode, token, onComp
         </div>
 
         {error && (
-          <div className="mx-5 mt-4 px-4 py-3 rounded bg-[#B23A2E]/10 border border-[#B23A2E]/30">
+          <div className="mx-5 mt-4 px-4 py-3 rounded bg-[var(--c-error)]/10 border border-[var(--c-error)]/30">
             <p className="text-sm text-[var(--c-error)]">{error}</p>
           </div>
         )}

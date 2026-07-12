@@ -60,7 +60,7 @@ function ResetPasswordForm() {
         <p className="text-[var(--c-text-3)] mb-6">Enter your new password below.</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {error && <div className="px-4 py-3 rounded-lg bg-[#B23A2E]/10 border border-[#B23A2E]/30 text-sm text-[var(--c-error)]">{error}</div>}
+          {error && <div className="px-4 py-3 rounded-lg bg-[var(--c-error)]/10 border border-[var(--c-error)]/30 text-sm text-[var(--c-error)]">{error}</div>}
 
           <div>
             <label className="block text-sm font-medium text-[var(--c-ink)] mb-1.5">New Password</label>

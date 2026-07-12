@@ -111,7 +111,7 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-4">
             {error && (
-              <div className="px-4 py-3 rounded-xl bg-[#B23A2E]/10 border border-[#B23A2E]/30" role="alert">
+              <div className="px-4 py-3 rounded-xl bg-[var(--c-error)]/10 border border-[var(--c-error)]/30" role="alert">
                 <p className="text-sm text-[var(--c-error)]">{error}</p>
               </div>
             )}
@@ -208,7 +208,7 @@ export default function LoginPage() {
 
           <p className="mt-8 text-center text-sm text-[var(--c-text-3)]">
             Don&apos;t have an account?{' '}
-            <Link href="/register" className="font-semibold text-[var(--c-accent)] hover:text-[#FF8F5A]">Create one</Link>
+            <Link href="/register" className="font-semibold text-[var(--c-accent)] hover:text-[var(--c-accent-hover)]">Create one</Link>
           </p>
         </div>
       </div>

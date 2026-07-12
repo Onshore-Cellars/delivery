@@ -192,7 +192,7 @@ export default function MessagesPage() {
         </div>
 
         {error && (
-          <div className="mb-4 px-4 py-3 rounded-lg bg-[#B23A2E]/10 border border-[#B23A2E]/30">
+          <div className="mb-4 px-4 py-3 rounded-lg bg-[var(--c-error)]/10 border border-[var(--c-error)]/30">
             <p className="text-sm text-[var(--c-error)] font-medium">{error}</p>
           </div>
         )}
@@ -200,7 +200,7 @@ export default function MessagesPage() {
         <div className="bg-[var(--c-surface)] rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.3)] border border-black/10 overflow-hidden" style={{ height: 'calc(100vh - 220px)' }}>
           <div className="flex h-full">
             {/* Conversation list */}
-            <div className={`${activeConv ? 'hidden md:block' : ''} w-full md:w-80 border-r border-[#D3D8D1] overflow-y-auto`}>
+            <div className={`${activeConv ? 'hidden md:block' : ''} w-full md:w-80 border-r border-[var(--c-border)] overflow-y-auto`}>
               {loading ? (
                 <div className="p-4 space-y-3">{[1,2,3].map(i => <div key={i} className="loading-shimmer h-16 rounded-lg" />)}</div>
               ) : conversations.length === 0 ? (
@@ -227,7 +227,7 @@ export default function MessagesPage() {
                           <div className="flex items-center justify-between mt-0.5">
                             <span className="text-xs text-[var(--c-text-3)] truncate">{lastMsg?.content || conv.subject || 'New conversation'}</span>
                             {conv.unreadCount > 0 && (
-                              <span className="ml-2 w-5 h-5 rounded-full bg-[#1d1d1f] text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0">{conv.unreadCount}</span>
+                              <span className="ml-2 w-5 h-5 rounded-full bg-[var(--c-accent)] text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0">{conv.unreadCount}</span>
                             )}
                           </div>
                         </div>
@@ -243,7 +243,7 @@ export default function MessagesPage() {
               {activeConv && otherUser ? (
                 <>
                   {/* Chat header */}
-                  <div className="px-4 py-3 border-b border-[#D3D8D1] flex items-center justify-between">
+                  <div className="px-4 py-3 border-b border-[var(--c-border)] flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <button onClick={() => setActiveConv(null)} className="md:hidden p-1 hover:bg-[var(--c-canvas-2)] rounded">
                         <svg className="w-5 h-5 text-[var(--c-text-3)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
@@ -285,7 +285,7 @@ export default function MessagesPage() {
                           <div className="max-w-[70%]">
                             <div className={`px-4 py-2.5 rounded-2xl text-sm ${
                               isMine
-                                ? 'bg-[#1d1d1f] text-white rounded-br-md'
+                                ? 'bg-[var(--c-accent)] text-white rounded-br-md'
                                 : 'bg-[var(--c-canvas-2)] text-[var(--c-ink)] rounded-bl-md'
                             }`}>
                               <p className="whitespace-pre-wrap">{msg.content}</p>
@@ -326,7 +326,7 @@ export default function MessagesPage() {
                   </div>
 
                   {/* Input */}
-                  <form onSubmit={sendMessage} className="p-4 border-t border-[#D3D8D1]">
+                  <form onSubmit={sendMessage} className="p-4 border-t border-[var(--c-border)]">
                     <div className="flex gap-2">
                       <input
                         type="text"

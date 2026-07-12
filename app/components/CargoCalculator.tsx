@@ -90,7 +90,7 @@ export default function CargoCalculator({ onCalculated }: CargoCalculatorProps) 
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="text-xs font-medium text-[var(--c-accent)] hover:text-[#FF8F5A] transition-colors"
+        className="text-xs font-medium text-[var(--c-accent)] hover:text-[var(--c-accent-hover)] transition-colors"
       >
         Calculate from pallets/boxes
       </button>
@@ -105,7 +105,7 @@ export default function CargoCalculator({ onCalculated }: CargoCalculatorProps) 
       </div>
 
       {items.map((item) => (
-        <div key={item.id} className="bg-[var(--c-surface)] rounded-lg border border-[#D3D8D1] p-3 space-y-2">
+        <div key={item.id} className="bg-[var(--c-surface)] rounded-lg border border-[var(--c-border)] p-3 space-y-2">
           <div className="flex items-center justify-between">
             <div className="flex gap-2">
               <select
@@ -172,7 +172,7 @@ export default function CargoCalculator({ onCalculated }: CargoCalculatorProps) 
 
       {/* Summary */}
       {items.some(i => i.heightCm > 0) && (
-        <div className="bg-[#0f1628] text-white rounded-lg p-3 flex justify-between items-center">
+        <div className="bg-[var(--c-ink)] text-white rounded-lg p-3 flex justify-between items-center">
           <div className="text-xs">
             <span className="text-[var(--c-text-2)]">Total: </span>
             <span className="font-semibold">

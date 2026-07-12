@@ -43,13 +43,13 @@ interface Booking {
 }
 
 const statusColors: Record<string, string> = {
-  ACTIVE: 'bg-[var(--c-success)]/10 text-[var(--c-success)] border-[#256B4A]/30',
+  ACTIVE: 'bg-[var(--c-success)]/10 text-[var(--c-success)] border-[var(--c-success)]/30',
   FULL: 'bg-[var(--c-accent)]/10 text-[var(--c-accent)] border-[var(--c-accent)]/20',
   COMPLETED: 'bg-[var(--c-canvas-2)] text-[var(--c-text-2)] border-black/10',
-  CANCELLED: 'bg-[#B23A2E]/10 text-[var(--c-error)] border-[#B23A2E]/30',
+  CANCELLED: 'bg-[var(--c-error)]/10 text-[var(--c-error)] border-[var(--c-error)]/30',
   IN_TRANSIT: 'bg-[var(--c-info)]/15 text-[var(--c-info)] border-[var(--c-info)]/25',
   PENDING: 'bg-[var(--c-warning)]/15 text-[var(--c-warning)] border-[var(--c-warning)]/25',
-  CONFIRMED: 'bg-[var(--c-success)]/10 text-[var(--c-success)] border-[#256B4A]/30',
+  CONFIRMED: 'bg-[var(--c-success)]/10 text-[var(--c-success)] border-[var(--c-success)]/30',
   PICKED_UP: 'bg-[var(--c-info)]/15 text-[var(--c-info)] border-[var(--c-info)]/25',
   DELIVERED: 'bg-[var(--c-canvas-2)] text-[var(--c-text-2)] border-black/10',
 }
@@ -60,7 +60,7 @@ function PaymentBanner() {
   if (!payment) return null
   if (payment === 'success') {
     return (
-      <div className="mb-6 px-4 py-3 rounded-xl bg-[var(--c-success)]/10 border border-[#256B4A]/30">
+      <div className="mb-6 px-4 py-3 rounded-xl bg-[var(--c-success)]/10 border border-[var(--c-success)]/30">
         <p className="text-sm font-medium text-[var(--c-success)]">Payment successful! Your booking is confirmed. Check your email for the receipt.</p>
       </div>
     )
@@ -201,8 +201,8 @@ export default function DashboardPage() {
       <Suspense><PaymentBanner /></Suspense>
 
       {error && (
-        <div className="mb-6 px-4 py-3 rounded-xl bg-[#B23A2E]/10 border border-[#B23A2E]/30">
-          <p className="text-sm font-medium text-[#B23A2E]">{error}</p>
+        <div className="mb-6 px-4 py-3 rounded-xl bg-[var(--c-error)]/10 border border-[var(--c-error)]/30">
+          <p className="text-sm font-medium text-[var(--c-error)]">{error}</p>
         </div>
       )}
 
@@ -483,8 +483,8 @@ export default function DashboardPage() {
                           {b.paymentStatus && (
                             <span className={`inline-block text-[10px] font-bold uppercase tracking-wider mt-1 px-2 py-0.5 rounded ${
                               b.paymentStatus === 'PAID' ? 'bg-[var(--c-success)]/10 text-[var(--c-success)]' :
-                              b.paymentStatus === 'FAILED' ? 'bg-[#B23A2E]/10 text-[var(--c-error)]' :
-                              b.paymentStatus === 'REFUNDED' ? 'bg-[#1F5E86]/10 text-[var(--c-info)]' :
+                              b.paymentStatus === 'FAILED' ? 'bg-[var(--c-error)]/10 text-[var(--c-error)]' :
+                              b.paymentStatus === 'REFUNDED' ? 'bg-[var(--c-info)]/10 text-[var(--c-info)]' :
                               'bg-[var(--c-accent)]/10 text-[var(--c-accent)]'
                             }`}>{b.paymentStatus}</span>
                           )}
@@ -505,7 +505,7 @@ export default function DashboardPage() {
                                 <button
                                   onClick={() => handleAcceptReject(b.id, 'reject')}
                                   disabled={actioning === b.id + ':reject'}
-                                  className="rounded-lg border border-[#B23A2E]/30 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-[var(--c-error)] hover:bg-[#B23A2E]/10 disabled:opacity-60"
+                                  className="rounded-lg border border-[var(--c-error)]/30 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-[var(--c-error)] hover:bg-[var(--c-error)]/10 disabled:opacity-60"
                                 >
                                   Decline
                                 </button>
@@ -525,7 +525,7 @@ export default function DashboardPage() {
                               href={`/api/bookings/${b.id}/invoice/pdf`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-[11px] font-medium text-[var(--c-accent)] hover:text-[#FF8F5A] transition-colors"
+                              className="text-[11px] font-medium text-[var(--c-accent)] hover:text-[var(--c-accent-hover)] transition-colors"
                             >
                               Download Invoice
                             </a>
@@ -554,7 +554,7 @@ export default function DashboardPage() {
 function StatCard({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
     <div className={`rounded-2xl border p-5 sm:p-6 transition-shadow hover:shadow-md ${accent ? 'bg-[var(--c-accent)] border-[var(--c-accent)]' : 'bg-[var(--c-surface)] border-black/10'}`}>
-      <div className={`text-xs font-semibold uppercase tracking-wider ${accent ? 'text-[#e8c994]' : 'text-[var(--c-text-2)]'}`}>{label}</div>
+      <div className={`text-xs font-semibold uppercase tracking-wider ${accent ? 'text-[var(--c-brass)]' : 'text-[var(--c-text-2)]'}`}>{label}</div>
       <div className={`mt-2 text-2xl sm:text-3xl font-bold tracking-tight ${accent ? 'text-white' : 'text-[var(--c-ink)]'}`}>{value}</div>
     </div>
   )

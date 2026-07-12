@@ -79,10 +79,10 @@ const emptyRespondForm: RespondForm = {
 
 const statusConfig: Record<string, { label: string; classes: string }> = {
   PENDING: { label: 'Pending', classes: 'bg-[var(--c-accent)]/10 text-[var(--c-accent)] border border-[var(--c-accent)]/20' },
-  QUOTED: { label: 'Quoted', classes: 'bg-[#1F5E86]/10 text-[var(--c-info)] border border-[#1F5E86]' },
-  ACCEPTED: { label: 'Accepted', classes: 'bg-[var(--c-success)]/10 text-[var(--c-success)] border border-[#256B4A]/40' },
+  QUOTED: { label: 'Quoted', classes: 'bg-[var(--c-info)]/10 text-[var(--c-info)] border border-[var(--c-info)]' },
+  ACCEPTED: { label: 'Accepted', classes: 'bg-[var(--c-success)]/10 text-[var(--c-success)] border border-[var(--c-success)]/40' },
   EXPIRED: { label: 'Expired', classes: 'bg-[var(--c-surface)] text-[var(--c-text-3)] border border-black/10' },
-  CANCELLED: { label: 'Cancelled', classes: 'bg-[#B23A2E]/10 text-[var(--c-error)] border border-[#B23A2E]/30' },
+  CANCELLED: { label: 'Cancelled', classes: 'bg-[var(--c-error)]/10 text-[var(--c-error)] border border-[var(--c-error)]/30' },
 }
 
 export default function QuotesPage() {
@@ -293,17 +293,17 @@ export default function QuotesPage() {
         </div>
 
         {error && (
-          <div className="mb-6 px-4 py-3 rounded-lg bg-[#B23A2E]/10 border border-[#B23A2E]/30">
+          <div className="mb-6 px-4 py-3 rounded-lg bg-[var(--c-error)]/10 border border-[var(--c-error)]/30">
             <p className="text-sm text-[var(--c-error)] font-medium">{error}</p>
           </div>
         )}
 
         {/* New Quote Form */}
         {showNewForm && (
-          <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-[#D3D8D1] p-6 mb-6">
+          <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-[var(--c-border)] p-6 mb-6">
             <h2 className="text-lg font-bold text-[var(--c-ink)] mb-4">Request a Quote</h2>
             {createError && (
-              <div className="mb-4 px-4 py-3 rounded-lg bg-[#B23A2E]/10 border border-[#B23A2E]/30">
+              <div className="mb-4 px-4 py-3 rounded-lg bg-[var(--c-error)]/10 border border-[var(--c-error)]/30">
                 <p className="text-sm text-[var(--c-error)]">{createError}</p>
               </div>
             )}
@@ -373,7 +373,7 @@ export default function QuotesPage() {
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label className="text-sm font-medium text-[var(--c-ink)]">Packages</label>
-                  <button type="button" onClick={addPackage} className="text-xs font-semibold text-[var(--c-accent)] hover:text-[#FF8F5A]">+ Add Package</button>
+                  <button type="button" onClick={addPackage} className="text-xs font-semibold text-[var(--c-accent)] hover:text-[var(--c-accent-hover)]">+ Add Package</button>
                 </div>
                 {packages.length === 0 && (
                   <p className="text-xs text-[var(--c-text-2)] mb-2">Add packages to specify cargo dimensions and weight, or leave empty for a general quote.</p>
@@ -381,7 +381,7 @@ export default function QuotesPage() {
                 {packages.map(pkg => {
                   const typeInfo = PACKAGE_TYPES.find(t => t.value === pkg.type)
                   return (
-                    <div key={pkg.id} className="flex flex-wrap items-end gap-2 mb-2 p-3 bg-[var(--c-surface)] rounded-lg border border-[#D3D8D1]">
+                    <div key={pkg.id} className="flex flex-wrap items-end gap-2 mb-2 p-3 bg-[var(--c-surface)] rounded-lg border border-[var(--c-border)]">
                       <div className="w-36">
                         <label className="block text-[10px] text-[var(--c-text-3)] mb-0.5">Type</label>
                         <select
@@ -474,12 +474,12 @@ export default function QuotesPage() {
         )}
 
         {/* Tabs */}
-        <div className="flex gap-1 mb-6 bg-[var(--c-surface)] rounded-xl shadow-sm border border-[#D3D8D1] p-1">
+        <div className="flex gap-1 mb-6 bg-[var(--c-surface)] rounded-xl shadow-sm border border-[var(--c-border)] p-1">
           <button
             onClick={() => setActiveTab('received')}
             className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-semibold transition-colors ${
               activeTab === 'received'
-                ? 'bg-[#1d1d1f] text-white'
+                ? 'bg-[var(--c-accent)] text-white'
                 : 'text-[var(--c-text-3)] hover:text-[var(--c-ink)] hover:bg-[var(--c-surface)]'
             }`}
           >
@@ -496,7 +496,7 @@ export default function QuotesPage() {
             onClick={() => setActiveTab('sent')}
             className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-semibold transition-colors ${
               activeTab === 'sent'
-                ? 'bg-[#1d1d1f] text-white'
+                ? 'bg-[var(--c-accent)] text-white'
                 : 'text-[var(--c-text-3)] hover:text-[var(--c-ink)] hover:bg-[var(--c-surface)]'
             }`}
           >
@@ -513,7 +513,7 @@ export default function QuotesPage() {
 
         {/* Error */}
         {error && (
-          <div className="mb-6 px-4 py-3 rounded-lg bg-[#B23A2E]/10 border border-[#B23A2E]/30">
+          <div className="mb-6 px-4 py-3 rounded-lg bg-[var(--c-error)]/10 border border-[var(--c-error)]/30">
             <p className="text-sm text-[var(--c-error)]">{error}</p>
           </div>
         )}
@@ -526,7 +526,7 @@ export default function QuotesPage() {
             ))}
           </div>
         ) : displayedQuotes.length === 0 ? (
-          <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-[#D3D8D1] p-16 text-center">
+          <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-[var(--c-border)] p-16 text-center">
             <svg className="mx-auto w-12 h-12 text-[var(--c-text-3)] mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
@@ -549,7 +549,7 @@ export default function QuotesPage() {
               const isRespondingToThis = respondingTo === quote.id
 
               return (
-                <div key={quote.id} className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-[#D3D8D1] overflow-hidden">
+                <div key={quote.id} className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-[var(--c-border)] overflow-hidden">
                   <div className="p-6">
                     {/* Top row: route + status */}
                     <div className="flex items-start justify-between mb-4">
@@ -643,7 +643,7 @@ export default function QuotesPage() {
                     )}
 
                     {/* Footer: other party + actions */}
-                    <div className="flex items-center justify-between pt-4 border-t border-[#D3D8D1]">
+                    <div className="flex items-center justify-between pt-4 border-t border-[var(--c-border)]">
                       <div className="flex items-center gap-2 text-sm text-[var(--c-text-3)]">
                         {otherParty && (
                           <>
@@ -694,7 +694,7 @@ export default function QuotesPage() {
                             <button
                               onClick={() => handleCancel(quote.id)}
                               disabled={actionLoading === quote.id}
-                              className="px-3 py-1.5 text-xs font-medium text-[var(--c-error)] hover:bg-[#B23A2E]/10 rounded-lg transition-colors disabled:opacity-50"
+                              className="px-3 py-1.5 text-xs font-medium text-[var(--c-error)] hover:bg-[var(--c-error)]/10 rounded-lg transition-colors disabled:opacity-50"
                             >
                               {actionLoading === quote.id ? 'Cancelling...' : 'Cancel'}
                             </button>
@@ -705,7 +705,7 @@ export default function QuotesPage() {
 
                   {/* Respond form (carrier only) */}
                   {isRespondingToThis && (
-                    <div className="bg-[var(--c-surface)] border-t border-[#D3D8D1] p-6">
+                    <div className="bg-[var(--c-surface)] border-t border-[var(--c-border)] p-6">
                       <h3 className="text-sm font-bold text-[var(--c-ink)] mb-3">Respond to Quote Request</h3>
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
                         <div>

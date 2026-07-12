@@ -46,7 +46,7 @@ const URGENCY_OPTIONS = [
   { value: 'same_day', label: 'Same day (premium)' },
 ]
 
-const inputClass = "w-full px-4 py-3 rounded border border-black/10 bg-[var(--c-surface)] text-[15px] text-[var(--c-ink)] placeholder:text-[#9a9a9a] focus:border-[var(--c-accent)] focus:ring-2 focus:ring-[var(--c-accent)]/10 transition-all outline-none"
+const inputClass = "w-full px-4 py-3 rounded border border-black/10 bg-[var(--c-surface)] text-[15px] text-[var(--c-ink)] placeholder:text-[var(--c-text-3)] focus:border-[var(--c-accent)] focus:ring-2 focus:ring-[var(--c-accent)]/10 transition-all outline-none"
 const selectClass = inputClass + " appearance-none"
 const labelClass = "block text-sm font-semibold text-[var(--c-ink)] mb-2"
 
@@ -247,7 +247,7 @@ export default function GetQuotesPage() {
       </div>
 
       {error && (
-        <div className="mb-6 px-4 py-3 rounded bg-[#B23A2E]/10 border border-[#B23A2E]/30">
+        <div className="mb-6 px-4 py-3 rounded bg-[var(--c-error)]/10 border border-[var(--c-error)]/30">
           <p className="text-sm text-[var(--c-error)]">{error}</p>
         </div>
       )}
@@ -278,7 +278,7 @@ export default function GetQuotesPage() {
           <div className="bg-[var(--c-surface)] rounded-lg border border-black/10 p-6">
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-base font-semibold text-[var(--c-ink)]">Packages & Items</h2>
-              <button type="button" onClick={() => addPackage('box')} className="text-sm font-semibold text-[var(--c-accent)] hover:text-[#FF8F5A] transition-colors">+ Add Package</button>
+              <button type="button" onClick={() => addPackage('box')} className="text-sm font-semibold text-[var(--c-accent)] hover:text-[var(--c-accent-hover)] transition-colors">+ Add Package</button>
             </div>
 
             {packages.length === 0 ? (

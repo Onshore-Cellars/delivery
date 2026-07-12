@@ -56,7 +56,7 @@ function VerifyEmailContent() {
   return (
     <div className="page-container flex items-center justify-center py-20">
       <div className="text-center">
-        <div className={`w-16 h-16 rounded-full ${success ? 'bg-[var(--c-success)]/10' : 'bg-[#B23A2E]/10'} flex items-center justify-center mx-auto mb-4`}>
+        <div className={`w-16 h-16 rounded-full ${success ? 'bg-[var(--c-success)]/10' : 'bg-[var(--c-error)]/10'} flex items-center justify-center mx-auto mb-4`}>
           {success ? (
             <svg className="w-8 h-8 text-[var(--c-success)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
           ) : (

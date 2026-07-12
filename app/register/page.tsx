@@ -131,7 +131,7 @@ function RegisterForm() {
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-5">
             {error && (
-              <div className="px-4 py-3 rounded-xl bg-[#B23A2E]/10 border border-[#B23A2E]/30" role="alert">
+              <div className="px-4 py-3 rounded-xl bg-[var(--c-error)]/10 border border-[var(--c-error)]/30" role="alert">
                 <p className="text-sm text-[var(--c-error)]">{error}</p>
               </div>
             )}
@@ -294,7 +294,7 @@ function RegisterForm() {
 
           <p className="mt-8 text-center text-sm text-[var(--c-text-3)]">
             Already have an account?{' '}
-            <Link href="/login" className="font-semibold text-[var(--c-accent)] hover:text-[#FF8F5A]">Sign in</Link>
+            <Link href="/login" className="font-semibold text-[var(--c-accent)] hover:text-[var(--c-accent-hover)]">Sign in</Link>
           </p>
         </div>
       </div>

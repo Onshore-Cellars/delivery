@@ -67,7 +67,7 @@ export default function CookieConsent() {
                   <span className="text-sm font-medium text-[var(--c-ink)]">Analytics</span>
                   <p className="text-xs text-[var(--c-text-2)]">Usage data to improve the platform</p>
                 </div>
-                <div className={`w-10 h-6 rounded-full relative transition-colors ${consent.analytics ? 'bg-[var(--c-accent)]' : 'bg-[#1E3A4D]'}`}>
+                <div className={`w-10 h-6 rounded-full relative transition-colors ${consent.analytics ? 'bg-[var(--c-accent)]' : 'bg-[var(--c-canvas-2)]'}`}>
                   <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-[var(--c-surface)] shadow transition-all ${consent.analytics ? 'right-0.5' : 'left-0.5'}`} />
                 </div>
               </label>
@@ -77,7 +77,7 @@ export default function CookieConsent() {
                   <span className="text-sm font-medium text-[var(--c-ink)]">Marketing</span>
                   <p className="text-xs text-[var(--c-text-2)]">Personalised offers and communications</p>
                 </div>
-                <div className={`w-10 h-6 rounded-full relative transition-colors ${consent.marketing ? 'bg-[var(--c-accent)]' : 'bg-[#1E3A4D]'}`}>
+                <div className={`w-10 h-6 rounded-full relative transition-colors ${consent.marketing ? 'bg-[var(--c-accent)]' : 'bg-[var(--c-canvas-2)]'}`}>
                   <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-[var(--c-surface)] shadow transition-all ${consent.marketing ? 'right-0.5' : 'left-0.5'}`} />
                 </div>
               </label>

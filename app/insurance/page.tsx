@@ -34,12 +34,12 @@ interface InsuredBooking {
 
 const tierColors: Record<string, string> = {
   basic: 'bg-[var(--c-canvas-2)] text-[var(--c-text-2)]',
-  standard: 'bg-[#1F5E86]/15 text-[var(--c-info)]',
-  premium: 'bg-[#1F5E86]/15 text-[var(--c-info)]',
+  standard: 'bg-[var(--c-info)]/15 text-[var(--c-info)]',
+  premium: 'bg-[var(--c-info)]/15 text-[var(--c-info)]',
 }
 
 const statusColors: Record<string, string> = {
-  OPEN: 'bg-[#B23A2E]/10 text-[var(--c-error)]',
+  OPEN: 'bg-[var(--c-error)]/10 text-[var(--c-error)]',
   UNDER_REVIEW: 'bg-[var(--c-accent)]/15 text-[var(--c-accent)]',
   RESOLVED: 'bg-[var(--c-success)]/15 text-[var(--c-success)]',
 }
@@ -225,7 +225,7 @@ export default function InsurancePage() {
               {calcLoading ? 'Calculating...' : 'Calculate'}
             </button>
 
-            {calcError && <div className="mb-4 p-3 bg-[#B23A2E]/10 border border-[#B23A2E]/30 rounded-lg text-sm text-[var(--c-error)]">{calcError}</div>}
+            {calcError && <div className="mb-4 p-3 bg-[var(--c-error)]/10 border border-[var(--c-error)]/30 rounded-lg text-sm text-[var(--c-error)]">{calcError}</div>}
 
             {estimates && (
               <div className="grid sm:grid-cols-3 gap-4">

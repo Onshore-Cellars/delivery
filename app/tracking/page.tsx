@@ -148,8 +148,8 @@ export default function TrackingPage() {
                       <span className="text-xs font-mono text-[var(--c-accent)] font-semibold">{b.trackingCode}</span>
                       <span className={`px-1.5 py-0.5 rounded text-[9px] font-semibold uppercase ${
                         b.status === 'DELIVERED' ? 'bg-[var(--c-success)]/10 text-[var(--c-success)]' :
-                        b.status === 'IN_TRANSIT' ? 'bg-[#1F5E86]/10 text-[var(--c-info)]' :
-                        b.status === 'CANCELLED' ? 'bg-[#B23A2E]/10 text-[var(--c-error)]' :
+                        b.status === 'IN_TRANSIT' ? 'bg-[var(--c-info)]/10 text-[var(--c-info)]' :
+                        b.status === 'CANCELLED' ? 'bg-[var(--c-error)]/10 text-[var(--c-error)]' :
                         'bg-[var(--c-accent)]/10 text-[var(--c-accent)]'
                       }`}>{b.status.replace('_', ' ')}</span>
                     </div>
@@ -164,7 +164,7 @@ export default function TrackingPage() {
               ))}
             </div>
             {userBookings.length > SHIPMENTS_PER_PAGE && (
-              <div className="flex items-center justify-between px-4 pt-3 mt-2 border-t border-[#D3D8D1]">
+              <div className="flex items-center justify-between px-4 pt-3 mt-2 border-t border-[var(--c-border)]">
                 <button
                   onClick={() => setShipmentsPage(p => Math.max(1, p - 1))}
                   disabled={shipmentsPage === 1}
@@ -201,9 +201,9 @@ export default function TrackingPage() {
                   <h2 className="text-lg font-bold text-[var(--c-ink)]">{data.booking.cargoDescription}</h2>
                 </div>
                 <span className={`badge border ${
-                  data.booking.status === 'DELIVERED' ? 'bg-[var(--c-success)]/10 text-[var(--c-success)] border-[#256B4A]/40' :
-                  data.booking.status === 'CANCELLED' ? 'bg-[#B23A2E]/10 text-[var(--c-error)] border-[#B23A2E]/30' :
-                  'bg-[#1F5E86]/10 text-[var(--c-info)] border-[#1F5E86]'
+                  data.booking.status === 'DELIVERED' ? 'bg-[var(--c-success)]/10 text-[var(--c-success)] border-[var(--c-success)]/40' :
+                  data.booking.status === 'CANCELLED' ? 'bg-[var(--c-error)]/10 text-[var(--c-error)] border-[var(--c-error)]/30' :
+                  'bg-[var(--c-info)]/10 text-[var(--c-info)] border-[var(--c-info)]'
                 }`}>
                   {data.booking.status.replace('_', ' ')}
                 </span>
@@ -217,7 +217,7 @@ export default function TrackingPage() {
                       <div key={step} className="flex flex-col items-center flex-1">
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold z-10 ${
                           i <= currentStep
-                            ? 'bg-[#1d1d1f] text-white'
+                            ? 'bg-[var(--c-accent)] text-white'
                             : 'bg-[var(--c-canvas-2)] text-[var(--c-text-2)]'
                         }`}>
                           {i <= currentStep ? (
@@ -236,7 +236,7 @@ export default function TrackingPage() {
                   </div>
                   <div className="absolute top-4 left-0 right-0 h-0.5 bg-[var(--c-canvas-2)] -z-0 mx-8">
                     <div
-                      className="h-full bg-[#1d1d1f] transition-all duration-500"
+                      className="h-full bg-[var(--c-accent)] transition-all duration-500"
                       style={{ width: `${(currentStep / (statusSteps.length - 1)) * 100}%` }}
                     />
                   </div>
@@ -319,8 +319,8 @@ export default function TrackingPage() {
                   {data.events.map((event, i) => (
                     <div key={event.id} className="flex gap-4">
                       <div className="flex flex-col items-center">
-                        <div className={`w-3 h-3 rounded-full ${i === 0 ? 'bg-[#1d1d1f]' : 'bg-[#1E3A4D]'}`} />
-                        {i < data.events.length - 1 && <div className="w-px h-full bg-[#1E3A4D] my-1" />}
+                        <div className={`w-3 h-3 rounded-full ${i === 0 ? 'bg-[var(--c-accent)]' : 'bg-[var(--c-canvas-2)]'}`} />
+                        {i < data.events.length - 1 && <div className="w-px h-full bg-[var(--c-canvas-2)] my-1" />}
                       </div>
                       <div className="pb-6">
                         <div className="text-sm font-medium text-[var(--c-ink)]">{event.description}</div>

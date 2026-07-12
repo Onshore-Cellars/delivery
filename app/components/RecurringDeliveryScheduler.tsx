@@ -116,7 +116,7 @@ export default function RecurringDeliveryScheduler({ onSchedule, onClose }: Recu
                     key={day}
                     onClick={() => setDayOfWeek(i)}
                     className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-all ${
-                      dayOfWeek === i ? 'bg-[var(--c-accent)] text-white' : 'bg-[var(--c-surface)] text-[var(--c-text-2)] hover:bg-[#1E3A4D]'
+                      dayOfWeek === i ? 'bg-[var(--c-accent)] text-white' : 'bg-[var(--c-surface)] text-[var(--c-text-2)] hover:bg-[var(--c-canvas-2)]'
                     }`}
                   >
                     {day}

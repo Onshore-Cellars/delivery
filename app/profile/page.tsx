@@ -101,13 +101,13 @@ export default function ProfilePage() {
         </div>
 
         {success && (
-          <div className="mb-6 px-4 py-3 rounded-lg bg-[var(--c-success)]/10 border border-[#256B4A]/40" role="status">
+          <div className="mb-6 px-4 py-3 rounded-lg bg-[var(--c-success)]/10 border border-[var(--c-success)]/40" role="status">
             <p className="text-sm text-[var(--c-success)] font-medium">{success}</p>
           </div>
         )}
 
         {error && (
-          <div className="mb-6 px-4 py-3 rounded-lg bg-[#B23A2E]/10 border border-[#B23A2E]/30" role="alert">
+          <div className="mb-6 px-4 py-3 rounded-lg bg-[var(--c-error)]/10 border border-[var(--c-error)]/30" role="alert">
             <p className="text-sm text-[var(--c-error)] font-medium">{error}</p>
           </div>
         )}
@@ -186,7 +186,7 @@ export default function ProfilePage() {
                   </div>
                 ))}
               </dl>
-              {profile.bio && <p className="mt-4 text-sm text-[var(--c-text-2)] leading-relaxed border-t border-[#D3D8D1] pt-4">{profile.bio}</p>}
+              {profile.bio && <p className="mt-4 text-sm text-[var(--c-text-2)] leading-relaxed border-t border-[var(--c-border)] pt-4">{profile.bio}</p>}
               <button onClick={() => setEditing(true)} className="mt-6 btn-primary text-sm !py-2 !px-5">Edit Profile</button>
             </>
           ) : (
@@ -249,7 +249,7 @@ export default function ProfilePage() {
                     }
                   }
                 }} className="sr-only peer" />
-                <div className="w-11 h-6 bg-[#1E3A4D] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--c-surface)] after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--c-accent)]"></div>
+                <div className="w-11 h-6 bg-[var(--c-canvas-2)] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--c-surface)] after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--c-accent)]"></div>
               </label>
             </div>
             <div className="flex items-center justify-between">
@@ -278,7 +278,7 @@ export default function ProfilePage() {
                     }
                   }
                 }} className="sr-only peer" />
-                <div className="w-11 h-6 bg-[#1E3A4D] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--c-surface)] after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--c-accent)]"></div>
+                <div className="w-11 h-6 bg-[var(--c-canvas-2)] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--c-surface)] after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--c-accent)]"></div>
               </label>
             </div>
           </div>
@@ -287,7 +287,7 @@ export default function ProfilePage() {
               <span className="font-medium text-[var(--c-ink)]">Current role:</span>
               <span className="badge bg-[var(--c-accent)]/10 text-[var(--c-accent)]">{profile.role.replace('_', ' ')}</span>
               {form.canCarry && <span className="badge bg-[var(--c-success)]/10 text-[var(--c-success)]">Can Carry</span>}
-              {form.canShip && <span className="badge bg-[#1F5E86]/10 text-[var(--c-info)]">Can Ship</span>}
+              {form.canShip && <span className="badge bg-[var(--c-info)]/10 text-[var(--c-info)]">Can Ship</span>}
             </div>
           </div>
         </div>
@@ -491,7 +491,7 @@ export default function ProfilePage() {
                     }
                   }
                 }} className="sr-only peer" />
-                <div className="w-11 h-6 bg-[#1E3A4D] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--c-surface)] after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--c-accent)]"></div>
+                <div className="w-11 h-6 bg-[var(--c-canvas-2)] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--c-surface)] after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--c-accent)]"></div>
               </label>
             </div>
             <div className="flex items-center justify-between">
@@ -517,7 +517,7 @@ export default function ProfilePage() {
                     }
                   }
                 }} className="sr-only peer" />
-                <div className="w-11 h-6 bg-[#1E3A4D] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--c-surface)] after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--c-accent)]"></div>
+                <div className="w-11 h-6 bg-[var(--c-canvas-2)] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--c-surface)] after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--c-accent)]"></div>
               </label>
             </div>
           </div>
@@ -558,7 +558,7 @@ export default function ProfilePage() {
                   else { const d = await res.json(); setError(d.error || 'Failed to delete account') }
                 } catch { setError('Failed to delete account') }
               }}
-              className="px-5 py-2.5 border border-[#B23A2E]/30 rounded-lg text-sm font-semibold text-[var(--c-error)] hover:bg-[#B23A2E]/10 transition-colors"
+              className="px-5 py-2.5 border border-[var(--c-error)]/30 rounded-lg text-sm font-semibold text-[var(--c-error)] hover:bg-[var(--c-error)]/10 transition-colors"
             >
               Delete Account
             </button>

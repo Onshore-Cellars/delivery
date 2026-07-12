@@ -31,7 +31,7 @@ const statusColors: Record<string, string> = {
   IN_TRANSIT: 'bg-[var(--c-info)]/15 text-[var(--c-info)]',
   DELIVERED: 'bg-[var(--c-success)]/15 text-[var(--c-success)]',
   CANCELLED: 'bg-[var(--c-canvas-2)] text-[var(--c-text-2)]',
-  DISPUTED: 'bg-[#B23A2E]/10 text-[var(--c-error)]',
+  DISPUTED: 'bg-[var(--c-error)]/10 text-[var(--c-error)]',
 }
 
 interface PayoutStatus {
