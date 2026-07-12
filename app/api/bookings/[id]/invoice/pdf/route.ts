@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { getTokenFromHeader, verifyToken } from '@/lib/auth'
+import { currencySymbol } from '@/lib/stripe'
+
+/** Escape user-controlled text before interpolating into the invoice HTML. */
+function esc(s: unknown): string {
+  return String(s ?? '').replace(/[&<>"']/g, c => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] as string
+  ))
+}
 
 // GET /api/bookings/[id]/invoice/pdf — Generate PDF invoice/receipt
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -39,14 +47,15 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     const carrier = booking.listing.carrier
     const shipper = booking.shipper
     const fmtDate = (d: Date | null) => d ? new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'
-    const fmtMoney = (n: number) => `€${n.toFixed(2)}`
+    const sym = currencySymbol(booking.currency)
+    const fmtMoney = (n: number) => `${sym}${n.toFixed(2)}`
 
     // Build HTML invoice
     const html = `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Invoice ${booking.trackingCode}</title>
+  <title>Invoice ${esc(booking.trackingCode)}</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 13px; color: #1a1a1a; padding: 40px; max-width: 800px; margin: 0 auto; }
@@ -93,7 +102,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     </div>
     <div class="invoice-info">
       <h2>INVOICE</h2>
-      <p><strong>${booking.trackingCode || 'N/A'}</strong></p>
+      <p><strong>${esc(booking.trackingCode || 'N/A')}</strong></p>
       <p>Date: ${fmtDate(booking.createdAt)}</p>
       <p>
         <span class="status-badge ${booking.paymentStatus === 'PAID' ? 'status-paid' : 'status-pending'}">
@@ -106,19 +115,19 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   <div class="parties">
     <div class="party">
       <div class="party-label">Carrier</div>
-      <div class="party-name">${carrier.name}</div>
-      ${carrier.company ? `<p>${carrier.company}</p>` : ''}
-      ${carrier.address ? `<p>${carrier.address}</p>` : ''}
-      ${carrier.city || carrier.country ? `<p>${[carrier.city, carrier.country].filter(Boolean).join(', ')}</p>` : ''}
-      <p>${carrier.email}</p>
+      <div class="party-name">${esc(carrier.name)}</div>
+      ${carrier.company ? `<p>${esc(carrier.company)}</p>` : ''}
+      ${carrier.address ? `<p>${esc(carrier.address)}</p>` : ''}
+      ${carrier.city || carrier.country ? `<p>${esc([carrier.city, carrier.country].filter(Boolean).join(', '))}</p>` : ''}
+      <p>${esc(carrier.email)}</p>
     </div>
     <div class="party">
       <div class="party-label">Shipper</div>
-      <div class="party-name">${shipper.name}</div>
-      ${shipper.company ? `<p>${shipper.company}</p>` : ''}
-      ${shipper.address ? `<p>${shipper.address}</p>` : ''}
-      ${shipper.city || shipper.country ? `<p>${[shipper.city, shipper.country].filter(Boolean).join(', ')}</p>` : ''}
-      <p>${shipper.email}</p>
+      <div class="party-name">${esc(shipper.name)}</div>
+      ${shipper.company ? `<p>${esc(shipper.company)}</p>` : ''}
+      ${shipper.address ? `<p>${esc(shipper.address)}</p>` : ''}
+      ${shipper.city || shipper.country ? `<p>${esc([shipper.city, shipper.country].filter(Boolean).join(', '))}</p>` : ''}
+      <p>${esc(shipper.email)}</p>
     </div>
   </div>
 
@@ -126,11 +135,11 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     <div class="details-grid">
       <div class="detail-item">
         <label>Origin</label>
-        <span>${booking.listing.originPort}</span>
+        <span>${esc(booking.listing.originPort)}</span>
       </div>
       <div class="detail-item">
         <label>Destination</label>
-        <span>${booking.listing.destinationPort}</span>
+        <span>${esc(booking.listing.destinationPort)}</span>
       </div>
       <div class="detail-item">
         <label>Departure</label>
@@ -138,7 +147,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       </div>
       <div class="detail-item">
         <label>Status</label>
-        <span>${booking.status.replace('_', ' ')}</span>
+        <span>${esc(booking.status.replace('_', ' '))}</span>
       </div>
     </div>
   </div>
@@ -156,9 +165,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     <tbody>
       <tr>
         <td>
-          <strong>${booking.cargoDescription}</strong>
-          ${booking.cargoType ? `<br><span style="color:#6b6b6b;font-size:12px;">${booking.cargoType}</span>` : ''}
-          ${booking.specialHandling ? `<br><span style="color:#6b6b6b;font-size:12px;">Special: ${booking.specialHandling}</span>` : ''}
+          <strong>${esc(booking.cargoDescription)}</strong>
+          ${booking.cargoType ? `<br><span style="color:#6b6b6b;font-size:12px;">${esc(booking.cargoType)}</span>` : ''}
+          ${booking.specialHandling ? `<br><span style="color:#6b6b6b;font-size:12px;">Special: ${esc(booking.specialHandling)}</span>` : ''}
         </td>
         <td>${booking.weightKg} kg</td>
         <td>${booking.volumeM3} m³</td>
@@ -182,7 +191,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       <span>${fmtMoney(booking.carrierPayout)}</span>
     </div>
     <div class="total-row grand">
-      <span>Total (${booking.currency})</span>
+      <span>Total (${esc(booking.currency)})</span>
       <span>${fmtMoney(booking.totalPrice)}</span>
     </div>
   </div>
@@ -191,7 +200,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   <div class="pod-section">
     <h3>Proof of Delivery</h3>
     <p>Delivered: ${fmtDate(booking.actualDelivery)}</p>
-    ${booking.podNotes ? `<p style="margin-top:4px;">${booking.podNotes}</p>` : ''}
+    ${booking.podNotes ? `<p style="margin-top:4px;">${esc(booking.podNotes)}</p>` : ''}
     ${booking.podSignature ? '<p style="margin-top:4px;color:#166534;">Signature captured</p>' : ''}
     ${booking.podPhotoUrl ? '<p style="margin-top:4px;color:#166534;">Photo attached</p>' : ''}
   </div>

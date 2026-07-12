@@ -4,15 +4,26 @@ import crypto from 'crypto'
 
 const SALT_ROUNDS = 12
 
+let ephemeralDevSecret: string | null = null
+
 function getJwtSecret(): string {
   const secret = process.env.NEXTAUTH_SECRET
-  if (!secret) {
-    if (process.env.NODE_ENV === 'production') {
-      throw new Error('NEXTAUTH_SECRET must be set in production')
-    }
-    return 'onshore-dev-secret-not-for-production'
+  if (secret) return secret
+
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('NEXTAUTH_SECRET must be set in production')
   }
-  return secret
+
+  // Non-production without a configured secret: use a random per-process secret
+  // rather than a known hardcoded string. A hardcoded default would let anyone
+  // forge an ADMIN token on any deploy where NODE_ENV isn't exactly 'production'
+  // (staging, preview, a misconfigured container). Tokens won't survive a
+  // restart in this mode — set NEXTAUTH_SECRET to make them stable.
+  if (!ephemeralDevSecret) {
+    ephemeralDevSecret = crypto.randomBytes(32).toString('hex')
+    console.warn('[auth] NEXTAUTH_SECRET is not set — using a random ephemeral dev secret. Set NEXTAUTH_SECRET for stable sessions.')
+  }
+  return ephemeralDevSecret
 }
 
 export interface DecodedToken {
