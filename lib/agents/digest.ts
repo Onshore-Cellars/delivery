@@ -18,7 +18,8 @@ export interface DigestResult {
   error?: string
 }
 
-export async function buildOpsDigest(): Promise<DigestResult> {
+export async function buildOpsDigest(opts: { deliver?: boolean } = {}): Promise<DigestResult> {
+  const deliver = opts.deliver !== false // deliver by default; false = preview only
   const since = new Date(Date.now() - 24 * 60 * 60 * 1000)
 
   const [newBookings, paidBookings, openDisputes, unpaid, pendingPayouts, pendingProposals, recentTasks] = await Promise.all([
@@ -45,7 +46,7 @@ export async function buildOpsDigest(): Promise<DigestResult> {
   const revenueLine = [...revenueByCcy.entries()].map(([ccy, amt]) => `${ccy} ${amt.toFixed(2)}`).join(', ') || 'none'
 
   // Per-team agent activity in the window.
-  const teams = ['OPS', 'SUPPORT', 'MARKETING', 'FINANCE', 'IT', 'GROWTH']
+  const teams = ['OPS', 'SUPPORT', 'MARKETING', 'FINANCE', 'IT', 'GROWTH', 'COMPLIANCE']
   const agentActivity = teams.map(team => {
     const forTeam = recentTasks.filter(t => t.team === team)
     return {
@@ -95,11 +96,13 @@ export async function buildOpsDigest(): Promise<DigestResult> {
     <p style="margin-top:20px"><a href="${process.env.NEXTAUTH_URL || ''}/admin" style="background:#0C5C54;color:#fff;padding:10px 16px;border-radius:8px;text-decoration:none;font-size:14px">Open the operations queue →</a></p>
   </div>`
 
-  for (const a of admins) {
-    await createNotification({ userId: a.id, type: 'SYSTEM', title: headline, message: body.slice(0, 500), linkUrl: '/admin', sendEmailNotification: false }).catch(() => {})
-    if (a.email) {
-      const sent = await sendEmail({ to: a.email, subject: headline, html }).catch(() => false)
-      if (sent) emailed = true
+  if (deliver) {
+    for (const a of admins) {
+      await createNotification({ userId: a.id, type: 'SYSTEM', title: headline, message: body.slice(0, 500), linkUrl: '/admin', sendEmailNotification: false }).catch(() => {})
+      if (a.email) {
+        const sent = await sendEmail({ to: a.email, subject: headline, html }).catch(() => false)
+        if (sent) emailed = true
+      }
     }
   }
 

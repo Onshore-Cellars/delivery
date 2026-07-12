@@ -16,6 +16,7 @@ const TEAM_STYLE: Record<string, string> = {
   FINANCE: 'bg-[var(--c-accent)]/12 text-[var(--c-accent)]',
   IT: 'bg-[var(--c-error)]/12 text-[var(--c-error)]',
   GROWTH: 'bg-[var(--c-warning)]/12 text-[var(--c-warning)]',
+  COMPLIANCE: 'bg-[var(--c-brass)]/12 text-[var(--c-brass-text)]',
 }
 const STATUSES = ['PENDING', 'ALL', 'EXECUTED', 'REJECTED', 'FAILED']
 
@@ -27,6 +28,28 @@ export default function AdminOperations({ token }: { token: string }) {
   const [busy, setBusy] = useState<string | null>(null)
   const [feedback, setFeedback] = useState<Record<string, string>>({})
   const [msg, setMsg] = useState('')
+  const [digest, setDigest] = useState<{ headline: string; body: string } | null>(null)
+  const [digestBusy, setDigestBusy] = useState<'preview' | 'send' | null>(null)
+  const [digestMsg, setDigestMsg] = useState('')
+
+  const previewDigest = async () => {
+    setDigestBusy('preview'); setDigestMsg('')
+    try {
+      const res = await fetch('/api/admin/ops-digest', { headers: { Authorization: `Bearer ${token}` } })
+      if (res.ok) { const d = await res.json(); setDigest({ headline: d.headline, body: d.body }) }
+      else setDigestMsg('Could not build the digest.')
+    } catch { setDigestMsg('Could not build the digest.') } finally { setDigestBusy(null) }
+  }
+
+  const sendDigest = async () => {
+    setDigestBusy('send'); setDigestMsg('')
+    try {
+      const res = await fetch('/api/admin/ops-digest', { method: 'POST', headers: { Authorization: `Bearer ${token}` } })
+      const d = await res.json()
+      if (res.ok) { setDigest({ headline: d.headline, body: d.body }); setDigestMsg(d.emailed ? 'Sent to all admins (email delivered).' : 'Sent to all admins (in-app; no email provider reached).') }
+      else setDigestMsg('Send failed.')
+    } catch { setDigestMsg('Send failed.') } finally { setDigestBusy(null) }
+  }
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -79,6 +102,27 @@ export default function AdminOperations({ token }: { token: string }) {
             </button>
           ))}
         </div>
+      </div>
+
+      {/* Morning ops digest */}
+      <div className="bg-[var(--c-surface)] rounded-2xl border border-black/10 shadow-sm p-6">
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <div>
+            <h3 className="text-lg font-bold text-[var(--c-ink)] mb-1">Morning brief</h3>
+            <p className="text-xs text-[var(--c-text-2)]">A daily summary of what every team did and what needs you. Sent automatically each morning — preview it here any time.</p>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={previewDigest} disabled={!!digestBusy} className="px-4 py-2 rounded-lg bg-[var(--c-canvas-2)] text-[var(--c-ink)] text-sm font-medium hover:opacity-80 disabled:opacity-50">{digestBusy === 'preview' ? 'Building…' : "Preview today's brief"}</button>
+            <button onClick={sendDigest} disabled={!!digestBusy} className="px-4 py-2 rounded-lg bg-[var(--c-accent)] text-white text-sm font-medium hover:bg-[var(--c-accent-hover)] disabled:opacity-50">{digestBusy === 'send' ? 'Sending…' : 'Send now'}</button>
+          </div>
+        </div>
+        {digestMsg && <p className="mt-3 text-sm text-[var(--c-text-2)]">{digestMsg}</p>}
+        {digest && (
+          <div className="mt-4 rounded-xl border border-[var(--c-border)] bg-[var(--c-canvas)] p-4">
+            <p className="font-semibold text-[var(--c-ink)] mb-2">{digest.headline}</p>
+            <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed text-[var(--c-text-2)]">{digest.body}</pre>
+          </div>
+        )}
       </div>
 
       {/* Queue */}
