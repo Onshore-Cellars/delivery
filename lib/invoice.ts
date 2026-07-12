@@ -14,6 +14,7 @@ import { PDFDocument, PDFFont, PDFPage, StandardFonts, rgb, RGB } from 'pdf-lib'
 import prisma from '@/lib/prisma'
 import { currencySymbol } from '@/lib/stripe'
 import { getTokenFromHeader, verifyToken, verifyInvoiceToken } from '@/lib/auth'
+import { platformVatConfig, standardRate } from '@/lib/vat'
 
 // ─── Brand palette (mirrors the --c-* tokens; literals because a PDF/print
 //     document can't reference CSS custom properties) ──────────────────────────
@@ -41,6 +42,7 @@ type Party = {
   address: string | null
   city: string | null
   country: string | null
+  vatNumber?: string | null
 }
 
 export type ChargeLine = { label: string; amount: number; negative?: boolean }
@@ -78,11 +80,16 @@ export type InvoiceModel = {
   specialHandling: string | null
   // Charges
   lines: ChargeLine[]
+  netTotal: number             // sum of the charge lines (VAT-exclusive)
   vatLabel: string | null
+  vatRate: number
   vatAmount: number
+  vatTreatmentNote: string | null   // legal statement (reverse charge / export / etc.)
   totalLabel: string
-  total: number
+  total: number                // gross = net + VAT
   feePercent: number
+  supplierVatNumber: string | null
+  customerVatNumber: string | null
   // Payout (remittance only)
   payoutStatus?: string
   payoutReference?: string | null
@@ -95,13 +102,17 @@ export type InvoiceModel = {
   podHasPhoto: boolean
 }
 
-const ONSHORE_PARTY: Party = {
-  name: 'Onshore',
-  company: 'Onshore Logistics',
-  email: 'billing@onshore.delivery',
-  address: null,
-  city: null,
-  country: null,
+function onshoreParty(): Party {
+  const cfg = platformVatConfig()
+  return {
+    name: 'Onshore',
+    company: 'Onshore Logistics',
+    email: 'billing@onshore.delivery',
+    address: null,
+    city: null,
+    country: cfg.country,
+    vatNumber: cfg.vatNumber,
+  }
 }
 
 const money = (n: number) => (Math.round(n * 100) / 100).toFixed(2)
@@ -120,12 +131,12 @@ export function loadInvoiceBooking(id: string) {
       listing: {
         include: {
           carrier: {
-            select: { id: true, name: true, email: true, company: true, phone: true, address: true, city: true, country: true },
+            select: { id: true, name: true, email: true, company: true, phone: true, address: true, city: true, country: true, vatNumber: true },
           },
         },
       },
       shipper: {
-        select: { id: true, name: true, email: true, company: true, phone: true, address: true, city: true, country: true },
+        select: { id: true, name: true, email: true, company: true, phone: true, address: true, city: true, country: true, vatNumber: true },
       },
     },
   })
@@ -215,12 +226,18 @@ export function buildInvoiceModel(booking: NonNullable<InvoiceBooking>, viewer: 
 
   const carrierParty: Party = {
     name: carrier.company || carrier.name, company: carrier.company, email: carrier.email,
-    phone: carrier.phone, address: carrier.address, city: carrier.city, country: carrier.country,
+    phone: carrier.phone, address: carrier.address, city: carrier.city, country: carrier.country, vatNumber: carrier.vatNumber,
   }
   const shipperParty: Party = {
     name: shipper.company || shipper.name, company: shipper.company, email: shipper.email,
-    phone: shipper.phone, address: shipper.address, city: shipper.city, country: shipper.country,
+    phone: shipper.phone, address: shipper.address, city: shipper.city, country: shipper.country, vatNumber: shipper.vatNumber,
   }
+  const platform = onshoreParty()
+
+  // VAT snapshot captured at checkout (0 for reverse-charge / export / unpaid).
+  const vatAmount = booking.vatAmount || 0
+  const vatRate = booking.vatRate || 0
+  const grossTotal = Math.round((total + vatAmount) * 100) / 100
 
   const payTone = (): InvoiceModel['statusTone'] =>
     booking.paymentStatus === 'PAID' ? 'paid'
@@ -260,9 +277,9 @@ export function buildInvoiceModel(booking: NonNullable<InvoiceBooking>, viewer: 
       currency, sym,
       statusLabel: transferred ? 'Paid out' : booking.status === 'DELIVERED' ? 'Releasing' : 'Scheduled',
       statusTone: transferred ? 'paid' : 'pending',
-      seller: ONSHORE_PARTY,
+      seller: platform,
       fromLabel: 'Issued by',
-      from: ONSHORE_PARTY,
+      from: platform,
       billedToLabel: 'Payable to',
       billedTo: carrierParty,
       ...shipment,
@@ -270,11 +287,20 @@ export function buildInvoiceModel(booking: NonNullable<InvoiceBooking>, viewer: 
         { label: 'Gross booking value', amount: total },
         { label: `Onshore commission (${feePercent}%)`, amount: fee, negative: true },
       ],
+      netTotal: payout,
       vatLabel: null,
+      vatRate: 0,
       vatAmount: 0,
+      // The carrier's own VAT on their supply to Onshore is a matter between the
+      // carrier and Onshore; the payout figure itself is VAT-exclusive here.
+      vatTreatmentNote: carrierParty.vatNumber
+        ? 'Your VAT on this supply, if any, should be invoiced to Onshore separately.'
+        : null,
       totalLabel: 'Net payout',
       total: payout,
       feePercent,
+      supplierVatNumber: platform.vatNumber ?? null,
+      customerVatNumber: carrierParty.vatNumber ?? null,
       payoutStatus: transferred
         ? `Transferred ${fmtDate(booking.payoutTransferredAt)}`
         : booking.status === 'DELIVERED' ? 'Releasing to your Stripe account' : 'Held in escrow until delivery is confirmed',
@@ -293,9 +319,9 @@ export function buildInvoiceModel(booking: NonNullable<InvoiceBooking>, viewer: 
       : booking.paymentStatus === 'REFUNDED' ? 'Refunded'
       : booking.paymentStatus === 'FAILED' ? 'Failed' : 'Payment pending',
     statusTone: payTone(),
-    seller: ONSHORE_PARTY,
+    seller: platform,
     fromLabel: 'From',
-    from: ONSHORE_PARTY,
+    from: platform,
     billedToLabel: 'Billed to',
     billedTo: shipperParty,
     ...shipment,
@@ -303,13 +329,19 @@ export function buildInvoiceModel(booking: NonNullable<InvoiceBooking>, viewer: 
       { label: `Transport & logistics service — ${carrierParty.name}`, amount: payout },
       { label: `Onshore platform fee (${feePercent}%)`, amount: fee },
     ],
-    // VAT-ready: shown only when actually charged. Marketplace currently applies
-    // no VAT at source (cross-border reverse charge may apply), so this is a note.
-    vatLabel: 'VAT',
-    vatAmount: 0,
+    netTotal: total,
+    vatLabel: vatRate > 0 ? `VAT (${vatRate}%)` : 'VAT',
+    vatRate,
+    vatAmount,
+    // Legal statement from the captured snapshot (reverse charge / export / etc.).
+    // Fall back to a sensible default for legacy bookings without a snapshot.
+    vatTreatmentNote: booking.vatNote
+      || (vatAmount > 0 ? null : 'VAT not charged at source — cross-border reverse charge may apply.'),
     totalLabel: 'Total paid',
-    total,
+    total: grossTotal,
     feePercent,
+    supplierVatNumber: platform.vatNumber ?? null,
+    customerVatNumber: shipperParty.vatNumber ?? null,
   }
 }
 
@@ -339,6 +371,7 @@ function partyBlock(label: string, p: Party): string {
       ${p.city || p.country ? `<p>${esc([p.city, p.country].filter(Boolean).join(', '))}</p>` : ''}
       ${p.email ? `<p>${esc(p.email)}</p>` : ''}
       ${p.phone ? `<p>${esc(p.phone)}</p>` : ''}
+      ${p.vatNumber ? `<p style="margin-top:3px;">VAT: ${esc(p.vatNumber)}</p>` : ''}
     </div>`
 }
 
@@ -449,12 +482,12 @@ export function renderInvoiceHtml(m: InvoiceModel): string {
       <div class="section-title">${m.kind === 'REMITTANCE' ? 'Payout breakdown' : 'Charge breakdown'}</div>
       <div class="charges">
         ${lineRows}
-        ${m.vatAmount > 0 ? `<div class="charge-row"><span>${esc(m.vatLabel)}</span><span>${esc(m.sym)}${money(m.vatAmount)}</span></div>` : ''}
+        ${m.kind === 'INVOICE' ? `
+        <div class="charge-row"><span>Subtotal (net)</span><span>${esc(m.sym)}${money(m.netTotal)}</span></div>
+        <div class="charge-row"><span>${esc(m.vatLabel)}</span><span>${m.vatAmount > 0 ? `${esc(m.sym)}${money(m.vatAmount)}` : `${esc(m.sym)}0.00`}</span></div>` : ''}
         <div class="charge-row total"><span>${esc(m.totalLabel)} (${esc(m.currency)})</span><span>${esc(m.sym)}${money(m.total)}</span></div>
       </div>
-      ${m.kind === 'INVOICE' && m.vatAmount === 0
-        ? `<p class="note">VAT: not charged at source — cross-border reverse charge may apply. Onshore's platform fee is inclusive of any applicable platform VAT.</p>`
-        : ''}
+      ${m.vatTreatmentNote ? `<p class="note"><strong>VAT:</strong> ${esc(m.vatTreatmentNote)}</p>` : ''}
       ${m.kind === 'REMITTANCE' ? `<p class="note"><strong>Payout status:</strong> ${esc(m.payoutStatus)}${m.payoutReference ? ` · ref ${esc(m.payoutReference)}` : ''}</p>` : ''}
 
       ${m.delivered ? `
@@ -551,6 +584,7 @@ export async function renderInvoicePdf(m: InvoiceModel): Promise<Uint8Array> {
     const lines = [
       p.company && p.company !== p.name ? p.company : null,
       p.address, [p.city, p.country].filter(Boolean).join(', ') || null, p.email, p.phone,
+      p.vatNumber ? `VAT: ${p.vatNumber}` : null,
     ].filter(Boolean) as string[]
     for (const ln of lines) { textAt(ctx, ln, x, yy, 9.5, BRAND.muted); yy -= 12 }
     return yy
@@ -619,7 +653,13 @@ export async function renderInvoicePdf(m: InvoiceModel): Promise<Uint8Array> {
     page.drawLine({ start: { x: chargeX, y: ctx.y }, end: { x: right, y: ctx.y }, thickness: 0.6, color: rgb(0.92, 0.91, 0.88) })
     ctx.y -= 14
   }
-  if (m.vatAmount > 0) {
+  // Invoice: show subtotal (net) and the VAT line explicitly (even at 0%).
+  if (m.kind === 'INVOICE') {
+    textAt(ctx, 'Subtotal (net)', chargeX, ctx.y, 10.5, BRAND.text2)
+    rightText(ctx, mny(m.netTotal), right, ctx.y, 10.5, BRAND.text2)
+    ctx.y -= 8
+    page.drawLine({ start: { x: chargeX, y: ctx.y }, end: { x: right, y: ctx.y }, thickness: 0.6, color: rgb(0.92, 0.91, 0.88) })
+    ctx.y -= 14
     textAt(ctx, m.vatLabel || 'VAT', chargeX, ctx.y, 10.5, BRAND.text2)
     rightText(ctx, mny(m.vatAmount), right, ctx.y, 10.5, BRAND.text2)
     ctx.y -= 22
@@ -631,9 +671,17 @@ export async function renderInvoicePdf(m: InvoiceModel): Promise<Uint8Array> {
   rightText(ctx, mny(m.total), right, ctx.y, 14, BRAND.teal, true)
   ctx.y -= 22
 
-  if (m.kind === 'INVOICE' && m.vatAmount === 0) {
-    textAt(ctx, 'VAT not charged at source - cross-border reverse charge may apply.', MARGIN, ctx.y, 8.5, BRAND.muted)
-    ctx.y -= 16
+  // VAT treatment / legal statement (reverse charge, export, etc.)
+  if (m.vatTreatmentNote) {
+    const words = `VAT: ${m.vatTreatmentNote}`.split(' ')
+    let line = ''
+    for (const w of words) {
+      const test = line ? `${line} ${w}` : w
+      if (reg.widthOfTextAtSize(sanitizePdf(test), 8.5) > A4.w - MARGIN * 2) {
+        textAt(ctx, line, MARGIN, ctx.y, 8.5, BRAND.muted); ctx.y -= 12; line = w
+      } else line = test
+    }
+    if (line) { textAt(ctx, line, MARGIN, ctx.y, 8.5, BRAND.muted); ctx.y -= 14 }
   }
   if (m.kind === 'REMITTANCE') {
     textAt(ctx, `Payout status: ${m.payoutStatus || ''}`, MARGIN, ctx.y, 9, BRAND.text2, true); ctx.y -= 13

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { verifyToken, getTokenFromHeader } from '@/lib/auth'
 import { createCheckoutSession, calculatePlatformFee, calculateCarrierPayout } from '@/lib/stripe'
+import { snapshotBookingVat } from '@/lib/vat'
 import { createRateLimiter, getClientIP } from '@/lib/rate-limit'
 
 const checkoutLimiter = createRateLimiter({ interval: 15 * 60_000, limit: 10 })
@@ -30,7 +31,7 @@ export async function POST(request: NextRequest) {
     const booking = await prisma.booking.findUnique({
       where: { id: bookingId },
       include: {
-        shipper: { select: { email: true, name: true } },
+        shipper: { select: { email: true, name: true, country: true, vatNumber: true, vatNumberValid: true, isBusiness: true } },
         listing: {
           select: {
             title: true,
@@ -65,6 +66,14 @@ export async function POST(request: NextRequest) {
 
     const appUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
 
+    // Determine VAT for this supply (platform → shipper). net = booking.totalPrice.
+    const vat = snapshotBookingVat(booking.totalPrice, {
+      country: booking.shipper.country,
+      vatNumber: booking.shipper.vatNumber,
+      vatValid: booking.shipper.vatNumberValid,
+      isBusiness: booking.shipper.isBusiness,
+    })
+
     const session = await createCheckoutSession({
       bookingId: booking.id,
       amount: booking.totalPrice,
@@ -77,6 +86,8 @@ export async function POST(request: NextRequest) {
       successUrl: `${appUrl}/dashboard?payment=success&booking=${booking.id}`,
       cancelUrl: `${appUrl}/dashboard?payment=cancelled&booking=${booking.id}`,
       carrierStripeAccountId: booking.listing.carrier.stripeAccountId || undefined,
+      vatAmount: vat.vatAmount,
+      vatRate: vat.vatRate,
     })
 
     // Update booking with payment info. Note: session.payment_intent is null at
@@ -89,6 +100,14 @@ export async function POST(request: NextRequest) {
         paymentStatus: 'PROCESSING',
         platformFee: calculatePlatformFee(booking.totalPrice),
         carrierPayout: calculateCarrierPayout(booking.totalPrice),
+        // Persist the VAT snapshot so the invoice is stable regardless of later changes.
+        vatAmount: vat.vatAmount,
+        vatRate: vat.vatRate,
+        vatTreatment: vat.treatment,
+        vatNote: vat.note,
+        vatSupplierNumber: vat.vatSupplierNumber,
+        vatCustomerNumber: vat.vatCustomerNumber,
+        vatCustomerCountry: vat.vatCustomerCountry,
       },
     })
 

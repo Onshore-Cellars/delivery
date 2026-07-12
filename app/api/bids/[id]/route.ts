@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma'
 import { verifyToken, getTokenFromHeader, generateTrackingCode } from '@/lib/auth'
 import { createNotification } from '@/lib/notifications'
 import { createCheckoutSession, calculatePlatformFee, calculateCarrierPayout } from '@/lib/stripe'
+import { snapshotBookingVat } from '@/lib/vat'
 
 // Accept, reject, counter, or withdraw a bid
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -135,7 +136,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       try {
         const bidder = await prisma.user.findUnique({
           where: { id: bid.bidderId },
-          select: { email: true, name: true },
+          select: { email: true, name: true, country: true, vatNumber: true, vatNumberValid: true, isBusiness: true },
         })
         const carrier = await prisma.user.findUnique({
           where: { id: bid.listing.carrierId },
@@ -143,6 +144,11 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         })
         if (bidder && acceptAmount > 0) {
           const appUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
+          const vat = snapshotBookingVat(acceptAmount, bidder)
+          await prisma.booking.update({ where: { id: booking.id }, data: {
+            vatAmount: vat.vatAmount, vatRate: vat.vatRate, vatTreatment: vat.treatment, vatNote: vat.note,
+            vatSupplierNumber: vat.vatSupplierNumber, vatCustomerNumber: vat.vatCustomerNumber, vatCustomerCountry: vat.vatCustomerCountry,
+          } })
           const session = await createCheckoutSession({
             bookingId: booking.id,
             amount: acceptAmount,
@@ -155,6 +161,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
             successUrl: `${appUrl}/dashboard?payment=success&booking=${booking.id}`,
             cancelUrl: `${appUrl}/dashboard?payment=cancelled&booking=${booking.id}`,
             carrierStripeAccountId: carrier?.stripeAccountId || undefined,
+            vatAmount: vat.vatAmount,
+            vatRate: vat.vatRate,
           })
           checkoutUrl = session.url
         }
@@ -247,7 +255,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       try {
         const bidder = await prisma.user.findUnique({
           where: { id: bid.bidderId },
-          select: { email: true, name: true },
+          select: { email: true, name: true, country: true, vatNumber: true, vatNumberValid: true, isBusiness: true },
         })
         const carrier = await prisma.user.findUnique({
           where: { id: bid.listing.carrierId },
@@ -255,6 +263,11 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         })
         if (bidder && acceptAmount > 0) {
           const appUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
+          const vat = snapshotBookingVat(acceptAmount, bidder)
+          await prisma.booking.update({ where: { id: booking.id }, data: {
+            vatAmount: vat.vatAmount, vatRate: vat.vatRate, vatTreatment: vat.treatment, vatNote: vat.note,
+            vatSupplierNumber: vat.vatSupplierNumber, vatCustomerNumber: vat.vatCustomerNumber, vatCustomerCountry: vat.vatCustomerCountry,
+          } })
           const session = await createCheckoutSession({
             bookingId: booking.id,
             amount: acceptAmount,
@@ -267,6 +280,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
             successUrl: `${appUrl}/dashboard?payment=success&booking=${booking.id}`,
             cancelUrl: `${appUrl}/dashboard?payment=cancelled&booking=${booking.id}`,
             carrierStripeAccountId: carrier?.stripeAccountId || undefined,
+            vatAmount: vat.vatAmount,
+            vatRate: vat.vatRate,
           })
           checkoutUrl = session.url
         }

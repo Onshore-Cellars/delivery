@@ -57,26 +57,45 @@ export async function createCheckoutSession(params: {
   successUrl: string
   cancelUrl: string
   carrierStripeAccountId?: string
+  vatAmount?: number
+  vatRate?: number
 }): Promise<Stripe.Checkout.Session> {
   const customerId = await getOrCreateCustomer(params.customerEmail, params.customerName, params.bookingId)
+
+  const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [
+    {
+      price_data: {
+        currency: params.currency.toLowerCase(),
+        product_data: {
+          name: params.description,
+          description: `${params.origin} → ${params.destination}`,
+          metadata: { bookingId: params.bookingId },
+        },
+        unit_amount: Math.round(params.amount * 100),
+      },
+      quantity: 1,
+    },
+  ]
+  // Show VAT as its own transparent line so the customer sees net + VAT.
+  if (params.vatAmount && params.vatAmount > 0) {
+    lineItems.push({
+      price_data: {
+        currency: params.currency.toLowerCase(),
+        product_data: {
+          name: `VAT${params.vatRate ? ` (${params.vatRate}%)` : ''}`,
+          description: 'Value Added Tax',
+          metadata: { bookingId: params.bookingId },
+        },
+        unit_amount: Math.round(params.vatAmount * 100),
+      },
+      quantity: 1,
+    })
+  }
 
   const sessionParams: Stripe.Checkout.SessionCreateParams = {
     customer: customerId,
     payment_method_types: ['card'],
-    line_items: [
-      {
-        price_data: {
-          currency: params.currency.toLowerCase(),
-          product_data: {
-            name: params.description,
-            description: `${params.origin} → ${params.destination}`,
-            metadata: { bookingId: params.bookingId },
-          },
-          unit_amount: Math.round(params.amount * 100),
-        },
-        quantity: 1,
-      },
-    ],
+    line_items: lineItems,
     mode: 'payment',
     success_url: params.successUrl,
     cancel_url: params.cancelUrl,

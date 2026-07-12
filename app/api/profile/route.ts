@@ -24,6 +24,7 @@ export async function GET(request: NextRequest) {
         emailNotifications: true, smsNotifications: true,
         verified: true, createdAt: true,
         stripeAccountId: true,
+        vatNumber: true, vatNumberValid: true, vatNumberCheckedAt: true, vatBusinessName: true, isBusiness: true,
         _count: { select: { listings: true, bookings: true, receivedReviews: true, documents: true, vehicles: true } },
       },
     })

@@ -147,6 +147,13 @@ model User {
   homePort        String?
   homePortId      String?
 
+  // VAT / tax status (for EU VAT determination on invoices)
+  vatNumber           String?           // e.g. "FR12345678901" — full, with country prefix
+  vatNumberValid      Boolean?          // last VIES/format check result (null = never checked)
+  vatNumberCheckedAt  DateTime?         // when it was last verified
+  vatBusinessName     String?           // trader name returned by VIES
+  isBusiness          Boolean  @default(false) // B2B customer? (a valid VAT number implies true)
+
   // Stripe
   stripeCustomerId  String?
   stripeAccountId   String?
@@ -376,10 +383,23 @@ model Booking {
   routeDirection    String?       // "outbound" or "return"
 
   // Pricing
+  // totalPrice is the NET (VAT-exclusive) service value. Platform fee and
+  // carrier payout are computed on the net. VAT is added on top at checkout;
+  // the gross actually charged is totalPrice + vatAmount.
   totalPrice        Float
   platformFee       Float         @default(0)
   carrierPayout     Float         @default(0)
   currency          String        @default("EUR")
+
+  // VAT snapshot — captured at checkout so the invoice is stable even if rates
+  // or the customer's status change later.
+  vatAmount         Float         @default(0)      // VAT charged on top of net
+  vatRate           Float         @default(0)      // % applied
+  vatTreatment      String?                        // DOMESTIC | REVERSE_CHARGE | B2C_EU | ZERO_RATED_EXPORT | OUT_OF_SCOPE | NOT_REGISTERED
+  vatNote           String?                        // human/legal statement for the invoice
+  vatSupplierNumber String?                        // platform VAT number at time of sale
+  vatCustomerNumber String?                        // customer VAT number at time of sale (if B2B)
+  vatCustomerCountry String?                       // customer VAT country code snapshot
 
   // Payment
   stripePaymentId       String?

@@ -107,10 +107,11 @@ export async function POST(request: NextRequest) {
 
           // Send payment receipt email to shipper
           try {
+            const grossPaid = booking.totalPrice + (booking.vatAmount || 0)
             const receiptEmail = paymentReceiptEmail({
               customerName: booking.shipper.name,
               trackingCode: booking.trackingCode || bookingId,
-              amount: fmtMoney(booking.totalPrice),
+              amount: fmtMoney(grossPaid),
               description: `${booking.listing.originPort} → ${booking.listing.destinationPort}`,
               paidAt: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
               invoiceUrl: `${appUrl}/api/bookings/${booking.id}/invoice/pdf?token=${generateInvoiceToken(booking.id, 'shipper')}`,

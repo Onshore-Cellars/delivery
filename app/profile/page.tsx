@@ -16,6 +16,7 @@ interface ProfileData {
   preferredLanguage?: string
   emailNotifications: boolean; smsNotifications: boolean
   verified: boolean; createdAt: string; stripeAccountId?: string
+  vatNumber?: string; vatNumberValid?: boolean | null; vatNumberCheckedAt?: string; vatBusinessName?: string; isBusiness?: boolean
   _count: { listings: number; bookings: number; receivedReviews: number; documents: number; vehicles: number }
 }
 
@@ -33,6 +34,9 @@ export default function ProfilePage() {
   const [success, setSuccess] = useState('')
   const [error, setError] = useState('')
   const [acceptingTerms, setAcceptingTerms] = useState(false)
+  const [vatInput, setVatInput] = useState('')
+  const [vatBusy, setVatBusy] = useState(false)
+  const [vatResult, setVatResult] = useState<{ valid: boolean; name?: string | null; source: string; reason?: string } | null>(null)
 
   const fetchProfile = useCallback(async () => {
     if (!token) return
@@ -42,6 +46,7 @@ export default function ProfilePage() {
         const data = await res.json()
         setProfile(data.user)
         setRating(data.rating)
+        setVatInput(data.user.vatNumber || '')
         setForm({
           name: data.user.name || '', phone: data.user.phone || '', company: data.user.company || '',
           bio: data.user.bio || '', website: data.user.website || '', address: data.user.address || '',
@@ -215,6 +220,106 @@ export default function ProfilePage() {
                 <button type="button" onClick={() => setEditing(false)} className="px-5 py-2.5 text-sm text-[var(--c-text-3)] hover:bg-[var(--c-canvas-2)] rounded-lg transition-colors">Cancel</button>
               </div>
             </form>
+          )}
+        </div>
+
+        {/* VAT / Tax status */}
+        <div className="bg-[var(--c-surface)] rounded-lg shadow-[0_2px_8px_rgba(0,0,0,0.3)] border border-black/10 p-6 sm:p-8 mb-6">
+          <h2 className="font-semibold text-[var(--c-ink)] mb-2" style={{ fontFamily: 'var(--font-display)' }}>VAT / Tax status</h2>
+          <p className="text-xs text-[var(--c-text-3)] mb-5">
+            Add your business VAT number so invoices are issued correctly. EU numbers are verified live against the EU VIES service. With a valid EU VAT number, cross-border supplies are invoiced under the reverse-charge rule (no VAT charged).
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 sm:items-end">
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-[var(--c-ink)] mb-1">VAT number</label>
+              <input
+                type="text"
+                placeholder="e.g. FR12345678901"
+                className="w-full px-4 py-3 sm:py-2.5 rounded-lg border border-black/10 text-base sm:text-sm text-[var(--c-ink)] uppercase focus:border-[var(--c-accent)] focus:ring-2 focus:ring-[var(--c-accent)]/10 outline-none"
+                value={vatInput}
+                onChange={e => { setVatInput(e.target.value); setVatResult(null) }}
+              />
+            </div>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                disabled={vatBusy || !vatInput.trim()}
+                onClick={async () => {
+                  if (!token) return
+                  setVatBusy(true); setVatResult(null); setError(''); setSuccess('')
+                  try {
+                    const res = await fetch('/api/vat/validate', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                      body: JSON.stringify({ vatNumber: vatInput.trim() }),
+                    })
+                    const data = await res.json()
+                    if (res.ok && data.result) {
+                      setVatResult(data.result)
+                      if (data.result.valid) setSuccess('VAT number verified and saved.')
+                      await fetchProfile()
+                    } else {
+                      setError(data.error || 'Could not verify VAT number')
+                    }
+                  } catch { setError('Could not verify VAT number') }
+                  finally { setVatBusy(false) }
+                }}
+                className="btn-primary text-sm !py-2.5 !px-5 disabled:opacity-50 whitespace-nowrap"
+              >
+                {vatBusy ? 'Checking…' : 'Verify & save'}
+              </button>
+              {profile.vatNumber && (
+                <button
+                  type="button"
+                  disabled={vatBusy}
+                  onClick={async () => {
+                    if (!token) return
+                    setVatBusy(true); setVatResult(null)
+                    try {
+                      await fetch('/api/vat/validate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                        body: JSON.stringify({ vatNumber: '' }),
+                      })
+                      setVatInput(''); setSuccess('VAT number removed.')
+                      await fetchProfile()
+                    } catch { setError('Could not remove VAT number') }
+                    finally { setVatBusy(false) }
+                  }}
+                  className="px-4 py-2.5 text-sm text-[var(--c-text-3)] hover:bg-[var(--c-canvas-2)] rounded-lg transition-colors"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+          </div>
+          {/* Current status */}
+          {(vatResult || profile.vatNumber) && (
+            <div className="mt-4 text-sm">
+              {vatResult ? (
+                vatResult.valid ? (
+                  <div className="flex items-start gap-2 text-[var(--c-success)]">
+                    <span>✓</span>
+                    <span>
+                      {vatResult.source === 'vies' ? 'Verified via EU VIES' : 'Format valid'}
+                      {vatResult.name ? ` — ${vatResult.name}` : ''}
+                      {vatResult.source === 'unavailable' ? ' (live check unavailable — accepted on format)' : ''}
+                    </span>
+                  </div>
+                ) : (
+                  <div className="flex items-start gap-2 text-[var(--c-error)]">
+                    <span>✕</span>
+                    <span>{vatResult.reason || 'This VAT number could not be validated.'}</span>
+                  </div>
+                )
+              ) : (
+                <div className="text-[var(--c-text-2)]">
+                  On file: <span className="font-semibold text-[var(--c-ink)]">{profile.vatNumber}</span>
+                  {profile.vatNumberValid === true && <span className="text-[var(--c-success)]"> · verified</span>}
+                  {profile.vatBusinessName ? ` · ${profile.vatBusinessName}` : ''}
+                </div>
+              )}
+            </div>
           )}
         </div>
 
