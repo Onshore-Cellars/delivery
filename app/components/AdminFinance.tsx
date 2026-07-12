@@ -3,17 +3,16 @@
 import { useCallback, useEffect, useState } from 'react'
 
 type Row = { key: string; count: number; net: number; vat: number }
+type Summary = {
+  bookings: number; netRevenue: number; vatCollected: number; grossRevenue: number
+  platformFees: number; carrierPayouts: number; refunds: number; refundedGross: number
+  vatReversed: number; netVatDue: number
+}
+type CurrencyReport = { currency: string; summary: Summary; byTreatment: Row[]; byRate: Row[]; byCountry: Row[] }
 type Report = {
   period: { from: string; to: string }
   currencies: string[]
-  summary: {
-    bookings: number; netRevenue: number; vatCollected: number; grossRevenue: number
-    platformFees: number; carrierPayouts: number; refunds: number; refundedGross: number
-    vatReversed: number; netVatDue: number
-  }
-  byTreatment: Row[]
-  byRate: Row[]
-  byCountry: Row[]
+  byCurrency: CurrencyReport[]
 }
 
 const TREATMENT_LABELS: Record<string, string> = {
@@ -49,8 +48,7 @@ export default function AdminFinance({ token }: { token: string }) {
 
   useEffect(() => { load() }, [load])
 
-  const cur = report?.currencies?.[0] || ''
-  const money = (n: number) => `${cur ? cur + ' ' : ''}${n.toFixed(2)}`
+  const money = (n: number, cur: string) => `${cur ? cur + ' ' : ''}${n.toFixed(2)}`
 
   const downloadCsv = async () => {
     const res = await fetch(`/api/admin/finance?from=${from}&to=${to}&format=csv`, { headers: { Authorization: `Bearer ${token}` } })
@@ -69,7 +67,7 @@ export default function AdminFinance({ token }: { token: string }) {
     </div>
   )
 
-  const table = (title: string, rows: Row[], labelMap?: Record<string, string>) => (
+  const table = (title: string, rows: Row[], cur: string, labelMap?: Record<string, string>) => (
     <div className="bg-[var(--c-surface)] rounded-xl border border-black/10 overflow-hidden">
       <div className="px-4 py-3 border-b border-[var(--c-border)] text-sm font-bold text-[var(--c-ink)]">{title}</div>
       <div className="overflow-x-auto">
@@ -89,8 +87,8 @@ export default function AdminFinance({ token }: { token: string }) {
               <tr key={r.key} className="border-t border-[var(--c-border)]">
                 <td className="px-4 py-2 text-[var(--c-ink)]">{labelMap?.[r.key] || r.key}</td>
                 <td className="px-4 py-2 text-right text-[var(--c-text-2)]">{r.count}</td>
-                <td className="px-4 py-2 text-right text-[var(--c-text-2)]">{money(r.net)}</td>
-                <td className="px-4 py-2 text-right font-semibold text-[var(--c-ink)]">{money(r.vat)}</td>
+                <td className="px-4 py-2 text-right text-[var(--c-text-2)]">{money(r.net, cur)}</td>
+                <td className="px-4 py-2 text-right font-semibold text-[var(--c-ink)]">{money(r.vat, cur)}</td>
               </tr>
             ))}
           </tbody>
@@ -118,37 +116,48 @@ export default function AdminFinance({ token }: { token: string }) {
           <button onClick={downloadCsv} disabled={!report} className="px-4 py-2 rounded-lg border border-black/10 text-sm font-medium text-[var(--c-text-2)] hover:bg-[var(--c-canvas-2)] disabled:opacity-50">Download CSV</button>
         </div>
         {report && report.currencies.length > 1 && (
-          <p className="mt-3 text-xs text-[var(--c-warning)]">Note: bookings span multiple currencies ({report.currencies.join(', ')}); totals below are summed across them. Filter to a single currency for filing.</p>
+          <p className="mt-3 text-xs text-[var(--c-text-2)]">Bookings span {report.currencies.length} currencies ({report.currencies.join(', ')}) — each is reported separately below for filing.</p>
         )}
       </div>
 
       {error && <div className="bg-[var(--c-surface)] border border-[var(--c-error)]/30 rounded-xl p-4 text-sm text-[var(--c-error)]">{error}</div>}
 
-      {report && (
-        <>
+      {report && report.byCurrency.length === 0 && (
+        <div className="bg-[var(--c-surface)] rounded-xl border border-black/10 p-8 text-center text-[var(--c-text-3)]">No paid bookings in this period.</div>
+      )}
+
+      {report && report.byCurrency.map(c => (
+        <div key={c.currency} className="space-y-4">
+          {report.byCurrency.length > 1 && (
+            <h3 className="text-base font-bold text-[var(--c-ink)] pt-2 flex items-center gap-2">
+              <span className="px-2 py-0.5 rounded-md bg-[var(--c-accent)] text-white text-xs">{c.currency}</span>
+              <span className="text-[var(--c-text-2)] font-medium text-sm">reporting group</span>
+            </h3>
+          )}
           {/* Summary cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {card('Net revenue', money(report.summary.netRevenue))}
-            {card('VAT collected', money(report.summary.vatCollected), true)}
-            {card('Gross revenue', money(report.summary.grossRevenue))}
-            {card('Net VAT due', money(report.summary.netVatDue), true)}
-            {card('Platform fees', money(report.summary.platformFees))}
-            {card('Carrier payouts', money(report.summary.carrierPayouts))}
-            {card('Paid bookings', String(report.summary.bookings))}
-            {card('Refunds', `${report.summary.refunds} · ${money(report.summary.vatReversed)} VAT`)}
+            {card('Net revenue', money(c.summary.netRevenue, c.currency))}
+            {card('VAT collected', money(c.summary.vatCollected, c.currency), true)}
+            {card('Gross revenue', money(c.summary.grossRevenue, c.currency))}
+            {card('Net VAT due', money(c.summary.netVatDue, c.currency), true)}
+            {card('Platform fees', money(c.summary.platformFees, c.currency))}
+            {card('Carrier payouts', money(c.summary.carrierPayouts, c.currency))}
+            {card('Paid bookings', String(c.summary.bookings))}
+            {card('Refunds', `${c.summary.refunds} · ${money(c.summary.vatReversed, c.currency)} VAT`)}
           </div>
-
           {/* Breakdowns */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {table('VAT by treatment', report.byTreatment, TREATMENT_LABELS)}
-            {table('VAT by rate', report.byRate)}
+            {table('VAT by treatment', c.byTreatment, c.currency, TREATMENT_LABELS)}
+            {table('VAT by rate', c.byRate, c.currency)}
           </div>
-          {table('VAT by customer country', report.byCountry)}
+          {table('VAT by customer country', c.byCountry, c.currency)}
+        </div>
+      ))}
 
-          <p className="text-xs text-[var(--c-text-3)]">
-            &ldquo;Net VAT due&rdquo; is VAT collected minus VAT reversed on refunds in this period. This is a reporting aid, not a filed return — confirm figures with your accountant before submitting.
-          </p>
-        </>
+      {report && report.byCurrency.length > 0 && (
+        <p className="text-xs text-[var(--c-text-3)]">
+          &ldquo;Net VAT due&rdquo; is VAT collected minus VAT reversed on refunds in this period, per currency. This is a reporting aid, not a filed return — confirm figures with your accountant before submitting.
+        </p>
       )}
     </div>
   )

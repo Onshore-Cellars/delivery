@@ -22,6 +22,9 @@ interface RecentBooking {
   id: string
   totalPrice: number
   platformFee: number
+  vatAmount?: number
+  refundedAmount?: number
+  currency?: string
   status: string
   paymentStatus: string
   createdAt: string
@@ -191,6 +194,9 @@ export default function AdminPage() {
   const [editListing, setEditListing] = useState<AdminListing | null>(null)
   const [editListingForm, setEditListingForm] = useState<Record<string, unknown>>({})
   const [editBooking, setEditBooking] = useState<RecentBooking | null>(null)
+  const [refundBooking, setRefundBooking] = useState<RecentBooking | null>(null)
+  const [refundAmountInput, setRefundAmountInput] = useState('')
+  const [refundReason, setRefundReason] = useState('')
   const [editBookingForm, setEditBookingForm] = useState<Record<string, unknown>>({})
   const [aiInsights, setAiInsights] = useState<AIInsights | null>(null)
   const [aiInsightsLoading, setAiInsightsLoading] = useState(false)
@@ -334,25 +340,28 @@ export default function AdminPage() {
     }
   }
 
-  const handleRefund = async (bookingId: string) => {
-    if (!token || !confirm('Process refund for this booking? This cannot be undone.')) return
+  // Real refund — issues the Stripe refund + reverses the carrier payout via the
+  // dedicated route (atomic, idempotent, partial-aware). Opens a modal so the
+  // admin can choose full or partial.
+  const submitRefund = async (bookingId: string, amount: number | undefined, reason: string) => {
+    if (!token) return
     setActionLoading(`refund-${bookingId}`)
     try {
-      const res = await fetch(`/api/bookings/${bookingId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ status: 'CANCELLED', paymentStatus: 'REFUNDED' }),
+      const res = await fetch(`/api/bookings/${bookingId}/refund`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ amount, reason }),
       })
+      const data = await res.json().catch(() => ({}))
       if (res.ok) {
+        const newStatus = data.fullyRefunded === false ? 'PARTIALLY_REFUNDED' : 'REFUNDED'
         setAllBookings(prev => prev.map(b =>
-          b.id === bookingId ? { ...b, status: 'CANCELLED', paymentStatus: 'REFUNDED' } : b
+          b.id === bookingId ? { ...b, paymentStatus: newStatus, refundedAmount: (b.refundedAmount || 0) + (amount ?? (b.totalPrice + (b.vatAmount || 0) - (b.refundedAmount || 0))) } : b
         ))
-        showToast('Refund processed successfully')
+        showToast('Refund issued')
+        setRefundBooking(null)
       } else {
-        showToast('Failed to process refund', 'error')
+        showToast(data.error || 'Failed to process refund', 'error')
       }
     } catch {
       showToast('Network error', 'error')
@@ -1123,9 +1132,9 @@ export default function AdminPage() {
                                   Cancel
                                 </button>
                               )}
-                              {b.paymentStatus !== 'REFUNDED' && b.status !== 'PENDING' && (
+                              {(b.paymentStatus === 'PAID' || b.paymentStatus === 'PARTIALLY_REFUNDED') && (
                                 <button
-                                  onClick={() => handleRefund(b.id)}
+                                  onClick={() => { setRefundBooking(b); const remaining = (b.totalPrice + (b.vatAmount || 0) - (b.refundedAmount || 0)); setRefundAmountInput(remaining.toFixed(2)); setRefundReason('') }}
                                   disabled={!!actionLoading}
                                   className="px-2 py-1 text-xs font-medium rounded-md bg-[var(--c-info)]/10 text-[var(--c-info)] border border-[var(--c-info)] hover:bg-[var(--c-info)]/15 disabled:opacity-50"
                                 >
@@ -1765,6 +1774,51 @@ export default function AdminPage() {
       )}
 
       {/* ═══════════════════ EDIT BOOKING MODAL ═══════════════════ */}
+      {refundBooking && (() => {
+        const gross = refundBooking.totalPrice + (refundBooking.vatAmount || 0)
+        const already = refundBooking.refundedAmount || 0
+        const remaining = Math.round((gross - already) * 100) / 100
+        const cur = refundBooking.currency || 'EUR'
+        const amt = parseFloat(refundAmountInput)
+        const valid = amt > 0 && amt <= remaining + 0.005
+        return (
+          <div className="fixed inset-0 bg-black/40 z-[60] flex items-center justify-center p-4" onClick={() => setRefundBooking(null)}>
+            <div className="bg-[var(--c-surface)] rounded-2xl border border-black/10 shadow-xl w-full max-w-md p-6" onClick={e => e.stopPropagation()}>
+              <h3 className="text-lg font-bold text-[var(--c-ink)] mb-1">Refund booking</h3>
+              <p className="text-xs text-[var(--c-text-2)] mb-4">{refundBooking.trackingCode || refundBooking.id.slice(-8)} · {refundBooking.shipper?.name}</p>
+
+              <div className="bg-[var(--c-canvas-2)] rounded-lg p-3 mb-4 text-sm space-y-1">
+                <div className="flex justify-between"><span className="text-[var(--c-text-2)]">Gross charged</span><span className="font-medium text-[var(--c-ink)]">{cur} {gross.toFixed(2)}</span></div>
+                {already > 0 && <div className="flex justify-between"><span className="text-[var(--c-text-2)]">Already refunded</span><span className="font-medium text-[var(--c-ink)]">{cur} {already.toFixed(2)}</span></div>}
+                <div className="flex justify-between border-t border-[var(--c-border)] pt-1"><span className="text-[var(--c-text-2)]">Remaining</span><span className="font-bold text-[var(--c-accent)]">{cur} {remaining.toFixed(2)}</span></div>
+              </div>
+
+              <label className="block text-xs font-medium text-[var(--c-text-2)] mb-1">Refund amount ({cur})</label>
+              <div className="flex gap-2 mb-1">
+                <input type="number" step="0.01" min="0" max={remaining} value={refundAmountInput} onChange={e => setRefundAmountInput(e.target.value)} className="flex-1 px-3 py-2 rounded-lg border border-black/10 text-sm text-[var(--c-ink)] outline-none focus:border-[var(--c-accent)]" />
+                <button type="button" onClick={() => setRefundAmountInput(remaining.toFixed(2))} className="px-3 py-2 rounded-lg border border-black/10 text-xs font-medium text-[var(--c-text-2)] hover:bg-[var(--c-canvas-2)]">Full</button>
+              </div>
+              {!valid && refundAmountInput && <p className="text-xs text-[var(--c-error)] mb-2">Enter an amount between 0 and {remaining.toFixed(2)}.</p>}
+
+              <label className="block text-xs font-medium text-[var(--c-text-2)] mb-1 mt-3">Reason (optional)</label>
+              <input value={refundReason} onChange={e => setRefundReason(e.target.value)} placeholder="e.g. cancelled by shipper" className="w-full px-3 py-2 rounded-lg border border-black/10 text-sm text-[var(--c-ink)] outline-none focus:border-[var(--c-accent)] mb-1" />
+              <p className="text-[11px] text-[var(--c-text-3)] mb-4">A partial refund keeps the booking active; a full refund cancels it. VAT is refunded proportionally and the carrier&rsquo;s payout is clawed back for their share only.</p>
+
+              <div className="flex gap-2">
+                <button
+                  disabled={!valid || actionLoading === `refund-${refundBooking.id}`}
+                  onClick={() => submitRefund(refundBooking.id, amt >= remaining ? undefined : amt, refundReason)}
+                  className="flex-1 px-4 py-2.5 rounded-xl bg-[var(--c-accent)] text-white text-sm font-medium hover:bg-[var(--c-accent-hover)] disabled:opacity-50"
+                >
+                  {actionLoading === `refund-${refundBooking.id}` ? 'Processing…' : `Refund ${cur} ${(valid ? amt : 0).toFixed(2)}`}
+                </button>
+                <button onClick={() => setRefundBooking(null)} className="px-4 py-2.5 rounded-xl border border-black/10 text-sm text-[var(--c-text-2)] hover:bg-[var(--c-canvas-2)]">Cancel</button>
+              </div>
+            </div>
+          </div>
+        )
+      })()}
+
       {editBooking && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setEditBooking(null)} />

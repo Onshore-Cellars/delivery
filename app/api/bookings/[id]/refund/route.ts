@@ -130,7 +130,12 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       },
     })
 
-    return NextResponse.json({ booking: updatedBooking })
+    return NextResponse.json({
+      booking: updatedBooking,
+      refundAmount: result.refundAmount,
+      cumulativeRefunded: result.cumulativeRefunded,
+      fullyRefunded: result.fullyRefunded,
+    })
   } catch (error) {
     console.error('Refund error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
