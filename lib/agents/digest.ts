@@ -90,7 +90,7 @@ export async function buildOpsDigest(opts: { deliver?: boolean } = {}): Promise<
   const admins = await prisma.user.findMany({ where: { role: 'ADMIN' }, select: { id: true, email: true, name: true } })
   let emailed = false
   const html = `<div style="font-family:system-ui,sans-serif;max-width:560px">
-    <h2 style="color:#0C5C54;margin:0 0 4px">${headline}</h2>
+    <h2 style="color:#0C5C54;margin:0 0 4px">${headline.replace(/</g, '&lt;')}</h2>
     <p style="color:#555;font-size:13px;margin:0 0 16px">Onshore operations · last 24 hours</p>
     <pre style="white-space:pre-wrap;font-family:inherit;font-size:14px;line-height:1.5;color:#222">${body.replace(/</g, '&lt;')}</pre>
     <p style="margin-top:20px"><a href="${process.env.NEXTAUTH_URL || ''}/admin" style="background:#0C5C54;color:#fff;padding:10px 16px;border-radius:8px;text-decoration:none;font-size:14px">Open the operations queue →</a></p>

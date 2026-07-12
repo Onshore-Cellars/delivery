@@ -23,10 +23,14 @@ export async function POST(req: NextRequest) {
     const isAuthorizedCron = cronSecret && process.env.CRON_SECRET && cronSecret === process.env.CRON_SECRET
 
     if (!isAuthorizedCron) {
+      // This job writes notifications into OTHER users' accounts and mutates
+      // every matched alert's state platform-wide — it must be admin-only, not
+      // runnable by any logged-in user.
       const token = getTokenFromHeader(req.headers.get('authorization'))
       if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
       const decoded = verifyToken(token)
       if (!decoded) return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
+      if (decoded.role !== 'ADMIN') return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
     }
 
     // ── 1. Fetch all active saved alerts ──

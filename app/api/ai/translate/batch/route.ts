@@ -1,11 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { translateText, SUPPORTED_LANGUAGES, type LanguageCode } from '@/lib/ai'
+import { createRateLimiter, getClientIP } from '@/lib/rate-limit'
 
-// Public (unauthenticated) batch translate endpoint for UI strings
-// Rate-limited by IP, max 50 keys per request
+// Public batch translate endpoint for UI strings. Unauthenticated (it powers
+// the language switcher for logged-out visitors) but IP rate-limited and input-
+// capped so it can't be abused to run up unbounded paid-LLM spend.
+const limiter = createRateLimiter({ interval: 60_000, limit: 20 })
+const MAX_TEXTS = 50
+const MAX_TOTAL_CHARS = 8_000
 
 export async function POST(request: NextRequest) {
   try {
+    const rl = await limiter.check(getClientIP(request))
+    if (!rl.success) return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+
     const body = await request.json()
     const { texts, targetLang } = body
 
@@ -17,8 +25,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ translations: texts })
     }
 
-    if (!Array.isArray(texts) || texts.length === 0 || texts.length > 50) {
+    if (!Array.isArray(texts) || texts.length === 0 || texts.length > MAX_TEXTS) {
       return NextResponse.json({ error: 'texts must be an array of 1-50 strings' }, { status: 400 })
+    }
+    if (!texts.every(t => typeof t === 'string') || texts.join('').length > MAX_TOTAL_CHARS) {
+      return NextResponse.json({ error: 'texts must be strings totalling ≤ 8000 chars' }, { status: 400 })
     }
 
     // Batch translate: join with separator, translate once, split back

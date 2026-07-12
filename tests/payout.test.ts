@@ -3,8 +3,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 // ── Mocks ────────────────────────────────────────────────────────────────────
 const findUnique = vi.fn()
 const update = vi.fn(() => Promise.resolve({}))
+const updateMany = vi.fn(() => Promise.resolve({ count: 1 }))
 vi.mock('@/lib/prisma', () => ({
-  default: { booking: { findUnique: (...a: any[]) => (findUnique as any)(...a), update: (...a: any[]) => (update as any)(...a) } },
+  default: { booking: {
+    findUnique: (...a: any[]) => (findUnique as any)(...a),
+    update: (...a: any[]) => (update as any)(...a),
+    updateMany: (...a: any[]) => (updateMany as any)(...a),
+  } },
 }))
 
 const createTransfer = vi.fn(() => Promise.resolve({ id: 'tr_test' }))
@@ -35,9 +40,17 @@ describe('releaseCarrierPayout', () => {
     findUnique.mockResolvedValue(paidBooking())
     await releaseCarrierPayout('b1')
     expect(createTransfer).toHaveBeenCalledOnce()
-    expect((createTransfer.mock.calls[0] as any[])[0]).toMatchObject({ amount: 90, destination: 'acct_1', bookingId: 'b1' })
+    // Transfer must carry an idempotency key so a duplicate is a no-op at Stripe.
+    expect((createTransfer.mock.calls[0] as any[])[0]).toMatchObject({ amount: 90, destination: 'acct_1', bookingId: 'b1', idempotencyKey: 'payout:b1' })
     expect(update).toHaveBeenCalledOnce()
     expect((update.mock.calls[0] as any[])[0].data).toMatchObject({ stripeTransferId: 'tr_test' })
+  })
+
+  it('does not transfer when the atomic claim is lost to a concurrent caller', async () => {
+    findUnique.mockResolvedValue(paidBooking())
+    updateMany.mockResolvedValueOnce({ count: 0 }) // someone else claimed it first
+    await releaseCarrierPayout('b1')
+    expect(createTransfer).not.toHaveBeenCalled()
   })
 
   it('is idempotent — does nothing if already paid out', async () => {

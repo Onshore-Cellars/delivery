@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { hashPassword, generateToken, generateSecureToken } from '@/lib/auth'
+import { hashApiKey } from '@/lib/api-key'
 import { isCommonPassword } from '@/lib/password-check'
 import { welcomeEmail, emailVerificationEmail } from '@/lib/email'
 import { queueEmail } from '@/lib/email-queue'
+import { getClientIP } from '@/lib/rate-limit'
 
 // Simple in-memory rate limiter for registration
 const registerAttempts = new Map<string, { count: number; resetAt: number }>()
@@ -23,7 +25,7 @@ function isRateLimited(ip: string): boolean {
 
 export async function POST(request: NextRequest) {
   try {
-    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+    const ip = getClientIP(request)
     if (isRateLimited(ip)) {
       return NextResponse.json(
         { error: 'Too many registration attempts. Please try again later.' },
@@ -139,7 +141,9 @@ export async function POST(request: NextRequest) {
             userId: user.id,
             type: 'SYSTEM',
             title: 'EMAIL_VERIFY',
-            message: emailVerifyToken,
+            // Store only a hash — the raw token travels in the emailed link, so
+            // even if this row is read it can't be used to self-verify.
+            message: hashApiKey(emailVerifyToken),
             metadata: JSON.stringify({ expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() }),
           },
         })

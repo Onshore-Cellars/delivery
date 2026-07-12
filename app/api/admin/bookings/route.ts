@@ -82,13 +82,19 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'Booking not found' }, { status: 404 })
     }
 
+    // NOTE: money fields (paymentStatus, totalPrice, platformFee, carrierPayout)
+    // are deliberately NOT editable here. Writing them raw would bypass Stripe
+    // and the ledger — e.g. flipping paymentStatus to PAID with a fabricated
+    // carrierPayout drives a real payout on delivery with no captured funds and
+    // no reconciling ledger row. Refunds go through Admin → Bookings → Refund
+    // (processRefund); payouts release on the DELIVERED transition.
     const allowed = [
-      'status', 'paymentStatus', 'cargoDescription', 'cargoType', 'weightKg', 'volumeM3',
+      'status', 'cargoDescription', 'cargoType', 'weightKg', 'volumeM3',
       'itemCount', 'declaredValue', 'specialHandling', 'temperatureReq', 'isFragile', 'isDangerous',
       'customsRequired', 'pickupAddress', 'pickupContact', 'pickupPhone', 'pickupEmail',
       'deliveryAddress', 'deliveryContact', 'deliveryPhone', 'deliveryEmail', 'deliveryNotes',
       'deliveryTimeWindow', 'yachtName', 'yachtMMSI', 'berthNumber', 'marinaName',
-      'totalPrice', 'platformFee', 'carrierPayout', 'estimatedDelivery', 'adminNotes',
+      'estimatedDelivery', 'adminNotes',
     ] as const
 
     const updateData: Record<string, unknown> = {}

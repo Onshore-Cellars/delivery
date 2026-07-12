@@ -40,6 +40,11 @@ async function policyFor(team: string, kind: string) {
 export async function executeAgentTask(taskId: string): Promise<ExecutionOutcome> {
   const task = await prisma.agentTask.findUnique({ where: { id: taskId } })
   if (!task) return { ok: false, error: 'Task not found' }
+  // Only execute a task that was actually approved — a latent guard so this can
+  // never run for a REJECTED/EXECUTED/FAILED task even if a caller slips up.
+  if (!['APPROVED', 'AUTO_APPROVED'].includes(task.status)) {
+    return { ok: false, error: `Task is not approved (status ${task.status})` }
+  }
   const agent = findAgent(task.team, task.kind)
   if (!agent) return { ok: false, error: `No agent for ${task.team}:${task.kind}` }
   let payload: Record<string, unknown> = {}

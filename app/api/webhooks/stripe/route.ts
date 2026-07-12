@@ -8,6 +8,7 @@ import { ensureInvoiceNumber } from '@/lib/invoice'
 import { generateInvoiceToken } from '@/lib/auth'
 import { recordTransaction } from '@/lib/ledger'
 import { getPlatformFeePercent } from '@/lib/settings'
+import { reverseCarrierPayout, carrierRefundShare } from '@/lib/payout'
 
 export async function POST(request: NextRequest) {
   try {
@@ -156,14 +157,48 @@ export async function POST(request: NextRequest) {
       }
 
       case 'charge.refunded': {
-        const charge = event.data.object as { metadata?: { bookingId?: string } }
+        // A refund happened at Stripe — could be a partial or full refund, and
+        // could be one WE issued (in-app processRefund already reconciled state
+        // + carrier + ledger) OR one issued directly from the Stripe Dashboard.
+        // Make this handler partial-aware and self-healing for the dashboard
+        // case without double-applying the in-app case.
+        const charge = event.data.object as { metadata?: { bookingId?: string }; amount?: number; amount_refunded?: number }
         const bookingId = charge.metadata?.bookingId
-
         if (bookingId) {
-          await prisma.booking.update({
+          const booking = await prisma.booking.findUnique({
             where: { id: bookingId },
-            data: { paymentStatus: 'REFUNDED' },
+            select: { id: true, totalPrice: true, vatAmount: true, carrierPayout: true, currency: true, refundedAmount: true, payoutTransferredAt: true, stripePaymentIntentId: true },
           })
+          if (booking) {
+            const gross = booking.totalPrice + (booking.vatAmount || 0)
+            // Stripe reports amount_refunded in minor units (cumulative on the charge).
+            const stripeRefunded = typeof charge.amount_refunded === 'number' ? charge.amount_refunded / 100 : gross
+            const chargeTotal = typeof charge.amount === 'number' ? charge.amount / 100 : gross
+            const fullyRefunded = stripeRefunded >= chargeTotal - 0.005
+            // Only advance our record if Stripe shows MORE refunded than we have
+            // (i.e. a dashboard refund the app didn't record). If our figure is
+            // already >= Stripe's, the in-app path handled it — do nothing.
+            if (stripeRefunded > (booking.refundedAmount || 0) + 0.005) {
+              const delta = stripeRefunded - (booking.refundedAmount || 0)
+              await prisma.booking.update({
+                where: { id: booking.id },
+                data: { refundedAmount: stripeRefunded, paymentStatus: fullyRefunded ? 'REFUNDED' : 'PARTIALLY_REFUNDED' },
+              })
+              await recordTransaction({ bookingId: booking.id, type: 'REFUND', amount: delta, currency: booking.currency, stripeRef: booking.stripePaymentIntentId, note: 'Refund reconciled from Stripe (dashboard/external)' })
+              // Claw back the carrier's proportional share if their payout was released.
+              if (booking.payoutTransferredAt) {
+                const claw = carrierRefundShare(delta, booking.carrierPayout, gross)
+                await reverseCarrierPayout(booking.id, claw).catch(e => console.error('Clawback on external refund failed:', e))
+              }
+            } else {
+              // In-app path already reconciled; just make sure status isn't stale.
+              const fully = (booking.refundedAmount || 0) >= gross - 0.005
+              await prisma.booking.update({
+                where: { id: booking.id },
+                data: { paymentStatus: fully ? 'REFUNDED' : 'PARTIALLY_REFUNDED' },
+              }).catch(() => {})
+            }
+          }
         }
         break
       }
@@ -287,12 +322,28 @@ export async function POST(request: NextRequest) {
                 resolvedAt: new Date(),
               },
             })
-            // If we lost the dispute, mark booking accordingly
+            // If we lost the dispute, Stripe pulls the gross back from the
+            // platform — reconcile like a full external refund: record the
+            // ledger movement and claw back the carrier's released payout.
             if (!won) {
+              const full = await prisma.booking.findUnique({
+                where: { id: booking.id },
+                select: { totalPrice: true, vatAmount: true, carrierPayout: true, currency: true, refundedAmount: true, payoutTransferredAt: true, stripePaymentIntentId: true },
+              })
               await prisma.booking.update({
                 where: { id: booking.id },
-                data: { paymentStatus: 'REFUNDED' },
+                data: { paymentStatus: 'REFUNDED', refundedAmount: full ? full.totalPrice + (full.vatAmount || 0) : undefined },
               })
+              if (full) {
+                const gross = full.totalPrice + (full.vatAmount || 0)
+                const delta = gross - (full.refundedAmount || 0)
+                if (delta > 0.005) {
+                  await recordTransaction({ bookingId: booking.id, type: 'REFUND', amount: delta, currency: full.currency, stripeRef: full.stripePaymentIntentId, note: 'Chargeback lost — refunded by Stripe' }).catch(() => {})
+                }
+                if (full.payoutTransferredAt) {
+                  await reverseCarrierPayout(booking.id).catch(e => console.error('Clawback on lost dispute failed:', e))
+                }
+              }
             } else {
               // Won — restore booking to previous state if it was disputed
               await prisma.booking.update({

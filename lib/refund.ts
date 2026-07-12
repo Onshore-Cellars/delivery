@@ -27,7 +27,7 @@ export async function processRefund(bookingId: string, amount?: number): Promise
   const booking = await prisma.booking.findUnique({
     where: { id: bookingId },
     select: {
-      id: true, totalPrice: true, vatAmount: true, carrierPayout: true,
+      id: true, totalPrice: true, vatAmount: true, carrierPayout: true, currency: true,
       paymentStatus: true, stripePaymentIntentId: true, refundedAmount: true, routeDirection: true,
       weightKg: true, volumeM3: true, listingId: true,
     },
@@ -65,7 +65,7 @@ export async function processRefund(bookingId: string, amount?: number): Promise
     await createRefund(booking.stripePaymentIntentId, fullyRefunded && amount === undefined ? undefined : refundAmount, {
       idempotencyKey: `refund:${booking.id}:${newTotal.toFixed(2)}`,
     })
-    await recordTransaction({ bookingId: booking.id, type: 'REFUND', amount: refundAmount, stripeRef: booking.stripePaymentIntentId, note: fullyRefunded ? 'Full refund' : 'Partial refund' })
+    await recordTransaction({ bookingId: booking.id, type: 'REFUND', amount: refundAmount, currency: booking.currency, stripeRef: booking.stripePaymentIntentId, note: fullyRefunded ? 'Full refund' : 'Partial refund' })
 
     // 3) Reverse the carrier's share (VAT excluded); undefined = full reversal.
     const carrierClaw = carrierRefundShare(refundAmount, booking.carrierPayout, gross)

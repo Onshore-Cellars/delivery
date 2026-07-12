@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { verifyToken, getTokenFromHeader } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import { queueEmail } from '@/lib/email-queue'
+import { processRefund } from '@/lib/refund'
 
 // GET /api/bookings/[id]/customs — get customs status and requirements
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -160,6 +161,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       return NextResponse.json({ error: 'Only carrier or admin can update customs status' }, { status: 403 })
     }
 
+    // Customs actions only make sense once cargo is in motion — guard the source
+    // state so this endpoint can't be used to jump a booking out of PENDING/
+    // CONFIRMED/DELIVERED or resurrect a cancelled one.
+    if (!['PICKED_UP', 'IN_TRANSIT', 'CUSTOMS_HOLD'].includes(booking.status)) {
+      return NextResponse.json({ error: `Customs actions are not valid from status ${booking.status}` }, { status: 400 })
+    }
+
     const statusMap: Record<string, string> = {
       hold: 'CUSTOMS_HOLD',
       clear: 'IN_TRANSIT',
@@ -172,11 +180,34 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       reject: `Customs rejected${notes ? `: ${notes}` : ''}`,
     }
 
-    // Update booking status
-    const updated = await prisma.booking.update({
-      where: { id },
-      data: { status: statusMap[action] as 'CUSTOMS_HOLD' | 'IN_TRANSIT' | 'CANCELLED' },
-    })
+    // A customs REJECT cancels the booking. If money was captured, it must go
+    // through the real refund path (refunds the shipper, reverses the carrier's
+    // payout, writes the ledger) and restore the listing's capacity — never a
+    // bare status flip that would strand the shipper's money.
+    if (action === 'reject') {
+      if (booking.paymentStatus === 'PAID' || booking.paymentStatus === 'PARTIALLY_REFUNDED') {
+        const refund = await processRefund(id) // full refund → also sets CANCELLED + reverses carrier
+        if (!refund.ok) return NextResponse.json({ error: refund.error || 'Refund failed' }, { status: refund.status || 500 })
+      } else {
+        await prisma.booking.update({ where: { id }, data: { status: 'CANCELLED' } })
+      }
+      // Restore the listing capacity this booking was holding (clamped to total).
+      const isReturn = booking.routeDirection === 'return'
+      await prisma.listing.update({
+        where: { id: booking.listingId },
+        data: isReturn
+          ? { returnAvailableKg: { increment: booking.weightKg }, returnAvailableM3: { increment: booking.volumeM3 } }
+          : { availableKg: { increment: booking.weightKg }, availableM3: { increment: booking.volumeM3 } },
+      }).catch(() => {})
+    }
+
+    // Update booking status (reject already handled above).
+    const updated = action === 'reject'
+      ? await prisma.booking.findUnique({ where: { id } })
+      : await prisma.booking.update({
+          where: { id },
+          data: { status: statusMap[action] as 'CUSTOMS_HOLD' | 'IN_TRANSIT' },
+        })
 
     // Create tracking event
     await prisma.trackingEvent.create({

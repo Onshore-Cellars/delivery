@@ -4,6 +4,7 @@ import { queueEmail } from './email-queue'
 import { NotificationType } from '@prisma/client'
 import { sendSMSNotification, formatSMSUpdate } from './sms'
 import { generateAlertEmail } from './ai'
+import { sanitizeHtml } from './sanitize'
 
 interface CreateNotificationParams {
   userId: string
@@ -53,7 +54,10 @@ export async function createNotification(params: CreateNotificationParams) {
           await queueEmail({
             to: user.email,
             subject: title,
-            html: `<p>Hi ${user.name},</p><p>${message}</p>`,
+            // Escape both fields — `message` is built from user-supplied data
+            // (addresses, contact names) at several call sites, so raw
+            // interpolation would allow HTML/link injection into the email.
+            html: `<p>Hi ${sanitizeHtml(user.name)},</p><p>${sanitizeHtml(message)}</p>`,
           })
           await prisma.notification.update({
             where: { id: notification.id },

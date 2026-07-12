@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { createRateLimiter, getClientIP } from '@/lib/rate-limit'
+import { hashApiKey } from '@/lib/api-key'
 
 const limiter = createRateLimiter({ interval: 15 * 60_000, limit: 10 })
 
@@ -31,7 +32,7 @@ export async function POST(request: NextRequest) {
 
     // Find the verification token
     const verifyNotif = await prisma.notification.findFirst({
-      where: { userId: user.id, type: 'SYSTEM', title: 'EMAIL_VERIFY', message: token },
+      where: { userId: user.id, type: 'SYSTEM', title: 'EMAIL_VERIFY', message: hashApiKey(token) },
     })
 
     if (!verifyNotif) {

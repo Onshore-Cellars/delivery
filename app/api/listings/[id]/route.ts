@@ -119,7 +119,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
             data[field] = null
           } else {
             const parsed = parseFloat(val)
-            if (isNaN(parsed)) {
+            if (isNaN(parsed) || parsed < 0) {
               return NextResponse.json({ error: `Invalid value for ${field}` }, { status: 400 })
             }
             data[field] = parsed

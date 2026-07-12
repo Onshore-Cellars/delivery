@@ -31,18 +31,27 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   }
 
   if (action === 'reject') {
-    await prisma.agentTask.update({
-      where: { id },
+    // Atomic compare-and-set so a double-click / concurrent decision can't
+    // reject a task that's already been acted on.
+    const claim = await prisma.agentTask.updateMany({
+      where: { id, status: 'PENDING' },
       data: { status: 'REJECTED', decidedById: admin.userId, decidedAt: new Date(), feedback },
     })
+    if (claim.count !== 1) return NextResponse.json({ error: 'Task already decided' }, { status: 409 })
     return NextResponse.json({ ok: true, status: 'REJECTED' })
   }
 
   if (action === 'approve') {
-    await prisma.agentTask.update({
-      where: { id },
+    // Atomically CLAIM the task before executing. Two concurrent approvals
+    // (double-click, two admins) both read PENDING above, but only the first
+    // updateMany flips it to APPROVED (count === 1); the loser gets a 409 and
+    // does NOT execute — preventing duplicate side-effects (double customer
+    // email, double ledger row).
+    const claim = await prisma.agentTask.updateMany({
+      where: { id, status: 'PENDING' },
       data: { status: 'APPROVED', decidedById: admin.userId, decidedAt: new Date(), feedback },
     })
+    if (claim.count !== 1) return NextResponse.json({ error: 'Task already decided' }, { status: 409 })
     const outcome = await executeAgentTask(id)
     const updated = await prisma.agentTask.findUnique({ where: { id }, select: { status: true, executionResult: true, error: true } })
     return NextResponse.json({ ok: outcome.ok, ...updated })

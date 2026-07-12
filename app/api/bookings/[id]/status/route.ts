@@ -70,6 +70,13 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       return NextResponse.json({ error: 'Shippers can only cancel or dispute bookings' }, { status: 403 })
     }
 
+    // A booking under DISPUTE can only be resolved by an admin. Without this, a
+    // carrier could unilaterally PATCH DISPUTED→DELIVERED to release the held
+    // escrow to themselves, defeating the dispute hold.
+    if (booking.status === 'DISPUTED' && !isAdmin) {
+      return NextResponse.json({ error: 'Only an admin can resolve a disputed booking' }, { status: 403 })
+    }
+
     // Prevent shipper from cancelling after pickup — must raise a dispute instead
     if (isShipper && status === 'CANCELLED' && ['PICKED_UP', 'IN_TRANSIT', 'CUSTOMS_HOLD'].includes(booking.status)) {
       return NextResponse.json({ error: 'Cannot cancel after pickup. Please raise a dispute instead.' }, { status: 400 })

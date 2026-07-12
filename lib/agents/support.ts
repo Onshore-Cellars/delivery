@@ -3,6 +3,20 @@ import { createNotification } from '@/lib/notifications'
 import type { Agent, ProposedTask } from './types'
 import { llmJson, aiEnabled } from './llm'
 
+// Append `addition` to a dispute's free-text adminNotes, capping length but
+// NEVER dropping the customer-reply "sent" marker (the reply de-dupe relies on
+// it). Both triageDispute and draftCustomerReply write here, so truncation must
+// preserve the marker regardless of which wrote it.
+const REPLY_SENT_MARKER = '[cs-reply-sent]'
+function mergeNotes(existing: string | null | undefined, addition: string): string {
+  const base = existing ? `${existing}\n${addition}` : addition
+  let out = base.slice(-1900)
+  if ((existing || '').includes(REPLY_SENT_MARKER) && !out.includes(REPLY_SENT_MARKER)) {
+    out = `${REPLY_SENT_MARKER}\n${out}`.slice(0, 2000)
+  }
+  return out
+}
+
 // Escalate disputes that have been open too long without resolution.
 const escalateDispute: Agent = {
   team: 'SUPPORT',
@@ -131,7 +145,10 @@ Return JSON: { "priority": "LOW"|"MEDIUM"|"HIGH"|"URGENT", "recommendation": str
       const validPriorities = ['LOW', 'MEDIUM', 'HIGH', 'URGENT']
       const priority = validPriorities.includes(String(payload.priority)) ? String(payload.priority) : 'MEDIUM'
       const note = `AI triage: ${payload.analysis || ''}${payload.suggestedRefund ? ` · suggested refund ${payload.suggestedRefund}` : ''}${payload.draftResponse ? `\nDraft reply: ${payload.draftResponse}` : ''}`
-      await prisma.dispute.update({ where: { id: disputeId }, data: { priority, status: 'UNDER_REVIEW', adminNotes: note.slice(0, 2000) } })
+      // Append to (never overwrite) existing notes — overwriting would erase the
+      // customer-reply "sent" marker and cause the reply to be re-proposed/sent twice.
+      const existing = await prisma.dispute.findUnique({ where: { id: disputeId }, select: { adminNotes: true } })
+      await prisma.dispute.update({ where: { id: disputeId }, data: { priority, status: 'UNDER_REVIEW', adminNotes: mergeNotes(existing?.adminNotes, note) } })
       const admins = await prisma.user.findMany({ where: { role: 'ADMIN' }, select: { id: true } })
       for (const a of admins) {
         await createNotification({ userId: a.id, type: 'SYSTEM', title: 'Dispute triaged by AI', message: 'A dispute has an AI-recommended resolution ready for your review.', linkUrl: '/admin' }).catch(() => {})
@@ -161,7 +178,6 @@ async function findOrCreateConversation(aId: string, bId: string, subject: strin
 // the customer). This is the "one-click reply" that removes the human writing
 // step while keeping a human approval gate. A sent marker on the dispute stops
 // it being re-proposed after the reply goes out.
-const REPLY_SENT_MARKER = '[cs-reply-sent]'
 const draftCustomerReply: Agent = {
   team: 'SUPPORT',
   kind: 'dispute-reply',
@@ -226,8 +242,7 @@ Return JSON: { "message": string (the reply to send, plain text, 3-6 sentences),
       }).catch(() => {})
       // Mark the dispute so this reply isn't proposed again.
       const disp = await prisma.dispute.findUnique({ where: { id: disputeId }, select: { adminNotes: true } })
-      const notes = `${disp?.adminNotes || ''}\n${REPLY_SENT_MARKER} ${new Date().toISOString()}`.trim()
-      await prisma.dispute.update({ where: { id: disputeId }, data: { adminNotes: notes.slice(0, 2000) } })
+      await prisma.dispute.update({ where: { id: disputeId }, data: { adminNotes: mergeNotes(disp?.adminNotes, `${REPLY_SENT_MARKER} ${new Date().toISOString()}`) } })
       return { ok: true, result: 'Reply sent to customer + they were notified' }
     } catch (e) { return { ok: false, error: e instanceof Error ? e.message : 'Send failed' } }
   },

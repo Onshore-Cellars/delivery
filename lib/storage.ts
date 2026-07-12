@@ -4,7 +4,9 @@
 //   STORAGE_ENDPOINT (for R2/MinIO), STORAGE_PUBLIC_URL (for CDN)
 
 const ALLOWED_MIME_TYPES = new Set([
-  'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml',
+  // SVG is deliberately excluded — it can carry inline <script>, so serving a
+  // user-uploaded SVG from our origin/CDN is a stored-XSS vector.
+  'image/jpeg', 'image/png', 'image/gif', 'image/webp',
   'application/pdf',
   'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   'text/plain', 'text/csv',
@@ -14,7 +16,7 @@ const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50MB
 
 const BLOCKED_EXTENSIONS = new Set([
   'exe', 'bat', 'cmd', 'sh', 'ps1', 'vbs', 'js', 'mjs', 'php', 'py', 'rb',
-  'jar', 'war', 'com', 'scr', 'pif', 'dll', 'sys',
+  'jar', 'war', 'com', 'scr', 'pif', 'dll', 'sys', 'svg', 'html', 'htm',
 ])
 
 interface UploadOptions {

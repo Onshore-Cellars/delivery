@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { generateSecureToken } from '@/lib/auth'
+import { hashApiKey } from '@/lib/api-key'
 import { passwordResetEmail } from '@/lib/email'
 import { queueEmail } from '@/lib/email-queue'
 import { createRateLimiter, getClientIP } from '@/lib/rate-limit'
@@ -49,7 +50,7 @@ export async function POST(request: NextRequest) {
         userId: user.id,
         type: 'SYSTEM',
         title: 'PASSWORD_RESET',
-        message: resetToken,
+        message: hashApiKey(resetToken),
         metadata: JSON.stringify({ expiresAt: resetExpiry.toISOString() }),
       },
     })

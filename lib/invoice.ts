@@ -102,16 +102,26 @@ export type InvoiceModel = {
   podHasPhoto: boolean
 }
 
-function onshoreParty(): Party {
+// Build the seller ("From") party. Prefer the VAT identity SNAPSHOTTED on the
+// booking at checkout (`vatSupplierNumber`) over the current env config, so the
+// invoice always shows the jurisdiction the VAT was actually charged in — even
+// if the admin later changes the platform establishment. Falls back to env for
+// legacy bookings with no snapshot.
+function onshoreParty(snapshotVatNumber?: string | null): Party {
   const cfg = platformVatConfig()
+  const vatNumber = snapshotVatNumber || cfg.vatNumber
+  // Derive the supplier country from the snapshotted VAT number prefix (e.g.
+  // "FR123…" → FR, "EL…" → EL/Greece), falling back to the configured country.
+  const prefix = vatNumber ? vatNumber.trim().slice(0, 2).toUpperCase() : ''
+  const country = /^[A-Z]{2}$/.test(prefix) ? prefix : cfg.country
   return {
     name: 'Onshore',
     company: 'Onshore Logistics',
     email: 'billing@onshore.delivery',
     address: null,
     city: null,
-    country: cfg.country,
-    vatNumber: cfg.vatNumber,
+    country,
+    vatNumber,
   }
 }
 
@@ -232,7 +242,7 @@ export function buildInvoiceModel(booking: NonNullable<InvoiceBooking>, viewer: 
     name: shipper.company || shipper.name, company: shipper.company, email: shipper.email,
     phone: shipper.phone, address: shipper.address, city: shipper.city, country: shipper.country, vatNumber: shipper.vatNumber,
   }
-  const platform = onshoreParty()
+  const platform = onshoreParty(booking.vatSupplierNumber)
 
   // VAT snapshot captured at checkout (0 for reverse-charge / export / unpaid).
   const vatAmount = booking.vatAmount || 0

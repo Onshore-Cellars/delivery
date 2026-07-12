@@ -62,16 +62,40 @@ export async function releaseCarrierPayout(bookingId: string): Promise<void> {
   const amount = booking.carrierPayout || calculateCarrierPayout(booking.totalPrice)
   if (amount <= 0) return
 
-  const transfer = await createTransfer({
-    amount,
-    currency: booking.currency,
-    destination: account,
-    bookingId: booking.id,
+  // Atomically CLAIM the payout before moving any money. This is the guard that
+  // makes the function genuinely idempotent under concurrency: the status route,
+  // the POD route and the ops agent can all fire for the same booking at once —
+  // only the first updateMany that flips payoutTransferredAt from null wins
+  // (count === 1); the losers see count 0 and return without transferring.
+  const claim = await prisma.booking.updateMany({
+    where: { id: booking.id, payoutTransferredAt: null, paymentStatus: 'PAID' },
+    data: { payoutTransferredAt: new Date() },
   })
+  if (claim.count !== 1) return                    // someone else already claimed it
+
+  let transfer: Awaited<ReturnType<typeof createTransfer>>
+  try {
+    // Idempotency key keyed on the booking makes a retried transfer a no-op at
+    // Stripe (belt-and-braces with the DB claim above).
+    transfer = await createTransfer({
+      amount,
+      currency: booking.currency,
+      destination: account,
+      bookingId: booking.id,
+      idempotencyKey: `payout:${booking.id}`,
+    })
+  } catch (err) {
+    // Transfer failed — release the claim so it can be retried later.
+    await prisma.booking.updateMany({
+      where: { id: booking.id, payoutTransferredAt: { not: null }, stripeTransferId: null },
+      data: { payoutTransferredAt: null },
+    }).catch(() => {})
+    throw err
+  }
 
   await prisma.booking.update({
     where: { id: booking.id },
-    data: { stripeTransferId: transfer.id, payoutTransferredAt: new Date() },
+    data: { stripeTransferId: transfer.id },
   })
   await recordTransaction({ bookingId: booking.id, type: 'PAYOUT', amount, currency: booking.currency, stripeRef: transfer.id, note: 'Carrier payout released' })
 
@@ -111,11 +135,11 @@ export async function releaseCarrierPayout(bookingId: string): Promise<void> {
 export async function reverseCarrierPayout(bookingId: string, amount?: number): Promise<void> {
   const booking = await prisma.booking.findUnique({
     where: { id: bookingId },
-    select: { stripeTransferId: true, payoutTransferredAt: true, carrierPayout: true },
+    select: { stripeTransferId: true, payoutTransferredAt: true, carrierPayout: true, currency: true },
   })
   if (!booking?.stripeTransferId || !booking.payoutTransferredAt) return
 
   const reversalAmount = amount != null ? Math.min(amount, booking.carrierPayout) : undefined
   const reversal = await reverseTransfer(booking.stripeTransferId, reversalAmount)
-  await recordTransaction({ bookingId, type: 'PAYOUT_REVERSAL', amount: reversalAmount ?? booking.carrierPayout, stripeRef: reversal.id, note: 'Carrier payout clawed back on refund' })
+  await recordTransaction({ bookingId, type: 'PAYOUT_REVERSAL', amount: reversalAmount ?? booking.carrierPayout, currency: booking.currency, stripeRef: reversal.id, note: 'Carrier payout clawed back on refund' })
 }

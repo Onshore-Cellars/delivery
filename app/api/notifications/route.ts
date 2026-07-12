@@ -13,7 +13,13 @@ export async function GET(request: NextRequest) {
     const unreadOnly = searchParams.get('unread') === 'true'
     const limit = Math.min(parseInt(searchParams.get('limit') || '20') || 20, 100)
 
-    const where: Record<string, unknown> = { userId: decoded.userId }
+    const where: Record<string, unknown> = {
+      userId: decoded.userId,
+      // Never expose the internal token-carrying rows (email-verify / password-
+      // reset) through the API — returning them would let a user read their own
+      // verification token and self-verify without inbox access.
+      NOT: { AND: [{ type: 'SYSTEM' }, { title: { in: ['EMAIL_VERIFY', 'PASSWORD_RESET'] } }] },
+    }
     if (unreadOnly) where.read = false
 
     const [notifications, unreadCount] = await Promise.all([

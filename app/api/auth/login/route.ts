@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { verifyPassword, generateToken } from '@/lib/auth'
+import { getClientIP } from '@/lib/rate-limit'
 
 // Simple in-memory rate limiter for login attempts (per IP)
 const loginAttempts = new Map<string, { count: number; resetAt: number }>()
@@ -53,7 +54,9 @@ function resetAccountAttempts(userId: string): void {
 
 export async function POST(request: NextRequest) {
   try {
-    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+    // Resolve the client IP via the trusted-proxy-aware helper — NOT the raw
+    // leftmost X-Forwarded-For, which a caller can spoof to dodge the limiter.
+    const ip = getClientIP(request)
     if (isRateLimited(ip)) {
       return NextResponse.json(
         { error: 'Too many login attempts. Please try again later.' },

@@ -78,11 +78,19 @@ export async function GET(request: NextRequest) {
     }))
 
     if (format === 'csv') {
+      // Neutralise CSV formula injection: a cell beginning = + - @ (or tab/CR)
+      // is treated as a formula by Excel/Sheets. Party/note are user-controlled
+      // (names, companies), so prefix a quote and escape embedded quotes.
+      const csvCell = (v: string | number | null | undefined) => {
+        let s = v == null ? '' : String(v)
+        if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`
+        return `"${s.replace(/"/g, '""')}"`
+      }
       const lines = ['Date,Type,Party,Route,Tracking,Amount,Currency,StripeRef,Note']
       for (const r of shaped) {
         lines.push([
-          new Date(r.date).toISOString(), r.type, `"${r.party}"`, `"${r.route || ''}"`, r.tracking || '',
-          r.amount.toFixed(2), r.currency, r.stripeRef || '', `"${(r.note || '').replace(/"/g, '""')}"`,
+          csvCell(new Date(r.date).toISOString()), csvCell(r.type), csvCell(r.party), csvCell(r.route || ''), csvCell(r.tracking || ''),
+          r.amount.toFixed(2), csvCell(r.currency), csvCell(r.stripeRef || ''), csvCell(r.note || ''),
         ].join(','))
       }
       return new NextResponse(lines.join('\n'), {

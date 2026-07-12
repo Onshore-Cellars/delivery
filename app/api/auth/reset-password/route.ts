@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { hashPassword } from '@/lib/auth'
+import { hashApiKey } from '@/lib/api-key'
 import { logAudit } from '@/lib/audit'
 
 export async function POST(request: NextRequest) {
@@ -29,7 +30,7 @@ export async function POST(request: NextRequest) {
 
     // Find the reset token notification
     const resetNotif = await prisma.notification.findFirst({
-      where: { userId: user.id, type: 'SYSTEM', title: 'PASSWORD_RESET', message: token },
+      where: { userId: user.id, type: 'SYSTEM', title: 'PASSWORD_RESET', message: hashApiKey(token) },
     })
 
     if (!resetNotif) {

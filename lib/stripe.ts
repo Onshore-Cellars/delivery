@@ -175,13 +175,14 @@ export async function createTransfer(params: {
   currency: string
   destination: string
   bookingId: string
+  idempotencyKey?: string
 }): Promise<Stripe.Transfer> {
   return stripe.transfers.create({
     amount: Math.round(params.amount * 100),
     currency: params.currency.toLowerCase(),
     destination: params.destination,
     metadata: { bookingId: params.bookingId },
-  })
+  }, params.idempotencyKey ? { idempotencyKey: params.idempotencyKey } : undefined)
 }
 
 /**
