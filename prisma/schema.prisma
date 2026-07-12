@@ -386,6 +386,10 @@ model Booking {
   stripePaymentIntentId String?
   paymentStatus         PaymentStatus @default(PENDING)
   paidAt                DateTime?
+  // Invoicing — a stable, unique invoice number assigned once (at payment) so it
+  // never changes on the document afterwards. invoiceIssuedAt is the issue date.
+  invoiceNumber         String?       @unique
+  invoiceIssuedAt       DateTime?
   // Escrow payout (separate charges & transfers): funds are held on the
   // platform balance at checkout and transferred to the carrier on delivery.
   stripeTransferId      String?

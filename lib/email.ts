@@ -16,7 +16,7 @@ interface EmailTemplate {
   text: string
 }
 
-const APP_NAME = 'Onshore Deliver'
+const APP_NAME = 'Onshore'
 const FROM_EMAIL = process.env.EMAIL_FROM || 'info@onshoredelivery.com'
 const APP_URL = process.env.NEXTAUTH_URL || 'http://localhost:3000'
 
@@ -92,12 +92,12 @@ function wrapEmail(content: string): string {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body style="margin:0;padding:0;background-color:#f8fafc;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+<body style="margin:0;padding:0;background-color:#F5F2EC;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
   <div style="max-width:600px;margin:0 auto;padding:20px;">
     <!-- Header -->
-    <div style="text-align:center;padding:24px 0;border-bottom:1px solid #e2e8f0;">
-      <div style="display:inline-block;background:linear-gradient(135deg,#0f1628,#162040);border-radius:8px;padding:8px 16px;">
-        <span style="color:#0071e3;font-weight:bold;font-size:18px;letter-spacing:1px;">Onshore Deliver</span>
+    <div style="text-align:center;padding:24px 0;border-bottom:1px solid #D3D8D1;">
+      <div style="display:inline-block;background:#0C5C54;border-radius:10px;padding:10px 18px;">
+        <span style="color:#FCFBF8;font-weight:700;font-size:18px;letter-spacing:0.5px;"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#A8813C;margin-right:8px;vertical-align:middle;"></span>Onshore</span>
       </div>
     </div>
 
@@ -107,10 +107,10 @@ function wrapEmail(content: string): string {
     </div>
 
     <!-- Footer -->
-    <div style="text-align:center;padding:24px 0;border-top:1px solid #e2e8f0;color:#94a3b8;font-size:12px;">
+    <div style="text-align:center;padding:24px 0;border-top:1px solid #D3D8D1;color:#647672;font-size:12px;">
       <p>&copy; ${new Date().getFullYear()} ${APP_NAME}. All rights reserved.</p>
       <p style="margin-top:8px;">
-        <a href="${APP_URL}" style="color:#0071e3;text-decoration:none;">Visit Onshore Deliver</a>
+        <a href="${APP_URL}" style="color:#0C5C54;text-decoration:none;">Visit Onshore</a>
       </p>
     </div>
   </div>
@@ -142,42 +142,42 @@ export function bookingConfirmationEmail(data: {
 }): EmailTemplate {
   data = safeData(data)
   const html = wrapEmail(`
-    <h2 style="color:#0f1628;font-size:24px;margin:0 0 16px;">Booking Confirmed!</h2>
-    <p style="color:#475569;font-size:16px;line-height:1.6;">
+    <h2 style="color:#12302C;font-size:24px;margin:0 0 16px;">Booking Confirmed!</h2>
+    <p style="color:#41524E;font-size:16px;line-height:1.6;">
       Hi ${data.customerName}, your shipment has been confirmed.
     </p>
 
-    <div style="background:#f1f5f9;border-radius:12px;padding:20px;margin:24px 0;">
+    <div style="background:#FCFBF8;border:1px solid #D3D8D1;border-radius:12px;padding:20px;margin:24px 0;">
       <div style="margin-bottom:12px;">
-        <span style="color:#64748b;font-size:12px;text-transform:uppercase;letter-spacing:1px;">Tracking Code</span>
-        <div style="color:#0f1628;font-size:24px;font-weight:bold;font-family:monospace;letter-spacing:2px;">${data.trackingCode}</div>
+        <span style="color:#41524E;font-size:12px;text-transform:uppercase;letter-spacing:1px;">Tracking Code</span>
+        <div style="color:#12302C;font-size:24px;font-weight:bold;font-family:monospace;letter-spacing:2px;">${data.trackingCode}</div>
       </div>
       <div style="display:flex;gap:20px;margin-top:16px;">
         <div>
-          <span style="color:#64748b;font-size:12px;">From</span>
-          <div style="color:#0f1628;font-weight:600;">${data.origin}</div>
+          <span style="color:#41524E;font-size:12px;">From</span>
+          <div style="color:#12302C;font-weight:600;">${data.origin}</div>
         </div>
-        <div style="color:#94a3b8;font-size:20px;">→</div>
+        <div style="color:#647672;font-size:20px;">→</div>
         <div>
-          <span style="color:#64748b;font-size:12px;">To</span>
-          <div style="color:#0f1628;font-weight:600;">${data.destination}</div>
+          <span style="color:#41524E;font-size:12px;">To</span>
+          <div style="color:#12302C;font-weight:600;">${data.destination}</div>
         </div>
       </div>
       <div style="margin-top:12px;">
-        <span style="color:#64748b;font-size:12px;">Departure</span>
-        <div style="color:#0f1628;font-weight:600;">${data.departureDate}</div>
+        <span style="color:#41524E;font-size:12px;">Departure</span>
+        <div style="color:#12302C;font-weight:600;">${data.departureDate}</div>
       </div>
       <div style="margin-top:12px;">
-        <span style="color:#64748b;font-size:12px;">Cargo</span>
-        <div style="color:#0f1628;font-weight:600;">${data.cargoDescription}</div>
+        <span style="color:#41524E;font-size:12px;">Cargo</span>
+        <div style="color:#12302C;font-weight:600;">${data.cargoDescription}</div>
       </div>
     </div>
 
-    <div style="background:#0f1628;border-radius:8px;padding:16px;text-align:center;margin:24px 0;">
-      <span style="color:#0071e3;font-size:24px;font-weight:bold;">${data.totalPrice}</span>
+    <div style="background:#0C5C54;border-radius:8px;padding:16px;text-align:center;margin:24px 0;">
+      <span style="color:#FCFBF8;font-size:24px;font-weight:bold;">${data.totalPrice}</span>
     </div>
 
-    <a href="${APP_URL}/tracking?code=${data.trackingCode}" style="display:block;background:linear-gradient(135deg,#0f1628,#162040);color:white;text-align:center;padding:14px 24px;border-radius:8px;font-weight:600;text-decoration:none;margin:24px 0;">
+    <a href="${APP_URL}/tracking?code=${data.trackingCode}" style="display:block;background:linear-gradient(135deg,#0C5C54,#094A44);color:white;text-align:center;padding:14px 24px;border-radius:8px;font-weight:600;text-decoration:none;margin:24px 0;">
       Track Your Shipment
     </a>
   `)
@@ -208,21 +208,21 @@ export function statusUpdateEmail(data: {
   const color = statusColors[data.status] || '#3b82f6'
 
   const html = wrapEmail(`
-    <h2 style="color:#0f1628;font-size:24px;margin:0 0 16px;">Shipment Update</h2>
-    <p style="color:#475569;font-size:16px;line-height:1.6;">
+    <h2 style="color:#12302C;font-size:24px;margin:0 0 16px;">Shipment Update</h2>
+    <p style="color:#41524E;font-size:16px;line-height:1.6;">
       Hi ${data.customerName}, here's an update on your shipment.
     </p>
 
-    <div style="background:#f1f5f9;border-radius:12px;padding:20px;margin:24px 0;">
-      <div style="font-family:monospace;color:#64748b;margin-bottom:8px;">${data.trackingCode}</div>
+    <div style="background:#FCFBF8;border:1px solid #D3D8D1;border-radius:12px;padding:20px;margin:24px 0;">
+      <div style="font-family:monospace;color:#41524E;margin-bottom:8px;">${data.trackingCode}</div>
       <div style="display:inline-block;background:${color};color:white;padding:4px 12px;border-radius:20px;font-size:14px;font-weight:600;">
         ${data.status.replace('_', ' ')}
       </div>
-      <p style="color:#0f1628;margin-top:12px;font-size:16px;">${data.description}</p>
-      ${data.location ? `<p style="color:#64748b;font-size:14px;">📍 ${data.location}</p>` : ''}
+      <p style="color:#12302C;margin-top:12px;font-size:16px;">${data.description}</p>
+      ${data.location ? `<p style="color:#41524E;font-size:14px;">📍 ${data.location}</p>` : ''}
     </div>
 
-    <a href="${APP_URL}/tracking?code=${data.trackingCode}" style="display:block;background:linear-gradient(135deg,#0f1628,#162040);color:white;text-align:center;padding:14px 24px;border-radius:8px;font-weight:600;text-decoration:none;margin:24px 0;">
+    <a href="${APP_URL}/tracking?code=${data.trackingCode}" style="display:block;background:linear-gradient(135deg,#0C5C54,#094A44);color:white;text-align:center;padding:14px 24px;border-radius:8px;font-weight:600;text-decoration:none;margin:24px 0;">
       View Full Tracking
     </a>
   `)
@@ -241,14 +241,14 @@ export function newMessageEmail(data: {
 }): EmailTemplate {
   data = safeData(data)
   const html = wrapEmail(`
-    <h2 style="color:#0f1628;font-size:24px;margin:0 0 16px;">New Message</h2>
-    <p style="color:#475569;font-size:16px;line-height:1.6;">
+    <h2 style="color:#12302C;font-size:24px;margin:0 0 16px;">New Message</h2>
+    <p style="color:#41524E;font-size:16px;line-height:1.6;">
       Hi ${data.recipientName}, you have a new message from <strong>${data.senderName}</strong>.
     </p>
-    <div style="background:#f1f5f9;border-radius:12px;padding:20px;margin:24px 0;">
-      <p style="color:#0f1628;font-size:16px;font-style:italic;">"${data.preview}"</p>
+    <div style="background:#FCFBF8;border:1px solid #D3D8D1;border-radius:12px;padding:20px;margin:24px 0;">
+      <p style="color:#12302C;font-size:16px;font-style:italic;">"${data.preview}"</p>
     </div>
-    <a href="${APP_URL}/messages" style="display:block;background:linear-gradient(135deg,#0f1628,#162040);color:white;text-align:center;padding:14px 24px;border-radius:8px;font-weight:600;text-decoration:none;margin:24px 0;">
+    <a href="${APP_URL}/messages" style="display:block;background:linear-gradient(135deg,#0C5C54,#094A44);color:white;text-align:center;padding:14px 24px;border-radius:8px;font-weight:600;text-decoration:none;margin:24px 0;">
       View Messages
     </a>
   `)
@@ -270,16 +270,16 @@ export function bidReceivedEmail(data: {
 }): EmailTemplate {
   data = safeData(data)
   const html = wrapEmail(`
-    <h2 style="color:#0f1628;font-size:24px;margin:0 0 16px;">New Bid Received</h2>
-    <p style="color:#475569;font-size:16px;line-height:1.6;">
+    <h2 style="color:#12302C;font-size:24px;margin:0 0 16px;">New Bid Received</h2>
+    <p style="color:#41524E;font-size:16px;line-height:1.6;">
       Hi ${data.carrierName}, <strong>${data.bidderName}</strong> has placed a bid on your listing.
     </p>
-    <div style="background:#f1f5f9;border-radius:12px;padding:20px;margin:24px 0;">
-      <div style="margin-bottom:8px;color:#64748b;font-size:14px;">${data.listingTitle}</div>
-      <div style="color:#0f1628;font-size:28px;font-weight:bold;">${data.amount}</div>
-      <div style="color:#64748b;font-size:14px;margin-top:8px;">${data.weightKg}kg · ${data.volumeM3}m³</div>
+    <div style="background:#FCFBF8;border:1px solid #D3D8D1;border-radius:12px;padding:20px;margin:24px 0;">
+      <div style="margin-bottom:8px;color:#41524E;font-size:14px;">${data.listingTitle}</div>
+      <div style="color:#12302C;font-size:28px;font-weight:bold;">${data.amount}</div>
+      <div style="color:#41524E;font-size:14px;margin-top:8px;">${data.weightKg}kg · ${data.volumeM3}m³</div>
     </div>
-    <a href="${APP_URL}/dashboard" style="display:block;background:linear-gradient(135deg,#d4b85e,#c9a84c);color:#0f1628;text-align:center;padding:14px 24px;border-radius:8px;font-weight:600;text-decoration:none;margin:24px 0;">
+    <a href="${APP_URL}/dashboard" style="display:block;background:#A8813C;color:#12302C;text-align:center;padding:14px 24px;border-radius:8px;font-weight:600;text-decoration:none;margin:24px 0;">
       Review Bid
     </a>
   `)
@@ -303,8 +303,8 @@ export function deliveryConfirmationEmail(data: {
 }): EmailTemplate {
   data = safeData(data)
   const html = wrapEmail(`
-    <h2 style="color:#0f1628;font-size:24px;margin:0 0 16px;">Delivery Confirmed!</h2>
-    <p style="color:#475569;font-size:16px;line-height:1.6;">
+    <h2 style="color:#12302C;font-size:24px;margin:0 0 16px;">Delivery Confirmed!</h2>
+    <p style="color:#41524E;font-size:16px;line-height:1.6;">
       Hi ${data.shipperName}, your shipment has been delivered successfully.
     </p>
 
@@ -314,21 +314,21 @@ export function deliveryConfirmationEmail(data: {
       <div style="color:#166534;font-size:14px;margin-top:4px;">${data.deliveredAt}</div>
     </div>
 
-    <div style="background:#f1f5f9;border-radius:12px;padding:20px;margin:24px 0;">
-      <div style="font-family:monospace;color:#64748b;margin-bottom:8px;">${data.trackingCode}</div>
+    <div style="background:#FCFBF8;border:1px solid #D3D8D1;border-radius:12px;padding:20px;margin:24px 0;">
+      <div style="font-family:monospace;color:#41524E;margin-bottom:8px;">${data.trackingCode}</div>
       <div style="margin-bottom:8px;">${data.origin} → ${data.destination}</div>
-      ${data.recipientName ? `<div style="color:#0f1628;font-weight:600;">Signed by: ${data.recipientName}</div>` : ''}
-      <div style="color:#64748b;font-size:13px;margin-top:8px;">
+      ${data.recipientName ? `<div style="color:#12302C;font-weight:600;">Signed by: ${data.recipientName}</div>` : ''}
+      <div style="color:#41524E;font-size:13px;margin-top:8px;">
         ${data.hasSignature ? '✓ Signature captured  ' : ''}
         ${data.hasPhoto ? '✓ Photo attached' : ''}
       </div>
     </div>
 
-    <a href="${APP_URL}/dashboard" style="display:block;background:linear-gradient(135deg,#0f1628,#162040);color:white;text-align:center;padding:14px 24px;border-radius:8px;font-weight:600;text-decoration:none;margin:24px 0;">
+    <a href="${APP_URL}/dashboard" style="display:block;background:linear-gradient(135deg,#0C5C54,#094A44);color:white;text-align:center;padding:14px 24px;border-radius:8px;font-weight:600;text-decoration:none;margin:24px 0;">
       View Proof of Delivery
     </a>
 
-    <p style="color:#64748b;font-size:13px;text-align:center;">
+    <p style="color:#41524E;font-size:13px;text-align:center;">
       Please leave a review to help other shippers.
     </p>
   `)
@@ -350,31 +350,31 @@ export function paymentReceiptEmail(data: {
 }): EmailTemplate {
   data = safeData(data)
   const html = wrapEmail(`
-    <h2 style="color:#0f1628;font-size:24px;margin:0 0 16px;">Payment Receipt</h2>
-    <p style="color:#475569;font-size:16px;line-height:1.6;">
+    <h2 style="color:#12302C;font-size:24px;margin:0 0 16px;">Payment Receipt</h2>
+    <p style="color:#41524E;font-size:16px;line-height:1.6;">
       Hi ${data.customerName}, here's your payment receipt.
     </p>
 
-    <div style="background:#f1f5f9;border-radius:12px;padding:20px;margin:24px 0;">
+    <div style="background:#FCFBF8;border:1px solid #D3D8D1;border-radius:12px;padding:20px;margin:24px 0;">
       <div style="display:flex;justify-content:space-between;margin-bottom:12px;">
-        <span style="color:#64748b;font-size:14px;">Reference</span>
-        <span style="color:#0f1628;font-weight:600;font-family:monospace;">${data.trackingCode}</span>
+        <span style="color:#41524E;font-size:14px;">Reference</span>
+        <span style="color:#12302C;font-weight:600;font-family:monospace;">${data.trackingCode}</span>
       </div>
       <div style="display:flex;justify-content:space-between;margin-bottom:12px;">
-        <span style="color:#64748b;font-size:14px;">Description</span>
-        <span style="color:#0f1628;font-weight:600;">${data.description}</span>
+        <span style="color:#41524E;font-size:14px;">Description</span>
+        <span style="color:#12302C;font-weight:600;">${data.description}</span>
       </div>
       <div style="display:flex;justify-content:space-between;margin-bottom:12px;">
-        <span style="color:#64748b;font-size:14px;">Date</span>
-        <span style="color:#0f1628;font-weight:600;">${data.paidAt}</span>
+        <span style="color:#41524E;font-size:14px;">Date</span>
+        <span style="color:#12302C;font-weight:600;">${data.paidAt}</span>
       </div>
-      <div style="border-top:1px solid #e2e8f0;padding-top:12px;display:flex;justify-content:space-between;">
-        <span style="color:#0f1628;font-size:18px;font-weight:bold;">Total</span>
-        <span style="color:#0f1628;font-size:18px;font-weight:bold;">${data.amount}</span>
+      <div style="border-top:1px solid #D3D8D1;padding-top:12px;display:flex;justify-content:space-between;">
+        <span style="color:#12302C;font-size:18px;font-weight:bold;">Total</span>
+        <span style="color:#12302C;font-size:18px;font-weight:bold;">${data.amount}</span>
       </div>
     </div>
 
-    <a href="${data.invoiceUrl}" style="display:block;background:linear-gradient(135deg,#0f1628,#162040);color:white;text-align:center;padding:14px 24px;border-radius:8px;font-weight:600;text-decoration:none;margin:24px 0;">
+    <a href="${data.invoiceUrl}" style="display:block;background:linear-gradient(135deg,#0C5C54,#094A44);color:white;text-align:center;padding:14px 24px;border-radius:8px;font-weight:600;text-decoration:none;margin:24px 0;">
       View Invoice
     </a>
   `)
@@ -393,32 +393,37 @@ export function carrierPayoutEmail(data: {
   bookingTotal: string
   platformFee: string
   deliveredAt: string
+  statementUrl?: string
 }): EmailTemplate {
   data = safeData(data)
   const html = wrapEmail(`
-    <h2 style="color:#0f1628;font-size:24px;margin:0 0 16px;">Payout Processed</h2>
-    <p style="color:#475569;font-size:16px;line-height:1.6;">
+    <h2 style="color:#12302C;font-size:24px;margin:0 0 16px;">Payout Processed</h2>
+    <p style="color:#41524E;font-size:16px;line-height:1.6;">
       Hi ${data.carrierName}, your payout for delivery ${data.trackingCode} has been processed.
     </p>
 
-    <div style="background:#f1f5f9;border-radius:12px;padding:20px;margin:24px 0;">
+    <div style="background:#FCFBF8;border:1px solid #D3D8D1;border-radius:12px;padding:20px;margin:24px 0;">
       <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-        <span style="color:#64748b;font-size:14px;">Booking Total</span>
-        <span style="color:#0f1628;">${data.bookingTotal}</span>
+        <span style="color:#41524E;font-size:14px;">Booking Total</span>
+        <span style="color:#12302C;">${data.bookingTotal}</span>
       </div>
       <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-        <span style="color:#64748b;font-size:14px;">Platform Fee</span>
+        <span style="color:#41524E;font-size:14px;">Platform Fee</span>
         <span style="color:#ef4444;">-${data.platformFee}</span>
       </div>
-      <div style="border-top:1px solid #e2e8f0;padding-top:8px;display:flex;justify-content:space-between;">
-        <span style="color:#0f1628;font-size:18px;font-weight:bold;">Your Payout</span>
+      <div style="border-top:1px solid #D3D8D1;padding-top:8px;display:flex;justify-content:space-between;">
+        <span style="color:#12302C;font-size:18px;font-weight:bold;">Your Payout</span>
         <span style="color:#10b981;font-size:18px;font-weight:bold;">${data.payoutAmount}</span>
       </div>
     </div>
 
-    <p style="color:#64748b;font-size:13px;text-align:center;">
+    <p style="color:#41524E;font-size:13px;text-align:center;">
       Funds will arrive in your Stripe account within 2–3 business days.
     </p>
+    ${data.statementUrl ? `
+    <a href="${data.statementUrl}" style="display:block;background:linear-gradient(135deg,#0C5C54,#094A44);color:white;text-align:center;padding:14px 24px;border-radius:8px;font-weight:600;text-decoration:none;margin:24px 0;">
+      Download Payout Statement
+    </a>` : ''}
   `)
 
   return {
@@ -431,21 +436,21 @@ export function carrierPayoutEmail(data: {
 export function welcomeEmail(data: { name: string; role: string }): EmailTemplate {
   data = safeData(data)
   const html = wrapEmail(`
-    <h2 style="color:#0f1628;font-size:24px;margin:0 0 16px;">Welcome to Onshore Deliver!</h2>
-    <p style="color:#475569;font-size:16px;line-height:1.6;">
+    <h2 style="color:#12302C;font-size:24px;margin:0 0 16px;">Welcome to Onshore!</h2>
+    <p style="color:#41524E;font-size:16px;line-height:1.6;">
       Hi ${data.name}, thanks for joining the delivery logistics marketplace.
     </p>
 
-    <div style="background:#f1f5f9;border-radius:12px;padding:20px;margin:24px 0;">
-      <h3 style="color:#0f1628;margin:0 0 12px;font-size:16px;">Get Started</h3>
+    <div style="background:#FCFBF8;border:1px solid #D3D8D1;border-radius:12px;padding:20px;margin:24px 0;">
+      <h3 style="color:#12302C;margin:0 0 12px;font-size:16px;">Get Started</h3>
       ${data.role === 'CARRIER' ? `
-        <ul style="color:#475569;font-size:14px;line-height:2;padding-left:20px;">
+        <ul style="color:#41524E;font-size:14px;line-height:2;padding-left:20px;">
           <li>Add your vehicle details and documentation</li>
           <li>List your available transport space</li>
           <li>Start accepting bookings and earning</li>
         </ul>
       ` : `
-        <ul style="color:#475569;font-size:14px;line-height:2;padding-left:20px;">
+        <ul style="color:#41524E;font-size:14px;line-height:2;padding-left:20px;">
           <li>Browse available carrier routes</li>
           <li>Book space for your provisions and equipment</li>
           <li>Track your deliveries in real time</li>
@@ -453,15 +458,15 @@ export function welcomeEmail(data: { name: string; role: string }): EmailTemplat
       `}
     </div>
 
-    <a href="${APP_URL}/dashboard" style="display:block;background:linear-gradient(135deg,#C6904D,#b07d3f);color:white;text-align:center;padding:14px 24px;border-radius:8px;font-weight:600;text-decoration:none;margin:24px 0;">
+    <a href="${APP_URL}/dashboard" style="display:block;background:#A8813C;color:white;text-align:center;padding:14px 24px;border-radius:8px;font-weight:600;text-decoration:none;margin:24px 0;">
       Go to Dashboard
     </a>
   `)
 
   return {
-    subject: 'Welcome to Onshore Deliver',
+    subject: 'Welcome to Onshore',
     html,
-    text: `Welcome to Onshore Deliver, ${data.name}! Visit your dashboard to get started.`,
+    text: `Welcome to Onshore, ${data.name}! Visit your dashboard to get started.`,
   }
 }
 
@@ -474,8 +479,8 @@ export function documentStatusEmail(data: {
   data = safeData(data)
   const isVerified = data.status === 'VERIFIED'
   const html = wrapEmail(`
-    <h2 style="color:#0f1628;font-size:24px;margin:0 0 16px;">Document ${isVerified ? 'Verified' : 'Requires Attention'}</h2>
-    <p style="color:#475569;font-size:16px;line-height:1.6;">
+    <h2 style="color:#12302C;font-size:24px;margin:0 0 16px;">Document ${isVerified ? 'Verified' : 'Requires Attention'}</h2>
+    <p style="color:#41524E;font-size:16px;line-height:1.6;">
       Hi ${data.userName}, your document <strong>${data.documentName}</strong> has been ${isVerified ? 'verified' : 'reviewed'}.
     </p>
 
@@ -488,7 +493,7 @@ export function documentStatusEmail(data: {
     </div>
 
     ${!isVerified ? `
-    <a href="${APP_URL}/profile" style="display:block;background:linear-gradient(135deg,#0f1628,#162040);color:white;text-align:center;padding:14px 24px;border-radius:8px;font-weight:600;text-decoration:none;margin:24px 0;">
+    <a href="${APP_URL}/profile" style="display:block;background:linear-gradient(135deg,#0C5C54,#094A44);color:white;text-align:center;padding:14px 24px;border-radius:8px;font-weight:600;text-decoration:none;margin:24px 0;">
       Re-upload Document
     </a>
     ` : ''}
@@ -511,16 +516,16 @@ export function quoteRequestEmail(data: {
 }): EmailTemplate {
   data = safeData(data)
   const html = wrapEmail(`
-    <h2 style="color:#0f1628;font-size:24px;margin:0 0 16px;">Quote Requested</h2>
-    <p style="color:#475569;font-size:16px;line-height:1.6;">
+    <h2 style="color:#12302C;font-size:24px;margin:0 0 16px;">Quote Requested</h2>
+    <p style="color:#41524E;font-size:16px;line-height:1.6;">
       Hi ${data.carrierName}, <strong>${data.requesterName}</strong> is requesting a quote.
     </p>
-    <div style="background:#f1f5f9;border-radius:12px;padding:20px;margin:24px 0;">
+    <div style="background:#FCFBF8;border:1px solid #D3D8D1;border-radius:12px;padding:20px;margin:24px 0;">
       <div style="margin-bottom:8px;">${data.origin} → ${data.destination}</div>
-      <div style="color:#0f1628;font-weight:600;">${data.cargoDescription}</div>
-      <div style="color:#64748b;font-size:14px;margin-top:8px;">${data.weightKg}kg</div>
+      <div style="color:#12302C;font-weight:600;">${data.cargoDescription}</div>
+      <div style="color:#41524E;font-size:14px;margin-top:8px;">${data.weightKg}kg</div>
     </div>
-    <a href="${APP_URL}/dashboard" style="display:block;background:linear-gradient(135deg,#d4b85e,#c9a84c);color:#0f1628;text-align:center;padding:14px 24px;border-radius:8px;font-weight:600;text-decoration:none;margin:24px 0;">
+    <a href="${APP_URL}/dashboard" style="display:block;background:#A8813C;color:#12302C;text-align:center;padding:14px 24px;border-radius:8px;font-weight:600;text-decoration:none;margin:24px 0;">
       Respond to Quote
     </a>
   `)
@@ -535,19 +540,19 @@ export function quoteRequestEmail(data: {
 export function passwordResetEmail(data: { name: string; resetLink: string }): EmailTemplate {
   data = safeData(data)
   const html = wrapEmail(`
-    <h2 style="color:#0f1628;font-size:24px;margin:0 0 16px;">Reset Your Password</h2>
-    <p style="color:#475569;font-size:16px;line-height:1.6;">
+    <h2 style="color:#12302C;font-size:24px;margin:0 0 16px;">Reset Your Password</h2>
+    <p style="color:#41524E;font-size:16px;line-height:1.6;">
       Hi ${data.name}, we received a request to reset your password. Click the button below to choose a new one.
     </p>
-    <a href="${data.resetLink}" style="display:block;background:linear-gradient(135deg,#C6904D,#b07d3f);color:white;text-align:center;padding:14px 24px;border-radius:8px;font-weight:600;text-decoration:none;margin:24px 0;">
+    <a href="${data.resetLink}" style="display:block;background:#A8813C;color:white;text-align:center;padding:14px 24px;border-radius:8px;font-weight:600;text-decoration:none;margin:24px 0;">
       Reset Password
     </a>
-    <p style="color:#94a3b8;font-size:13px;line-height:1.5;">
+    <p style="color:#647672;font-size:13px;line-height:1.5;">
       This link expires in 1 hour. If you didn't request this, you can safely ignore this email.
     </p>
   `)
   return {
-    subject: 'Reset your Onshore Deliver password',
+    subject: 'Reset your Onshore password',
     html,
     text: `Hi ${data.name}, reset your password here: ${data.resetLink}. This link expires in 1 hour.`,
   }
@@ -563,18 +568,18 @@ export function alertMatchEmail(data: {
   data = safeData(data)
   const APP_URL_RESOLVED = process.env.NEXTAUTH_URL || 'http://localhost:3000'
   const html = wrapEmail(`
-    <h2 style="color:#0f1628;font-size:24px;margin:0 0 16px;">New Listing Match${data.alertName ? `: ${data.alertName}` : ''}</h2>
-    <p style="color:#475569;font-size:16px;line-height:1.6;">
+    <h2 style="color:#12302C;font-size:24px;margin:0 0 16px;">New Listing Match${data.alertName ? `: ${data.alertName}` : ''}</h2>
+    <p style="color:#41524E;font-size:16px;line-height:1.6;">
       Hi ${data.userName},
     </p>
-    <div style="background:#f1f5f9;border-radius:12px;padding:20px;margin:24px 0;">
-      <p style="color:#0f1628;font-size:16px;line-height:1.6;white-space:pre-line;">${data.body}</p>
+    <div style="background:#FCFBF8;border:1px solid #D3D8D1;border-radius:12px;padding:20px;margin:24px 0;">
+      <p style="color:#12302C;font-size:16px;line-height:1.6;white-space:pre-line;">${data.body}</p>
     </div>
-    <a href="${APP_URL_RESOLVED}/listings/${data.listingId}" style="display:block;background:linear-gradient(135deg,#0f1628,#162040);color:white;text-align:center;padding:14px 24px;border-radius:8px;font-weight:600;text-decoration:none;margin:24px 0;">
+    <a href="${APP_URL_RESOLVED}/listings/${data.listingId}" style="display:block;background:linear-gradient(135deg,#0C5C54,#094A44);color:white;text-align:center;padding:14px 24px;border-radius:8px;font-weight:600;text-decoration:none;margin:24px 0;">
       View Listing
     </a>
-    <p style="color:#64748b;font-size:13px;text-align:center;">
-      <a href="${APP_URL_RESOLVED}/marketplace" style="color:#0071e3;text-decoration:none;">Manage Alerts</a>
+    <p style="color:#41524E;font-size:13px;text-align:center;">
+      <a href="${APP_URL_RESOLVED}/marketplace" style="color:#0C5C54;text-decoration:none;">Manage Alerts</a>
     </p>
   `)
 
@@ -588,19 +593,19 @@ export function alertMatchEmail(data: {
 export function emailVerificationEmail(data: { name: string; verifyLink: string }): EmailTemplate {
   data = safeData(data)
   const html = wrapEmail(`
-    <h2 style="color:#0f1628;font-size:24px;margin:0 0 16px;">Verify Your Email</h2>
-    <p style="color:#475569;font-size:16px;line-height:1.6;">
+    <h2 style="color:#12302C;font-size:24px;margin:0 0 16px;">Verify Your Email</h2>
+    <p style="color:#41524E;font-size:16px;line-height:1.6;">
       Hi ${data.name}, please verify your email address to complete your registration.
     </p>
-    <a href="${data.verifyLink}" style="display:block;background:linear-gradient(135deg,#C6904D,#b07d3f);color:white;text-align:center;padding:14px 24px;border-radius:8px;font-weight:600;text-decoration:none;margin:24px 0;">
+    <a href="${data.verifyLink}" style="display:block;background:#A8813C;color:white;text-align:center;padding:14px 24px;border-radius:8px;font-weight:600;text-decoration:none;margin:24px 0;">
       Verify Email
     </a>
-    <p style="color:#94a3b8;font-size:13px;line-height:1.5;">
+    <p style="color:#647672;font-size:13px;line-height:1.5;">
       This link expires in 24 hours.
     </p>
   `)
   return {
-    subject: 'Verify your Onshore Deliver email',
+    subject: 'Verify your Onshore email',
     html,
     text: `Hi ${data.name}, verify your email here: ${data.verifyLink}. This link expires in 24 hours.`,
   }

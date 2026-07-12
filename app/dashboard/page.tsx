@@ -522,7 +522,7 @@ export default function DashboardPage() {
                               </button>
                             )}
                             <a
-                              href={`/api/bookings/${b.id}/invoice/pdf`}
+                              href={`/api/bookings/${b.id}/invoice/pdf${token ? `?token=${token}` : ''}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-[11px] font-medium text-[var(--c-accent)] hover:text-[var(--c-accent-hover)] transition-colors"

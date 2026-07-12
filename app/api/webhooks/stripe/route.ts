@@ -4,6 +4,8 @@ import { constructWebhookEvent, calculatePlatformFee, calculateCarrierPayout, cu
 import { createNotification } from '@/lib/notifications'
 import { paymentReceiptEmail } from '@/lib/email'
 import { queueEmail } from '@/lib/email-queue'
+import { ensureInvoiceNumber } from '@/lib/invoice'
+import { generateInvoiceToken } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {
   try {
@@ -73,6 +75,10 @@ export async function POST(request: NextRequest) {
           const sym = currencySymbol(booking.currency)
           const fmtMoney = (n: number) => `${sym}${n.toFixed(2)}`
 
+          // Assign the stable invoice number now, at payment, so it's fixed on
+          // every copy of the document (receipt email, PDF, HTML view) forever.
+          try { await ensureInvoiceNumber(booking.id) } catch (e) { console.error('Invoice number error:', e) }
+
           // Notify both parties (in-app)
           await createNotification({
             userId: booking.shipperId,
@@ -107,7 +113,7 @@ export async function POST(request: NextRequest) {
               amount: fmtMoney(booking.totalPrice),
               description: `${booking.listing.originPort} → ${booking.listing.destinationPort}`,
               paidAt: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
-              invoiceUrl: `${appUrl}/api/bookings/${booking.id}/invoice/pdf`,
+              invoiceUrl: `${appUrl}/api/bookings/${booking.id}/invoice/pdf?token=${generateInvoiceToken(booking.id, 'shipper')}`,
             })
             await queueEmail({ to: booking.shipper.email, ...receiptEmail })
           } catch (e) { console.error('Receipt email error:', e) }

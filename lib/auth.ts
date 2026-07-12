@@ -59,6 +59,31 @@ export function getTokenFromHeader(authHeader: string | null): string | null {
   return authHeader.slice(7)
 }
 
+// ─── Scoped invoice access tokens ────────────────────────────────────────────
+// A read-only, single-booking token embedded in emailed invoice/payout links so
+// a recipient can open their document without logging in — without ever handing
+// out a full-access session JWT. Scoped to one booking and one viewpoint.
+export interface InvoiceTokenPayload {
+  scope: 'invoice'
+  bookingId: string
+  as: 'shipper' | 'carrier'
+  iat?: number
+  exp?: number
+}
+
+export function generateInvoiceToken(bookingId: string, as: 'shipper' | 'carrier', expiresIn: string = '120d'): string {
+  return jwt.sign({ scope: 'invoice', bookingId, as }, getJwtSecret(), { expiresIn } as jwt.SignOptions)
+}
+
+export function verifyInvoiceToken(token: string): InvoiceTokenPayload | null {
+  try {
+    const decoded = jwt.verify(token, getJwtSecret()) as InvoiceTokenPayload
+    return decoded?.scope === 'invoice' && decoded.bookingId ? decoded : null
+  } catch {
+    return null
+  }
+}
+
 export function generateTrackingCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
   const bytes = crypto.randomBytes(8)

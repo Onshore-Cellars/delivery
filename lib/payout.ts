@@ -3,6 +3,7 @@ import { createTransfer, reverseTransfer, currencySymbol, calculateCarrierPayout
 import { createNotification } from './notifications'
 import { carrierPayoutEmail } from './email'
 import { queueEmail } from './email-queue'
+import { generateInvoiceToken } from './auth'
 
 /**
  * Release a carrier's escrowed payout for a DELIVERED booking.
@@ -74,6 +75,7 @@ export async function releaseCarrierPayout(bookingId: string): Promise<void> {
         platformFee: `${sym}${booking.platformFee.toFixed(2)}`,
         payoutAmount: `${sym}${amount.toFixed(2)}`,
         deliveredAt: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+        statementUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/bookings/${booking.id}/invoice/pdf?token=${generateInvoiceToken(booking.id, 'carrier')}`,
       })
       await queueEmail({ to: booking.listing.carrier.email, ...email })
     } catch (e) {
