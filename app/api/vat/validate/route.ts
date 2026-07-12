@@ -2,8 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { verifyToken, getTokenFromHeader } from '@/lib/auth'
 import { checkVatNumber, normaliseVatNumber } from '@/lib/vat'
+import { createRateLimiter } from '@/lib/rate-limit'
 
 export const runtime = 'nodejs'
+
+// Per-user cap on VIES lookups — the endpoint makes an outbound call to the EU
+// service and writes the profile, so bound it to prevent abuse / egress throttling.
+const vatLimiter = createRateLimiter({ interval: 60 * 60_000, limit: 30 })
 
 // POST /api/vat/validate — verify a VAT number (VIES) and, by default, save the
 // result to the current user's profile.
@@ -15,6 +20,9 @@ export async function POST(request: NextRequest) {
     if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     const decoded = verifyToken(token)
     if (!decoded) return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
+
+    const rl = await vatLimiter.check(`vat:${decoded.userId}`)
+    if (!rl.success) return NextResponse.json({ error: 'Too many VAT checks. Please try again later.' }, { status: 429 })
 
     const body = await request.json().catch(() => ({}))
     const raw = typeof body.vatNumber === 'string' ? body.vatNumber.trim() : ''

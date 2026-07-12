@@ -6,10 +6,14 @@ import {
   deliveryConfirmationEmail, carrierPayoutEmail, bidReceivedEmail, quoteRequestEmail,
 } from '@/lib/email'
 import { buildInvoiceModel, renderInvoicePdf } from '@/lib/invoice'
+import { createRateLimiter } from '@/lib/rate-limit'
 
 export const runtime = 'nodejs'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+// Each call sends 8 emails; cap per admin so a leaked admin token can't be used
+// as an email-bomb amplifier.
+const testEmailLimiter = createRateLimiter({ interval: 60 * 60_000, limit: 6 })
 
 // A realistic fake booking so the sample invoice PDF looks complete.
 function sampleBooking(): any {
@@ -44,6 +48,9 @@ export async function POST(request: NextRequest) {
     if (!decoded || decoded.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
     }
+
+    const rl = await testEmailLimiter.check(`test-email:${decoded.userId}`)
+    if (!rl.success) return NextResponse.json({ error: 'Too many test sends. Please wait before trying again.' }, { status: 429 })
 
     const body = await request.json().catch(() => ({}))
     const to = String(body.to || '').trim()

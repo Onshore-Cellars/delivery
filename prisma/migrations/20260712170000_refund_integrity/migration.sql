@@ -1,0 +1,3 @@
+-- Partial-refund tracking + status
+ALTER TYPE "PaymentStatus" ADD VALUE IF NOT EXISTS 'PARTIALLY_REFUNDED';
+ALTER TABLE "Booking" ADD COLUMN "refundedAmount" DOUBLE PRECISION NOT NULL DEFAULT 0;

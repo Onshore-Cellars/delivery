@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { verifyToken, getTokenFromHeader } from '@/lib/auth'
-import { createRefund } from '@/lib/stripe'
-import { reverseCarrierPayout, carrierRefundShare } from '@/lib/payout'
+import { processRefund } from '@/lib/refund'
 import { createNotification } from '@/lib/notifications'
 
 // GET — list all disputes with pagination
@@ -125,6 +124,37 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'Dispute not found' }, { status: 404 })
     }
 
+    // Issue any refund FIRST — validated and atomic (shared processRefund) —
+    // so we never mark a dispute RESOLVED when the refund itself is rejected.
+    if (refundAmount && refundAmount > 0 && status === 'RESOLVED') {
+      if (typeof refundAmount !== 'number') {
+        return NextResponse.json({ error: 'refundAmount must be a number' }, { status: 400 })
+      }
+      const b = dispute.booking
+      const gross = Math.round((b.totalPrice + (b.vatAmount || 0)) * 100) / 100
+      const result = await processRefund(dispute.bookingId, refundAmount >= gross ? undefined : refundAmount)
+      if (!result.ok) {
+        return NextResponse.json({ error: result.error }, { status: result.status })
+      }
+
+      await prisma.auditLog.create({
+        data: {
+          userId: decoded.userId,
+          targetId: dispute.booking.shipperId,
+          action: 'DISPUTE_REFUND',
+          details: JSON.stringify({ disputeId: id, bookingId: dispute.bookingId, refundAmount: result.refundAmount, trackingCode: dispute.booking.trackingCode }),
+        },
+      })
+      await createNotification({
+        userId: dispute.booking.shipperId,
+        type: 'PAYMENT_RECEIVED',
+        title: 'Dispute Resolved — Refund Issued',
+        message: `Your dispute for booking #${dispute.booking.trackingCode} has been resolved. A refund of ${b.currency === 'GBP' ? '£' : '€'}${result.refundAmount.toFixed(2)} has been issued.`,
+        linkUrl: '/disputes',
+      }).catch(() => {})
+    }
+
+    // Now record the dispute status/resolution.
     const updateData: Record<string, unknown> = {}
     if (status) updateData.status = status
     if (resolutionNotes) updateData.resolution = resolutionNotes
@@ -137,66 +167,6 @@ export async function PATCH(request: NextRequest) {
       where: { id },
       data: updateData,
     })
-
-    // If refundAmount is provided and status is RESOLVED, ACTUALLY issue the
-    // refund via Stripe and reverse the carrier's payout (VAT excluded — it's
-    // the platform's, not the carrier's). Previously this only flipped the
-    // payment status without moving any money.
-    if (refundAmount && refundAmount > 0 && status === 'RESOLVED') {
-      const b = dispute.booking
-      const gross = Math.round((b.totalPrice + (b.vatAmount || 0)) * 100) / 100
-      if (refundAmount > gross) {
-        return NextResponse.json({ error: 'Refund amount cannot exceed booking total (incl. VAT)' }, { status: 400 })
-      }
-      if (b.paymentStatus !== 'PAID') {
-        return NextResponse.json({ error: 'Cannot refund — booking is not in a PAID state' }, { status: 400 })
-      }
-      if (!b.stripePaymentIntentId) {
-        return NextResponse.json({ error: 'Cannot refund — no payment intent on this booking' }, { status: 400 })
-      }
-
-      const isFull = refundAmount >= gross
-      // Actually refund via Stripe (undefined amount = full gross refund).
-      await createRefund(b.stripePaymentIntentId, isFull ? undefined : refundAmount)
-      // Reverse the carrier's proportional share (never the VAT portion).
-      const carrierClaw = carrierRefundShare(refundAmount, b.carrierPayout, gross)
-      await reverseCarrierPayout(b.id, carrierClaw).catch(e => console.error('Dispute payout reversal error:', e))
-
-      await prisma.booking.update({
-        where: { id: dispute.bookingId },
-        data: { paymentStatus: 'REFUNDED' },
-      })
-
-      // Create an audit log for the refund
-      await prisma.auditLog.create({
-        data: {
-          userId: decoded.userId,
-          targetId: dispute.booking.shipperId,
-          action: 'DISPUTE_REFUND',
-          details: JSON.stringify({
-            disputeId: id,
-            bookingId: dispute.bookingId,
-            refundAmount,
-            trackingCode: dispute.booking.trackingCode,
-          }),
-        },
-      })
-
-      // Notify the shipper about the refund
-      try {
-        await prisma.notification.create({
-          data: {
-            userId: dispute.booking.shipperId,
-            type: 'PAYMENT_RECEIVED',
-            title: 'Dispute Resolved — Refund Issued',
-            message: `Your dispute for booking #${dispute.booking.trackingCode} has been resolved. A refund of €${refundAmount.toFixed(2)} has been issued.`,
-            metadata: JSON.stringify({ disputeId: id, bookingId: dispute.bookingId, refundAmount }),
-          },
-        })
-      } catch (notifErr) {
-        console.error('Refund notification error:', notifErr)
-      }
-    }
 
     // Log the admin action
     await prisma.auditLog.create({

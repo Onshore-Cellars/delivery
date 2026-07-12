@@ -198,7 +198,7 @@ export async function reverseTransfer(transferId: string, amount?: number): Prom
 export async function createRefund(
   paymentIntentId: string,
   amount?: number,
-  opts?: { reverseTransfer?: boolean; refundApplicationFee?: boolean },
+  opts?: { reverseTransfer?: boolean; refundApplicationFee?: boolean; idempotencyKey?: string },
 ) {
   const refundParams: Stripe.RefundCreateParams = {
     payment_intent: paymentIntentId,
@@ -209,7 +209,9 @@ export async function createRefund(
   // refunds the shipper out of its own balance while the carrier keeps the payout.
   if (opts?.reverseTransfer) refundParams.reverse_transfer = true
   if (opts?.refundApplicationFee) refundParams.refund_application_fee = true
-  return stripe.refunds.create(refundParams)
+  // An idempotency key makes a retried/concurrent refund a no-op at Stripe,
+  // preventing a double refund if the request is duplicated.
+  return stripe.refunds.create(refundParams, opts?.idempotencyKey ? { idempotencyKey: opts.idempotencyKey } : undefined)
 }
 
 // ─── WEBHOOK VERIFICATION ─────────────────────────────────────────────────────

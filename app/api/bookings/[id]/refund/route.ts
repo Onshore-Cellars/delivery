@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { verifyToken, getTokenFromHeader } from '@/lib/auth'
-import { createRefund, currencySymbol } from '@/lib/stripe'
-import { reverseCarrierPayout, carrierRefundShare } from '@/lib/payout'
+import { currencySymbol } from '@/lib/stripe'
+import { processRefund } from '@/lib/refund'
 import { createNotification } from '@/lib/notifications'
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -45,47 +45,16 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       return NextResponse.json({ error: 'Booking not found' }, { status: 404 })
     }
 
-    if (!booking.stripePaymentIntentId) {
-      return NextResponse.json({ error: 'No payment intent found for this booking' }, { status: 400 })
+    // Atomic, idempotent, partial-aware refund (money + status). Returns whether
+    // this completes the refund so we can restore capacity below.
+    const result = await processRefund(id, amount)
+    if (!result.ok) {
+      return NextResponse.json({ error: result.error }, { status: result.status })
     }
+    const isPartial = !result.fullyRefunded
 
-    if (booking.paymentStatus !== 'PAID') {
-      return NextResponse.json({ error: 'Booking payment status is not PAID' }, { status: 400 })
-    }
-
-    // The customer paid the GROSS (net + VAT), so a full refund returns the
-    // gross and a partial refund may be up to the gross.
-    const gross = Math.round((booking.totalPrice + (booking.vatAmount || 0)) * 100) / 100
-
-    // Validate partial refund amount
-    if (amount !== undefined) {
-      if (typeof amount !== 'number' || amount <= 0) {
-        return NextResponse.json({ error: 'Refund amount must be a positive number' }, { status: 400 })
-      }
-      if (amount > gross) {
-        return NextResponse.json({ error: 'Refund amount cannot exceed booking total (incl. VAT)' }, { status: 400 })
-      }
-    }
-
-    const isPartial = amount !== undefined && amount < gross
-    const refundAmount = amount ?? gross
-
-    // Escrow: the charge is on the platform balance, so refund it directly
-    // (undefined amount = full gross refund by Stripe). If the payout was
-    // already released to the carrier, claw back only the carrier's share of
-    // the refund — VAT is the platform's liability, not the carrier's, so it is
-    // excluded from the payout reversal.
-    const carrierClaw = isPartial ? carrierRefundShare(refundAmount, booking.carrierPayout, gross) : undefined // full reversal
-    await createRefund(booking.stripePaymentIntentId, amount)
-    await reverseCarrierPayout(id, carrierClaw).catch(e => console.error('Payout reversal error:', e))
-
-    // Update booking payment status
-    const updatedBooking = await prisma.booking.update({
+    const updatedBooking = await prisma.booking.findUnique({
       where: { id },
-      data: {
-        paymentStatus: 'REFUNDED',
-        ...(isPartial ? {} : { status: 'CANCELLED' }),
-      },
       include: {
         shipper: { select: { id: true, name: true, email: true } },
         listing: {
@@ -148,7 +117,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       userId: booking.shipperId,
       type: 'PAYMENT_RECEIVED',
       title: 'Refund Processed',
-      message: `Refund of ${currencySymbol(booking.currency)}${refundAmount.toFixed(2)} processed for booking ${booking.trackingCode || id}`,
+      message: `Refund of ${currencySymbol(booking.currency)}${result.refundAmount.toFixed(2)} processed for booking ${booking.trackingCode || id}${result.fullyRefunded ? '' : ' (partial)'}`,
       linkUrl: `/tracking?code=${booking.trackingCode}`,
     })
 
@@ -156,7 +125,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     await prisma.trackingEvent.create({
       data: {
         bookingId: id,
-        status: updatedBooking.status,
+        status: updatedBooking?.status || 'CANCELLED',
         description: `Refund processed${reason ? `: ${reason}` : ''}`,
       },
     })

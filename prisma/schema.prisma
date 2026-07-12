@@ -46,6 +46,7 @@ enum PaymentStatus {
   PENDING
   PROCESSING
   PAID
+  PARTIALLY_REFUNDED
   REFUNDED
   FAILED
 }
@@ -419,6 +420,9 @@ model Booking {
   // never changes on the document afterwards. invoiceIssuedAt is the issue date.
   invoiceNumber         String?       @unique
   invoiceIssuedAt       DateTime?
+  // Cumulative amount refunded to the customer (gross). Booking is REFUNDED only
+  // when this reaches the gross charged; otherwise PARTIALLY_REFUNDED.
+  refundedAmount        Float         @default(0)
   // Escrow payout (separate charges & transfers): funds are held on the
   // platform balance at checkout and transferred to the carrier on delivery.
   stripeTransferId      String?

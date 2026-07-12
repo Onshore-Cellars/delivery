@@ -31,17 +31,29 @@ export async function GET(request: NextRequest) {
     to.setHours(23, 59, 59, 999)
 
     // Paid bookings in the window keyed on paidAt (the tax point).
+    // VAT is due when payment is captured, so count every booking whose payment
+    // was captured in the window (PAID or later-refunded — all have paidAt).
+    // Refunds are reclaimed separately below, keyed on when they happened.
     const paid = await prisma.booking.findMany({
-      where: { paymentStatus: 'PAID', paidAt: { gte: from, lte: to } },
+      where: { paymentStatus: { in: ['PAID', 'PARTIALLY_REFUNDED', 'REFUNDED'] }, paidAt: { gte: from, lte: to } },
       select: {
         currency: true, totalPrice: true, platformFee: true, carrierPayout: true,
         vatAmount: true, vatRate: true, vatTreatment: true, vatCustomerCountry: true, paidAt: true,
       },
     })
-    // Refunds in the window (VAT reversed).
+    // Refunds in the window — include PARTIALLY_REFUNDED, and reverse only the
+    // ACTUAL amount refunded (refundedAmount), not the full booking snapshot.
     const refunded = await prisma.booking.findMany({
-      where: { paymentStatus: 'REFUNDED', updatedAt: { gte: from, lte: to } },
-      select: { currency: true, totalPrice: true, vatAmount: true },
+      where: { paymentStatus: { in: ['REFUNDED', 'PARTIALLY_REFUNDED'] }, updatedAt: { gte: from, lte: to } },
+      select: { currency: true, totalPrice: true, vatAmount: true, refundedAmount: true },
+    })
+    // The refunded amount is gross; split it back into net + VAT at the booking's
+    // effective VAT ratio so the VAT reversed is proportional to what was refunded.
+    const refundParts = refunded.map(b => {
+      const gross = b.totalPrice + (b.vatAmount || 0)
+      const refundedGross = Math.min(b.refundedAmount || 0, gross)
+      const vatShare = gross > 0 ? (b.vatAmount || 0) / gross : 0
+      return { gross: refundedGross, vat: Math.round(refundedGross * vatShare * 100) / 100 }
     })
 
     // Assume a single reporting currency (the platform's). If mixed, we still
@@ -56,10 +68,10 @@ export async function GET(request: NextRequest) {
       platformFees: round(paid.reduce((s, b) => s + b.platformFee, 0)),
       carrierPayouts: round(paid.reduce((s, b) => s + b.carrierPayout, 0)),
       refunds: refunded.length,
-      refundedGross: round(refunded.reduce((s, b) => s + b.totalPrice + (b.vatAmount || 0), 0)),
-      vatReversed: round(refunded.reduce((s, b) => s + (b.vatAmount || 0), 0)),
+      refundedGross: round(refundParts.reduce((s, r) => s + r.gross, 0)),
+      vatReversed: round(refundParts.reduce((s, r) => s + r.vat, 0)),
       netVatDue: round(
-        paid.reduce((s, b) => s + (b.vatAmount || 0), 0) - refunded.reduce((s, b) => s + (b.vatAmount || 0), 0),
+        paid.reduce((s, b) => s + (b.vatAmount || 0), 0) - refundParts.reduce((s, r) => s + r.vat, 0),
       ),
     }
 
