@@ -579,7 +579,7 @@ export default function MarketplacePage() {
       <div className="flex items-start justify-between gap-3 mb-4">
         <div className="min-w-0 flex-1">
           <h3 className="font-bold text-[#F7F9FB] text-base sm:text-lg truncate">{listing.title}</h3>
-          <p className="text-sm text-[#6B7C86] mt-0.5">{listing.listingType === 'SPACE_NEEDED' ? 'Needs delivery' : `${listing.vehicleType} route`}</p>
+          <p className="text-sm text-[#8FA1AB] mt-0.5">{listing.listingType === 'SPACE_NEEDED' ? 'Needs delivery' : `${listing.vehicleType} route`}</p>
         </div>
         <div className="flex flex-col items-end gap-1">
           {listing.listingType !== 'SPACE_NEEDED' && (
@@ -593,7 +593,7 @@ export default function MarketplacePage() {
             </span>
           )}
           {listing.routeDirection === 'RETURN' && (
-            <span className="badge bg-[#102535] text-[#9AADB8] border border-blue-100 whitespace-nowrap text-[10px]">
+            <span className="badge bg-[#102535] text-[#9AADB8] border border-white/10 whitespace-nowrap text-[10px]">
               Return
             </span>
           )}
@@ -627,7 +627,7 @@ export default function MarketplacePage() {
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2 min-w-0">
           {listing.carrier.name && (
-            <span className="text-xs text-[#6B7C86] truncate">{listing.carrier.name}{listing.carrier.company ? ` · ${listing.carrier.company}` : ''}</span>
+            <span className="text-xs text-[#8FA1AB] truncate">{listing.carrier.name}{listing.carrier.company ? ` · ${listing.carrier.company}` : ''}</span>
           )}
           {listing.carrier.receivedReviews && listing.carrier.receivedReviews.length > 0 && (() => {
             const avg = listing.carrier.receivedReviews!.reduce((s, r) => s + r.rating, 0) / listing.carrier.receivedReviews!.length
@@ -642,7 +642,7 @@ export default function MarketplacePage() {
         </div>
         <div className="flex items-center gap-1.5">
           {listing.flexibleRoute && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded text-[10px] font-semibold">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#9ED36A]/15 text-[#9ED36A] rounded text-[10px] font-semibold">
               Flexible{listing.maxDetourKm ? ` ±${listing.maxDetourKm}km` : ''}
             </span>
           )}
@@ -673,7 +673,7 @@ export default function MarketplacePage() {
       </div>
 
       {/* Capacity & Price footer */}
-      <div className="flex items-end justify-between pt-3 border-t border-slate-100">
+      <div className="flex items-end justify-between pt-3 border-t border-white/10">
         <div className="flex gap-4">
           <div>
             <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">{listing.listingType === 'SPACE_NEEDED' ? 'Cargo' : 'Weight'}</div>
@@ -735,7 +735,7 @@ export default function MarketplacePage() {
       {fetchError && (
         <div className="site-container pt-4">
           <div className="px-4 py-3 rounded-xl bg-red-900/20 border border-red-500/30">
-            <p className="text-sm font-medium text-red-800">{fetchError}</p>
+            <p className="text-sm font-medium text-red-300">{fetchError}</p>
           </div>
         </div>
       )}
@@ -745,7 +745,7 @@ export default function MarketplacePage() {
           <div className="flex items-center justify-between mb-4 sm:mb-5">
             <div>
               <h1 className="text-xl sm:text-2xl font-bold text-[#F7F9FB] tracking-tight">Marketplace</h1>
-              <p className="text-sm text-[#6B7C86] mt-1">{activeTab === 'SPACE_NEEDED' ? 'Loads needing drivers' : 'Find van space to any destination'}</p>
+              <p className="text-sm text-[#8FA1AB] mt-1">{activeTab === 'SPACE_NEEDED' ? 'Loads needing drivers' : 'Find van space to any destination'}</p>
             </div>
             <div className="flex items-center gap-2">
               {/* View toggle */}
@@ -790,7 +790,7 @@ export default function MarketplacePage() {
               className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-semibold transition-all ${
                 activeTab === 'SPACE_AVAILABLE'
                   ? 'bg-[#162E3D] text-[#F7F9FB] shadow-sm'
-                  : 'text-[#6B7C86] hover:text-[#9AADB8]'
+                  : 'text-[#8FA1AB] hover:text-[#9AADB8]'
               }`}
             >
               Available Space
@@ -800,7 +800,7 @@ export default function MarketplacePage() {
               className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-semibold transition-all ${
                 activeTab === 'SPACE_NEEDED'
                   ? 'bg-[#162E3D] text-[#F7F9FB] shadow-sm'
-                  : 'text-[#6B7C86] hover:text-[#9AADB8]'
+                  : 'text-[#8FA1AB] hover:text-[#9AADB8]'
               }`}
             >
               Loads Needing Drivers
@@ -899,7 +899,7 @@ export default function MarketplacePage() {
         <div className="fixed inset-0 z-50">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setFiltersOpen(false)} />
           <div ref={mobileFilterRef} className="absolute right-0 top-0 bottom-0 w-full max-w-md bg-[#162E3D] shadow-2xl overflow-y-auto animate-slide-in-right">
-            <div className="sticky top-0 bg-[#162E3D] border-b border-slate-100 px-5 py-4 flex items-center justify-between z-10">
+            <div className="sticky top-0 bg-[#162E3D] border-b border-white/10 px-5 py-4 flex items-center justify-between z-10">
               <h2 className="text-lg font-bold text-[#F7F9FB]">Filters</h2>
               <button onClick={() => setFiltersOpen(false)} className="p-2 rounded-xl hover:bg-[#102535] text-slate-400 transition-colors">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -940,7 +940,7 @@ export default function MarketplacePage() {
         {/* Results header */}
         {!loading && (
           <div className="flex items-center justify-between mb-4">
-            <p className="text-sm text-[#6B7C86] font-medium">
+            <p className="text-sm text-[#8FA1AB] font-medium">
               {pagination.total === 0 ? 'No routes found' : `${pagination.total} route${pagination.total !== 1 ? 's' : ''} found`}
             </p>
             <div className="flex items-center gap-2">
@@ -959,7 +959,7 @@ export default function MarketplacePage() {
         {viewMode === 'calendar' && !loading && listings.length > 0 && (
           <div className="mb-8">
             <div className="bg-[#162E3D] rounded-2xl border border-white/10 overflow-hidden">
-              <div className="grid grid-cols-7 border-b border-slate-100">
+              <div className="grid grid-cols-7 border-b border-white/10">
                 {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(d => (
                   <div key={d} className="py-2 text-center text-[10px] font-semibold text-slate-400 uppercase tracking-wider">{d}</div>
                 ))}
@@ -981,7 +981,7 @@ export default function MarketplacePage() {
                     const isToday = day.toDateString() === today.toDateString()
                     return (
                       <div key={i} className={`min-h-[80px] p-1.5 border-b border-r border-white/10 ${isToday ? 'bg-[#FF6A2A]/5' : ''}`}>
-                        <div className={`text-xs font-medium mb-1 ${isToday ? 'text-[#FF6A2A] font-bold' : 'text-[#6B7C86]'}`}>
+                        <div className={`text-xs font-medium mb-1 ${isToday ? 'text-[#FF6A2A] font-bold' : 'text-[#8FA1AB]'}`}>
                           {day.getDate()}
                         </div>
                         {dayListings.slice(0, 2).map(l => (
@@ -1016,7 +1016,7 @@ export default function MarketplacePage() {
               </svg>
             </div>
             <p className="text-[#F7F9FB] font-semibold text-lg mb-2">No routes found</p>
-            <p className="text-sm text-[#6B7C86] mb-6">Try adjusting your search or filters</p>
+            <p className="text-sm text-[#8FA1AB] mb-6">Try adjusting your search or filters</p>
             {hasActiveFilters && (
               <button onClick={resetFilters} className="btn-primary !text-sm !py-2.5 !px-6">Clear All Filters</button>
             )}
@@ -1068,11 +1068,11 @@ export default function MarketplacePage() {
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setBookingModal(null)} />
           <div className="relative bg-[#162E3D] w-full sm:max-w-lg sm:rounded-2xl rounded-t-2xl shadow-2xl max-h-[90vh] overflow-y-auto animate-slide-up sm:animate-fade-up">
             {/* Header */}
-            <div className="sticky top-0 bg-[#162E3D] border-b border-slate-100 px-5 sm:px-6 py-4 rounded-t-2xl z-10">
+            <div className="sticky top-0 bg-[#162E3D] border-b border-white/10 px-5 sm:px-6 py-4 rounded-t-2xl z-10">
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-lg font-bold text-[#F7F9FB]">Book Space</h2>
-                  <p className="text-sm text-[#6B7C86] mt-0.5">
+                  <p className="text-sm text-[#8FA1AB] mt-0.5">
                     {bookingModal.originPort} &rarr; {bookingModal.destinationPort} &middot; {formatDate(bookingModal.departureDate)}
                   </p>
                 </div>
@@ -1090,7 +1090,7 @@ export default function MarketplacePage() {
                   </svg>
                 </div>
                 <h3 className="text-xl font-bold text-[#F7F9FB] mb-2">Booking Confirmed!</h3>
-                <p className="text-[#6B7C86] mb-6">Your space has been reserved. Check your dashboard for details.</p>
+                <p className="text-[#8FA1AB] mb-6">Your space has been reserved. Check your dashboard for details.</p>
                 <div className="flex gap-3 justify-center">
                   <Link href="/dashboard" className="btn-primary !text-sm !py-2.5">View Dashboard</Link>
                   <button onClick={() => setBookingModal(null)} className="btn-secondary !text-sm !py-2.5">Close</button>
@@ -1211,7 +1211,7 @@ export default function MarketplacePage() {
                               return p.lengthCm === pkg.lengthCm && p.widthCm === pkg.widthCm && p.heightCm === pkg.heightCm
                             }) || '']?.label || `${pkg.lengthCm}×${pkg.widthCm}×${pkg.heightCm}cm`}
                           </div>
-                          <span className="text-xs text-[#6B7C86]">{(pkg.weightKg * pkg.quantity).toFixed(1)}kg</span>
+                          <span className="text-xs text-[#8FA1AB]">{(pkg.weightKg * pkg.quantity).toFixed(1)}kg</span>
                           <button type="button" onClick={() => {
                             const updated = packages.filter((_, i) => i !== idx)
                             setPackages(updated)
@@ -1228,7 +1228,7 @@ export default function MarketplacePage() {
                           </button>
                         </div>
                       ))}
-                      <div className="flex justify-between text-xs text-[#6B7C86] pt-1 border-t border-white/10">
+                      <div className="flex justify-between text-xs text-[#8FA1AB] pt-1 border-t border-white/10">
                         <span>Total: {packages.reduce((s, p) => s + p.quantity, 0)} items</span>
                         <span>{packages.reduce((s, p) => s + p.weightKg * p.quantity, 0).toFixed(1)} kg / {packages.reduce((s, p) => s + (p.lengthCm * p.widthCm * p.heightCm * p.quantity) / 1000000, 0).toFixed(2)} m³</span>
                       </div>
@@ -1261,8 +1261,8 @@ export default function MarketplacePage() {
                 </div>
 
                 {/* Cargo Dimensions — auto-calculates volume */}
-                <div className="pt-3 border-t border-slate-100">
-                  <p className="text-xs font-semibold text-[#6B7C86] uppercase tracking-wider mb-3">Cargo Size (optional — auto-fills volume)</p>
+                <div className="pt-3 border-t border-white/10">
+                  <p className="text-xs font-semibold text-[#8FA1AB] uppercase tracking-wider mb-3">Cargo Size (optional — auto-fills volume)</p>
                   <div className="grid grid-cols-3 gap-3">
                     <div>
                       <label className="block text-[11px] text-slate-400 mb-1">Length (cm)</label>
@@ -1307,8 +1307,8 @@ export default function MarketplacePage() {
                 </div>
 
                 {/* Cargo Photos */}
-                <div className="pt-3 border-t border-slate-100">
-                  <p className="text-xs font-semibold text-[#6B7C86] uppercase tracking-wider mb-3">Cargo Photos (optional)</p>
+                <div className="pt-3 border-t border-white/10">
+                  <p className="text-xs font-semibold text-[#8FA1AB] uppercase tracking-wider mb-3">Cargo Photos (optional)</p>
                   <CargoImageUpload
                     images={bookingForm.cargoImages}
                     onChange={(imgs) => setBookingForm({ ...bookingForm, cargoImages: imgs })}
@@ -1317,8 +1317,8 @@ export default function MarketplacePage() {
                 </div>
 
                 {/* Pickup Details */}
-                <div className="pt-3 border-t border-slate-100">
-                  <p className="text-xs font-semibold text-[#6B7C86] uppercase tracking-wider mb-3">Pickup Details</p>
+                <div className="pt-3 border-t border-white/10">
+                  <p className="text-xs font-semibold text-[#8FA1AB] uppercase tracking-wider mb-3">Pickup Details</p>
                   <div className="space-y-3">
                     <input type="text" className={inputClass} placeholder="Pickup address" value={bookingForm.pickupAddress} onChange={(e) => setBookingForm({ ...bookingForm, pickupAddress: e.target.value })} />
                     <div className="grid grid-cols-2 gap-3">
@@ -1329,8 +1329,8 @@ export default function MarketplacePage() {
                 </div>
 
                 {/* Delivery Details */}
-                <div className="pt-3 border-t border-slate-100">
-                  <p className="text-xs font-semibold text-[#6B7C86] uppercase tracking-wider mb-3">Delivery Details</p>
+                <div className="pt-3 border-t border-white/10">
+                  <p className="text-xs font-semibold text-[#8FA1AB] uppercase tracking-wider mb-3">Delivery Details</p>
                   <div className="space-y-3">
                     <input type="text" className={inputClass} placeholder="Delivery address (marina, port, etc.)" value={bookingForm.deliveryAddress} onChange={(e) => setBookingForm({ ...bookingForm, deliveryAddress: e.target.value })} />
                     <div className="grid grid-cols-2 gap-3">
@@ -1353,7 +1353,7 @@ export default function MarketplacePage() {
                 </div>
 
                 {/* Yacht / Vessel Details */}
-                <div className="pt-3 border-t border-slate-100">
+                <div className="pt-3 border-t border-white/10">
                   <p className="text-xs font-semibold text-[#FF6A2A] uppercase tracking-wider mb-3">Delivery Location</p>
                   <div className="space-y-3">
                     <div className="grid grid-cols-2 gap-3">
@@ -1439,16 +1439,16 @@ export default function MarketplacePage() {
           <div className="relative bg-[#162E3D] rounded-2xl shadow-2xl w-full max-w-sm p-6 animate-fade-up">
             {alertSuccess ? (
               <div className="text-center py-4">
-                <div className="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-3">
+                <div className="w-12 h-12 rounded-full bg-[#9ED36A]/15 flex items-center justify-center mx-auto mb-3">
                   <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
                 </div>
                 <p className="font-semibold text-[#F7F9FB]">Alert saved!</p>
-                <p className="text-xs text-[#6B7C86] mt-1">We&apos;ll notify you when matching listings appear.</p>
+                <p className="text-xs text-[#8FA1AB] mt-1">We&apos;ll notify you when matching listings appear.</p>
               </div>
             ) : (
               <>
                 <h3 className="text-lg font-bold text-[#F7F9FB] mb-1">Set Listing Alert</h3>
-                <p className="text-xs text-[#6B7C86] mb-4">Get notified when new listings match your search.</p>
+                <p className="text-xs text-[#8FA1AB] mb-4">Get notified when new listings match your search.</p>
                 <div className="space-y-3">
                   <div>
                     <label className="block text-xs font-semibold text-[#F7F9FB] mb-1">Alert Name (optional)</label>
