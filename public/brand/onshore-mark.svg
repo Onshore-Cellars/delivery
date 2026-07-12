@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Onshore mark">
+  <title>Onshore — The Waypoint</title>
+  <!-- horizon: the shore / route -->
+  <line x1="16" y1="62" x2="84" y2="62" stroke="#0C5C54" stroke-width="7" stroke-linecap="round"/>
+  <!-- the waypoint: a point, on a shore -->
+  <circle cx="50" cy="41" r="9" fill="#A8813C"/>
+</svg>

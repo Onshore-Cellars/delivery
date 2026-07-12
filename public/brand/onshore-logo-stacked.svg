@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 150" role="img" aria-label="Onshore — the yacht delivery network">
+  <title>Onshore stacked lockup</title>
+  <g transform="translate(96,6) scale(0.48)">
+    <line x1="16" y1="62" x2="84" y2="62" stroke="#0C5C54" stroke-width="7" stroke-linecap="round"/>
+    <circle cx="50" cy="41" r="9" fill="#A8813C"/>
+  </g>
+  <text x="120" y="112" text-anchor="middle" font-family="'Söhne','Switzer','Helvetica Neue',Arial,system-ui,sans-serif" font-size="42" font-weight="500" letter-spacing="0.4" fill="#12302C">Onshore</text>
+  <text x="120" y="134" text-anchor="middle" font-family="'Söhne','Switzer','Helvetica Neue',Arial,system-ui,sans-serif" font-size="8.5" font-weight="500" letter-spacing="3" fill="#41524E">THE YACHT DELIVERY NETWORK</text>
+</svg>
