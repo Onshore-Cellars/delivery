@@ -43,13 +43,13 @@ interface Booking {
 }
 
 const statusColors: Record<string, string> = {
-  ACTIVE: 'bg-[var(--c-success)]/10 text-[var(--c-success)] border-green-500/30',
+  ACTIVE: 'bg-[var(--c-success)]/10 text-[var(--c-success)] border-[#256B4A]/40/30',
   FULL: 'bg-[var(--c-accent)]/10 text-[var(--c-accent)] border-[var(--c-accent)]/20',
   COMPLETED: 'bg-[var(--c-canvas-2)] text-[var(--c-text-2)] border-black/10',
   CANCELLED: 'bg-[#B23A2E]/10 text-[var(--c-error)] border-[#B23A2E]/30',
   IN_TRANSIT: 'bg-[var(--c-info)]/15 text-[var(--c-info)] border-[var(--c-info)]/25',
   PENDING: 'bg-[var(--c-warning)]/15 text-[var(--c-warning)] border-[var(--c-warning)]/25',
-  CONFIRMED: 'bg-[var(--c-success)]/10 text-[var(--c-success)] border-green-500/30',
+  CONFIRMED: 'bg-[var(--c-success)]/10 text-[var(--c-success)] border-[#256B4A]/40/30',
   PICKED_UP: 'bg-[var(--c-info)]/15 text-[var(--c-info)] border-[var(--c-info)]/25',
   DELIVERED: 'bg-[var(--c-canvas-2)] text-[var(--c-text-2)] border-black/10',
 }
@@ -60,7 +60,7 @@ function PaymentBanner() {
   if (!payment) return null
   if (payment === 'success') {
     return (
-      <div className="mb-6 px-4 py-3 rounded-xl bg-[var(--c-success)]/10 border border-green-500/30">
+      <div className="mb-6 px-4 py-3 rounded-xl bg-[var(--c-success)]/10 border border-[#256B4A]/40/30">
         <p className="text-sm font-medium text-[var(--c-success)]">Payment successful! Your booking is confirmed. Check your email for the receipt.</p>
       </div>
     )
@@ -202,7 +202,7 @@ export default function DashboardPage() {
 
       {error && (
         <div className="mb-6 px-4 py-3 rounded-xl bg-[#B23A2E]/10 border border-[#B23A2E]/30">
-          <p className="text-sm font-medium text-red-800">{error}</p>
+          <p className="text-sm font-medium text-[#B23A2E]">{error}</p>
         </div>
       )}
 

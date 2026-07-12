@@ -95,32 +95,32 @@ type TabKey = 'overview' | 'users' | 'bookings' | 'listings' | 'documents' | 'no
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 const statusColors: Record<string, string> = {
-  QUOTE_REQUESTED: 'bg-[#1F5E86]/10 text-[var(--c-info)] border-purple-200',
-  QUOTED: 'bg-violet-50 text-violet-700 border-violet-200',
+  QUOTE_REQUESTED: 'bg-[#1F5E86]/10 text-[var(--c-info)] border-[#1F5E86]',
+  QUOTED: 'bg-[#1F5E86]/10 text-[var(--c-info)] border-[#1F5E86]',
   PENDING: 'bg-[var(--c-accent)]/10 text-[var(--c-accent)] border-[var(--c-accent)]/20',
-  CONFIRMED: 'bg-[var(--c-success)]/10 text-[var(--c-success)] border-emerald-200',
-  PICKED_UP: 'bg-cyan-50 text-cyan-700 border-cyan-200',
-  IN_TRANSIT: 'bg-[#1F5E86]/10 text-[var(--c-info)] border-indigo-200',
-  CUSTOMS_HOLD: 'bg-[var(--c-accent)]/10 text-[var(--c-accent)] border-orange-200',
+  CONFIRMED: 'bg-[var(--c-success)]/10 text-[var(--c-success)] border-[#256B4A]/40',
+  PICKED_UP: 'bg-[#1F5E86]/10 text-[var(--c-info)] border-[#1F5E86]',
+  IN_TRANSIT: 'bg-[#1F5E86]/10 text-[var(--c-info)] border-[#1F5E86]',
+  CUSTOMS_HOLD: 'bg-[var(--c-accent)]/10 text-[var(--c-accent)] border-[#8A5A08]/40',
   DELIVERED: 'bg-[var(--c-canvas-2)] text-[var(--c-text-2)] border-black/10',
   CANCELLED: 'bg-[#B23A2E]/10 text-[var(--c-error)] border-[#B23A2E]/30',
-  DISPUTED: 'bg-rose-50 text-rose-700 border-rose-200',
+  DISPUTED: 'bg-[#B23A2E]/10 text-[#B23A2E] border-[#B23A2E]/40',
 }
 
 const listingStatusColors: Record<string, string> = {
   DRAFT: 'bg-[var(--c-surface)] text-[var(--c-text-2)] border-black/10',
-  ACTIVE: 'bg-[var(--c-success)]/10 text-[var(--c-success)] border-emerald-200',
+  ACTIVE: 'bg-[var(--c-success)]/10 text-[var(--c-success)] border-[#256B4A]/40',
   FULL: 'bg-[var(--c-accent)]/10 text-[var(--c-accent)] border-[var(--c-accent)]/20',
-  IN_TRANSIT: 'bg-[#1F5E86]/10 text-[var(--c-info)] border-indigo-200',
+  IN_TRANSIT: 'bg-[#1F5E86]/10 text-[var(--c-info)] border-[#1F5E86]',
   COMPLETED: 'bg-[var(--c-canvas-2)] text-[var(--c-text-2)] border-black/10',
   CANCELLED: 'bg-[#B23A2E]/10 text-[var(--c-error)] border-[#B23A2E]/30',
 }
 
 const paymentStatusColors: Record<string, string> = {
   PENDING: 'bg-[var(--c-accent)]/10 text-[var(--c-accent)] border-[var(--c-accent)]/20',
-  PROCESSING: 'bg-[#1F5E86]/10 text-[var(--c-info)] border-indigo-200',
-  PAID: 'bg-[var(--c-success)]/10 text-[var(--c-success)] border-emerald-200',
-  REFUNDED: 'bg-[#1F5E86]/10 text-[var(--c-info)] border-purple-200',
+  PROCESSING: 'bg-[#1F5E86]/10 text-[var(--c-info)] border-[#1F5E86]',
+  PAID: 'bg-[var(--c-success)]/10 text-[var(--c-success)] border-[#256B4A]/40',
+  REFUNDED: 'bg-[#1F5E86]/10 text-[var(--c-info)] border-[#1F5E86]',
   FAILED: 'bg-[#B23A2E]/10 text-[var(--c-error)] border-[#B23A2E]/30',
 }
 
@@ -663,8 +663,8 @@ export default function AdminPage() {
       {toast && (
         <div className={`fixed top-4 right-4 z-50 px-5 py-3 rounded-xl shadow-lg text-sm font-medium transition-all ${
           toast.type === 'success'
-            ? 'bg-emerald-600 text-white'
-            : 'bg-red-600 text-white'
+            ? 'bg-[#256B4A] text-white'
+            : 'bg-[#B23A2E] text-white'
         }`}>
           {toast.message}
         </div>
@@ -697,7 +697,7 @@ export default function AdminPage() {
 
         {/* Tabs */}
         <div className="overflow-x-auto -mx-5 px-5 sm:mx-0 sm:px-0 mb-8">
-          <div className="flex gap-1 bg-[var(--c-surface)] rounded-xl p-1 shadow-sm border border-slate-100 w-fit min-w-full sm:min-w-0">
+          <div className="flex gap-1 bg-[var(--c-surface)] rounded-xl p-1 shadow-sm border border-[#D3D8D1] w-fit min-w-full sm:min-w-0">
           {TAB_CONFIG.map(t => (
             <button
               key={t.key}
@@ -725,7 +725,7 @@ export default function AdminPage() {
             {tab === 'overview' && stats && (
               <div className="space-y-8">
                 {/* AI Insights */}
-                <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-slate-100 p-6">
+                <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-[#D3D8D1] p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div>
                       <h3 className="text-sm font-semibold text-[var(--c-ink)]">AI Insights</h3>
@@ -749,18 +749,18 @@ export default function AdminPage() {
 
                   {aiInsights && (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                      <div className="rounded-lg border border-slate-100 p-4">
+                      <div className="rounded-lg border border-[#D3D8D1] p-4">
                         <h4 className="text-xs font-semibold text-[var(--c-text-2)] uppercase tracking-wider mb-3">Highlights</h4>
                         <ul className="space-y-2">
                           {aiInsights.highlights.map((item, i) => (
                             <li key={i} className="flex items-start gap-2 text-sm text-[var(--c-text-2)]">
-                              <span className="mt-1.5 h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
+                              <span className="mt-1.5 h-2 w-2 rounded-full bg-[#256B4A] shrink-0" />
                               {item}
                             </li>
                           ))}
                         </ul>
                       </div>
-                      <div className="rounded-lg border border-slate-100 p-4">
+                      <div className="rounded-lg border border-[#D3D8D1] p-4">
                         <h4 className="text-xs font-semibold text-[var(--c-text-2)] uppercase tracking-wider mb-3">Anomalies</h4>
                         <ul className="space-y-2">
                           {aiInsights.anomalies.map((item, i) => (
@@ -771,7 +771,7 @@ export default function AdminPage() {
                           ))}
                         </ul>
                       </div>
-                      <div className="rounded-lg border border-slate-100 p-4">
+                      <div className="rounded-lg border border-[#D3D8D1] p-4">
                         <h4 className="text-xs font-semibold text-[var(--c-text-2)] uppercase tracking-wider mb-3">Recommendations</h4>
                         <ul className="space-y-2">
                           {aiInsights.recommendations.map((item, i) => (
@@ -788,7 +788,7 @@ export default function AdminPage() {
 
                 {/* Primary Stats Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-slate-100 p-5">
+                  <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-[#D3D8D1] p-5">
                     <div className="flex items-center justify-between">
                       <div className="text-xs font-semibold text-[var(--c-text-2)] uppercase tracking-wider">Total Revenue</div>
                       <div className="w-8 h-8 rounded-lg bg-[var(--c-success)]/10 flex items-center justify-center text-[var(--c-success)] text-sm font-bold">&euro;</div>
@@ -796,7 +796,7 @@ export default function AdminPage() {
                     <div className="mt-2 text-3xl font-semibold text-[var(--c-ink)]">{formatCurrency(stats.revenue.total)}</div>
                     <div className="mt-2 text-xs text-[var(--c-text-3)]">Platform lifetime revenue</div>
                   </div>
-                  <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-slate-100 p-5">
+                  <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-[#D3D8D1] p-5">
                     <div className="flex items-center justify-between">
                       <div className="text-xs font-semibold text-[var(--c-text-2)] uppercase tracking-wider">Active Listings</div>
                       <div className="w-8 h-8 rounded-lg bg-[var(--c-canvas-2)] flex items-center justify-center text-[var(--c-text-2)] text-sm font-bold">#</div>
@@ -804,7 +804,7 @@ export default function AdminPage() {
                     <div className="mt-2 text-3xl font-semibold text-[var(--c-ink)]">{stats.listings.active}</div>
                     <div className="mt-2 text-xs text-[var(--c-text-3)]">{stats.listings.total} total listings</div>
                   </div>
-                  <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-slate-100 p-5">
+                  <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-[#D3D8D1] p-5">
                     <div className="flex items-center justify-between">
                       <div className="text-xs font-semibold text-[var(--c-text-2)] uppercase tracking-wider">Pending Bookings</div>
                       <div className="w-8 h-8 rounded-lg bg-[var(--c-accent)]/10 flex items-center justify-center text-[var(--c-accent)] text-sm font-bold">!</div>
@@ -812,10 +812,10 @@ export default function AdminPage() {
                     <div className="mt-2 text-3xl font-semibold text-[var(--c-ink)]">{stats.bookings.pending}</div>
                     <div className="mt-2 text-xs text-[var(--c-text-3)]">{stats.bookings.confirmed} confirmed &middot; {stats.bookings.total} total</div>
                   </div>
-                  <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-slate-100 p-5">
+                  <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-[#D3D8D1] p-5">
                     <div className="flex items-center justify-between">
                       <div className="text-xs font-semibold text-[var(--c-text-2)] uppercase tracking-wider">New Users (This Week)</div>
-                      <div className="w-8 h-8 rounded-lg bg-violet-50 flex items-center justify-center text-violet-600 text-sm font-bold">+</div>
+                      <div className="w-8 h-8 rounded-lg bg-[#1F5E86]/10 flex items-center justify-center text-[var(--c-info)] text-sm font-bold">+</div>
                     </div>
                     <div className="mt-2 text-3xl font-semibold text-[var(--c-ink)]">{newUsersThisWeek}</div>
                     <div className="mt-2 text-xs text-[var(--c-text-3)]">{stats.users.total} total users</div>
@@ -827,12 +827,12 @@ export default function AdminPage() {
                   {[
                     { label: 'Two-Way Listings', value: stats.listings.twoWay || 0, color: 'text-[var(--c-accent)]' },
                     { label: 'MMSI Bookings', value: stats.bookings.withMMSI || 0, color: 'text-[var(--c-text-2)]' },
-                    { label: 'Return Leg Bookings', value: stats.bookings.returnLegs || 0, color: 'text-violet-600' },
-                    { label: 'In Transit', value: stats.bookings.inTransit || 0, color: 'text-cyan-600' },
+                    { label: 'Return Leg Bookings', value: stats.bookings.returnLegs || 0, color: 'text-[var(--c-info)]' },
+                    { label: 'In Transit', value: stats.bookings.inTransit || 0, color: 'text-[var(--c-info)]' },
                     { label: 'Pending Docs', value: stats.documents?.pending || 0, color: 'text-[var(--c-accent)]' },
                     { label: 'Vehicles', value: stats.vehicles?.total || 0, color: 'text-[var(--c-text-2)]' },
                   ].map(item => (
-                    <div key={item.label} className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-slate-100 p-4 text-center">
+                    <div key={item.label} className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-[#D3D8D1] p-4 text-center">
                       <div className={`text-2xl font-bold ${item.color}`}>{item.value}</div>
                       <div className="text-[10px] text-[var(--c-text-2)] font-medium uppercase tracking-wider mt-1">{item.label}</div>
                     </div>
@@ -842,7 +842,7 @@ export default function AdminPage() {
                 {/* Row: Revenue Chart + Breakdown Cards */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   {/* Revenue Bar Chart */}
-                  <div className="lg:col-span-2 bg-[var(--c-surface)] rounded-xl shadow-sm border border-slate-100 p-6">
+                  <div className="lg:col-span-2 bg-[var(--c-surface)] rounded-xl shadow-sm border border-[#D3D8D1] p-6">
                     <h2 className="font-semibold text-[var(--c-ink)] mb-4">Revenue by Month</h2>
                     {revenueByMonth.length === 0 ? (
                       <div className="text-center text-[var(--c-text-2)] text-sm py-12">No revenue data yet</div>
@@ -870,7 +870,7 @@ export default function AdminPage() {
                   {/* Breakdowns */}
                   <div className="space-y-4">
                     {/* Users by Role */}
-                    <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-slate-100 p-5">
+                    <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-[#D3D8D1] p-5">
                       <h3 className="text-sm font-semibold text-[var(--c-ink)] mb-3">Users by Role</h3>
                       <div className="space-y-2">
                         {Object.entries(usersByRole).map(([role, count]) => (
@@ -883,7 +883,7 @@ export default function AdminPage() {
                     </div>
 
                     {/* Bookings by Status */}
-                    <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-slate-100 p-5">
+                    <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-[#D3D8D1] p-5">
                       <h3 className="text-sm font-semibold text-[var(--c-ink)] mb-3">Bookings by Status</h3>
                       <div className="space-y-2">
                         {Object.entries(bookingsByStatus).map(([status, count]) => (
@@ -903,8 +903,8 @@ export default function AdminPage() {
                 </div>
 
                 {/* Recent Bookings (on Overview) */}
-                <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-slate-100 overflow-hidden">
-                  <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-[#D3D8D1] overflow-hidden">
+                  <div className="px-6 py-4 border-b border-[#D3D8D1] flex items-center justify-between">
                     <h2 className="font-semibold text-[var(--c-ink)]">Recent Bookings</h2>
                     <button
                       onClick={() => setTab('bookings')}
@@ -951,7 +951,7 @@ export default function AdminPage() {
                     Export CSV
                   </button>
                 </div>
-                <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+                <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-[#D3D8D1] overflow-hidden">
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
@@ -980,7 +980,7 @@ export default function AdminPage() {
                             <td className="px-6 py-3 text-[var(--c-text-2)]">{u.company || '-'}</td>
                             <td className="px-6 py-3">
                               {u.verified ? (
-                                <span className="badge bg-[var(--c-success)]/10 text-[var(--c-success)] border border-emerald-200">Verified</span>
+                                <span className="badge bg-[var(--c-success)]/10 text-[var(--c-success)] border border-[#256B4A]/40">Verified</span>
                               ) : (
                                 <span className="badge bg-[var(--c-accent)]/10 text-[var(--c-accent)] border border-[var(--c-accent)]/20">Unverified</span>
                               )}
@@ -995,7 +995,7 @@ export default function AdminPage() {
                                     <button
                                       onClick={() => handleUserAction(u.id, 'verify')}
                                       disabled={actionLoading === `${u.id}-verify`}
-                                      className="px-2.5 py-1 text-xs font-medium rounded-md bg-[var(--c-success)]/10 text-[var(--c-success)] border border-emerald-200 hover:bg-emerald-100 transition-colors disabled:opacity-50"
+                                      className="px-2.5 py-1 text-xs font-medium rounded-md bg-[var(--c-success)]/10 text-[var(--c-success)] border border-[#256B4A]/40 hover:bg-[var(--c-success)]/10 transition-colors disabled:opacity-50"
                                     >
                                       {actionLoading === `${u.id}-verify` ? '...' : 'Verify'}
                                     </button>
@@ -1013,7 +1013,7 @@ export default function AdminPage() {
                                       setEditUser(u)
                                       setEditUserForm({ name: u.name, email: u.email, phone: u.phone || '', company: u.company || '', role: u.role, verified: u.verified, suspended: u.suspended || false, canCarry: u.canCarry || false, canShip: u.canShip || false })
                                     }}
-                                    className="px-2.5 py-1 text-xs font-medium rounded-md bg-[#1F5E86]/10 text-[var(--c-info)] border border-indigo-200 hover:bg-[#1F5E86]/15 transition-colors"
+                                    className="px-2.5 py-1 text-xs font-medium rounded-md bg-[#1F5E86]/10 text-[var(--c-info)] border border-[#1F5E86] hover:bg-[#1F5E86]/15 transition-colors"
                                   >
                                     Edit
                                   </button>
@@ -1048,7 +1048,7 @@ export default function AdminPage() {
                     Export CSV
                   </button>
                 </div>
-                <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+                <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-[#D3D8D1] overflow-hidden">
                   <div className="divide-y divide-black/10">
                     {filteredBookings.map(b => (
                       <div key={b.id} className="px-6 py-4 hover:bg-[var(--c-surface)]">
@@ -1079,7 +1079,7 @@ export default function AdminPage() {
                                 <button
                                   onClick={() => handleBookingStatus(b.id, 'CONFIRMED')}
                                   disabled={!!actionLoading}
-                                  className="px-2 py-1 text-xs font-medium rounded-md bg-[var(--c-success)]/10 text-[var(--c-success)] border border-emerald-200 hover:bg-emerald-100 disabled:opacity-50"
+                                  className="px-2 py-1 text-xs font-medium rounded-md bg-[var(--c-success)]/10 text-[var(--c-success)] border border-[#256B4A]/40 hover:bg-[var(--c-success)]/10 disabled:opacity-50"
                                 >
                                   Confirm
                                 </button>
@@ -1088,7 +1088,7 @@ export default function AdminPage() {
                                 <button
                                   onClick={() => handleBookingStatus(b.id, 'PICKED_UP')}
                                   disabled={!!actionLoading}
-                                  className="px-2 py-1 text-xs font-medium rounded-md bg-cyan-50 text-cyan-700 border border-cyan-200 hover:bg-cyan-100 disabled:opacity-50"
+                                  className="px-2 py-1 text-xs font-medium rounded-md bg-[#1F5E86]/10 text-[var(--c-info)] border border-[#1F5E86] hover:bg-[var(--c-info)] disabled:opacity-50"
                                 >
                                   Mark Picked Up
                                 </button>
@@ -1097,7 +1097,7 @@ export default function AdminPage() {
                                 <button
                                   onClick={() => handleBookingStatus(b.id, 'IN_TRANSIT')}
                                   disabled={!!actionLoading}
-                                  className="px-2 py-1 text-xs font-medium rounded-md bg-[#1F5E86]/10 text-[var(--c-info)] border border-indigo-200 hover:bg-[#1F5E86]/15 disabled:opacity-50"
+                                  className="px-2 py-1 text-xs font-medium rounded-md bg-[#1F5E86]/10 text-[var(--c-info)] border border-[#1F5E86] hover:bg-[#1F5E86]/15 disabled:opacity-50"
                                 >
                                   In Transit
                                 </button>
@@ -1124,7 +1124,7 @@ export default function AdminPage() {
                                 <button
                                   onClick={() => handleRefund(b.id)}
                                   disabled={!!actionLoading}
-                                  className="px-2 py-1 text-xs font-medium rounded-md bg-[#1F5E86]/10 text-[var(--c-info)] border border-purple-200 hover:bg-[#1F5E86]/15 disabled:opacity-50"
+                                  className="px-2 py-1 text-xs font-medium rounded-md bg-[#1F5E86]/10 text-[var(--c-info)] border border-[#1F5E86] hover:bg-[#1F5E86]/15 disabled:opacity-50"
                                 >
                                   Refund
                                 </button>
@@ -1134,7 +1134,7 @@ export default function AdminPage() {
                                   setEditBooking(b)
                                   setEditBookingForm({ status: b.status, paymentStatus: b.paymentStatus, totalPrice: b.totalPrice, cargoDescription: b.cargoDescription || '', weightKg: b.weightKg || '', volumeM3: b.volumeM3 || '', pickupAddress: b.pickupAddress || '', deliveryAddress: b.deliveryAddress || '', deliveryNotes: '', adminNotes: '' })
                                 }}
-                                className="px-2 py-1 text-xs font-medium rounded-md bg-[#1F5E86]/10 text-[var(--c-info)] border border-indigo-200 hover:bg-[#1F5E86]/15"
+                                className="px-2 py-1 text-xs font-medium rounded-md bg-[#1F5E86]/10 text-[var(--c-info)] border border-[#1F5E86] hover:bg-[#1F5E86]/15"
                               >
                                 Edit
                               </button>
@@ -1165,7 +1165,7 @@ export default function AdminPage() {
                     Export CSV
                   </button>
                 </div>
-                <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+                <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-[#D3D8D1] overflow-hidden">
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
@@ -1224,7 +1224,7 @@ export default function AdminPage() {
                                     setEditListing(l)
                                     setEditListingForm({ title: l.title, status: l.status, featured: l.featured, originPort: l.originPort, destinationPort: l.destinationPort, departureDate: l.departureDate ? l.departureDate.slice(0, 10) : '', totalCapacityKg: l.totalCapacityKg || '', availableKg: l.availableKg || '', pricePerKg: l.pricePerKg || '', pricePerM3: '', flatRate: l.flatRate || '', currency: 'EUR', biddingEnabled: false })
                                   }}
-                                  className="px-2.5 py-1 text-xs font-medium rounded-md bg-[#1F5E86]/10 text-[var(--c-info)] border border-indigo-200 hover:bg-[#1F5E86]/15 transition-colors"
+                                  className="px-2.5 py-1 text-xs font-medium rounded-md bg-[#1F5E86]/10 text-[var(--c-info)] border border-[#1F5E86] hover:bg-[#1F5E86]/15 transition-colors"
                                 >
                                   Edit
                                 </button>
@@ -1252,7 +1252,7 @@ export default function AdminPage() {
                 <div className="flex items-center justify-between">
                   <h2 className="font-semibold text-[var(--c-ink)]">Document Verification ({allDocuments.length})</h2>
                 </div>
-                <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+                <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-[#D3D8D1] overflow-hidden">
                   <div className="divide-y divide-black/10">
                     {allDocuments.map(doc => (
                       <div key={doc.id} className="px-6 py-4 hover:bg-[var(--c-surface)]">
@@ -1260,7 +1260,7 @@ export default function AdminPage() {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1 flex-wrap">
                               <span className={`badge border ${
-                                doc.status === 'VERIFIED' ? 'bg-[var(--c-success)]/10 text-[var(--c-success)] border-emerald-200' :
+                                doc.status === 'VERIFIED' ? 'bg-[var(--c-success)]/10 text-[var(--c-success)] border-[#256B4A]/40' :
                                 doc.status === 'REJECTED' ? 'bg-[#B23A2E]/10 text-[var(--c-error)] border-[#B23A2E]/30' :
                                 doc.status === 'EXPIRED' ? 'bg-[var(--c-canvas-2)] text-[var(--c-text-2)] border-black/10' :
                                 'bg-[var(--c-accent)]/10 text-[var(--c-accent)] border-[var(--c-accent)]/20'
@@ -1286,7 +1286,7 @@ export default function AdminPage() {
                                 <button
                                   onClick={() => handleDocumentAction(doc.id, 'verify')}
                                   disabled={actionLoading === `doc-${doc.id}`}
-                                  className="px-3 py-1.5 text-xs font-medium rounded-md bg-[var(--c-success)]/10 text-[var(--c-success)] border border-emerald-200 hover:bg-emerald-100 disabled:opacity-50"
+                                  className="px-3 py-1.5 text-xs font-medium rounded-md bg-[var(--c-success)]/10 text-[var(--c-success)] border border-[#256B4A]/40 hover:bg-[var(--c-success)]/10 disabled:opacity-50"
                                 >
                                   {actionLoading === `doc-${doc.id}` ? '...' : 'Verify'}
                                 </button>
@@ -1318,7 +1318,7 @@ export default function AdminPage() {
             {tab === 'notifications' && (
               <div className="space-y-6">
                 <h2 className="font-semibold text-[var(--c-ink)]">Broadcast Notification</h2>
-                <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-slate-100 p-6">
+                <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-[#D3D8D1] p-6">
                   <form onSubmit={handleBroadcast} className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-[var(--c-ink)] mb-1">Title *</label>
@@ -1366,7 +1366,7 @@ export default function AdminPage() {
                   </form>
                 </div>
 
-                <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-slate-100 p-6">
+                <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-[#D3D8D1] p-6">
                   <h3 className="font-semibold text-[var(--c-ink)] mb-3">Quick Actions</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <button
@@ -1406,7 +1406,7 @@ export default function AdminPage() {
             {tab === 'activity' && (
               <div className="space-y-4">
                 <h2 className="font-semibold text-[var(--c-ink)]">Recent Activity</h2>
-                <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+                <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-[#D3D8D1] overflow-hidden">
                   <div className="divide-y divide-black/10">
                     {activityFeed.map(item => (
                       <div key={item.id} className="px-6 py-4 hover:bg-[var(--c-surface)] flex items-start gap-4">
@@ -1481,7 +1481,7 @@ export default function AdminPage() {
                 </div>
 
                 {/* Cancellation Policy */}
-                <div className="border-t border-slate-100 pt-6">
+                <div className="border-t border-[#D3D8D1] pt-6">
                   <h4 className="text-sm font-semibold text-[var(--c-ink)] mb-3">Cancellation Policy</h4>
                   <div className="bg-[var(--c-surface)] rounded-xl p-4 text-sm text-[var(--c-text-2)] space-y-1.5">
                     <div className="flex justify-between"><span>More than 7 days before departure</span><span className="font-semibold text-[var(--c-success)]">No fee</span></div>
@@ -1492,7 +1492,7 @@ export default function AdminPage() {
                 </div>
 
                 {/* Email Templates */}
-                <div className="border-t border-slate-100 pt-6">
+                <div className="border-t border-[#D3D8D1] pt-6">
                   <h4 className="text-sm font-semibold text-[var(--c-ink)] mb-3">Email Templates</h4>
                   <p className="text-xs text-[var(--c-text-2)] mb-4">These templates are sent automatically for platform events.</p>
                   <div className="space-y-2">
@@ -1516,14 +1516,14 @@ export default function AdminPage() {
                           <span className="text-sm font-medium text-[var(--c-ink)]">{t.name}</span>
                           <span className="text-xs text-[var(--c-text-2)] ml-2">{t.trigger}</span>
                         </div>
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[var(--c-success)]/10 text-[var(--c-success)] border border-green-500/30">{t.status}</span>
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[var(--c-success)]/10 text-[var(--c-success)] border border-[#256B4A]/40/30">{t.status}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
                 {/* Notification Types */}
-                <div className="border-t border-slate-100 pt-6">
+                <div className="border-t border-[#D3D8D1] pt-6">
                   <h4 className="text-sm font-semibold text-[var(--c-ink)] mb-3">Notification Events</h4>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     {[
@@ -1541,7 +1541,7 @@ export default function AdminPage() {
                 </div>
 
                 {/* Admin Accounts */}
-                <div className="border-t border-slate-100 pt-6">
+                <div className="border-t border-[#D3D8D1] pt-6">
                   <h4 className="text-sm font-semibold text-[var(--c-ink)] mb-3">Admin Access</h4>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between px-4 py-3 rounded-lg bg-[var(--c-surface)]">
@@ -1612,33 +1612,33 @@ export default function AdminPage() {
               <div className="flex items-center justify-between">
                 <label className="text-sm font-medium text-[var(--c-ink)]">Verified</label>
                 <button type="button" onClick={() => setEditUserForm(prev => ({ ...prev, verified: !prev.verified }))}
-                  className={`relative w-11 h-6 rounded-full transition-colors ${editUserForm.verified ? 'bg-emerald-500' : 'bg-[#1E3A4D]'}`}>
+                  className={`relative w-11 h-6 rounded-full transition-colors ${editUserForm.verified ? 'bg-[#256B4A]' : 'bg-[#1E3A4D]'}`}>
                   <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-[var(--c-surface)] rounded-full shadow transition-transform ${editUserForm.verified ? 'translate-x-5' : ''}`} />
                 </button>
               </div>
               <div className="flex items-center justify-between">
                 <label className="text-sm font-medium text-[var(--c-ink)]">Suspended</label>
                 <button type="button" onClick={() => setEditUserForm(prev => ({ ...prev, suspended: !prev.suspended }))}
-                  className={`relative w-11 h-6 rounded-full transition-colors ${editUserForm.suspended ? 'bg-red-500' : 'bg-[#1E3A4D]'}`}>
+                  className={`relative w-11 h-6 rounded-full transition-colors ${editUserForm.suspended ? 'bg-[#B23A2E]' : 'bg-[#1E3A4D]'}`}>
                   <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-[var(--c-surface)] rounded-full shadow transition-transform ${editUserForm.suspended ? 'translate-x-5' : ''}`} />
                 </button>
               </div>
               <div className="flex items-center justify-between">
                 <label className="text-sm font-medium text-[var(--c-ink)]">Can Carry</label>
                 <button type="button" onClick={() => setEditUserForm(prev => ({ ...prev, canCarry: !prev.canCarry }))}
-                  className={`relative w-11 h-6 rounded-full transition-colors ${editUserForm.canCarry ? 'bg-emerald-500' : 'bg-[#1E3A4D]'}`}>
+                  className={`relative w-11 h-6 rounded-full transition-colors ${editUserForm.canCarry ? 'bg-[#256B4A]' : 'bg-[#1E3A4D]'}`}>
                   <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-[var(--c-surface)] rounded-full shadow transition-transform ${editUserForm.canCarry ? 'translate-x-5' : ''}`} />
                 </button>
               </div>
               <div className="flex items-center justify-between">
                 <label className="text-sm font-medium text-[var(--c-ink)]">Can Ship</label>
                 <button type="button" onClick={() => setEditUserForm(prev => ({ ...prev, canShip: !prev.canShip }))}
-                  className={`relative w-11 h-6 rounded-full transition-colors ${editUserForm.canShip ? 'bg-emerald-500' : 'bg-[#1E3A4D]'}`}>
+                  className={`relative w-11 h-6 rounded-full transition-colors ${editUserForm.canShip ? 'bg-[#256B4A]' : 'bg-[#1E3A4D]'}`}>
                   <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-[var(--c-surface)] rounded-full shadow transition-transform ${editUserForm.canShip ? 'translate-x-5' : ''}`} />
                 </button>
               </div>
             </div>
-            <div className="flex gap-3 mt-6 pt-4 border-t border-slate-100">
+            <div className="flex gap-3 mt-6 pt-4 border-t border-[#D3D8D1]">
               <button onClick={() => setEditUser(null)} className="flex-1 px-4 py-2.5 rounded-xl border border-black/10 text-sm font-medium text-[var(--c-text-2)] hover:bg-[var(--c-surface)]">Cancel</button>
               <button onClick={handleEditUser} disabled={!!actionLoading} className="flex-1 px-4 py-2.5 rounded-xl bg-[#1d1d1f] text-white text-sm font-medium hover:bg-[var(--c-accent-hover)] disabled:opacity-50">
                 {actionLoading ? 'Saving...' : 'Save Changes'}
@@ -1740,12 +1740,12 @@ export default function AdminPage() {
               <div className="flex items-center justify-between">
                 <label className="text-sm font-medium text-[var(--c-ink)]">Bidding Enabled</label>
                 <button type="button" onClick={() => setEditListingForm(prev => ({ ...prev, biddingEnabled: !prev.biddingEnabled }))}
-                  className={`relative w-11 h-6 rounded-full transition-colors ${editListingForm.biddingEnabled ? 'bg-emerald-500' : 'bg-[#1E3A4D]'}`}>
+                  className={`relative w-11 h-6 rounded-full transition-colors ${editListingForm.biddingEnabled ? 'bg-[#256B4A]' : 'bg-[#1E3A4D]'}`}>
                   <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-[var(--c-surface)] rounded-full shadow transition-transform ${editListingForm.biddingEnabled ? 'translate-x-5' : ''}`} />
                 </button>
               </div>
             </div>
-            <div className="flex gap-3 mt-6 pt-4 border-t border-slate-100">
+            <div className="flex gap-3 mt-6 pt-4 border-t border-[#D3D8D1]">
               <button onClick={() => setEditListing(null)} className="flex-1 px-4 py-2.5 rounded-xl border border-black/10 text-sm font-medium text-[var(--c-text-2)] hover:bg-[var(--c-surface)]">Cancel</button>
               <button onClick={handleEditListing} disabled={!!actionLoading} className="flex-1 px-4 py-2.5 rounded-xl bg-[#1d1d1f] text-white text-sm font-medium hover:bg-[var(--c-accent-hover)] disabled:opacity-50">
                 {actionLoading ? 'Saving...' : 'Save Changes'}
@@ -1837,7 +1837,7 @@ export default function AdminPage() {
                   className="w-full px-3 py-2.5 rounded-xl border border-black/10 text-sm outline-none focus:border-[var(--c-accent)] focus:ring-2 focus:ring-[var(--c-accent)]/10 resize-none" />
               </div>
             </div>
-            <div className="flex gap-3 mt-6 pt-4 border-t border-slate-100">
+            <div className="flex gap-3 mt-6 pt-4 border-t border-[#D3D8D1]">
               <button onClick={() => setEditBooking(null)} className="flex-1 px-4 py-2.5 rounded-xl border border-black/10 text-sm font-medium text-[var(--c-text-2)] hover:bg-[var(--c-surface)]">Cancel</button>
               <button onClick={handleEditBooking} disabled={!!actionLoading} className="flex-1 px-4 py-2.5 rounded-xl bg-[#1d1d1f] text-white text-sm font-medium hover:bg-[var(--c-accent-hover)] disabled:opacity-50">
                 {actionLoading ? 'Saving...' : 'Save Changes'}

@@ -740,7 +740,7 @@ export default function CreateListingPage() {
 
               {/* Vehicle Features */}
               {!isSpaceNeeded && (
-              <div className="pt-4 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="pt-4 border-t border-[#D3D8D1] grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input type="checkbox" name="hasRefrigeration" checked={form.hasRefrigeration} onChange={handleChange} className="w-4 h-4 rounded border-black/15 text-[var(--c-ink)] focus:ring-[var(--c-accent)]" />
                   <span className="text-sm text-[var(--c-ink)]">Refrigeration</span>
@@ -899,7 +899,7 @@ export default function CreateListingPage() {
               </div>
 
               {/* Bidding */}
-              <div className="pt-4 border-t border-slate-100">
+              <div className="pt-4 border-t border-[#D3D8D1]">
                 <div className="flex items-center justify-between">
                   <div>
                     <label className="text-sm font-medium text-[var(--c-ink)]">Enable Bidding</label>
@@ -990,7 +990,7 @@ export default function CreateListingPage() {
               </span>
             </button>
             {estimateOpen && (
-              <div className="px-5 sm:px-6 pb-5 sm:pb-6 space-y-4 border-t border-slate-100 pt-4">
+              <div className="px-5 sm:px-6 pb-5 sm:pb-6 space-y-4 border-t border-[#D3D8D1] pt-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className={labelCls}>Distance (km)</label>
@@ -1045,7 +1045,7 @@ export default function CreateListingPage() {
                     )}
 
                     {form.totalCapacityKg && Number(form.totalCapacityKg) > 0 && (
-                      <div className="rounded-lg bg-[var(--c-accent)]/10 border border-amber-100 p-3">
+                      <div className="rounded-lg bg-[var(--c-accent)]/10 border border-[#8A5A08]/40 p-3">
                         <p className="text-xs text-[var(--c-accent)]">
                           <span className="font-medium">Suggested minimum price per kg:</span>{' '}
                           &euro;{(costEstimate.totalEstimate / Number(form.totalCapacityKg)).toFixed(2)}/kg

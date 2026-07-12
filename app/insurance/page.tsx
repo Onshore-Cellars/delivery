@@ -39,7 +39,7 @@ const tierColors: Record<string, string> = {
 }
 
 const statusColors: Record<string, string> = {
-  OPEN: 'bg-red-100 text-[var(--c-error)]',
+  OPEN: 'bg-[#B23A2E]/10 text-[var(--c-error)]',
   UNDER_REVIEW: 'bg-[var(--c-accent)]/15 text-[var(--c-accent)]',
   RESOLVED: 'bg-[var(--c-success)]/15 text-[var(--c-success)]',
 }

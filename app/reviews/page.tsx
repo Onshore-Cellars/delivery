@@ -304,7 +304,7 @@ export default function ReviewsPage() {
         </div>
 
         {/* Rating Summary */}
-        <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-slate-100 p-6 sm:p-8 mb-6">
+        <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-[#D3D8D1] p-6 sm:p-8 mb-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
             <div className="flex flex-col items-center text-center min-w-[120px]">
               <div className="text-5xl font-semibold text-[var(--c-ink)]">{average > 0 ? average.toFixed(1) : '—'}</div>
@@ -314,7 +314,7 @@ export default function ReviewsPage() {
               </p>
             </div>
             {count > 0 && (
-              <div className="flex-1 w-full space-y-2.5 sm:border-l sm:border-slate-100 sm:pl-8">
+              <div className="flex-1 w-full space-y-2.5 sm:border-l sm:border-[#D3D8D1] sm:pl-8">
                 <SubRatingBar
                   label="Communication"
                   value={
@@ -391,11 +391,11 @@ export default function ReviewsPage() {
 
         {/* Write New Review Form */}
         {showNewReview && (
-          <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-slate-100 p-6 sm:p-8 mb-6">
+          <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-[#D3D8D1] p-6 sm:p-8 mb-6">
             <h2 className="text-lg font-bold text-[var(--c-ink)] mb-6">Write a New Review</h2>
 
             {submitSuccess && (
-              <div className="mb-4 p-3 bg-[var(--c-success)]/10 border border-emerald-200 rounded-lg text-[var(--c-success)] text-sm">
+              <div className="mb-4 p-3 bg-[var(--c-success)]/10 border border-[#256B4A]/40 rounded-lg text-[var(--c-success)] text-sm">
                 {submitSuccess}
               </div>
             )}
@@ -477,7 +477,7 @@ export default function ReviewsPage() {
         )}
 
         {/* Tabs */}
-        <div className="flex gap-1 bg-[var(--c-surface)] rounded-xl shadow-sm border border-slate-100 p-1 mb-6">
+        <div className="flex gap-1 bg-[var(--c-surface)] rounded-xl shadow-sm border border-[#D3D8D1] p-1 mb-6">
           <button
             onClick={() => setActiveTab('about')}
             className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all ${
@@ -502,7 +502,7 @@ export default function ReviewsPage() {
 
         {/* Reviews List */}
         {currentReviews.length === 0 ? (
-          <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-slate-100 p-12 text-center">
+          <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-[#D3D8D1] p-12 text-center">
             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--c-canvas-2)] flex items-center justify-center">
               <svg className="w-8 h-8 text-[var(--c-text-2)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
@@ -528,7 +528,7 @@ export default function ReviewsPage() {
         ) : (
           <div className="space-y-4">
             {currentReviews.map((review) => (
-              <div key={review.id} className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-slate-100 p-6">
+              <div key={review.id} className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-[#D3D8D1] p-6">
                 {/* Review Header */}
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">

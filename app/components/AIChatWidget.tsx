@@ -71,7 +71,7 @@ export default function AIChatWidget() {
       {open && (
         <div className="fixed bottom-24 right-4 z-50 w-[calc(100vw-2rem)] sm:w-96 h-[500px] bg-[var(--c-surface)] rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-black/10 flex flex-col overflow-hidden">
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 bg-[var(--c-accent)]">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-[#D3D8D1] bg-[var(--c-accent)]">
             <div className="flex items-center gap-2">
               <svg className="w-5 h-5 text-[var(--c-accent)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
@@ -105,9 +105,9 @@ export default function AIChatWidget() {
               <div className="flex justify-start">
                 <div className="bg-[var(--c-surface)] text-[var(--c-ink)] px-3.5 py-2 rounded-2xl rounded-bl-md">
                   <div className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                    <span className="w-1.5 h-1.5 bg-[#647672] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <span className="w-1.5 h-1.5 bg-[#647672] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <span className="w-1.5 h-1.5 bg-[#647672] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                   </div>
                 </div>
               </div>
@@ -116,7 +116,7 @@ export default function AIChatWidget() {
           </div>
 
           {/* Input */}
-          <form onSubmit={sendMessage} className="p-3 border-t border-slate-100">
+          <form onSubmit={sendMessage} className="p-3 border-t border-[#D3D8D1]">
             <div className="flex gap-2">
               <input
                 ref={inputRef}

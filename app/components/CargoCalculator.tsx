@@ -105,7 +105,7 @@ export default function CargoCalculator({ onCalculated }: CargoCalculatorProps) 
       </div>
 
       {items.map((item) => (
-        <div key={item.id} className="bg-[var(--c-surface)] rounded-lg border border-slate-100 p-3 space-y-2">
+        <div key={item.id} className="bg-[var(--c-surface)] rounded-lg border border-[#D3D8D1] p-3 space-y-2">
           <div className="flex items-center justify-between">
             <div className="flex gap-2">
               <select

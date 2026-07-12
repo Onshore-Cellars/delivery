@@ -200,7 +200,7 @@ export default function MessagesPage() {
         <div className="bg-[var(--c-surface)] rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.3)] border border-black/10 overflow-hidden" style={{ height: 'calc(100vh - 220px)' }}>
           <div className="flex h-full">
             {/* Conversation list */}
-            <div className={`${activeConv ? 'hidden md:block' : ''} w-full md:w-80 border-r border-slate-100 overflow-y-auto`}>
+            <div className={`${activeConv ? 'hidden md:block' : ''} w-full md:w-80 border-r border-[#D3D8D1] overflow-y-auto`}>
               {loading ? (
                 <div className="p-4 space-y-3">{[1,2,3].map(i => <div key={i} className="loading-shimmer h-16 rounded-lg" />)}</div>
               ) : conversations.length === 0 ? (
@@ -243,7 +243,7 @@ export default function MessagesPage() {
               {activeConv && otherUser ? (
                 <>
                   {/* Chat header */}
-                  <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+                  <div className="px-4 py-3 border-b border-[#D3D8D1] flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <button onClick={() => setActiveConv(null)} className="md:hidden p-1 hover:bg-[var(--c-canvas-2)] rounded">
                         <svg className="w-5 h-5 text-[var(--c-text-3)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
@@ -326,7 +326,7 @@ export default function MessagesPage() {
                   </div>
 
                   {/* Input */}
-                  <form onSubmit={sendMessage} className="p-4 border-t border-slate-100">
+                  <form onSubmit={sendMessage} className="p-4 border-t border-[#D3D8D1]">
                     <div className="flex gap-2">
                       <input
                         type="text"

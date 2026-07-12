@@ -29,7 +29,7 @@ const CATEGORIES = [
 const CATEGORY_COLORS: Record<string, string> = {
   routes: 'bg-[#1F5E86]/10 text-[var(--c-info)]',
   wanted: 'bg-[#B23A2E]/10 text-[var(--c-error)]',
-  ports: 'bg-sky-50 text-sky-700',
+  ports: 'bg-[#1F5E86]/10 text-[var(--c-info)]',
   customs: 'bg-[var(--c-accent)]/10 text-[var(--c-accent)]',
   tips: 'bg-[var(--c-success)]/10 text-[var(--c-success)]',
 }
