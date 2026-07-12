@@ -50,11 +50,14 @@ export async function POST(request: NextRequest) {
       data: { status: 'COMPLETED' },
     })
 
-    // Cancel all PENDING bookings on those listings (no capacity restore since listing is done)
+    // Cancel PENDING bookings on those listings (no capacity restore since the
+    // listing is done) — but NEVER a paid one whose webhook simply hasn't flipped
+    // status off PENDING yet, or we'd kill a booking the customer already paid for.
     const cancelledBookings = await prisma.booking.updateMany({
       where: {
         listingId: { in: expiredListingIds },
         status: 'PENDING',
+        paymentStatus: { notIn: ['PAID', 'PARTIALLY_REFUNDED'] },
       },
       data: { status: 'CANCELLED' },
     })

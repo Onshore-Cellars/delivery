@@ -25,7 +25,15 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       })
     }
 
-    const updated = await prisma.savedAddress.update({ where: { id }, data: body })
+    // Whitelist editable fields — never pass the raw body to Prisma, or a caller
+    // could set userId (transfer the row to another account) or usageCount.
+    const ALLOWED = ['label', 'type', 'address', 'city', 'region', 'country', 'postcode',
+      'lat', 'lng', 'contactName', 'contactPhone', 'contactEmail', 'notes',
+      'marinaName', 'berthNumber', 'yachtName', 'portAccessNotes', 'isDefault'] as const
+    const data: Record<string, unknown> = {}
+    for (const k of ALLOWED) if (k in body) data[k] = body[k]
+
+    const updated = await prisma.savedAddress.update({ where: { id }, data })
     return NextResponse.json({ address: updated })
   } catch {
     return NextResponse.json({ error: 'Server error' }, { status: 500 })

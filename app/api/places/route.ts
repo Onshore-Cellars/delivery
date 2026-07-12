@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createRateLimiter, getClientIP } from '@/lib/rate-limit'
 
 // Google Places Autocomplete proxy — keeps API key server-side
 // Set GOOGLE_PLACES_API_KEY in your .env
+// IP rate-limited so anonymous callers can't run up the billed Google quota.
+const limiter = createRateLimiter({ interval: 60_000, limit: 30 })
 
 export async function GET(request: NextRequest) {
   try {
+    const rl = await limiter.check(getClientIP(request))
+    if (!rl.success) return NextResponse.json({ predictions: [], error: 'Too many requests' }, { status: 429 })
+
     const apiKey = process.env.GOOGLE_PLACES_API_KEY
     if (!apiKey) {
       return NextResponse.json({ predictions: [] })
@@ -60,6 +66,9 @@ export async function GET(request: NextRequest) {
 // GET place details by place_id — returns full address components
 export async function POST(request: NextRequest) {
   try {
+    const rl = await limiter.check(getClientIP(request))
+    if (!rl.success) return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+
     const apiKey = process.env.GOOGLE_PLACES_API_KEY
     if (!apiKey) {
       return NextResponse.json({ error: 'Places API not configured' }, { status: 503 })

@@ -49,6 +49,18 @@ export async function POST(request: NextRequest) {
         deactivated++; continue
       }
 
+      // Atomically CLAIM this occurrence before generating anything. Advancing
+      // nextRunAt with a conditional updateMany means two overlapping cron runs
+      // (scheduled + manual dispatch) can't both process the same due row — the
+      // loser sees count 0 and skips, preventing a duplicate booking + double
+      // capacity decrement.
+      const nextRun = advanceRun(schedule, r.nextRunAt < now ? now : r.nextRunAt)
+      const claim = await prisma.recurringBooking.updateMany({
+        where: { id: r.id, nextRunAt: r.nextRunAt, active: true },
+        data: { nextRunAt: nextRun },
+      })
+      if (claim.count !== 1) { skipped++; continue } // already claimed by a concurrent run
+
       const listing = r.listing
       const capacityOk = listing.status === 'ACTIVE' && r.weightKg <= listing.availableKg && r.volumeM3 <= listing.availableM3
 
@@ -101,13 +113,13 @@ export async function POST(request: NextRequest) {
         skipped++
       }
 
-      // Advance the schedule regardless (so we don't loop on the same due date).
-      const next = advanceRun(schedule, r.nextRunAt < now ? now : r.nextRunAt)
+      // nextRunAt was already advanced by the claim above; here we settle the
+      // remaining metadata (counts / end-of-schedule deactivation).
       const remaining = r.remainingCount != null ? r.remainingCount - 1 : null
-      const stop = (remaining != null && remaining <= 0) || (r.endDate != null && next > r.endDate)
+      const stop = (remaining != null && remaining <= 0) || (r.endDate != null && nextRun > r.endDate)
       await prisma.recurringBooking.update({
         where: { id: r.id },
-        data: { lastGeneratedAt: now, nextRunAt: next, remainingCount: remaining, active: !stop },
+        data: { lastGeneratedAt: now, remainingCount: remaining, active: !stop },
       })
       if (stop) deactivated++
     }

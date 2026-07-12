@@ -65,13 +65,16 @@ export async function POST(request: NextRequest) {
       results.capacityRestored++
     }
 
-    // 2. Cancel ACCEPTED bookings that haven't been paid within 48 hours
+    // 2. Cancel ACCEPTED bookings that haven't been paid within 48 hours OF
+    //    ACCEPTANCE. Measure from updatedAt (the accept flips status → ACCEPTED),
+    //    NOT createdAt — an old quote accepted 5 minutes ago must still get its
+    //    full 48h payment window, not be cancelled immediately.
     const unpaidCutoff = new Date(now.getTime() - 48 * 60 * 60 * 1000)
     const unpaidAccepted = await prisma.booking.findMany({
       where: {
         status: 'ACCEPTED',
         paymentStatus: 'PENDING',
-        createdAt: { lt: unpaidCutoff },
+        updatedAt: { lt: unpaidCutoff },
       },
       include: { listing: true },
     })

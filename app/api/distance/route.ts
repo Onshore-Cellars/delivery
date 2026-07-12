@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createRateLimiter, getClientIP } from '@/lib/rate-limit'
 
 // Google Distance Matrix proxy — calculates real driving distance & duration
 // Falls back to haversine (straight-line × 1.3 road factor) when Google is unavailable
+// IP rate-limited so anonymous callers can't run up the billed Google quota.
+const limiter = createRateLimiter({ interval: 60_000, limit: 30 })
 
 function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const R = 6371
@@ -15,6 +18,9 @@ function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): nu
 
 export async function POST(request: NextRequest) {
   try {
+    const rl = await limiter.check(getClientIP(request))
+    if (!rl.success) return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+
     const body = await request.json()
     // Accept both naming conventions for flexibility
     const originLat = parseFloat(body.originLat)
