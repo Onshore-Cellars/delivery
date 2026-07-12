@@ -1,6 +1,7 @@
 import prisma from './prisma'
 import { createRefund } from './stripe'
 import { reverseCarrierPayout, carrierRefundShare } from './payout'
+import { recordTransaction } from './ledger'
 
 export type RefundResult =
   | { ok: true; refundAmount: number; cumulativeRefunded: number; fullyRefunded: boolean }
@@ -64,6 +65,8 @@ export async function processRefund(bookingId: string, amount?: number): Promise
     await createRefund(booking.stripePaymentIntentId, fullyRefunded && amount === undefined ? undefined : refundAmount, {
       idempotencyKey: `refund:${booking.id}:${newTotal.toFixed(2)}`,
     })
+    await recordTransaction({ bookingId: booking.id, type: 'REFUND', amount: refundAmount, stripeRef: booking.stripePaymentIntentId, note: fullyRefunded ? 'Full refund' : 'Partial refund' })
+
     // 3) Reverse the carrier's share (VAT excluded); undefined = full reversal.
     const carrierClaw = carrierRefundShare(refundAmount, booking.carrierPayout, gross)
     await reverseCarrierPayout(booking.id, carrierClaw).catch(e => console.error('Payout reversal error:', e))

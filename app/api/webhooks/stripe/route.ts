@@ -6,6 +6,7 @@ import { paymentReceiptEmail } from '@/lib/email'
 import { queueEmail } from '@/lib/email-queue'
 import { ensureInvoiceNumber } from '@/lib/invoice'
 import { generateInvoiceToken } from '@/lib/auth'
+import { recordTransaction } from '@/lib/ledger'
 
 export async function POST(request: NextRequest) {
   try {
@@ -78,6 +79,12 @@ export async function POST(request: NextRequest) {
           // Assign the stable invoice number now, at payment, so it's fixed on
           // every copy of the document (receipt email, PDF, HTML view) forever.
           try { await ensureInvoiceNumber(booking.id) } catch (e) { console.error('Invoice number error:', e) }
+          // Ledger: record the charge (gross = net + VAT).
+          await recordTransaction({
+            bookingId: booking.id, type: 'CHARGE',
+            amount: booking.totalPrice + (booking.vatAmount || 0), currency: booking.currency,
+            stripeRef: session.payment_intent as string, note: 'Payment captured',
+          })
 
           // Notify both parties (in-app)
           await createNotification({

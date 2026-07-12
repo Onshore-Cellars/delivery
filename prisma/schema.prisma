@@ -459,6 +459,7 @@ model Booking {
   liveTracking      LiveTracking[]
   documents         BookingDocument[]
   disputes          Dispute[]
+  transactions      Transaction[]
 
   // Insurance
   insuranceTier     String?           // basic, standard, premium
@@ -509,6 +510,26 @@ model RecurringBooking {
 
   @@index([active, nextRunAt])
   @@index([shipperId])
+}
+
+// An immutable ledger of every money movement, written at the point each one
+// happens (charge captured, payout released/reversed, refund issued). Gives one
+// searchable place to reconcile against Stripe.
+model Transaction {
+  id          String   @id @default(cuid())
+  bookingId   String?
+  booking     Booking? @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  type        String   // CHARGE | PAYOUT | PAYOUT_REVERSAL | REFUND
+  amount      Float    // positive magnitude of the movement
+  currency    String   @default("EUR")
+  stripeRef   String?  // payment intent / transfer / refund id
+  actorId     String?  // admin/user who triggered it, when applicable
+  note        String?
+  createdAt   DateTime @default(now())
+
+  @@index([type])
+  @@index([bookingId])
+  @@index([createdAt])
 }
 
 model Bid {

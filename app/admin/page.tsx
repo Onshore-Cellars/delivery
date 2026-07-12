@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '../components/AuthProvider'
 import AdminCRM from '../components/AdminCRM'
 import AdminFinance from '../components/AdminFinance'
+import AdminTransactions from '../components/AdminTransactions'
 import AdminTestEmail from '../components/AdminTestEmail'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -95,7 +96,7 @@ interface AIInsights {
   recommendations: string[]
 }
 
-type TabKey = 'overview' | 'users' | 'bookings' | 'listings' | 'documents' | 'notifications' | 'activity' | 'crm' | 'finance' | 'settings'
+type TabKey = 'overview' | 'users' | 'bookings' | 'listings' | 'documents' | 'notifications' | 'activity' | 'crm' | 'finance' | 'transactions' | 'settings'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -139,6 +140,7 @@ const TAB_CONFIG: { key: TabKey; label: string; icon: string }[] = [
   { key: 'activity', label: 'Activity', icon: 'activity' },
   { key: 'crm', label: 'CRM', icon: 'crm' },
   { key: 'finance', label: 'Finance', icon: 'overview' },
+  { key: 'transactions', label: 'Transactions', icon: 'bookings' },
   { key: 'settings', label: 'Settings', icon: 'settings' },
 ]
 
@@ -1463,6 +1465,11 @@ export default function AdminPage() {
         {/* ─── FINANCE TAB ─── */}
         {tab === 'finance' && token && (
           <AdminFinance token={token} />
+        )}
+
+        {/* ─── TRANSACTIONS TAB ─── */}
+        {tab === 'transactions' && token && (
+          <AdminTransactions token={token} />
         )}
 
         {/* ─── SETTINGS TAB ─── */}

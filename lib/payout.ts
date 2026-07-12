@@ -4,6 +4,7 @@ import { createNotification } from './notifications'
 import { carrierPayoutEmail } from './email'
 import { queueEmail } from './email-queue'
 import { generateInvoiceToken } from './auth'
+import { recordTransaction } from './ledger'
 
 /**
  * The carrier's share of a refund. On a FULL refund the whole payout is
@@ -72,6 +73,7 @@ export async function releaseCarrierPayout(bookingId: string): Promise<void> {
     where: { id: booking.id },
     data: { stripeTransferId: transfer.id, payoutTransferredAt: new Date() },
   })
+  await recordTransaction({ bookingId: booking.id, type: 'PAYOUT', amount, currency: booking.currency, stripeRef: transfer.id, note: 'Carrier payout released' })
 
   // Notify + email the carrier that funds are on the way.
   const sym = currencySymbol(booking.currency)
@@ -114,5 +116,6 @@ export async function reverseCarrierPayout(bookingId: string, amount?: number): 
   if (!booking?.stripeTransferId || !booking.payoutTransferredAt) return
 
   const reversalAmount = amount != null ? Math.min(amount, booking.carrierPayout) : undefined
-  await reverseTransfer(booking.stripeTransferId, reversalAmount)
+  const reversal = await reverseTransfer(booking.stripeTransferId, reversalAmount)
+  await recordTransaction({ bookingId, type: 'PAYOUT_REVERSAL', amount: reversalAmount ?? booking.carrierPayout, stripeRef: reversal.id, note: 'Carrier payout clawed back on refund' })
 }
