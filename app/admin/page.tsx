@@ -6,6 +6,7 @@ import { useAuth } from '../components/AuthProvider'
 import AdminCRM from '../components/AdminCRM'
 import AdminFinance from '../components/AdminFinance'
 import AdminTransactions from '../components/AdminTransactions'
+import AdminPlatformTrends from '../components/AdminPlatformTrends'
 import AdminTestEmail from '../components/AdminTestEmail'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -738,6 +739,7 @@ export default function AdminPage() {
             {/* ═══════════════════ OVERVIEW TAB ═══════════════════ */}
             {tab === 'overview' && stats && (
               <div className="space-y-8">
+                {token && <AdminPlatformTrends token={token} />}
                 {/* AI Insights */}
                 <div className="bg-[var(--c-surface)] rounded-xl shadow-sm border border-[var(--c-border)] p-6">
                   <div className="flex items-center justify-between mb-4">
