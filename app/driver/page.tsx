@@ -219,7 +219,7 @@ export default function DriverPage() {
 
       {/* Tracking Status */}
       {tracking && position && (
-        <div className="bg-[var(--c-success)]/10 border border-[#256B4A]/40/30 rounded-2xl p-4 mb-6">
+        <div className="bg-[var(--c-success)]/10 border border-[#256B4A]/30 rounded-2xl p-4 mb-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-3 h-3 rounded-full bg-[var(--c-success)]/100 animate-pulse" />

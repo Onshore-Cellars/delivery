@@ -210,7 +210,7 @@ export default function CreateListingPage() {
   return (
     <div className="page-container narrow">
         <div className="mb-8 sm:mb-10">
-          <Link href="/dashboard" className="text-sm text-[var(--c-text-3)] hover:text-white transition-colors">
+          <Link href="/dashboard" className="text-sm text-[var(--c-text-3)] hover:text-[var(--c-ink)] transition-colors">
             &larr; Back to Dashboard
           </Link>
           <p className="text-[11px] font-semibold text-[var(--c-accent)] uppercase tracking-[0.15em] mt-4 sm:mt-5 mb-1">New Listing</p>
@@ -233,7 +233,7 @@ export default function CreateListingPage() {
               <label
                 className={`flex flex-col items-center gap-1.5 p-4 rounded-xl border-2 cursor-pointer transition-all text-center ${
                   listingType === 'SPACE_AVAILABLE'
-                    ? 'border-[var(--c-accent)] bg-[var(--c-accent)]/10/50'
+                    ? 'border-[var(--c-accent)] bg-[var(--c-accent)]/50'
                     : 'border-black/10 hover:border-black/15'
                 }`}
               >
@@ -252,7 +252,7 @@ export default function CreateListingPage() {
               <label
                 className={`flex flex-col items-center gap-1.5 p-4 rounded-xl border-2 cursor-pointer transition-all text-center ${
                   listingType === 'SPACE_NEEDED'
-                    ? 'border-[var(--c-accent)] bg-[var(--c-accent)]/10/50'
+                    ? 'border-[var(--c-accent)] bg-[var(--c-accent)]/50'
                     : 'border-black/10 hover:border-black/15'
                 }`}
               >
@@ -543,7 +543,7 @@ export default function CreateListingPage() {
                     key={opt.value}
                     className={`flex flex-col items-center gap-1.5 p-4 rounded-xl border-2 cursor-pointer transition-all text-center ${
                       form.routeDirection === opt.value
-                        ? 'border-[var(--c-accent)] bg-[var(--c-accent)]/10/50'
+                        ? 'border-[var(--c-accent)] bg-[var(--c-accent)]/50'
                         : 'border-black/10 hover:border-black/15'
                     }`}
                   >
@@ -1068,7 +1068,7 @@ export default function CreateListingPage() {
               className="btn-primary !py-3 sm:!px-8 text-sm disabled:opacity-50 w-full sm:w-auto">
               {loading ? 'Creating...' : (isSpaceNeeded ? 'Post Load' : 'Publish Listing')}
             </button>
-            <Link href="/dashboard" className="text-sm text-[var(--c-text-3)] hover:text-white transition-colors text-center">
+            <Link href="/dashboard" className="text-sm text-[var(--c-text-3)] hover:text-[var(--c-ink)] transition-colors text-center">
               Cancel
             </Link>
           </div>

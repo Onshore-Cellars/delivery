@@ -771,7 +771,7 @@ export default function AdminCRM({ token }: { token: string }) {
     const colors: Record<string, string> = {
       draft: 'bg-[var(--c-surface)] text-[var(--c-text-2)] border-black/10',
       sending: 'bg-[var(--c-brand)]/15 text-[var(--c-info)] border-[var(--c-brand)]/30',
-      sent: 'bg-[var(--c-success)]/10 text-[var(--c-success)] border-[#256B4A]/40/30',
+      sent: 'bg-[var(--c-success)]/10 text-[var(--c-success)] border-[#256B4A]/30',
       failed: 'bg-[#B23A2E]/10 text-[var(--c-error)] border-[#B23A2E]/30',
     }
     return colors[s] || colors.draft
@@ -1225,12 +1225,12 @@ export default function AdminCRM({ token }: { token: string }) {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1.5">
                           <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${
-                            post.platform === 'linkedin' ? 'bg-[var(--c-brand)]/15 text-[var(--c-info)] border-[var(--c-brand)]/30' : 'bg-[#B23A2E]/20 text-[var(--c-error)] border-[#B23A2E]/40/30'
+                            post.platform === 'linkedin' ? 'bg-[var(--c-brand)]/15 text-[var(--c-info)] border-[var(--c-brand)]/30' : 'bg-[#B23A2E]/20 text-[var(--c-error)] border-[#B23A2E]/30'
                           }`}>
                             {post.platform}
                           </span>
                           <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${
-                            post.status === 'published' ? 'bg-[var(--c-success)]/10 text-[var(--c-success)] border-[#256B4A]/40/30' :
+                            post.status === 'published' ? 'bg-[var(--c-success)]/10 text-[var(--c-success)] border-[#256B4A]/30' :
                             post.status === 'scheduled' ? 'bg-[var(--c-accent)]/10 text-[var(--c-accent)] border-[var(--c-accent)]/20' :
                             post.status === 'failed' ? 'bg-[#B23A2E]/10 text-[var(--c-error)] border-[#B23A2E]/30' :
                             'bg-[var(--c-surface)] text-[var(--c-text-2)] border-black/10'
@@ -1396,7 +1396,7 @@ export default function AdminCRM({ token }: { token: string }) {
                             </span>
                             <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${
                               action.status === 'pending' ? 'bg-[var(--c-accent)]/10 text-[var(--c-accent)] border-[var(--c-accent)]/20' :
-                              action.status === 'executed' ? 'bg-[var(--c-success)]/10 text-[var(--c-success)] border-[#256B4A]/40/30' :
+                              action.status === 'executed' ? 'bg-[var(--c-success)]/10 text-[var(--c-success)] border-[#256B4A]/30' :
                               action.status === 'rejected' ? 'bg-[#B23A2E]/10 text-[var(--c-error)] border-[#B23A2E]/30' :
                               'bg-[var(--c-surface)] text-[var(--c-text-2)] border-black/10'
                             }`}>
@@ -1634,7 +1634,7 @@ export default function AdminCRM({ token }: { token: string }) {
                 {inboxEmails.map(email => (
                   <div
                     key={email.id}
-                    className={`px-4 py-3 hover:bg-[var(--c-surface)]/50 cursor-pointer flex items-start gap-3 ${!email.isRead ? 'bg-[var(--c-brand)]/15/30' : ''}`}
+                    className={`px-4 py-3 hover:bg-[var(--c-surface)]/50 cursor-pointer flex items-start gap-3 ${!email.isRead ? 'bg-[var(--c-brand)]/30' : ''}`}
                     onClick={async () => {
                       setSelectedEmail(email)
                       if (!email.isRead) {

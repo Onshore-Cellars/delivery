@@ -483,7 +483,7 @@ export default function ReviewsPage() {
             className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all ${
               activeTab === 'about'
                 ? 'bg-[#1d1d1f] text-white shadow-sm'
-                : 'text-[var(--c-text-3)] hover:text-white hover:bg-[var(--c-surface)]'
+                : 'text-[var(--c-text-3)] hover:text-[var(--c-ink)] hover:bg-[var(--c-surface)]'
             }`}
           >
             Reviews About Me ({aboutMeReviews.length})
@@ -493,7 +493,7 @@ export default function ReviewsPage() {
             className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all ${
               activeTab === 'written'
                 ? 'bg-[#1d1d1f] text-white shadow-sm'
-                : 'text-[var(--c-text-3)] hover:text-white hover:bg-[var(--c-surface)]'
+                : 'text-[var(--c-text-3)] hover:text-[var(--c-ink)] hover:bg-[var(--c-surface)]'
             }`}
           >
             Reviews I&apos;ve Written ({writtenReviews.length})
@@ -593,7 +593,7 @@ export default function ReviewsPage() {
                         <div className="flex gap-2 justify-end">
                           <button
                             onClick={() => { setRespondingTo(null); setResponseText('') }}
-                            className="px-4 py-2 text-sm text-[var(--c-text-3)] hover:text-white transition-colors"
+                            className="px-4 py-2 text-sm text-[var(--c-text-3)] hover:text-[var(--c-ink)] transition-colors"
                           >
                             Cancel
                           </button>
@@ -609,7 +609,7 @@ export default function ReviewsPage() {
                     ) : (
                       <button
                         onClick={() => { setRespondingTo(review.id); setResponseText('') }}
-                        className="text-sm font-medium text-[var(--c-ink)] hover:text-white transition-colors hover:underline"
+                        className="text-sm font-medium text-[var(--c-ink)] hover:text-[var(--c-ink)] transition-colors hover:underline"
                       >
                         Respond to this review
                       </button>

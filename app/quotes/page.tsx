@@ -480,7 +480,7 @@ export default function QuotesPage() {
             className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-semibold transition-colors ${
               activeTab === 'received'
                 ? 'bg-[#1d1d1f] text-white'
-                : 'text-[var(--c-text-3)] hover:text-white hover:bg-[var(--c-surface)]'
+                : 'text-[var(--c-text-3)] hover:text-[var(--c-ink)] hover:bg-[var(--c-surface)]'
             }`}
           >
             Received
@@ -497,7 +497,7 @@ export default function QuotesPage() {
             className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-semibold transition-colors ${
               activeTab === 'sent'
                 ? 'bg-[#1d1d1f] text-white'
-                : 'text-[var(--c-text-3)] hover:text-white hover:bg-[var(--c-surface)]'
+                : 'text-[var(--c-text-3)] hover:text-[var(--c-ink)] hover:bg-[var(--c-surface)]'
             }`}
           >
             Sent
