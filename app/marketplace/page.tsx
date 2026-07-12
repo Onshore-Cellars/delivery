@@ -1048,7 +1048,7 @@ export default function MarketplacePage() {
                     <span key={`e-${i}`} className="px-2 text-[var(--c-text-2)] text-sm">...</span>
                   ) : (
                     <button key={p} onClick={() => goToPage(p)} className={`min-w-[40px] h-10 rounded-xl text-sm font-semibold transition-colors ${
-                      p === pagination.page ? 'bg-[var(--c-accent)] text-white' : 'border border-black/10 bg-[var(--c-surface)] text-[var(--c-text-2)] hover:bg-[var(--c-surface)]'
+                      p === pagination.page ? 'bg-[var(--c-accent)] text-white' : 'border border-black/10 bg-[var(--c-surface)] text-[var(--c-text-2)] hover:bg-[var(--c-canvas-2)]'
                     }`}>{p}</button>
                   )
                 )}
