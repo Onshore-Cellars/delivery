@@ -395,9 +395,9 @@ export type BookingVatSnapshot = {
 export function snapshotBookingVat(
   net: number,
   customer: { country: string | null; vatNumber?: string | null; vatValid?: boolean | null; isBusiness?: boolean | null },
-  opts?: { departureCountry?: string | null },
+  opts?: { departureCountry?: string | null; platform?: PlatformVatConfig },
 ): BookingVatSnapshot {
-  const platform = platformVatConfig()
+  const platform = opts?.platform ?? platformVatConfig()
   // When the customer has a verified VAT number, trust the country encoded in
   // that number (VIES-validated) over the self-editable profile country — this
   // stops a customer forcing reverse charge / export by mistyping their country.

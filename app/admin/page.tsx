@@ -8,6 +8,7 @@ import AdminFinance from '../components/AdminFinance'
 import AdminTransactions from '../components/AdminTransactions'
 import AdminPlatformTrends from '../components/AdminPlatformTrends'
 import AdminTestEmail from '../components/AdminTestEmail'
+import AdminVatSettings from '../components/AdminVatSettings'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -1477,6 +1478,7 @@ export default function AdminPage() {
         {/* ─── SETTINGS TAB ─── */}
         {tab === 'settings' && (
           <div className="space-y-6">
+            {token && <AdminVatSettings token={token} />}
             {token && <AdminTestEmail token={token} />}
             {/* Platform Settings */}
             <div className="bg-[var(--c-surface)] rounded-2xl border border-black/10 shadow-sm p-6">

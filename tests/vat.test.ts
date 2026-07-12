@@ -150,6 +150,14 @@ describe('snapshotBookingVat (platform config from env)', () => {
     expect(s.gross).toBe(1000)
     expect(s.vatCustomerCountry).toBe('DE')
   })
+  it('honours an injected platform config over the env default', () => {
+    process.env.PLATFORM_VAT_COUNTRY = 'FR' // env says France
+    // ...but the admin-configured platform is GB, so a GB customer is domestic 20%
+    const s = snapshotBookingVat(1000, { country: 'GB' }, { platform: { country: 'GB', vatNumber: 'GB123', registered: true } })
+    expect(s.treatment).toBe('DOMESTIC')
+    expect(s.vatRate).toBe(20)
+    expect(s.vatSupplierNumber).toBe('GB123')
+  })
   it('does NOT let an unverified VAT number escape VAT (fail-safe)', () => {
     process.env.PLATFORM_VAT_COUNTRY = 'FR'
     // number provided but never VIES-verified (vatValid null) → still charged VAT

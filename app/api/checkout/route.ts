@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma'
 import { verifyToken, getTokenFromHeader } from '@/lib/auth'
 import { createCheckoutSession, calculatePlatformFee, calculateCarrierPayout } from '@/lib/stripe'
 import { snapshotBookingVat } from '@/lib/vat'
+import { getPlatformVatConfig } from '@/lib/settings'
 import { createRateLimiter, getClientIP } from '@/lib/rate-limit'
 
 const checkoutLimiter = createRateLimiter({ interval: 15 * 60_000, limit: 10 })
@@ -73,7 +74,7 @@ export async function POST(request: NextRequest) {
       vatNumber: booking.shipper.vatNumber,
       vatValid: booking.shipper.vatNumberValid,
       isBusiness: booking.shipper.isBusiness,
-    }, { departureCountry: booking.listing.originCountry })
+    }, { departureCountry: booking.listing.originCountry, platform: await getPlatformVatConfig() })
 
     const session = await createCheckoutSession({
       bookingId: booking.id,

@@ -4,6 +4,7 @@ import { verifyToken, getTokenFromHeader, generateTrackingCode } from '@/lib/aut
 import { createNotification } from '@/lib/notifications'
 import { createCheckoutSession, calculatePlatformFee, calculateCarrierPayout } from '@/lib/stripe'
 import { snapshotBookingVat } from '@/lib/vat'
+import { getPlatformVatConfig } from '@/lib/settings'
 
 // Accept, reject, counter, or withdraw a bid
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -144,7 +145,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         })
         if (bidder && acceptAmount > 0) {
           const appUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
-          const vat = snapshotBookingVat(acceptAmount, bidder, { departureCountry: bid.listing.originCountry })
+          const vat = snapshotBookingVat(acceptAmount, bidder, { departureCountry: bid.listing.originCountry, platform: await getPlatformVatConfig() })
           await prisma.booking.update({ where: { id: booking.id }, data: {
             vatAmount: vat.vatAmount, vatRate: vat.vatRate, vatTreatment: vat.treatment, vatNote: vat.note,
             vatSupplierNumber: vat.vatSupplierNumber, vatCustomerNumber: vat.vatCustomerNumber, vatCustomerCountry: vat.vatCustomerCountry,
@@ -263,7 +264,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         })
         if (bidder && acceptAmount > 0) {
           const appUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
-          const vat = snapshotBookingVat(acceptAmount, bidder, { departureCountry: bid.listing.originCountry })
+          const vat = snapshotBookingVat(acceptAmount, bidder, { departureCountry: bid.listing.originCountry, platform: await getPlatformVatConfig() })
           await prisma.booking.update({ where: { id: booking.id }, data: {
             vatAmount: vat.vatAmount, vatRate: vat.vatRate, vatTreatment: vat.treatment, vatNote: vat.note,
             vatSupplierNumber: vat.vatSupplierNumber, vatCustomerNumber: vat.vatCustomerNumber, vatCustomerCountry: vat.vatCustomerCountry,

@@ -532,6 +532,14 @@ model Transaction {
   @@index([createdAt])
 }
 
+// Simple key/value store for admin-editable platform settings (VAT
+// establishment, etc.). Env vars remain the fallback when a key is unset.
+model PlatformSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
 model Bid {
   id          String    @id @default(cuid())
   listingId   String

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { verifyToken, getTokenFromHeader } from '@/lib/auth'
 import { snapshotBookingVat } from '@/lib/vat'
+import { getPlatformVatConfig } from '@/lib/settings'
 
 export const runtime = 'nodejs'
 
@@ -31,7 +32,7 @@ export async function GET(request: NextRequest) {
       vatNumber: user.vatNumber,
       vatValid: user.vatNumberValid,
       isBusiness: user.isBusiness,
-    })
+    }, { platform: await getPlatformVatConfig() })
 
     return NextResponse.json({
       net: s.net,
