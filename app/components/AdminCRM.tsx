@@ -507,6 +507,51 @@ export default function AdminCRM({ token }: { token: string }) {
     }
   }
 
+  // AI-enrich the selected contacts (infer emails, category, country).
+  const aiEnrichSelected = async () => {
+    if (selected.size === 0) return
+    setActionLoading(true)
+    try {
+      const res = await fetch('/api/admin/crm/enrich', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ action: 'enrich', contactIds: Array.from(selected) }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed')
+      const skipped = (data.requested || 0) - (data.processed || 0)
+      showToast(`AI enriched ${data.updated}/${data.processed} contacts${skipped > 0 ? ` · ${skipped} skipped (25 max per run)` : ''}`)
+      setSelected(new Set())
+      fetchContacts()
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Enrichment failed', 'error')
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  // AI-discover new EU/UK yacht suppliers and add them (unverified).
+  const aiDiscover = async () => {
+    const country = window.prompt('Discover yacht suppliers in which country/region? (blank = anywhere EU/UK)', categoryFilter ? '' : 'France') ?? undefined
+    if (country === undefined) return
+    setActionLoading(true)
+    try {
+      const res = await fetch('/api/admin/crm/enrich', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ action: 'discover', category: categoryFilter || undefined, country: country || undefined }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed')
+      showToast(`Added ${data.created} new suppliers (${data.suggested} suggested) — tagged unverified`)
+      fetchContacts()
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Discovery failed', 'error')
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
   // ─── Campaign ─────────────────────────────────────────────────────────────
 
   const sendQuickEmail = async () => {
@@ -879,12 +924,21 @@ export default function AdminCRM({ token }: { token: string }) {
               >
                 ↓ CSV
               </button>
+              <button
+                onClick={aiDiscover}
+                disabled={actionLoading}
+                className="px-4 py-2 rounded-lg border border-[var(--c-brass)]/40 bg-[var(--c-brass)]/10 text-sm font-medium text-[var(--c-brass-text)] hover:bg-[var(--c-brass)]/15 disabled:opacity-50"
+                title="AI-discover new EU/UK yacht suppliers (respects the current category filter)"
+              >
+                ✦ Discover suppliers
+              </button>
             </div>
 
             {/* Bulk Actions */}
             {selected.size > 0 && (
               <div className="flex items-center gap-3 bg-[var(--c-brand)]/15 rounded-lg px-4 py-2">
                 <span className="text-sm font-medium text-[var(--c-info)]">{selected.size} selected</span>
+                <button onClick={aiEnrichSelected} disabled={actionLoading} className="px-3 py-1 rounded text-xs font-semibold bg-[var(--c-brass)]/15 text-[var(--c-brass-text)] hover:bg-[var(--c-brass)]/25 disabled:opacity-50">✦ AI enrich</button>
                 <button onClick={() => bulkUpdatePriority('high')} className="px-3 py-1 rounded text-xs font-medium bg-[#B23A2E]/10 text-[var(--c-error)] hover:bg-[#B23A2E]">Set High</button>
                 <button onClick={() => bulkUpdatePriority('medium')} className="px-3 py-1 rounded text-xs font-medium bg-[var(--c-accent)]/15 text-[var(--c-accent)] hover:bg-[var(--c-accent)]/20">Set Medium</button>
                 <button onClick={() => bulkUpdatePriority('low')} className="px-3 py-1 rounded text-xs font-medium bg-[var(--c-canvas-2)] text-[var(--c-text-2)] hover:bg-[var(--c-surface)]">Set Low</button>

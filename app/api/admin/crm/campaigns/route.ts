@@ -139,10 +139,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Name, subject, and htmlBody are required' }, { status: 400 })
     }
 
-    // Build contact filter from campaign filters
+    // Build contact filter from campaign filters.
+    // Exclude AI-guessed / discovered contacts still tagged 'unverified' — a
+    // human must verify the address before it can be emailed (GDPR/PECR +
+    // sender-reputation safety).
     const where: Record<string, unknown> = {
       email: { not: null },
       opted_out: false,
+      NOT: { tags: { contains: 'unverified', mode: 'insensitive' } },
     }
     if (filters?.category) where.category = filters.category
     if (filters?.country) where.country = { contains: filters.country, mode: 'insensitive' }
