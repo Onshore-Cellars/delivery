@@ -48,7 +48,11 @@ async function ask(prompt: string, system: string, model = FAST_MODEL, maxTokens
   }
 }
 
-async function askJSON<T>(prompt: string, system: string, model = FAST_MODEL, maxTokens = 1024): Promise<T | null> {
+/** Whether an Anthropic key is configured (agents fall back to rules if not). */
+export const aiEnabled = () => !!process.env.ANTHROPIC_API_KEY
+export { MODEL as AI_MODEL, FAST_MODEL as AI_FAST_MODEL }
+
+export async function askJSON<T>(prompt: string, system: string, model = FAST_MODEL, maxTokens = 1024): Promise<T | null> {
   const raw = await ask(prompt, system + '\n\nRespond ONLY with valid JSON. No markdown, no explanation.', model, maxTokens)
   try {
     const cleaned = raw.replace(/^```json?\n?/, '').replace(/\n?```$/, '').trim()
