@@ -1,0 +1,64 @@
+name: Scheduled jobs
+
+# Triggers the app's background cron endpoints on a schedule. Each endpoint is
+# a POST guarded by the x-cron-secret header (see app/api/cron/*).
+#
+# Required repository secrets (Settings → Secrets and variables → Actions):
+#   APP_BASE_URL  — the deployed app origin, e.g. https://onshore.up.railway.app
+#   CRON_SECRET   — same value set as CRON_SECRET in the Railway environment
+#
+# GitHub cron is UTC and best-effort (can be delayed a few minutes under load).
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'   # every 15 min — expire abandoned checkouts
+    - cron: '17 * * * *'     # hourly — generate due recurring shipments
+    - cron: '30 6 * * *'     # daily 06:30 UTC — expiries, docs, cleanup
+    - cron: '0 7 * * 1'      # Mondays 07:00 UTC — weekly digest
+  workflow_dispatch:
+    inputs:
+      job:
+        description: 'Run a single job now (leave blank to run the daily set)'
+        required: false
+        type: choice
+        options: ['', expire-checkouts, recurring, expire-listings, check-documents, cleanup-stale, digest]
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fire scheduled endpoints
+        env:
+          APP_BASE_URL: ${{ secrets.APP_BASE_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          SCHEDULE: ${{ github.event.schedule }}
+          MANUAL_JOB: ${{ github.event.inputs.job }}
+        run: |
+          set -euo pipefail
+          if [ -z "${APP_BASE_URL:-}" ] || [ -z "${CRON_SECRET:-}" ]; then
+            echo "APP_BASE_URL and CRON_SECRET repository secrets must be set." >&2
+            exit 1
+          fi
+
+          hit() {
+            local path="$1"
+            echo "→ POST /api/cron/$path"
+            code=$(curl -sS -o /tmp/out -w '%{http_code}' -X POST \
+              -H "x-cron-secret: ${CRON_SECRET}" \
+              "${APP_BASE_URL%/}/api/cron/$path" || echo "000")
+            echo "  HTTP $code — $(head -c 400 /tmp/out)"
+            # Don't fail the whole run if one job hiccups; log and continue.
+            [ "$code" = "200" ] || echo "  ⚠ non-200 for $path"
+          }
+
+          # Manual single-job run.
+          if [ -n "${MANUAL_JOB:-}" ]; then hit "${MANUAL_JOB}"; exit 0; fi
+
+          case "${SCHEDULE:-}" in
+            "*/15 * * * *") hit expire-checkouts ;;
+            "17 * * * *")   hit recurring ;;
+            "0 7 * * 1")    hit digest ;;
+            "30 6 * * *")   hit expire-listings; hit check-documents; hit cleanup-stale ;;
+            *)              # workflow_dispatch with no input → run the daily set
+                            hit expire-listings; hit check-documents; hit cleanup-stale ;;
+          esac
