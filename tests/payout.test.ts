@@ -73,3 +73,25 @@ describe('reverseCarrierPayout', () => {
     expect(reverseTransfer).toHaveBeenCalledWith('tr_test', 90)
   })
 })
+
+import { carrierRefundShare } from '@/lib/payout'
+
+describe('carrierRefundShare', () => {
+  // booking: net 1000 + VAT 200 = gross 1200; carrier payout 900 (net - 10% fee)
+  const gross = 1200, payout = 900
+  it('returns undefined (full reversal) for a full refund', () => {
+    expect(carrierRefundShare(1200, payout, gross)).toBeUndefined()
+    expect(carrierRefundShare(1300, payout, gross)).toBeUndefined() // >= gross
+  })
+  it('reverses the carrier proportional share of a partial refund, excluding VAT', () => {
+    // Refund half the gross → carrier loses half their payout.
+    expect(carrierRefundShare(600, payout, gross)).toBe(450)
+    // Refunding exactly the VAT-inclusive value keeps proportions correct.
+    expect(carrierRefundShare(300, payout, gross)).toBe(225)
+  })
+  it('never claws more than the payout and handles zero gross safely', () => {
+    expect(carrierRefundShare(500, payout, 0)).toBeUndefined()
+    const share = carrierRefundShare(1199, payout, gross)!
+    expect(share).toBeLessThan(payout) // partial stays below full payout
+  })
+})

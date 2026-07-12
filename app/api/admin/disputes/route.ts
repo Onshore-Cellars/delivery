@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { verifyToken, getTokenFromHeader } from '@/lib/auth'
 import { createRefund } from '@/lib/stripe'
-import { reverseCarrierPayout } from '@/lib/payout'
+import { reverseCarrierPayout, carrierRefundShare } from '@/lib/payout'
 import { createNotification } from '@/lib/notifications'
 
 // GET — list all disputes with pagination
@@ -159,8 +159,7 @@ export async function PATCH(request: NextRequest) {
       // Actually refund via Stripe (undefined amount = full gross refund).
       await createRefund(b.stripePaymentIntentId, isFull ? undefined : refundAmount)
       // Reverse the carrier's proportional share (never the VAT portion).
-      const carrierClaw = isFull ? undefined
-        : (gross > 0 ? Math.round((refundAmount * (b.carrierPayout / gross)) * 100) / 100 : undefined)
+      const carrierClaw = carrierRefundShare(refundAmount, b.carrierPayout, gross)
       await reverseCarrierPayout(b.id, carrierClaw).catch(e => console.error('Dispute payout reversal error:', e))
 
       await prisma.booking.update({

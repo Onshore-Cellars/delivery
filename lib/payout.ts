@@ -6,6 +6,23 @@ import { queueEmail } from './email-queue'
 import { generateInvoiceToken } from './auth'
 
 /**
+ * The carrier's share of a refund. On a FULL refund the whole payout is
+ * reversed (return undefined = full reversal). On a partial refund, reverse
+ * only the carrier's proportional share of the gross — VAT is the platform's
+ * liability, not the carrier's, so it is excluded.
+ *
+ *   refundAmount : amount being refunded to the customer (gross basis)
+ *   carrierPayout: the carrier's net payout for the booking
+ *   gross        : booking gross actually charged (net + VAT)
+ * Returns the amount to claw back, or undefined for a full reversal.
+ */
+export function carrierRefundShare(refundAmount: number, carrierPayout: number, gross: number): number | undefined {
+  if (!(gross > 0)) return undefined
+  if (refundAmount >= gross) return undefined // full refund → full reversal
+  return Math.round((refundAmount * (carrierPayout / gross)) * 100) / 100
+}
+
+/**
  * Release a carrier's escrowed payout for a DELIVERED booking.
  *
  * With separate charges & transfers, the shipper's payment sits on the platform

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { verifyToken, getTokenFromHeader } from '@/lib/auth'
 import { createRefund, currencySymbol } from '@/lib/stripe'
-import { reverseCarrierPayout } from '@/lib/payout'
+import { reverseCarrierPayout, carrierRefundShare } from '@/lib/payout'
 import { createNotification } from '@/lib/notifications'
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -75,9 +75,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     // already released to the carrier, claw back only the carrier's share of
     // the refund — VAT is the platform's liability, not the carrier's, so it is
     // excluded from the payout reversal.
-    const carrierClaw = isPartial && gross > 0
-      ? Math.round((refundAmount * (booking.carrierPayout / gross)) * 100) / 100
-      : undefined // full reversal
+    const carrierClaw = isPartial ? carrierRefundShare(refundAmount, booking.carrierPayout, gross) : undefined // full reversal
     await createRefund(booking.stripePaymentIntentId, amount)
     await reverseCarrierPayout(id, carrierClaw).catch(e => console.error('Payout reversal error:', e))
 
