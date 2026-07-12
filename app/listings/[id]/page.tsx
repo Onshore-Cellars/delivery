@@ -93,6 +93,42 @@ export default function ListingDetailPage() {
   const [messageContent, setMessageContent] = useState('')
   const [classifying, setClassifying] = useState(false)
   const [cargoWarnings, setCargoWarnings] = useState<string[]>([])
+  const [bids, setBids] = useState<Array<{ id: string; amount: number; counterOffer?: number; currency: string; weightKg: number; volumeM3: number; message?: string; status: string; bidder?: { name?: string } }>>([])
+  const [bidActioning, setBidActioning] = useState<string | null>(null)
+
+  const isOwner = !!(user && listing && user.id === listing.carrier.id)
+
+  const fetchBids = useCallback(async () => {
+    if (!token || !params.id) return
+    try {
+      const res = await fetch(`/api/listings/${params.id}/bids`, { headers: { Authorization: `Bearer ${token}` } })
+      if (res.ok) {
+        const data = await res.json()
+        setBids(data.bids || [])
+      }
+    } catch { /* ignore */ }
+  }, [token, params.id])
+
+  const actOnBid = async (bidId: string, action: 'accept' | 'reject') => {
+    if (!token) return
+    if (action === 'reject' && !confirm('Reject this bid?')) return
+    setBidActioning(bidId + ':' + action)
+    try {
+      const res = await fetch(`/api/bids/${bidId}`, {
+        method: 'PATCH',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action }),
+      })
+      const data = await res.json()
+      if (!res.ok) { alert(data.error || 'Action failed'); return }
+      await Promise.all([fetchBids(), fetchListing()])
+      if (action === 'accept') alert('Bid accepted — a booking has been created and the bidder notified to pay.')
+    } catch {
+      alert('Action failed. Please try again.')
+    } finally {
+      setBidActioning(null)
+    }
+  }
 
   const fetchListing = useCallback(async () => {
     setFetchError('')
@@ -112,6 +148,7 @@ export default function ListingDetailPage() {
   }, [params.id])
 
   useEffect(() => { fetchListing() }, [fetchListing])
+  useEffect(() => { if (isOwner) fetchBids() }, [isOwner, fetchBids])
 
   const formatDate = (d: string) => new Date(d).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
   const formatCurrency = (amount: number, currency: string = 'EUR') => {
@@ -399,7 +436,61 @@ export default function ListingDetailPage() {
                     Sign in to Book
                   </Link>
                 )}
+                {isOwner && (
+                  <Link href="/dashboard" className="block w-full px-4 py-3 text-sm font-medium text-center text-[#9AADB8] border border-white/10 rounded-lg hover:bg-[#162E3D] transition-colors">
+                    Manage in Dashboard
+                  </Link>
+                )}
               </div>
+
+              {/* Incoming bids — carrier (owner) only */}
+              {isOwner && listing.biddingEnabled && (
+                <div className="mt-6 pt-6 border-t border-white/10">
+                  <h3 className="text-sm font-bold text-[#F7F9FB] mb-3">Incoming bids ({bids.filter(b => b.status === 'PENDING').length})</h3>
+                  {bids.length === 0 ? (
+                    <p className="text-xs text-[#6B7C86]">No bids yet.</p>
+                  ) : (
+                    <div className="space-y-2.5">
+                      {bids.map(bid => (
+                        <div key={bid.id} className="rounded-lg border border-white/10 bg-[#0B1F2A] p-3">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="text-sm font-bold text-[#F7F9FB]">
+                              {formatCurrency(bid.counterOffer ?? bid.amount, bid.currency)}
+                            </div>
+                            <span className={`text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded ${
+                              bid.status === 'PENDING' ? 'bg-[#FF6A2A]/15 text-[#FF6A2A]' :
+                              bid.status === 'ACCEPTED' ? 'bg-[#9ED36A]/15 text-[#9ED36A]' :
+                              'bg-[#102535] text-[#6B7C86]'
+                            }`}>{bid.status}</span>
+                          </div>
+                          <div className="text-xs text-slate-400 mt-0.5">
+                            {bid.bidder?.name || 'Bidder'} &middot; {bid.weightKg}kg &middot; {bid.volumeM3}m&sup3;
+                          </div>
+                          {bid.message && <p className="text-xs text-[#9AADB8] mt-1.5">{bid.message}</p>}
+                          {bid.status === 'PENDING' && (
+                            <div className="flex gap-2 mt-2.5">
+                              <button
+                                onClick={() => actOnBid(bid.id, 'accept')}
+                                disabled={bidActioning === bid.id + ':accept'}
+                                className="flex-1 rounded-lg bg-[#9ED36A] px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-[#0B1F2A] hover:brightness-95 disabled:opacity-60"
+                              >
+                                {bidActioning === bid.id + ':accept' ? '…' : 'Accept'}
+                              </button>
+                              <button
+                                onClick={() => actOnBid(bid.id, 'reject')}
+                                disabled={bidActioning === bid.id + ':reject'}
+                                className="flex-1 rounded-lg border border-red-500/40 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-red-300 hover:bg-red-500/10 disabled:opacity-60"
+                              >
+                                Reject
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Carrier Info (anonymous until booking confirmed) */}
               <div className="mt-6 pt-6 border-t border-slate-100">

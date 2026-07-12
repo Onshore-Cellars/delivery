@@ -32,12 +32,13 @@ interface Booking {
   paymentStatus: string
   trackingCode: string
   createdAt: string
+  shipper?: { id: string; name: string; company?: string }
   listing: {
     title: string
     originPort: string
     destinationPort: string
     departureDate: string
-    carrier: { name: string; company?: string }
+    carrier: { id?: string; name: string; company?: string }
   }
 }
 
@@ -130,6 +131,49 @@ export default function DashboardPage() {
       setLoading(false)
     }
   }, [token, user])
+
+  const [actioning, setActioning] = useState<string | null>(null)
+
+  // Shipper: start Stripe checkout for an accepted booking.
+  const handlePay = useCallback(async (bookingId: string) => {
+    if (!token) return
+    setActioning(bookingId + ':pay')
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bookingId }),
+      })
+      const data = await res.json()
+      if (res.ok && data.checkoutUrl) { window.location.href = data.checkoutUrl; return }
+      alert(data.error || 'Could not start payment. Please try again.')
+    } catch {
+      alert('Could not start payment. Please try again.')
+    } finally {
+      setActioning(null)
+    }
+  }, [token])
+
+  // Carrier: accept or reject a pending booking request.
+  const handleAcceptReject = useCallback(async (bookingId: string, action: 'accept' | 'reject') => {
+    if (!token) return
+    if (action === 'reject' && !confirm('Decline this booking request? The shipper will be notified and capacity released.')) return
+    setActioning(bookingId + ':' + action)
+    try {
+      const res = await fetch(`/api/bookings/${bookingId}/accept`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action }),
+      })
+      const data = await res.json()
+      if (res.ok) { await fetchData() }
+      else { alert(data.error || 'Action failed. Please try again.') }
+    } catch {
+      alert('Action failed. Please try again.')
+    } finally {
+      setActioning(null)
+    }
+  }, [token, fetchData])
 
   useEffect(() => {
     if (!authLoading && !user) { router.push('/login'); return }
@@ -447,7 +491,36 @@ export default function DashboardPage() {
                           {b.trackingCode && (
                             <div className="mt-1.5 inline-flex text-xs font-mono text-[#F7F9FB] bg-[#102535] px-2.5 py-1 rounded-lg">{b.trackingCode}</div>
                           )}
-                          <div className="mt-2 flex gap-2 justify-end flex-wrap">
+                          <div className="mt-2 flex gap-2 justify-end flex-wrap items-center">
+                            {/* Carrier: accept / reject a pending request */}
+                            {b.listing.carrier?.id === user.id && b.status === 'PENDING' && (
+                              <>
+                                <button
+                                  onClick={() => handleAcceptReject(b.id, 'accept')}
+                                  disabled={actioning === b.id + ':accept'}
+                                  className="rounded-lg bg-[#9ED36A] px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-[#0B1F2A] hover:brightness-95 disabled:opacity-60"
+                                >
+                                  {actioning === b.id + ':accept' ? '…' : 'Accept'}
+                                </button>
+                                <button
+                                  onClick={() => handleAcceptReject(b.id, 'reject')}
+                                  disabled={actioning === b.id + ':reject'}
+                                  className="rounded-lg border border-red-500/40 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-red-300 hover:bg-red-500/10 disabled:opacity-60"
+                                >
+                                  Decline
+                                </button>
+                              </>
+                            )}
+                            {/* Shipper: pay for an accepted booking */}
+                            {b.shipper?.id === user.id && b.status === 'ACCEPTED' && b.paymentStatus !== 'PAID' && b.paymentStatus !== 'PROCESSING' && (
+                              <button
+                                onClick={() => handlePay(b.id)}
+                                disabled={actioning === b.id + ':pay'}
+                                className="rounded-lg bg-[#FF6A2A] px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-wide text-white hover:bg-[#E85A1C] disabled:opacity-60"
+                              >
+                                {actioning === b.id + ':pay' ? 'Redirecting…' : `Pay ${formatCurrency(b.totalPrice, b.currency)}`}
+                              </button>
+                            )}
                             <a
                               href={`/api/bookings/${b.id}/invoice/pdf`}
                               target="_blank"
