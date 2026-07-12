@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { verifyToken, getTokenFromHeader } from '@/lib/auth'
 import { createRefund, currencySymbol } from '@/lib/stripe'
+import { reverseCarrierPayout } from '@/lib/payout'
 import { createNotification } from '@/lib/notifications'
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -62,16 +63,15 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       }
     }
 
-    // Call Stripe refund — reverse the carrier transfer + platform fee for
-    // Connect destination charges so the platform doesn't eat the refund.
-    const isConnect = !!booking.listing?.carrier?.stripeAccountId
-    await createRefund(booking.stripePaymentIntentId, amount, {
-      reverseTransfer: isConnect,
-      refundApplicationFee: isConnect,
-    })
-
     const isPartial = amount !== undefined && amount < booking.totalPrice
     const refundAmount = amount ?? booking.totalPrice
+
+    // Escrow: the charge is on the platform balance, so refund it directly. If
+    // the payout was already released to the carrier (delivered-then-refunded),
+    // claw the corresponding portion of their transfer back so the platform
+    // doesn't eat the refund.
+    await createRefund(booking.stripePaymentIntentId, amount)
+    await reverseCarrierPayout(id, refundAmount).catch(e => console.error('Payout reversal error:', e))
 
     // Update booking payment status
     const updatedBooking = await prisma.booking.update({

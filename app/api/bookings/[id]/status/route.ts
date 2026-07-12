@@ -5,6 +5,7 @@ import { notifyStatusUpdate } from '@/lib/notifications'
 import { deliveryConfirmationEmail } from '@/lib/email'
 import { queueEmail } from '@/lib/email-queue'
 import { createRefund, currencySymbol } from '@/lib/stripe'
+import { releaseCarrierPayout, reverseCarrierPayout } from '@/lib/payout'
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -97,14 +98,12 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
       const refundAmount = Math.max(0, Math.round((booking.totalPrice - cancellationFee) * 100) / 100)
       if (booking.stripePaymentIntentId && refundAmount > 0) {
-        // Reverse the carrier transfer + platform fee only if this was a Connect
-        // destination charge (carrier has an onboarded Stripe account).
-        const isConnect = !!booking.listing.carrier?.stripeAccountId
         try {
-          await createRefund(booking.stripePaymentIntentId, refundAmount, {
-            reverseTransfer: isConnect,
-            refundApplicationFee: isConnect,
-          })
+          // Escrow: the charge sits on the platform balance, so refund it
+          // directly. If the payout was already released (delivered-then-refunded
+          // edge case), claw the carrier's transfer back too.
+          await createRefund(booking.stripePaymentIntentId, refundAmount)
+          await reverseCarrierPayout(id, refundAmount).catch(e => console.error('Payout reversal error:', e))
         } catch (refundErr) {
           console.error('Cancellation refund error:', refundErr)
           return NextResponse.json({ error: 'Failed to process refund. Cancellation aborted — please try again.' }, { status: 502 })
@@ -338,6 +337,11 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
           data: { status: 'COMPLETED' },
         })
       }
+
+      // Escrow: release the held carrier payout now that delivery is confirmed.
+      // Idempotent and best-effort — a transfer failure must not fail the
+      // delivery confirmation; the payout stays pending and can be retried.
+      await releaseCarrierPayout(id).catch(e => console.error('Payout release error:', e))
     }
 
     // Send notification
