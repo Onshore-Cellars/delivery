@@ -44,20 +44,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Reset link has expired. Please request a new one.' }, { status: 400 })
     }
 
-    // Update password
+    // Update password and bump the session version — this revokes every
+    // previously issued JWT (they embed the old version and fail the session
+    // check at /api/auth/me and /api/auth/refresh, logging those clients out).
     const hashedPassword = await hashPassword(password)
     await prisma.user.update({
       where: { id: user.id },
-      data: { password: hashedPassword },
+      data: { password: hashedPassword, sessionVersion: { increment: 1 } },
     })
 
     // Delete the reset token
     await prisma.notification.delete({ where: { id: resetNotif.id } })
 
     // Audit log for password reset
-    // Note: Stateless JWTs cannot be retroactively invalidated. Previously issued tokens
-    // remain valid until they expire. For immediate session invalidation, a session store
-    // or token blocklist would be required.
     await logAudit({
       targetId: user.id,
       action: 'PASSWORD_RESET',

@@ -30,6 +30,8 @@ export interface DecodedToken {
   userId: string
   email: string
   role: string
+  /** Session version at issue time — compared to User.sessionVersion to revoke old tokens. */
+  sv?: number
   iat?: number
   exp?: number
 }
@@ -42,8 +44,17 @@ export async function verifyPassword(password: string, hashedPassword: string): 
   return compare(password, hashedPassword)
 }
 
-export function generateToken(payload: { userId: string; email: string; role: string }, expiresIn: string = '7d'): string {
+export function generateToken(payload: { userId: string; email: string; role: string; sv?: number }, expiresIn: string = '7d'): string {
   return jwt.sign(payload, getJwtSecret(), { expiresIn } as jwt.SignOptions)
+}
+
+/**
+ * Does a decoded token's session version still match the user's current one?
+ * Tokens issued before the `sv` claim existed (sv undefined) are treated as
+ * version 0, so bumping a user's sessionVersion revokes them too.
+ */
+export function tokenSessionCurrent(decoded: DecodedToken, userSessionVersion: number): boolean {
+  return (decoded.sv ?? 0) === userSessionVersion
 }
 
 export function verifyToken(token: string): DecodedToken | null {

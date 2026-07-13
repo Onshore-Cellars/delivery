@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
-import { verifyToken, getTokenFromHeader, generateToken } from '@/lib/auth'
+import { verifyToken, getTokenFromHeader, generateToken, tokenSessionCurrent } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     // Check the user still exists and is not suspended or soft-deleted
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
-    }) as { id: string; email: string; role: string; suspended: boolean; deletedAt: Date | null } | null
+    }) as { id: string; email: string; role: string; suspended: boolean; deletedAt: Date | null; sessionVersion: number } | null
 
     if (!user) {
       return NextResponse.json(
@@ -49,11 +49,20 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Tokens issued before the last password reset/change cannot be refreshed.
+    if (!tokenSessionCurrent(decoded, user.sessionVersion)) {
+      return NextResponse.json(
+        { error: 'Session revoked. Please log in again.' },
+        { status: 401 }
+      )
+    }
+
     // Issue a fresh token with a new 7-day expiry
     const newToken = generateToken({
       userId: user.id,
       email: user.email,
       role: user.role,
+      sv: user.sessionVersion,
     })
 
     return NextResponse.json({ token: newToken })

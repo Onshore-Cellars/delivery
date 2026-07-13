@@ -4,7 +4,7 @@ Everything needed to configure, deploy, operate and verify the Onshore yacht-log
 marketplace. Pair this with `.env.example` (the canonical list of variables).
 
 - **Stack:** Next.js 16 (App Router) · React 19 · TypeScript · Prisma 6 · PostgreSQL · Stripe (Connect) · Tailwind v4
-- **Deploy:** Railway (Dockerfile → `prisma migrate`/`db push` on start → `node server.js`)
+- **Deploy:** Railway (Dockerfile → `prisma migrate deploy` on start → `node server.js`)
 - **Tests:** `npx vitest run` · **Build:** `npx next build` · **CI:** `.github/workflows/ci.yml`
 
 ---
@@ -59,7 +59,7 @@ marketplace. Pair this with `.env.example` (the canonical list of variables).
 
 1. Connect the repo; Railway builds from `Dockerfile`.
 2. Set all §1 variables in **Variables** (paste values raw — no quotes).
-3. On deploy, the container applies the schema and starts `node server.js`.
+3. On deploy, `scripts/start.sh` runs `prisma migrate deploy` (committed migrations only — **never `db push`**, so destructive drift can't be applied silently). Databases created before the migrate-deploy cutover are baselined automatically on first boot. If migrations fail, the container **exits instead of starting** against an unknown schema — inspect with `prisma migrate status`.
 4. Health check: `GET /api/health`.
 5. **Stripe webhook:** in the Stripe dashboard add an endpoint → `https://<app>/api/webhooks/stripe`, subscribe to `checkout.session.completed`, `payment_intent.payment_failed`, `charge.refunded` (+ related), and copy the signing secret into `STRIPE_WEBHOOK_SECRET`.
 6. **Stripe Connect:** enable Connect (Express) so carriers can onboard and receive payouts.
@@ -114,11 +114,16 @@ A daily **morning ops digest** (`/api/cron/ops-digest`, 07:15 UTC) sends every a
 AI-backed agents (triage, customer reply, campaign copy, digest narrative) need `ANTHROPIC_API_KEY`; without it they stay dormant/templated and the rule-based agents still run. Nothing
 with side-effects runs until you Approve (which executes it) or a per-category
 **Automation** policy auto-approves proposals above a confidence threshold.
+**Hard rail:** actions that move money or message customers (release-payout,
+dispute-reply) are `guarded` and can NEVER be auto-approved — the runner
+ignores any auto-approve policy for them and the policy API refuses to set one;
+they always require an explicit human decision.
 Approve/reject decisions + feedback are stored and fed back to the agents as
 examples. Add a new action by dropping an `Agent` into `lib/agents/*` and the
-registry — it appears in the queue and Automation list automatically. Auto-
-approval executes real actions (payouts, notifications, listing changes), so
-enable it only per-category once you've watched it behave.
+registry — it appears in the queue and Automation list automatically (mark it
+`guarded: true` if it moves money or contacts customers). Auto-approval
+executes real actions (notifications, listing changes), so enable it only
+per-category once you've watched it behave.
 
 ### 3.8 Storage, CRM/AI, notifications
 - Uploads go to S3-compatible storage (`STORAGE_*`); without it, upload features degrade.

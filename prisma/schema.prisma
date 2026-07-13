@@ -155,6 +155,10 @@ model User {
   vatBusinessName     String?           // trader name returned by VIES
   isBusiness          Boolean  @default(false) // B2B customer? (a valid VAT number implies true)
 
+  // Session revocation: bumped on password reset/change so previously issued
+  // JWTs (which embed this value) stop passing session checks immediately.
+  sessionVersion  Int       @default(0)
+
   // Stripe
   stripeCustomerId  String?
   stripeAccountId   String?

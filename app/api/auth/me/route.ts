@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
-import { verifyToken, getTokenFromHeader } from '@/lib/auth'
+import { verifyToken, getTokenFromHeader, tokenSessionCurrent } from '@/lib/auth'
 
 export async function GET(request: NextRequest) {
   try {
@@ -28,6 +28,7 @@ export async function GET(request: NextRequest) {
         canShip: true,
         verified: true,
         suspended: true,
+        sessionVersion: true,
         createdAt: true,
       },
     })
@@ -40,7 +41,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Your account has been suspended.' }, { status: 403 })
     }
 
-    return NextResponse.json({ user })
+    // Reject tokens issued before the last password reset/change.
+    if (!tokenSessionCurrent(decoded, user.sessionVersion)) {
+      return NextResponse.json({ error: 'Session expired. Please log in again.' }, { status: 401 })
+    }
+
+    const { sessionVersion: _sv, ...safeUser } = user
+    return NextResponse.json({ user: safeUser })
   } catch (error) {
     console.error('Auth me error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

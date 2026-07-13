@@ -183,6 +183,7 @@ const draftCustomerReply: Agent = {
   kind: 'dispute-reply',
   label: 'AI customer-service reply',
   description: 'Draft (and on approval, send) a reply to the customer on an open dispute.',
+  guarded: true, // messages a real customer — human approval only, never auto-approved
   async run(ctx) {
     if (!aiEnabled()) return []
     const disputes = await prisma.dispute.findMany({

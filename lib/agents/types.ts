@@ -43,6 +43,13 @@ export interface Agent {
   kind: string
   label: string
   description: string
+  /**
+   * Hard safety rail: guarded agents move money or contact customers and can
+   * NEVER be auto-approved — every proposal requires an explicit human
+   * decision, regardless of any AgentPolicy row. Enforced in runAgents() and
+   * the policy API (belt and braces).
+   */
+  guarded?: boolean
   /** Inspect the platform and return proposals (no side-effects here). */
   run(ctx: RunContext): Promise<ProposedTask[]>
   /** Perform the approved action. Only called after approval / auto-approval. */

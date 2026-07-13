@@ -6,7 +6,7 @@ type Task = {
   id: string; team: string; kind: string; title: string; summary: string; reasoning: string
   confidence: number; status: string; createdAt: string; executionResult?: string | null; error?: string | null
 }
-type CatalogueItem = { team: string; kind: string; label: string; description: string; policy: { autoApprove: boolean; minConfidence: number } }
+type CatalogueItem = { team: string; kind: string; label: string; description: string; guarded?: boolean; policy: { autoApprove: boolean; minConfidence: number } }
 type Data = { tasks: Task[]; catalogue: CatalogueItem[]; counts: Record<string, number> }
 
 const TEAM_STYLE: Record<string, string> = {
@@ -172,20 +172,26 @@ export default function AdminOperations({ token }: { token: string }) {
                   <div className="text-xs text-[var(--c-text-3)]">{c.description}</div>
                 </div>
                 <div className="flex items-center gap-3 shrink-0">
-                  {c.policy.autoApprove && (
-                    <select value={c.policy.minConfidence} onChange={e => setPolicy(c, { minConfidence: Number(e.target.value) })} className="px-2 py-1 rounded border border-black/10 text-xs text-[var(--c-ink)]">
-                      {[0.7, 0.8, 0.85, 0.9, 0.95].map(v => <option key={v} value={v}>≥ {Math.round(v * 100)}%</option>)}
-                    </select>
+                  {c.guarded ? (
+                    <span className="px-2 py-1 rounded text-[10px] font-semibold bg-[var(--c-error)]/12 text-[var(--c-error)]" title="Moves money or contacts customers — always requires human approval">Human approval only</span>
+                  ) : (
+                    <>
+                      {c.policy.autoApprove && (
+                        <select value={c.policy.minConfidence} onChange={e => setPolicy(c, { minConfidence: Number(e.target.value) })} className="px-2 py-1 rounded border border-black/10 text-xs text-[var(--c-ink)]">
+                          {[0.7, 0.8, 0.85, 0.9, 0.95].map(v => <option key={v} value={v}>≥ {Math.round(v * 100)}%</option>)}
+                        </select>
+                      )}
+                      <button type="button" role="switch" aria-checked={c.policy.autoApprove} onClick={() => setPolicy(c, { autoApprove: !c.policy.autoApprove })}
+                        className={`relative w-11 h-6 rounded-full transition-colors ${c.policy.autoApprove ? 'bg-[var(--c-accent)]' : 'bg-[var(--c-canvas-2)]'}`}>
+                        <span className={`absolute top-[2px] left-[2px] h-5 w-5 rounded-full bg-[var(--c-surface)] shadow transition-transform ${c.policy.autoApprove ? 'translate-x-5' : ''}`} />
+                      </button>
+                    </>
                   )}
-                  <button type="button" role="switch" aria-checked={c.policy.autoApprove} onClick={() => setPolicy(c, { autoApprove: !c.policy.autoApprove })}
-                    className={`relative w-11 h-6 rounded-full transition-colors ${c.policy.autoApprove ? 'bg-[var(--c-accent)]' : 'bg-[var(--c-canvas-2)]'}`}>
-                    <span className={`absolute top-[2px] left-[2px] h-5 w-5 rounded-full bg-[var(--c-surface)] shadow transition-transform ${c.policy.autoApprove ? 'translate-x-5' : ''}`} />
-                  </button>
                 </div>
               </div>
             ))}
           </div>
-          <p className="text-[11px] text-[var(--c-text-3)] mt-4">Auto-approval executes real actions (payouts, notifications, listing changes) without review. Enable only for categories you've watched approve reliably.</p>
+          <p className="text-[11px] text-[var(--c-text-3)] mt-4">Auto-approval executes real actions (notifications, listing changes) without review. Enable only for categories you've watched approve reliably. Actions that move money or message customers are hard-locked to human approval and cannot be automated.</p>
         </div>
       )}
     </div>

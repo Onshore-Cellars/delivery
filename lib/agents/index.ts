@@ -96,7 +96,9 @@ export async function runAgents(teams?: Team[]): Promise<RunSummary> {
       }
 
       const confidence = p.confidence ?? 0.6
-      const auto = policy.autoApprove && confidence >= policy.minConfidence
+      // Guarded agents (money-moving / customer-contact) can never auto-run,
+      // even if a policy row says autoApprove — the flag is a hard rail.
+      const auto = !agent.guarded && policy.autoApprove && confidence >= policy.minConfidence
 
       const task = await prisma.agentTask.create({
         data: {

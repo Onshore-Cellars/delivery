@@ -128,7 +128,7 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    const token = generateToken({ userId: user.id, email: user.email, role: user.role })
+    const token = generateToken({ userId: user.id, email: user.email, role: user.role, sv: user.sessionVersion })
 
     return NextResponse.json({
       user: {

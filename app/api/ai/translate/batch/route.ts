@@ -3,9 +3,11 @@ import { translateText, SUPPORTED_LANGUAGES, type LanguageCode } from '@/lib/ai'
 import { createRateLimiter, getClientIP } from '@/lib/rate-limit'
 
 // Public batch translate endpoint for UI strings. Unauthenticated (it powers
-// the language switcher for logged-out visitors) but IP rate-limited and input-
-// capped so it can't be abused to run up unbounded paid-LLM spend.
+// the language switcher for logged-out visitors) but abuse-bounded three ways:
+// a per-IP limit, a GLOBAL limit (so many IPs can't multiply spend), and hard
+// input caps. Worst-case paid-LLM spend is bounded regardless of caller count.
 const limiter = createRateLimiter({ interval: 60_000, limit: 20 })
+const globalLimiter = createRateLimiter({ interval: 60_000, limit: 120, prefix: 'translate-global' })
 const MAX_TEXTS = 50
 const MAX_TOTAL_CHARS = 8_000
 
@@ -13,6 +15,8 @@ export async function POST(request: NextRequest) {
   try {
     const rl = await limiter.check(getClientIP(request))
     if (!rl.success) return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+    const grl = await globalLimiter.check('all')
+    if (!grl.success) return NextResponse.json({ error: 'Translation temporarily busy — try again shortly' }, { status: 429 })
 
     const body = await request.json()
     const { texts, targetLang } = body

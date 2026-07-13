@@ -590,7 +590,12 @@ export default function ProfilePage() {
                 body: JSON.stringify({ currentPassword, newPassword }),
               })
               const data = await res.json()
-              if (res.ok) { setSuccess('Password changed successfully'); (e.target as HTMLFormElement).reset() }
+              if (res.ok) {
+                // The server rotates the session on password change (old tokens
+                // are revoked) — store the fresh token so this session survives.
+                if (data.token) localStorage.setItem('yh_token', data.token)
+                setSuccess('Password changed successfully'); (e.target as HTMLFormElement).reset()
+              }
               else setError(data.error || 'Failed to change password')
             } catch { setError('Failed to change password') }
           }} className="space-y-3">

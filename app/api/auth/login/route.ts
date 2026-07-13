@@ -136,7 +136,7 @@ export async function POST(request: NextRequest) {
       await prisma.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } })
     }
 
-    const token = generateToken({ userId: user.id, email: user.email, role: user.role })
+    const token = generateToken({ userId: user.id, email: user.email, role: user.role, sv: user.sessionVersion })
 
     return NextResponse.json({
       user: {

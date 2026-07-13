@@ -40,6 +40,7 @@ RUN npm install -g prisma@6.18.0
 
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/scripts/start.sh ./scripts/start.sh
 
 # Set the correct permission for prerender cache
 RUN mkdir .next
@@ -59,5 +60,6 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# Mark existing migrations as applied, push any schema drift, then start
-CMD ["sh", "-c", "prisma migrate resolve --applied 20260315084934_init --schema ./prisma/schema.prisma 2>/dev/null; prisma migrate resolve --applied 20260321000000_add_missing_schema --schema ./prisma/schema.prisma 2>/dev/null; prisma db push --accept-data-loss --schema ./prisma/schema.prisma 2>&1 || echo 'Schema push warning — check logs'; node server.js"]
+# Apply committed migrations (baselining pre-cutover DBs once), then start.
+# Never uses `db push` — schema changes only happen via reviewed migrations.
+CMD ["sh", "./scripts/start.sh"]

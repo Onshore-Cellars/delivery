@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
 
   // The catalogue of known agents (so the UI can render policy toggles even
   // before any task exists for a kind).
-  const catalogue = AGENTS.map(a => ({ team: a.team, kind: a.kind, label: a.label, description: a.description }))
+  const catalogue = AGENTS.map(a => ({ team: a.team, kind: a.kind, label: a.label, description: a.description, guarded: !!a.guarded }))
   const policyMap = Object.fromEntries(policies.map(p => [p.key, p]))
 
   return NextResponse.json({

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
-import { verifyToken, getTokenFromHeader, hashPassword, verifyPassword } from '@/lib/auth'
+import { verifyToken, getTokenFromHeader, hashPassword, verifyPassword, generateToken } from '@/lib/auth'
 import { createRateLimiter, getClientIP } from '@/lib/rate-limit'
 
 const limiter = createRateLimiter({ interval: 15 * 60_000, limit: 5 })
@@ -49,12 +49,16 @@ export async function POST(request: NextRequest) {
     }
 
     const hashed = await hashPassword(newPassword)
-    await prisma.user.update({
+    // Bump the session version so every other session's token is revoked; the
+    // caller gets a fresh token below so their current session survives.
+    const updated = await prisma.user.update({
       where: { id: decoded.userId },
-      data: { password: hashed },
+      data: { password: hashed, sessionVersion: { increment: 1 } },
+      select: { id: true, email: true, role: true, sessionVersion: true },
     })
+    const newToken = generateToken({ userId: updated.id, email: updated.email, role: updated.role, sv: updated.sessionVersion })
 
-    return NextResponse.json({ message: 'Password changed successfully' })
+    return NextResponse.json({ message: 'Password changed successfully', token: newToken })
   } catch (error) {
     console.error('Change password error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

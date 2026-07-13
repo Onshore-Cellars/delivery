@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    const token = generateToken({ userId: user.id, email: user.email, role: user.role })
+    const token = generateToken({ userId: user.id, email: user.email, role: user.role, sv: 0 })
 
     // Send welcome email (async, don't block registration)
     try {

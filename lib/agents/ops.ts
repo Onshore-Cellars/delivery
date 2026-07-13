@@ -8,6 +8,7 @@ const releasePayout: Agent = {
   kind: 'release-payout',
   label: 'Release stuck payouts',
   description: 'Delivered & paid bookings whose carrier payout has not been released.',
+  guarded: true, // moves real money — human approval only, never auto-approved
   async run() {
     const cutoff = new Date(Date.now() - 6 * 60 * 60 * 1000) // delivered ≥ 6h ago
     const stuck = await prisma.booking.findMany({
