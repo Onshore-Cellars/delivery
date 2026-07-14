@@ -3,6 +3,7 @@ import { sendEmail, bookingConfirmationEmail, statusUpdateEmail, newMessageEmail
 import { queueEmail } from './email-queue'
 import { NotificationType } from '@prisma/client'
 import { sendSMSNotification, formatSMSUpdate } from './sms'
+import { sendWhatsApp } from './whatsapp'
 import { generateAlertEmail } from './ai'
 import { sanitizeHtml } from './sanitize'
 
@@ -65,22 +66,27 @@ export async function createNotification(params: CreateNotificationParams) {
           })
         }
 
-        // Send SMS if user has it enabled (free via email-to-SMS gateway)
+        // Send WhatsApp (preferred) or SMS if the user has text alerts enabled
         if (user?.smsNotifications && user?.phone) {
           try {
-            const smsSent = await sendSMSNotification(
-              { phone: user.phone, smsNotifications: true },
-              message.slice(0, 160),
-              title,
-            )
-            if (smsSent) {
+            let sent = await sendWhatsApp({
+              phoneNumber: user.phone,
+              message: `${title}\n${message}`,
+            })
+            if (!sent) {
+              sent = await sendSMSNotification(
+                { phone: user.phone, smsNotifications: true },
+                message.slice(0, 160),
+              )
+            }
+            if (sent) {
               await prisma.notification.update({
                 where: { id: notification.id },
                 data: { smsSent: true },
               })
             }
           } catch (smsError) {
-            console.error('Failed to send SMS notification:', smsError)
+            console.error('Failed to send WhatsApp/SMS notification:', smsError)
           }
         }
       } catch (emailError) {
@@ -203,17 +209,18 @@ export async function notifyStatusUpdate(data: {
     await queueEmail({ to: booking.shipper.email, ...template })
   }
 
-  // Send SMS for status updates (free)
+  // Send WhatsApp (preferred) or SMS for status updates (via Bird)
   if (booking.trackingCode) {
     const shipper = await prisma.user.findUnique({
       where: { id: booking.shipper.id },
       select: { phone: true, smsNotifications: true },
     })
-    if (shipper) {
-      await sendSMSNotification(
-        shipper,
-        formatSMSUpdate(data.status, booking.trackingCode, data.description),
-      )
+    if (shipper?.smsNotifications && shipper.phone) {
+      const text = formatSMSUpdate(data.status, booking.trackingCode, data.description)
+      const sent = await sendWhatsApp({ phoneNumber: shipper.phone, message: text })
+      if (!sent) {
+        await sendSMSNotification(shipper, text)
+      }
     }
   }
 }

@@ -1,7 +1,27 @@
 /**
  * WhatsApp integration utilities
- * Generates click-to-chat links with pre-filled messages
+ * - Outbound messages via the Infobip API (lib/infobip.ts)
+ * - Click-to-chat links with pre-filled messages
  */
+
+import { sendInfobipWhatsApp } from './infobip'
+
+/**
+ * Send a WhatsApp text message via Infobip.
+ * Requires INFOBIP_API_KEY, INFOBIP_BASE_URL and INFOBIP_WHATSAPP_SENDER.
+ * Note: WhatsApp only allows free-form text within 24h of the user's last
+ * message; outside that window Meta requires an approved template, so
+ * platform-initiated notifications may need a template registered in Infobip.
+ */
+export async function sendWhatsApp(params: {
+  phoneNumber: string
+  message: string
+}): Promise<boolean> {
+  return sendInfobipWhatsApp({
+    phoneNumber: params.phoneNumber,
+    text: params.message,
+  })
+}
 
 /**
  * Generate a WhatsApp click-to-chat URL
