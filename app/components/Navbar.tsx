@@ -104,6 +104,7 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
           { href: '/recurring', label: 'Recurring', icon: 'repeat' },
           { href: '/disputes', label: 'Disputes', icon: 'warn' },
           { href: '/insurance', label: 'Insurance', icon: 'shield' },
+          { href: '/bills', label: 'Bills', icon: 'clipboard' },
         ],
       },
       ...(user.canCarry ? [{
@@ -222,7 +223,7 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
                       onClick={() => setMoreMenuOpen(!moreMenuOpen)}
                       onBlur={() => setTimeout(() => setMoreMenuOpen(false), 150)}
                       className={`px-3 py-2 rounded text-xs font-medium uppercase tracking-wider transition-colors ${
-                        moreMenuOpen || ['/analytics','/insurance','/disputes','/earnings','/vehicles','/quotes','/reviews'].includes(pathname)
+                        moreMenuOpen || ['/analytics','/insurance','/disputes','/earnings','/vehicles','/quotes','/reviews','/bills'].includes(pathname)
                           ? isTransparentMode ? 'bg-[var(--c-surface)]/20 text-white font-semibold' : 'bg-[var(--c-surface)]/10 text-[var(--c-ink)]'
                           : isTransparentMode ? 'text-white hover:text-white/80 hover:bg-[var(--c-surface)]/10' : 'text-[var(--c-text-2)] hover:text-[var(--c-ink)] hover:bg-[var(--c-surface)]/[0.06]'
                       }`}
@@ -238,6 +239,7 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
                         <Link href="/recurring" className="block px-4 py-2 text-sm text-[var(--c-ink)] hover:bg-[var(--c-surface)]/[0.06] hover:no-underline">Recurring</Link>
                         <Link href="/disputes" className="block px-4 py-2 text-sm text-[var(--c-ink)] hover:bg-[var(--c-surface)]/[0.06] hover:no-underline">Disputes</Link>
                         <Link href="/insurance" className="block px-4 py-2 text-sm text-[var(--c-ink)] hover:bg-[var(--c-surface)]/[0.06] hover:no-underline">Insurance</Link>
+                        <Link href="/bills" className="block px-4 py-2 text-sm text-[var(--c-ink)] hover:bg-[var(--c-surface)]/[0.06] hover:no-underline">Bills</Link>
                         {user.canCarry && (
                           <>
                             <p className="px-4 pt-2.5 pb-1.5 text-[10px] font-semibold uppercase tracking-widest text-[var(--c-text-3)] border-t border-black/[0.06] mt-1.5">Carrier</p>

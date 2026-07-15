@@ -225,6 +225,7 @@ model User {
   communityReplies CommunityReply[]
   apiKeys          ApiKey[]
   integrationOrders IntegrationOrder[]
+  bills            Bill[]
   uploadedDocuments BookingDocument[]  @relation("documentUploader")
 
   @@index([email])
@@ -1243,8 +1244,8 @@ model ApiKey {
 
 model IntegrationOrder {
   id                String   @id @default(cuid())
-  apiKeyId          String
-  apiKey            ApiKey   @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+  apiKeyId          String?              // Null for webhook-sourced orders (e.g. Shopify)
+  apiKey            ApiKey?  @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
   userId            String   // The company user who owns this order
   user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -1285,6 +1286,38 @@ model IntegrationOrder {
   @@index([status])
   @@index([apiKeyId])
   @@index([createdAt])
+}
+
+// ─── BILLS (AI-extracted supplier invoices) ──────────────────────────────────
+
+model Bill {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  supplierName  String
+  invoiceNumber String?
+  invoiceDate   DateTime?
+  dueDate       DateTime?
+  currency      String    @default("EUR")
+  subtotal      Float?
+  taxAmount     Float?
+  total         Float
+  lineItems     String?   // JSON array: [{ description, quantity, unitPrice, amount }]
+  category      String?   // e.g. fuel, provisions, berthing, maintenance
+  notes         String?
+  status        String    @default("confirmed")  // confirmed, paid
+
+  fileUrl       String?   // Stored PDF/image of the original bill
+  fileKey       String?   // Storage key (for deletion)
+  extractedRaw  String?   // Raw AI extraction JSON (audit trail for misreads)
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([invoiceDate])
 }
 
 // ─── CRM ──────────────────────────────────────────────────────────────────────
