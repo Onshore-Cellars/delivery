@@ -241,28 +241,6 @@ pending → listed → matched → in_transit → delivered
 
 API key requests are rate-limited to **60 requests per minute** per key. Standard platform rate limits apply.
 
-## Shopify Integration
-
-Shopify orders can flow into the platform automatically via the built-in webhook receiver.
-
-### Setup
-
-1. In Shopify admin go to **Settings → Notifications → Webhooks** and create a webhook:
-   - **Event:** Order creation
-   - **Format:** JSON
-   - **URL:** `https://<your-host>/api/integrations/shopify`
-2. Copy the webhook **signing secret** shown by Shopify.
-3. Set these environment variables on the platform:
-   - `SHOPIFY_WEBHOOK_SECRET` — the signing secret from step 2 (used to verify the `X-Shopify-Hmac-Sha256` header)
-   - `SHOPIFY_ORDERS_USER_EMAIL` — email of the platform account that should own incoming orders
-
-### Behaviour
-
-- Each Shopify order creates an `IntegrationOrder` (reference `shopify-<order_number>`) and a live `SPACE_NEEDED` listing, exactly like `POST /api/integrations/orders`.
-- Weight is derived from line-item grams (minimum 1 kg). Order total is stored as the declared cargo value.
-- Delivery is retried safely: duplicate webhook deliveries are detected by order reference and acknowledged without creating duplicates.
-- Orders without a shipping address (e.g. digital goods) are acknowledged and skipped.
-
 ## Webhooks (Coming Soon)
 
 Webhook callbacks for order status changes (e.g. when a carrier accepts your listing). Contact us to register interest.

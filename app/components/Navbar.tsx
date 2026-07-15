@@ -104,7 +104,6 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
           { href: '/recurring', label: 'Recurring', icon: 'repeat' },
           { href: '/disputes', label: 'Disputes', icon: 'warn' },
           { href: '/insurance', label: 'Insurance', icon: 'shield' },
-          { href: '/bills', label: 'Bills', icon: 'clipboard' },
         ],
       },
       ...(user.canCarry ? [{
@@ -142,38 +141,6 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
     // menuGroups is rebuilt each render from user/pathname — deps below cover it
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mobileMenuOpen, pathname])
-
-  // Desktop 'More' dropdown: same collapsible groups, one open at a time.
-  const moreGroups: MenuGroup[] = user ? [
-    {
-      key: 'shipping', label: 'Shipping', items: [
-        { href: '/quotes', label: 'My Quotes', icon: 'clipboard' },
-        { href: '/recurring', label: 'Recurring', icon: 'repeat' },
-        { href: '/disputes', label: 'Disputes', icon: 'warn' },
-        { href: '/insurance', label: 'Insurance', icon: 'shield' },
-        { href: '/bills', label: 'Bills', icon: 'clipboard' },
-      ],
-    },
-    ...(user.canCarry ? [{
-      key: 'carrier', label: 'Carrier', items: [
-        { href: '/earnings', label: 'Earnings', icon: 'coins' },
-        { href: '/vehicles', label: 'My Vehicles', icon: 'van' },
-      ],
-    }] : []),
-    {
-      key: 'insights', label: 'Insights', items: [
-        { href: '/analytics', label: 'Analytics', icon: 'chart' },
-        { href: '/reviews', label: 'Reviews', icon: 'star' },
-        { href: '/help', label: 'Help & Support', icon: 'help' },
-      ],
-    },
-  ] : []
-  const [openMoreGroup, setOpenMoreGroup] = useState<string | null>(null)
-  const openMoreMenu = () => {
-    const current = moreGroups.find(g => g.items.some(i => i.href === pathname))
-    setOpenMoreGroup(current?.key || moreGroups[0]?.key || null)
-    setMoreMenuOpen(true)
-  }
 
   const isTransparentMode = transparent && !scrolled
   const navLinkCls = (href: string) => `px-4 py-2 rounded text-xs font-medium uppercase tracking-wider transition-colors hover:no-underline ${
@@ -252,10 +219,10 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
                   {/* More dropdown */}
                   <div className="relative">
                     <button
-                      onClick={() => moreMenuOpen ? setMoreMenuOpen(false) : openMoreMenu()}
+                      onClick={() => setMoreMenuOpen(!moreMenuOpen)}
                       onBlur={() => setTimeout(() => setMoreMenuOpen(false), 150)}
                       className={`px-3 py-2 rounded text-xs font-medium uppercase tracking-wider transition-colors ${
-                        moreMenuOpen || ['/analytics','/insurance','/disputes','/earnings','/vehicles','/quotes','/reviews','/bills'].includes(pathname)
+                        moreMenuOpen || ['/analytics','/insurance','/disputes','/earnings','/vehicles','/quotes','/reviews'].includes(pathname)
                           ? isTransparentMode ? 'bg-[var(--c-surface)]/20 text-white font-semibold' : 'bg-[var(--c-surface)]/10 text-[var(--c-ink)]'
                           : isTransparentMode ? 'text-white hover:text-white/80 hover:bg-[var(--c-surface)]/10' : 'text-[var(--c-text-2)] hover:text-[var(--c-ink)] hover:bg-[var(--c-surface)]/[0.06]'
                       }`}
@@ -265,30 +232,23 @@ export default function Navbar({ transparent = false }: { transparent?: boolean 
                       <svg className="w-3 h-3 ml-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
                     </button>
                     {moreMenuOpen && (
-                      <div className="absolute top-full right-0 mt-1 w-52 bg-[var(--c-surface)] rounded-lg shadow-lg border border-black/[0.08] py-1.5 z-50">
-                        {moreGroups.map((group, gi) => (
-                          <div key={group.key} className={gi > 0 ? 'border-t border-black/[0.06] mt-1 pt-1' : ''}>
-                            <button
-                              type="button"
-                              onMouseDown={e => e.preventDefault()}
-                              onClick={() => setOpenMoreGroup(openMoreGroup === group.key ? null : group.key)}
-                              className="w-full flex items-center justify-between px-4 py-2 text-[10px] font-semibold uppercase tracking-widest text-[var(--c-text-3)] hover:text-[var(--c-ink)] transition-colors"
-                              aria-expanded={openMoreGroup === group.key}
-                            >
-                              {group.label}
-                              <svg className={`w-3 h-3 transition-transform ${openMoreGroup === group.key ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-                            </button>
-                            {openMoreGroup === group.key && group.items.map(item => (
-                              <Link
-                                key={item.href}
-                                href={item.href}
-                                className={`block px-4 py-2 text-sm hover:bg-[var(--c-surface)]/[0.06] hover:no-underline ${pathname === item.href ? 'text-[var(--c-accent)] font-medium' : 'text-[var(--c-ink)]'}`}
-                              >
-                                {item.label}
-                              </Link>
-                            ))}
-                          </div>
-                        ))}
+                      <div className="absolute top-full right-0 mt-1 w-52 bg-[var(--c-surface)] rounded-lg shadow-lg border border-black/[0.08] py-2 z-50">
+                        <p className="px-4 pt-1 pb-1.5 text-[10px] font-semibold uppercase tracking-widest text-[var(--c-text-3)]">Shipping</p>
+                        <Link href="/quotes" className="block px-4 py-2 text-sm text-[var(--c-ink)] hover:bg-[var(--c-surface)]/[0.06] hover:no-underline">My Quotes</Link>
+                        <Link href="/recurring" className="block px-4 py-2 text-sm text-[var(--c-ink)] hover:bg-[var(--c-surface)]/[0.06] hover:no-underline">Recurring</Link>
+                        <Link href="/disputes" className="block px-4 py-2 text-sm text-[var(--c-ink)] hover:bg-[var(--c-surface)]/[0.06] hover:no-underline">Disputes</Link>
+                        <Link href="/insurance" className="block px-4 py-2 text-sm text-[var(--c-ink)] hover:bg-[var(--c-surface)]/[0.06] hover:no-underline">Insurance</Link>
+                        {user.canCarry && (
+                          <>
+                            <p className="px-4 pt-2.5 pb-1.5 text-[10px] font-semibold uppercase tracking-widest text-[var(--c-text-3)] border-t border-black/[0.06] mt-1.5">Carrier</p>
+                            <Link href="/earnings" className="block px-4 py-2 text-sm text-[var(--c-ink)] hover:bg-[var(--c-surface)]/[0.06] hover:no-underline">Earnings</Link>
+                            <Link href="/vehicles" className="block px-4 py-2 text-sm text-[var(--c-ink)] hover:bg-[var(--c-surface)]/[0.06] hover:no-underline">My Vehicles</Link>
+                          </>
+                        )}
+                        <p className="px-4 pt-2.5 pb-1.5 text-[10px] font-semibold uppercase tracking-widest text-[var(--c-text-3)] border-t border-black/[0.06] mt-1.5">Insights</p>
+                        <Link href="/analytics" className="block px-4 py-2 text-sm text-[var(--c-ink)] hover:bg-[var(--c-surface)]/[0.06] hover:no-underline">Analytics</Link>
+                        <Link href="/reviews" className="block px-4 py-2 text-sm text-[var(--c-ink)] hover:bg-[var(--c-surface)]/[0.06] hover:no-underline">Reviews</Link>
+                        <Link href="/help" className="block px-4 py-2 text-sm text-[var(--c-ink)] hover:bg-[var(--c-surface)]/[0.06] hover:no-underline">Help & Support</Link>
                       </div>
                     )}
                   </div>
